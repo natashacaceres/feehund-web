@@ -3,7 +3,7 @@ const MARCA = "Feehund";
 (function marca(){
   document.querySelectorAll("[data-marca]").forEach(el => { if (el.tagName === "IMG") el.alt = MARCA; else el.textContent = MARCA; });
   const t = document.documentElement.dataset.title;
-  document.title = t ? t + " · " + MARCA : MARCA;
+  if (!document.documentElement.hasAttribute("data-title-fijo")) document.title = t ? t + " · " + MARCA : MARCA;
 })();
 
 /* TITULAR: datos del titular en un solo sitio. Se insertan en /aviso-legal/, /privacidad/, /condiciones/ y /contacto/. */
@@ -19,7 +19,7 @@ const TITULAR = {nombre:"Natasha Cáceres", nif:"61759305G", domicilio:"Gran Via
 // ---------- pago: configuración en un solo sitio
 const PAGO = {
   enlace: "https://buy.stripe.com/3cI5kEffNfIK5r93fb2VG00",
-  activo: true, // en pruebas: el enlace de Stripe vuelve todavía a la web antigua
+  activo: true, // el enlace de Stripe vuelve a https://feehund.com/es/?pago=ok
   precio: 10,
   umbralAhorro: 50
 };
@@ -136,7 +136,7 @@ let REFERENCIA = null;
 // Título en una sola línea: reduce la letra hasta que quepa (mínimo 22 px; por debajo, deja que se parta).
 (function fitTitle(){
   const h = document.querySelector(".c-hero h1, .home-title h1"); if (!h) return;
-  const MAX = 52, MIN = 14;
+  const MAX = 44, MIN = 14;
   const fit = () => {
     h.style.whiteSpace = "nowrap"; h.style.fontSize = MAX + "px";
     const w = h.scrollWidth, a = h.clientWidth;
@@ -166,54 +166,54 @@ function iniciarUI(){
   const TX = {
     es: {
       vYes: "Sí, paga de más.", vNo: "No, está bien.", noSub: "Ninguna tarifa le ahorra lo bastante para que compense cambiar.",
-      payLine: (x, p) => "Ahorro estimado: " + x + "/año · Recomendación: " + p,
-      iCost: (c, s) => "Coste: " + c + "/mes · Ahorro: " + s + "/año", iAltCost: c => c + "/mes",
+      payLine: (x, p) => "Ahorro estimado de " + x + " al año · Recomendación por " + p,
+      iCost: (c, s) => "Cuesta " + c + " al mes y ahorra " + s + " al año", iAltCost: c => c + "/mes",
       iWait2: (d, pen) => "Cuando acabe su permanencia, en " + d + "." + (pen ? " Así evita la penalización de " + pen + "." : ""),
       iBankX: (x, y) => "Pida igualar " + x + "/mes o la tarifa " + y + "; si no, solicite la baja.",
       iSteps2: ["Contrate el nuevo proveedor.", "Reciba y active el nuevo datáfono.", "Pida por escrito la baja del anterior.", "Si su datáfono actual es de alquiler, devuélvalo."],
       prog: (i, n) => i + " de " + n, pre: "Paga", post: "de más", one: x => x + "/mes",
       instant: "Al instante", months: n => "≈ " + n + (n === 1 ? " mes" : " meses"), cheap: n => "de " + n + " tarifas le salen más baratas",
-      ref: (v, s) => "Comisión media que cobran los bancos en España: " + v + "\u00a0% (" + s + "Banco de España). No incluye cuotas ni alquiler.",
+      ref: (v, s) => "La comisión media de los bancos en España es del " + v + "\u00a0% (" + s + "Banco de España). No incluye cuotas ni alquiler.",
       shareTxtYes: x => x + " de más por cobrar con tarjeta. Calcule lo suyo, gratis:", shareTxtNo: "¿Paga de más por cobrar con tarjeta? Calcúlelo gratis:",
       shTop: "Calculadora del datáfono", shYes: "de más por cobrar con tarjeta", shNo: "de coste efectivo por cobrar con tarjeta", shAsk: "¿Y usted?",
       shared: "Imagen descargada y enlace copiado.",
-      chooseProv: "Elija su proveedor y plan", banks: "Bancos", fin: "Fintech y otros", own: "Otro o precio negociado: escribir mis precios", own2: "Su contrato actual",
+      chooseProv: "Elija su banco o empresa y su plan", banks: "Bancos", fin: "Otras empresas de datáfonos", own: "Escribir mis propios precios", own2: "Su contrato actual",
       iSave: x => "Ahorra unos " + x + " al mes", iWait: d => "Cuando acabe su permanencia, en " + d + ". Así evita la penalización.", iNow: "Ya. Cambiar no le cuesta nada.", iNowCost: x => "Ya. Cambiar le cuesta " + x + " y lo recupera con el ahorro.",
       iBank1: p => "Que le iguale " + p + " por cobro con tarjeta europea de particular.", iBank2: "Que le quite la cuota mensual y el alquiler del datáfono.", iBank3: "Que se lo dé por escrito, con la fecha de inicio.",
       iSteps: ["Pida al nuevo proveedor las condiciones por escrito.", "Confirme que el datáfono funciona con su caja o programa de ventas.", "Active el nuevo datáfono antes de dar de baja el antiguo.", "Pida la baja por escrito y guarde el justificante."]
     },
     ca: {
       vYes: "Sí, paga de més.", vNo: "No, està bé.", noSub: "Cap tarifa li estalvia prou perquè compensi canviar.",
-      payLine: (x, p) => "Estalvi estimat: " + x + "/any · Recomanació: " + p,
-      iCost: (c, s) => "Cost: " + c + "/mes · Estalvi: " + s + "/any", iAltCost: c => c + "/mes",
+      payLine: (x, p) => "Estalvi estimat de " + x + " l'any · Recomanació per " + p,
+      iCost: (c, s) => "Costa " + c + " al mes i estalvia " + s + " l'any", iAltCost: c => c + "/mes",
       iWait2: (d, pen) => "Quan acabi la permanència, el " + d + "." + (pen ? " Així evita la penalització de " + pen + "." : ""),
       iBankX: (x, y) => "Demani igualar " + x + "/mes o la tarifa " + y + "; si no, sol·liciti la baixa.",
       iSteps2: ["Contracti el nou proveïdor.", "Rebi i activi el nou datàfon.", "Demani per escrit la baixa de l'anterior.", "Si el seu datàfon actual és de lloguer, torni'l."],
       prog: (i, n) => i + " de " + n, pre: "Paga", post: "de més", one: x => x + "/mes",
       instant: "A l'instant", months: n => "≈ " + n + (n === 1 ? " mes" : " mesos"), cheap: n => "de " + n + " tarifes li surten més barates",
-      ref: (v, s) => "Comissió mitjana que cobren els bancs a Espanya: " + v + "\u00a0% (" + s + "Banc d'Espanya). No inclou quotes ni lloguer.",
+      ref: (v, s) => "La comissió mitjana dels bancs a Espanya és del " + v + "\u00a0% (" + s + "Banc d'Espanya). No inclou quotes ni lloguer.",
       shareTxtYes: x => x + " de més per cobrar amb targeta. Calculi el seu, gratis:", shareTxtNo: "Paga de més per cobrar amb targeta? Calculi-ho gratis:",
       shTop: "Calculadora del datàfon", shYes: "de més per cobrar amb targeta", shNo: "de cost efectiu per cobrar amb targeta", shAsk: "I vostè?",
       shared: "Imatge descarregada i enllaç copiat.",
-      chooseProv: "Triï el seu proveïdor i pla", banks: "Bancs", fin: "Fintech i altres", own: "Un altre o preu negociat: escriure els meus preus", own2: "El seu contracte actual",
+      chooseProv: "Triï el seu banc o empresa i el seu pla", banks: "Bancs", fin: "Altres empreses de datàfons", own: "Escriure els meus propis preus", own2: "El seu contracte actual",
       iSave: x => "Estalvia uns " + x + " al mes", iWait: d => "Quan acabi la permanència, el " + d + ". Així evita la penalització.", iNow: "Ja. Canviar no li costa res.", iNowCost: x => "Ja. Canviar li costa " + x + " i ho recupera amb l'estalvi.",
       iBank1: p => "Que li iguali " + p + " per cobrament amb targeta europea de particular.", iBank2: "Que li tregui la quota mensual i el lloguer del datàfon.", iBank3: "Que l'hi doni per escrit, amb la data d'inici.",
       iSteps: ["Demani al nou proveïdor les condicions per escrit.", "Confirmi que el datàfon funciona amb la seva caixa o programa de vendes.", "Activi el nou datàfon abans de donar de baixa l'antic.", "Demani la baixa per escrit i guardi'n el justificant."]
     },
     en: {
       vYes: "Yes, you are paying too much.", vNo: "No, you are fine.", noSub: "No rate saves you enough to make switching worth it.",
-      payLine: (x, p) => "Estimated saving: " + x + "/year · Recommendation: " + p,
-      iCost: (c, s) => "Cost: " + c + "/month · Saving: " + s + "/year", iAltCost: c => c + "/month",
+      payLine: (x, p) => "Estimated saving of " + x + " a year · Recommendation for " + p,
+      iCost: (c, s) => "Costs " + c + " a month and saves " + s + " a year", iAltCost: c => c + "/month",
       iWait2: (d, pen) => "When your minimum term ends, in " + d + "." + (pen ? " That way you avoid the " + pen + " penalty." : ""),
       iBankX: (x, y) => "Ask them to match " + x + "/month or the " + y + " rate; if not, request cancellation.",
       iSteps2: ["Sign up with the new provider.", "Receive and activate the new card machine.", "Cancel the previous one in writing.", "If your current card machine is rented, return it."],
       prog: (i, n) => i + " of " + n, pre: "You pay", post: "too much", one: x => x + "/month",
       instant: "Straight away", months: n => "≈ " + n + (n === 1 ? " month" : " months"), cheap: n => "of " + n + " rates are cheaper for you",
-      ref: (v, s) => "Average fee charged by banks in Spain: " + v + "\u00a0% (" + s + "Bank of Spain). Excludes monthly fees and rental.",
+      ref: (v, s) => "The average bank fee in Spain is " + v + "\u00a0% (" + s + "Bank of Spain). It excludes monthly fees and rental.",
       shareTxtYes: x => x + " too much to take card payments. Check yours, free:", shareTxtNo: "Paying too much for card payments? Check for free:",
       shTop: "Card terminal calculator", shYes: "too much to take card payments", shNo: "effective cost of card payments", shAsk: "What about you?",
       shared: "Image downloaded and link copied.",
-      chooseProv: "Choose your provider and plan", banks: "Banks", fin: "Fintech and others", own: "Other or negotiated price: enter my own prices", own2: "Your current contract",
+      chooseProv: "Choose your bank or company and plan", banks: "Banks", fin: "Other card machine companies", own: "Enter my own prices", own2: "Your current contract",
       iSave: x => "You save about " + x + " a month", iWait: d => "When your minimum term ends, in " + d + ". That way you avoid the penalty.", iNow: "Now. Switching costs you nothing.", iNowCost: x => "Now. Switching costs you " + x + " and the saving pays it back.",
       iBank1: p => "To match " + p + " per payment on European consumer cards.", iBank2: "To drop the monthly fee and the terminal rental.", iBank3: "To put it in writing, with a start date.",
       iSteps: ["Ask the new provider for the terms in writing.", "Check that the terminal works with your till or sales software.", "Activate the new terminal before cancelling the old one.", "Cancel in writing and keep the receipt."]
@@ -222,9 +222,10 @@ function iniciarUI(){
   const T = () => TX[lang()];
 
   const SIM = PLANS.filter(p => p.sim === "Sí");
-  const grp = s => s.replace(/\B(?=(\d{3})+(?!\d))/g, "\u202F");
-  const eur = (x, d = 0) => { const v = (Math.round(Math.abs(x) * 10**d) / 10**d).toFixed(d).split("."); return (x < 0 ? "−" : "") + grp(v[0]) + (d ? "," + v[1] : "") + "\u00a0€"; };
-  const pct = x => (x * 100).toFixed(2).replace(".", ",") + "\u00a0%";
+  const SEP = () => lang() === "en" ? [",", "."] : [".", ","];
+  const grp = s => s.replace(/\B(?=(\d{3})+(?!\d))/g, SEP()[0]);
+  const eur = (x, d = 0) => { const v = (Math.round(Math.abs(x) * 10**d) / 10**d).toFixed(d).split("."); const n = grp(v[0]) + (d ? SEP()[1] + v[1] : ""); return (x < 0 ? "−" : "") + (lang() === "en" ? "€" + n : n + "\u00a0€"); };
+  const pct = x => (x * 100).toFixed(2).replace(".", SEP()[1]) + "\u00a0%";
   const num = s => {
     if (s == null) return null; s = String(s).trim().replace(/\s|€|%/g, ""); if (s === "") return null;
     if (/^\d{1,3}(,\d{3})+$/.test(s) || /^\d{1,3}(,\d{3})+\.\d+$/.test(s)) s = s.replace(/,/g, "");
@@ -390,14 +391,30 @@ function iniciarUI(){
     const c = document.createElement("canvas"); c.width = 1080; c.height = 1080;
     const x = c.getContext("2d");
     try { await document.fonts.ready; } catch(_) {}
+    const TXT = '"Atkinson Hyperlegible Next", system-ui, sans-serif', HEAD = 'Fredoka, ui-rounded, system-ui, sans-serif';
     x.fillStyle = "#FFF8EC"; x.fillRect(0, 0, 1080, 1080);
+    const L0 = 260, R0 = 860, T0 = 300, B0 = 880, SC = 0.3, BW = 22 * SC, INK = "#14213D";
+    x.fillStyle = "#FFFDF7"; x.fillRect(L0, T0, R0 - L0, B0 - T0);
+    x.fillStyle = INK; x.fillRect(L0, T0, R0 - L0 - 118 * SC, BW); x.fillRect(L0, T0, BW, B0 - T0); x.fillRect(R0 - BW, T0 + 108 * SC, BW, B0 - T0 - 108 * SC);
+    x.lineWidth = BW; x.strokeStyle = INK; x.lineCap = "round"; x.lineJoin = "round";
+    const NZ = Math.round((R0 - L0) / (81 * SC)), ZW = (R0 - L0) / NZ, ZH = 40 * SC; x.beginPath(); x.moveTo(L0, B0);
+    for (let k = 0; k < NZ; k++) { x.lineTo(L0 + k * ZW + ZW / 2, B0 + ZH); x.lineTo(L0 + (k + 1) * ZW, B0); }
+    x.stroke();
+    const pieza = async (sel, dx, dy, w) => { const el = document.querySelector(sel); if (!el) return; try { const im = new Image(); im.src = el.currentSrc || el.src; await im.decode(); x.drawImage(im, dx, dy, w, w * im.naturalHeight / im.naturalWidth); } catch(_) {} };
+    await pieza("img.dog-head", L0 - 560 * SC, T0 - 132 * SC, 582 * SC);
+    await pieza("img.dog-tail", R0 + 105 * SC - 223 * SC, T0 - 132 * SC, 223 * SC);
+    await pieza("img.dog-paws", R0 + 22 * SC - 280 * SC, B0 + 40 * SC, 280 * SC);
     x.textAlign = "center";
-    x.fillStyle = "#0E5E6F"; x.font = '600 30px "Atkinson Hyperlegible Next", system-ui, sans-serif'; x.fillText(t.shTop.toUpperCase(), 540, 250);
-    x.fillStyle = "#14213D"; let size = 150; x.font = '800 ' + size + 'px "Atkinson Hyperlegible Next", system-ui, sans-serif';
-    while (x.measureText(big).width > 940 && size > 60) { size -= 6; x.font = '800 ' + size + 'px "Atkinson Hyperlegible Next", system-ui, sans-serif'; }
-    x.fillText(big, 540, 520);
-    x.fillStyle = "#14213D"; x.font = '400 42px "Atkinson Hyperlegible Next", system-ui, sans-serif'; x.fillText(line, 540, 610);
-    x.fillStyle = "#4A5468"; x.font = '400 34px "Atkinson Hyperlegible Next", system-ui, sans-serif'; x.fillText(t.shAsk, 540, 860); x.fillText(location.host + location.pathname, 540, 910);
+    x.fillStyle = "#4A5468"; x.font = "600 26px " + TXT; x.fillText(t.shTop.toUpperCase(), 540, T0 + 90);
+    x.setLineDash([12, 10]); x.lineWidth = 3; x.strokeStyle = "rgba(20,33,61,.35)";
+    x.beginPath(); x.moveTo(L0 + 50, T0 + 130); x.lineTo(R0 - 50, T0 + 130); x.stroke();
+    x.fillStyle = "#14213D"; x.font = "600 44px " + HEAD; x.fillText("TOTAL", 540, T0 + 210);
+    x.fillStyle = "#0E5E6F"; let size = 120; x.font = "600 " + size + "px " + HEAD;
+    while (x.measureText(big).width > 560 && size > 50) { size -= 6; x.font = "600 " + size + "px " + HEAD; }
+    x.fillText(big, 540, T0 + 340);
+    x.fillStyle = "#14213D"; x.font = "400 34px " + TXT; x.fillText(line, 540, T0 + 410);
+    x.beginPath(); x.moveTo(L0 + 50, T0 + 460); x.lineTo(R0 - 50, T0 + 460); x.stroke(); x.setLineDash([]);
+    x.fillStyle = "#4A5468"; x.font = "400 30px " + TXT; x.fillText(t.shAsk, 540, T0 + 520); x.fillText(location.host + location.pathname, 540, T0 + 562);
     const blob = await new Promise(r => c.toBlob(r, "image/png"));
     if (!blob) return;
     const file = new File([blob], "resultado-datafono.png", { type: "image/png" });
@@ -424,7 +441,7 @@ function iniciarUI(){
   $("payOk").addEventListener("change", () => { $("payBtn").disabled = !(PAGABLE && $("payOk").checked); });
   $("payBtn").addEventListener("click", () => {
     if (!PAGABLE || !$("payOk").checked || !last) return;
-    try { sessionStorage.setItem(KEY, JSON.stringify({ I: last.I })); } catch(_) {}
+    try { sessionStorage.setItem(KEY, JSON.stringify({ I: last.I, ruta: location.pathname })); } catch(_) {}
     location.href = PAGO.enlace;
   });
   function fillInforme(){
@@ -455,6 +472,14 @@ function iniciarUI(){
   if (qs.get("pago") === "ok") {
     let saved = null;
     try { saved = JSON.parse(sessionStorage.getItem(KEY)); } catch(_) {}
+    // Stripe vuelve siempre a /es/: si se pagó desde /es/ca/ o /es/en/, el informe se muestra en ese idioma.
+    const ruta = saved && typeof saved.ruta === "string" ? saved.ruta : "";
+    const idioma = /\/es\/ca\/(index\.html)?$/.test(ruta) ? "ca" : /\/es\/en\/(index\.html)?$/.test(ruta) ? "en" : "";
+    const aqui = /\/es\/ca\/(index\.html)?$/.test(location.pathname) ? "ca" : /\/es\/en\/(index\.html)?$/.test(location.pathname) ? "en" : "";
+    if (idioma && idioma !== aqui) {
+      const base = location.pathname.replace(/\/es\/((ca|en)\/)?(index\.html)?$/, "/es/");
+      location.replace(base + idioma + "/index.html?pago=ok"); return;
+    }
     try { history.replaceState(null, "", location.pathname); } catch(_) {}
     pp.hidden = true;
     const R = saved && saved.I ? calcular(PLANS, saved.I) : null;
@@ -493,7 +518,7 @@ function iniciarUI(){
     document.querySelectorAll(".fechaTarifas").forEach(el => el.textContent = fecha(actualizado, el.dataset.fl));
     ["es","ca","en"].forEach(l => {
       const sc = document.getElementById("faq-ld-" + l); if (!sc) return;
-      try { const j = JSON.parse(sc.textContent); const t = j.mainEntity[1].acceptedAnswer; t.text = t.text.replace(/(Fecha de la última revisión|Data de l'última revisió|Date of last review): [^.]+\./, "$1: " + fecha(actualizado, l) + "."); sc.textContent = JSON.stringify(j); } catch(_) {}
+      try { const j = JSON.parse(sc.textContent); const t = j.mainEntity[0].acceptedAnswer; t.text = t.text.replace(/(la última revisión es del|l'última revisió és del|the last check was on) [^.]+\./, "$1 " + fecha(actualizado, l) + "."); sc.textContent = JSON.stringify(j); } catch(_) {}
     });
   };
   document.addEventListener("nc-lang", putDate);
@@ -520,12 +545,22 @@ function iniciarUI(){
   list.forEach(d => d.addEventListener("toggle", () => { if (d.open) list.forEach(o => { if (o !== d && o.open) o.open = false; }); }));
 })();
 
-// Selector de idioma: se cierra al pulsar fuera o con Escape.
-(function idioma(){
-  const d = document.querySelector(".langdd"); if (!d) return;
-  document.addEventListener("click", e => { if (d.open && !d.contains(e.target)) d.open = false; });
-  document.addEventListener("keydown", e => { if (e.key === "Escape" && d.open) { d.open = false; d.querySelector("summary").focus(); } });
+// Menús de la cabecera (Recursos e idioma): se cierran al pulsar fuera o con Escape.
+(function menus(){
+  const ds = [...document.querySelectorAll(".langdd, .navdd")]; if (!ds.length) return;
+  ds.forEach(d => d.addEventListener("toggle", () => { if (d.open) ds.forEach(o => { if (o !== d) o.open = false; }); }));
+  document.addEventListener("click", e => ds.forEach(d => { if (d.open && !d.contains(e.target)) d.open = false; }));
+  // Recursos e idioma: también se abren al pasar el cursor (solo en dispositivos con ratón).
+  if (matchMedia("(hover: hover) and (pointer: fine)").matches) document.querySelectorAll(".navdd, .langdd").forEach(d => {
+    let t;
+    d.addEventListener("mouseenter", () => { clearTimeout(t); d.open = true; });
+    d.addEventListener("mouseleave", () => { t = setTimeout(() => { d.open = false; }, 150); });
+  });
+  document.addEventListener("keydown", e => { if (e.key !== "Escape") return; ds.forEach(d => { if (d.open) { d.open = false; d.querySelector("summary").focus(); } }); });
 })();
+
+// Códigos de país ISO para los desplegables de lista de espera
+const ISO_PAISES = "AD AE AF AG AI AL AM AO AQ AR AS AT AU AW AX AZ BA BB BD BE BF BG BH BI BJ BL BM BN BO BQ BR BS BT BV BW BY BZ CA CC CD CF CG CH CI CK CL CM CN CO CR CU CV CW CX CY CZ DE DJ DK DM DO DZ EC EE EG EH ER ES ET FI FJ FK FM FO FR GA GB GD GE GF GG GH GI GL GM GN GP GQ GR GS GT GU GW GY HK HM HN HR HT HU ID IE IL IM IN IO IQ IR IS IT JE JM JO JP KE KG KH KI KM KN KP KR KW KY KZ LA LB LC LI LK LR LS LT LU LV LY MA MC MD ME MF MG MH MK ML MM MN MO MP MQ MR MS MT MU MV MW MX MY MZ NA NC NE NF NG NI NL NO NP NR NU NZ OM PA PE PF PG PH PK PL PM PN PR PS PT PW PY QA RE RO RS RU RW SA SB SC SD SE SG SH SI SJ SK SL SM SN SO SR SS ST SV SX SY SZ TC TD TF TG TH TJ TK TL TM TN TO TR TT TV TW TZ UA UG UM US UY UZ VA VC VE VG VI VN VU WF WS XK YE YT ZA ZM ZW".split(" ");
 
 // ---------- página de entrada: países (añada aquí los nuevos)
 const PAISES = [{codigo:"ES", nombre:"España", ruta:"/es/", idiomas:"Español · Català · English", activo:true}];
@@ -533,7 +568,7 @@ const PAISES = [{codigo:"ES", nombre:"España", ruta:"/es/", idiomas:"Español �
   const lista = document.getElementById("paises"); if (!lista) return;
   const $ = id => document.getElementById(id);
   const KEY = "nc-pais";
-  const rel = r => r.replace(/^\//, "");
+  const rel = r => r.replace(/^\//, "").replace(/\/$/, "/index.html");
   const activo = c => PAISES.find(p => p.codigo === c && p.activo);
   const guardar = c => { try { localStorage.setItem(KEY, c); } catch(_) {} };
   const esc = s => String(s).replace(/[&<>"]/g, ch => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;" }[ch]));
@@ -572,7 +607,7 @@ const PAISES = [{codigo:"ES", nombre:"España", ruta:"/es/", idiomas:"Español �
   }
 
   // Otro país: lista de espera (FormSubmit)
-  const COD = "AD AE AF AG AI AL AM AO AQ AR AS AT AU AW AX AZ BA BB BD BE BF BG BH BI BJ BL BM BN BO BQ BR BS BT BV BW BY BZ CA CC CD CF CG CH CI CK CL CM CN CO CR CU CV CW CX CY CZ DE DJ DK DM DO DZ EC EE EG EH ER ES ET FI FJ FK FM FO FR GA GB GD GE GF GG GH GI GL GM GN GP GQ GR GS GT GU GW GY HK HM HN HR HT HU ID IE IL IM IN IO IQ IR IS IT JE JM JO JP KE KG KH KI KM KN KP KR KW KY KZ LA LB LC LI LK LR LS LT LU LV LY MA MC MD ME MF MG MH MK ML MM MN MO MP MQ MR MS MT MU MV MW MX MY MZ NA NC NE NF NG NI NL NO NP NR NU NZ OM PA PE PF PG PH PK PL PM PN PR PS PT PW PY QA RE RO RS RU RW SA SB SC SD SE SG SH SI SJ SK SL SM SN SO SR SS ST SV SX SY SZ TC TD TF TG TH TJ TK TL TM TN TO TR TT TV TW TZ UA UG UM US UY UZ VA VC VE VG VI VN VU WF WS XK YE YT ZA ZM ZW".split(" ");
+  const COD = ISO_PAISES;
   const sel = $("oPais"); let lleno = false;
   const llenar = () => {
     if (lleno) return; lleno = true;
@@ -615,6 +650,112 @@ const PAISES = [{codigo:"ES", nombre:"España", ruta:"/es/", idiomas:"Español �
       f.hidden = true; $("cOk").hidden = false; $("cOk").focus();
     } catch(_) { $("cErr").hidden = false; }
     finally { $("cSend").disabled = false; }
+  });
+})();
+
+// ---------- recibo: cabecera «1 de 9», líneas impresas con las respuestas y colita (solo presentación; no toca el cálculo)
+(function recibo(){
+  const pp = document.getElementById("calc"), wrap = document.getElementById("reciboWrap"); if (!pp || !wrap) return;
+  const $ = id => document.getElementById(id);
+  const lang = () => ["es","ca","en"].indexOf(document.documentElement.lang) >= 0 ? document.documentElement.lang : "es";
+  const TX = {
+    es: { q: "Pregunta", de: "de", ventas: "Ventas con tarjeta", cobros: "Cobros", pagado: "Total pagado", prov: "Banco o empresa", perm: "Permanencia", neg: "Negocio", forma: "Forma", iva: "Recupera el IVA", imp: "Importe al datáfono", mios: "Mis precios", nada: "Sin permanencia", meses: n => n + (n === 1 ? " mes" : " meses"), edit: "Cambiar" },
+    ca: { q: "Pregunta", de: "de", ventas: "Vendes amb targeta", cobros: "Cobraments", pagado: "Total pagat", prov: "Banc o empresa", perm: "Permanència", neg: "Negoci", forma: "Forma", iva: "Recupera l'IVA", imp: "Import al datàfon", mios: "Els meus preus", nada: "Sense permanència", meses: n => n + (n === 1 ? " mes" : " mesos"), edit: "Canviar" },
+    en: { q: "Question", de: "of", ventas: "Card sales", cobros: "Payments", pagado: "Total paid", prov: "Bank or company", perm: "Minimum term", neg: "Business", forma: "Legal form", iva: "Reclaims VAT", imp: "Amount entry", mios: "My own prices", nada: "None", meses: n => n + (n === 1 ? " month" : " months"), edit: "Change" }
+  };
+  const num = s => {
+    if (s == null) return null; s = String(s).trim().replace(/\s|€|%/g, ""); if (s === "") return null;
+    if (/^\d{1,3}(,\d{3})+$/.test(s) || /^\d{1,3}(,\d{3})+\.\d+$/.test(s)) s = s.replace(/,/g, "");
+    else if (/^\d{1,3}(\.\d{3})+$/.test(s)) s = s.replace(/\./g, "");
+    else if (/^\d{1,3}(\.\d{3})+,\d+$/.test(s)) s = s.replace(/\./g, "").replace(",", ".");
+    else s = s.replace(",", ".");
+    const v = parseFloat(s); return isFinite(v) ? v : null; };
+  const fmt = n => { const sep = lang() === "en" ? [",", "."] : [".", ","]; const r = Math.round(n * 100) / 100; const [a, b] = String(Math.abs(r)).split("."); return (r < 0 ? "−" : "") + a.replace(/\B(?=(\d{3})+(?!\d))/g, sep[0]) + (b ? sep[1] + b.padEnd(2, "0") : ""); };
+  const eur = n => lang() === "en" ? "€" + fmt(n) : fmt(n) + "\u00a0€";
+  const esc = s => String(s).replace(/[&<>"]/g, ch => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;" }[ch]));
+  const txt = el => { if (!el) return ""; const s = el.querySelector('[data-l="' + lang() + '"]'); return (s || el).textContent.trim(); };
+  const on = sel => pp.querySelector(sel + ' .chip[aria-pressed="true"]');
+  const steps = [...pp.querySelectorAll(":scope > .q")], N = steps.length;
+  const LAB = ["ventas","cobros","pagado","prov","perm","neg","forma","iva","imp"];
+  const valor = i => {
+    const T = TX[lang()];
+    if (i === 0) { const v = ["pPart","pEmp","pNoe","pAmex","pBiz"].reduce((a, id) => a + (num($(id).value) || 0), 0); return v > 0 ? eur(v) : ""; }
+    if (i === 1) { const v = num($("pOps").value); return v > 0 ? fmt(v) : ""; }
+    if (i === 2) { const v = num($("pPaid").value); if (v > 0) return eur(v); const no = pp.querySelector('[data-paid-no][aria-pressed="true"]'); return no ? txt(no) : ""; }
+    if (i === 3) { const pl = on("#pPlanChips"); if (pl) return txt(pl); const pv = on("#pProvChips"); if (!pv) return ""; if (pv.dataset.v === "CONTRATO") return T.mios; if (pv.dataset.v === "OTRO") { const s = $("pProv"); return s.value && s.selectedIndex > 0 ? s.options[s.selectedIndex].text : ""; } return txt(pv); }
+    if (i === 4) { const m = num($("pPerm").value), p = num($("pPen").value); if (!(m > 0) && !(p > 0)) return T.nada; return [m > 0 ? T.meses(m) : "", p > 0 ? eur(p) : ""].filter(Boolean).join(" · "); }
+    if (i === 5) return txt(on("#pSectorChips"));
+    if (i === 6) return txt(on('[data-name="pForma"]'));
+    if (i === 7) return txt(on('[data-name="pIva"]'));
+    if (i === 8) return txt(on("#pLockChips"));
+    return "";
+  };
+  const actual = () => steps.findIndex(s => !s.hidden);
+  let prev = -1, raf = 0;
+  function pintar(){
+    raf = 0;
+    const T = TX[lang()], cur = actual(), done = !$("res").hidden || !$("resLoad").hidden;
+    wrap.hidden = pp.hidden; wrap.classList.toggle("done", done);
+    const hasta = done ? N : cur;
+    let html = "";
+    for (let i = 0; i < hasta; i++) { const v = valor(i); if (!v) continue; const k = T[LAB[i]];
+      html += '<li><button type="button" class="r-line" data-goto="' + i + '" aria-label="' + esc(k + ": " + v + ". " + T.edit) + '"><span class="r-k">' + esc(k) + '</span><span class="r-dots" aria-hidden="true"></span><span class="r-v">' + esc(v) + '</span></button></li>'; }
+    $("rLines").innerHTML = html; $("rLines").hidden = !html;
+    const n = Math.max(0, cur) + 1;
+    $("rN").textContent = (done ? N : n) + " " + T.de + " " + N;
+    $("rProg").style.width = (done ? 100 : n / N * 100) + "%";
+    if (cur !== prev) {
+      if (!done) $("rLive").textContent = T.q + " " + n + " " + T.de + " " + N;
+      if (prev >= 0) { const tl = wrap.querySelector(".dog-tail"); if (tl) { tl.classList.remove("wag"); void tl.getBoundingClientRect(); tl.classList.add("wag"); } }
+      prev = cur;
+    }
+  }
+  const pedir = () => { if (!raf) raf = setTimeout(pintar, 0); };
+  new MutationObserver(pedir).observe(pp, { subtree: true, childList: true, attributes: true, attributeFilter: ["hidden", "aria-pressed"] });
+  ["res","resLoad"].forEach(id => new MutationObserver(pedir).observe($(id), { attributes: true, attributeFilter: ["hidden"] }));
+  new MutationObserver(pedir).observe(pp, { attributes: true, attributeFilter: ["hidden"] });
+  pp.addEventListener("input", pedir); pp.addEventListener("change", pedir);
+  pp.addEventListener("submit", e => e.preventDefault());
+  $("rLines").addEventListener("click", e => {
+    const b = e.target.closest("[data-goto]"); if (!b) return;
+    const i = +b.dataset.goto; let cur = actual();
+    if (i === cur && wrap.classList.contains("done")) { ["res","pay","resLoad"].forEach(id => $(id).hidden = true); $("shareMsg").hidden = true; }
+    let guard = 0;
+    while ((cur = actual()) > i && guard++ < 20) { const bk = steps[cur].querySelector("[data-pback]"); if (!bk) break; bk.click(); }
+    pintar();
+    const h2 = steps[actual()] && steps[actual()].querySelector("h2"); if (h2) h2.focus({ preventScroll: true });
+  });
+  pintar();
+})();
+
+// ---------- «¿Cobra fuera de España?»: lista de espera en ventana emergente (páginas /es/)
+(function espera(){
+  const dlg = document.getElementById("espera"), abrir = document.getElementById("esperaBtn"); if (!dlg || !abrir) return;
+  const $ = id => document.getElementById(id);
+  const lang = ["es","ca","en"].indexOf(document.documentElement.lang) >= 0 ? document.documentElement.lang : "es";
+  const sel = $("wPais"); let lleno = false;
+  const llenar = () => {
+    if (lleno) return; lleno = true;
+    let dn = null; try { dn = new Intl.DisplayNames([lang], { type: "region" }); } catch(_) {}
+    ISO_PAISES.map(c => dn ? dn.of(c) : c).sort((a, b) => a.localeCompare(b, lang))
+      .forEach(n => { const o = document.createElement("option"); o.value = n; o.textContent = n; sel.appendChild(o); });
+  };
+  const cerrar = () => { if (dlg.open) dlg.close(); };
+  abrir.addEventListener("click", e => { e.preventDefault(); llenar(); if (dlg.showModal) dlg.showModal(); else dlg.setAttribute("open", ""); sel.focus(); });
+  $("esperaX").addEventListener("click", cerrar);
+  dlg.addEventListener("click", e => { if (e.target === dlg) cerrar(); });
+  const f = $("wForm");
+  f.addEventListener("submit", async e => {
+    e.preventDefault();
+    if (!f.reportValidity() || f.elements._honey.value) return;
+    f.elements._subject.value = "Lista de espera · " + sel.value;
+    $("wErr").hidden = true; $("wSend").disabled = true;
+    try {
+      const r = await fetch(f.action.replace("formsubmit.co/", "formsubmit.co/ajax/"), { method: "POST", headers: { Accept: "application/json" }, body: new FormData(f) });
+      if (!r.ok) throw new Error(r.status);
+      f.hidden = true; $("wOk").hidden = false; $("wOk").focus();
+    } catch(_) { $("wErr").hidden = false; }
+    finally { $("wSend").disabled = false; }
   });
 })();
 
