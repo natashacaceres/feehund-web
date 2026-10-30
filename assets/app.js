@@ -292,7 +292,7 @@ function iniciarUI(){
     if (focus) { keepTop(pp); steps[pi].querySelector("h2").focus({ preventScroll: true }); }
   }
   const next = i => { if (i >= NS - 1) run(precisaInput()); else showStep(i + 1, true); };
-  function answered(i){ clearTimeout(advT); advT = setTimeout(() => { if (pi === i) next(i); }, 250); }
+  function answered(i){ clearTimeout(advT); navState(); }
   const provSub = which => { $("pPlanChips").hidden = which !== "plan"; prov.hidden = which !== "sel"; $("pContract").hidden = $("pContractNext").hidden = which !== "own"; };
 
   pp.addEventListener("click", e => {
@@ -775,14 +775,19 @@ const PAISES = [{codigo:"ES", nombre:"España", ruta:"/es/", idiomas:"Español �
   ["pPlanChips","pProv","pContract"].forEach(id => { const el = document.getElementById(id); if (!el) return;
     new MutationObserver(() => { if (!el.hidden) { const q = el.previousElementSibling && el.previousElementSibling.classList.contains("sub-q") ? el.previousElementSibling : el; requestAnimationFrame(() => { const hd = document.querySelector(".hdr"); const top = q.getBoundingClientRect().top + window.pageYOffset - (hd ? hd.offsetHeight : 0) - 12; if (q.getBoundingClientRect().top < (hd ? hd.offsetHeight : 0) || q.getBoundingClientRect().bottom > window.innerHeight - 80) window.scrollTo({ top, behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" }); }); } })
       .observe(el, { attributes: true, attributeFilter: ["hidden"] }); });
-  // «¿Con quién cobra hoy?»: botón Siguiente visible, activo cuando ya hay una elección.
-  const nx4 = document.getElementById("pContractNext");
-  if (nx4) {
+  // Siguiente: siempre lo pulsa la persona; se activa cuando la pregunta tiene respuesta.
+  const form = document.getElementById("calc");
+  if (form) {
+    const qs = [...form.querySelectorAll(":scope > .q")];
+    const num = s => { s = String(s || "").replace(/\s|€/g, "").replace(/\./g, "").replace(",", "."); const v = parseFloat(s); return isFinite(v) ? v : 0; };
     const elegido = () => { const pv = document.querySelector('#pProvChips .chip[aria-pressed="true"]'), pl = document.querySelector('#pPlanChips .chip[aria-pressed="true"]'), s = document.getElementById("pProv");
-      if (pl) return true; if (!pv) return false; if (pv.dataset.v === "CONTRATO") return true; if (pv.dataset.v === "OTRO") return !!(s && s.value && s.value !== "CONTRATO") || (s && s.value === "CONTRATO"); return document.getElementById("pPlanChips").hidden; };
-    const upd = () => { const d = !elegido(); if (nx4.disabled !== d) nx4.disabled = d; };
-    const q4 = nx4.closest(".q"); new MutationObserver(() => setTimeout(upd, 0)).observe(q4, { subtree: true, attributes: true, attributeFilter: ["aria-pressed", "hidden"] });
-    q4.addEventListener("change", () => setTimeout(upd, 0)); q4.addEventListener("input", () => setTimeout(upd, 0)); upd();
+      if (pl) return true; if (!pv) return false; if (pv.dataset.v === "CONTRATO") return true; if (pv.dataset.v === "OTRO") return !!(s && s.value); return document.getElementById("pPlanChips").hidden; };
+    const ok = i => i === 2 ? (num(document.getElementById("pPaid").value) > 0 || !!form.querySelector('[data-paid-no][aria-pressed="true"]'))
+      : i === 3 ? elegido() : i >= 5 ? !!qs[i].querySelector('.chips .chip[aria-pressed="true"]') : null;
+    const upd = () => qs.forEach((q, i) => { const r = ok(i); if (r === null) return; q.querySelectorAll("[data-pnext]").forEach(b => { if (b.disabled !== !r) b.disabled = !r; }); });
+    const pedir = () => setTimeout(upd, 0);
+    new MutationObserver(pedir).observe(form, { subtree: true, attributes: true, attributeFilter: ["aria-pressed", "hidden"] });
+    form.addEventListener("input", pedir); form.addEventListener("change", pedir); form.addEventListener("click", pedir); upd();
   }
   const m = document.getElementById("pPermM"), y = document.getElementById("pPermY"), out = document.getElementById("pPerm");
   if (!m || !y || !out) return;

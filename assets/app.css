@@ -346,8 +346,7 @@ picture:has(> .tiqui){display:contents}
 @media (min-width:1024px){
   .calc .c-grid{max-width:1104px}
   .recibo{padding:var(--s-5) var(--s-7) var(--s-6)}
-  .recibo .q h2{white-space:nowrap;font-size:clamp(1.25rem,2.3vw,2rem)}
-  .recibo .q .hint{white-space:nowrap;font-size:clamp(15px,1.3vw,17px)}
+  .recibo .q h2{font-size:clamp(1.375rem,2.3vw,1.875rem);text-wrap:balance}
   .recibo .chips,.calc .c-main .recibo .chips{grid-template-columns:repeat(3,minmax(0,1fr))}
   .recibo .chips > .chip:last-child:nth-child(odd){grid-column:auto}
 }
@@ -536,7 +535,9 @@ picture:has(> .tiqui){display:contents}
 .permsel:focus{outline:3px solid var(--accent);outline-offset:2px;border-color:var(--ink)}
 @media (min-width:521px){.calc .field:has(.perm){grid-template-columns:minmax(0,1fr) 260px}}
 .calc .money{max-width:min(300px,100%)}
-.recibo .q h2{overflow-wrap:anywhere}
+.recibo .q h2{overflow-wrap:break-word;max-width:100%}
+.recibo,.recibo *{min-width:0}
+.recibo #calc,.recibo .q,.recibo fieldset{max-width:100%}
 @media (max-width:1023px){.recibo .q h2,.recibo .q .hint{white-space:normal}}
 
 /* Segunda parte de «¿Con quién cobra hoy?» */
@@ -545,7 +546,7 @@ picture:has(> .tiqui){display:contents}
 .sub-q + .chips,.sub-q + .sel{margin-top:var(--s-4)!important}
 .sub-q + #pContract{margin-top:var(--s-3)}
 
-.calc #pContractNext[hidden]{display:inline-flex!important}
+.calc #pContractNext[hidden],.calc #pLockNext[hidden]{display:inline-flex!important}
 
 /* Enlaces dentro del texto: zona táctil de 44 px sin mover el texto */
 .calc .consent a,.calc .obs-consent a,.oc a,.doc p a,.doc .datos a{display:inline-block;padding:12px 0;margin:-12px 0}
