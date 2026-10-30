@@ -254,8 +254,8 @@ function iniciarUI(){
     [{es:"Otro",ca:"Un altre",en:"Other"},"Otro"]
   ];
   const LOCK = [
-    [{es:"Lo tecleo en el datáfono",ca:"L'escric al datàfon",en:"I type it into the terminal"},"No"],
-    [{es:"Llega solo desde mi caja o programa de ventas",ca:"Arriba sol des de la meva caixa o programa de vendes",en:"It comes automatically from my till or sales software"},"Sí"],
+    [{es:"No, tecleo el importe",ca:"No, escric l'import",en:"No, I type the amount"},"No"],
+    [{es:"Sí, el importe llega solo",ca:"Sí, l'import arriba sol",en:"Yes, the amount comes through by itself"},"Sí"],
     [{es:"No lo sé",ca:"No ho sé",en:"I don't know"},"No sé"]
   ];
   const PROVS = [["SumUp","SumUp"],["CaixaBank","CaixaBank"],["BBVA","BBVA"],["Santander-Getnet","Santander"],["Sabadell","Sabadell"],["Revolut","Revolut"],["Square","Square"]]
@@ -376,7 +376,7 @@ function iniciarUI(){
       $("fCheapK").textContent = t.cheap(SIM.length);
     }
     const vol = I.V * ((12 - I.nF) + I.nF * I.pF);
-    $("rEff").textContent = vol > 0 ? pct(R.CURANN / vol) : "—";
+    $("rEff").textContent = vol > 0 ? eur(R.CURANN / vol * 100, 2) : "—";
     const ref = REFERENCIA;
     $("rRef").hidden = !ref;
     if (ref) $("rRef").textContent = t.ref(String(ref.valor).replace(".", ","), ref.periodo ? ref.periodo + ", " : "");
@@ -659,9 +659,9 @@ const PAISES = [{codigo:"ES", nombre:"España", ruta:"/es/", idiomas:"Español �
   const $ = id => document.getElementById(id);
   const lang = () => ["es","ca","en"].indexOf(document.documentElement.lang) >= 0 ? document.documentElement.lang : "es";
   const TX = {
-    es: { q: "Pregunta", de: "de", ventas: "Ventas con tarjeta", cobros: "Cobros", pagado: "Total pagado", prov: "Banco o empresa", perm: "Permanencia", neg: "Negocio", forma: "Forma", iva: "Recupera el IVA", imp: "Importe al datáfono", mios: "Mis precios", nada: "Sin permanencia", meses: n => n + (n === 1 ? " mes" : " meses"), edit: "Cambiar" },
-    ca: { q: "Pregunta", de: "de", ventas: "Vendes amb targeta", cobros: "Cobraments", pagado: "Total pagat", prov: "Banc o empresa", perm: "Permanència", neg: "Negoci", forma: "Forma", iva: "Recupera l'IVA", imp: "Import al datàfon", mios: "Els meus preus", nada: "Sense permanència", meses: n => n + (n === 1 ? " mes" : " mesos"), edit: "Canviar" },
-    en: { q: "Question", de: "of", ventas: "Card sales", cobros: "Payments", pagado: "Total paid", prov: "Bank or company", perm: "Minimum term", neg: "Business", forma: "Legal form", iva: "Reclaims VAT", imp: "Amount entry", mios: "My own prices", nada: "None", meses: n => n + (n === 1 ? " month" : " months"), edit: "Change" }
+    es: { q: "Pregunta", de: "de", ventas: "Ventas con tarjeta", cobros: "Pagos con tarjeta", pagado: "Pagado al banco", prov: "Banco o empresa", perm: "Permanencia", neg: "Negocio", forma: "Forma", iva: "Recupera el IVA", imp: "Importe al datáfono", mios: "Mis precios", nada: "Sin permanencia", meses: n => n + (n === 1 ? " mes" : " meses"), edit: "Cambiar" },
+    ca: { q: "Pregunta", de: "de", ventas: "Vendes amb targeta", cobros: "Pagaments amb targeta", pagado: "Pagat al banc", prov: "Banc o empresa", perm: "Permanència", neg: "Negoci", forma: "Forma", iva: "Recupera l'IVA", imp: "Import al datàfon", mios: "Els meus preus", nada: "Sense permanència", meses: n => n + (n === 1 ? " mes" : " mesos"), edit: "Canviar" },
+    en: { q: "Question", de: "of", ventas: "Card sales", cobros: "Card payments", pagado: "Paid to bank", prov: "Bank or company", perm: "Minimum term", neg: "Business", forma: "Legal form", iva: "Reclaims VAT", imp: "Amount entry", mios: "My own prices", nada: "None", meses: n => n + (n === 1 ? " month" : " months"), edit: "Change" }
   };
   const num = s => {
     if (s == null) return null; s = String(s).trim().replace(/\s|€|%/g, ""); if (s === "") return null;
@@ -677,7 +677,7 @@ const PAISES = [{codigo:"ES", nombre:"España", ruta:"/es/", idiomas:"Español �
   const on = sel => pp.querySelector(sel + ' .chip[aria-pressed="true"]');
   const steps = [...pp.querySelectorAll(":scope > .q")], N = steps.length;
   const LAB = ["ventas","cobros","pagado","prov","perm","neg","forma","iva","imp"];
-  const CORTO = { es: ["Ventas tarjeta","Cobros","Pagado","Banco","Permanencia","Negocio","Forma","IVA","Importe"], ca: ["Vendes targeta","Cobraments","Pagat","Banc","Permanència","Negoci","Forma","IVA","Import"], en: ["Card sales","Payments","Paid","Bank","Term","Business","Form","VAT","Entry"] };
+  const CORTO = { es: ["Ventas tarjeta","Nº pagos","Pagado","Banco","Permanencia","Negocio","Forma","IVA","Importe"], ca: ["Vendes targeta","Nº pagaments","Pagat","Banc","Permanència","Negoci","Forma","IVA","Import"], en: ["Card sales","No. payments","Paid","Bank","Term","Business","Form","VAT","Entry"] };
   const valor = i => {
     const T = TX[lang()];
     if (i === 0) { const v = ["pPart","pEmp","pNoe","pAmex","pBiz"].reduce((a, id) => a + (num($(id).value) || 0), 0); return v > 0 ? eur(v) : ""; }
@@ -696,7 +696,9 @@ const PAISES = [{codigo:"ES", nombre:"España", ruta:"/es/", idiomas:"Español �
   function pintar(){
     raf = 0;
     const T = TX[lang()], cur = actual(), done = !$("res").hidden || !$("resLoad").hidden;
+    const antes = wrap.classList.contains("done");
     wrap.hidden = pp.hidden; wrap.classList.toggle("done", done);
+    if (done && !antes && !$("res").hidden) requestAnimationFrame(() => { const hd = document.querySelector(".hdr"); window.scrollTo({ top: Math.max(0, $("res").getBoundingClientRect().top + window.pageYOffset - (hd ? hd.offsetHeight : 0) - 16), behavior: "auto" }); });
     const hasta = done ? N : cur;
     let html = "";
     for (let i = 0; i < hasta; i++) { const v = valor(i); if (!v) continue; const k = T[LAB[i]];
@@ -759,6 +761,37 @@ const PAISES = [{codigo:"ES", nombre:"España", ruta:"/es/", idiomas:"Español �
     } catch(_) { $("wErr").hidden = false; }
     finally { $("wSend").disabled = false; }
   });
+})();
+
+// Ayudas «?» y fecha de fin de permanencia (pasa a meses en el campo oculto pPerm)
+(function ayudas(){
+  document.addEventListener("click", e => {
+    const b = e.target.closest(".help"); if (!b) return;
+    e.preventDefault(); e.stopPropagation();
+    const t = document.getElementById(b.dataset.help); if (!t) return;
+    t.hidden = !t.hidden; b.setAttribute("aria-expanded", !t.hidden);
+  }, true);
+  // Al aparecer la segunda parte (plan, lista o precios), se lleva a la vista.
+  ["pPlanChips","pProv","pContract"].forEach(id => { const el = document.getElementById(id); if (!el) return;
+    new MutationObserver(() => { if (!el.hidden) { const q = el.previousElementSibling && el.previousElementSibling.classList.contains("sub-q") ? el.previousElementSibling : el; requestAnimationFrame(() => { const hd = document.querySelector(".hdr"); const top = q.getBoundingClientRect().top + window.pageYOffset - (hd ? hd.offsetHeight : 0) - 12; if (q.getBoundingClientRect().top < (hd ? hd.offsetHeight : 0) || q.getBoundingClientRect().bottom > window.innerHeight - 80) window.scrollTo({ top, behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" }); }); } })
+      .observe(el, { attributes: true, attributeFilter: ["hidden"] }); });
+  // «¿Con quién cobra hoy?»: botón Siguiente visible, activo cuando ya hay una elección.
+  const nx4 = document.getElementById("pContractNext");
+  if (nx4) {
+    const elegido = () => { const pv = document.querySelector('#pProvChips .chip[aria-pressed="true"]'), pl = document.querySelector('#pPlanChips .chip[aria-pressed="true"]'), s = document.getElementById("pProv");
+      if (pl) return true; if (!pv) return false; if (pv.dataset.v === "CONTRATO") return true; if (pv.dataset.v === "OTRO") return !!(s && s.value && s.value !== "CONTRATO") || (s && s.value === "CONTRATO"); return document.getElementById("pPlanChips").hidden; };
+    const upd = () => { const d = !elegido(); if (nx4.disabled !== d) nx4.disabled = d; };
+    const q4 = nx4.closest(".q"); new MutationObserver(() => setTimeout(upd, 0)).observe(q4, { subtree: true, attributes: true, attributeFilter: ["aria-pressed", "hidden"] });
+    q4.addEventListener("change", () => setTimeout(upd, 0)); q4.addEventListener("input", () => setTimeout(upd, 0)); upd();
+  }
+  const m = document.getElementById("pPermM"), y = document.getElementById("pPermY"), out = document.getElementById("pPerm");
+  if (!m || !y || !out) return;
+  const calc = () => {
+    const now = new Date();
+    out.value = m.value && y.value ? String(Math.max(0, (+y.value * 12 + +m.value) - (now.getFullYear() * 12 + now.getMonth() + 1))) : "";
+    out.dispatchEvent(new Event("input", { bubbles: true }));
+  };
+  m.addEventListener("change", calc); y.addEventListener("change", calc);
 })();
 
 // Pie de las páginas sin calculadora: fecha de las tarifas desde /data/tarifas-datafono.json (si no, se queda la escrita en la página).
