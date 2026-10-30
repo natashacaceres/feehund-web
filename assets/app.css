@@ -59,7 +59,7 @@ button{font:inherit;color:inherit}
 .navdd ul{position:absolute;right:0;top:calc(100% + var(--s-1));z-index:60;min-width:120px;padding:var(--s-1);background:var(--surface);border:2px solid var(--ink);border-radius:var(--r-input)}
 .navdd li a{display:flex;align-items:center;min-height:40px;padding:0 var(--s-3);border-radius:var(--r-badge);font-size:15px;color:var(--ink);text-decoration:none}
 .navdd li a:hover{background:var(--brand-tint);color:var(--ink)}
-@media (max-width:400px){.navdd summary{padding:0 var(--s-2);font-size:15px}.langdd summary,.hdr-out{font-size:15px}}
+@media (max-width:400px){.langdd summary,.hdr-out{font-size:15px}}
 .langdd{position:relative}
 .langdd ul::before{content:"";position:absolute;left:0;right:0;top:-8px;height:8px}
 .langdd summary{display:inline-flex;align-items:center;justify-content:center;gap:7px;min-width:44px;min-height:44px;padding:0 14px;border:2px solid var(--line-strong);border-radius:var(--r-pill);background:transparent;font-size:16px;font-weight:600;letter-spacing:.04em;cursor:pointer;list-style:none;user-select:none;transition:background .18s}
@@ -512,7 +512,13 @@ picture:has(> .tiqui){display:contents}
 .navdd-out{display:none}
 .navdd-out button{display:flex;align-items:center;width:100%;min-height:44px;padding:0 var(--s-3);border:0;border-radius:var(--r-badge);background:none;font:inherit;font-size:15px;color:var(--ink);text-align:left;cursor:pointer}
 .navdd-out button:hover{background:var(--brand-tint)}
-@media (max-width:640px){.hdr-r > .hdr-out{display:none}.navdd-out{display:block}.navdd ul{min-width:220px}}
+@media (max-width:640px){
+  .hdr-r > .hdr-out{display:none}.navdd-out{display:block}.navdd ul{min-width:220px}
+  .hdr-r .navdd{order:2}
+  .navdd summary{width:44px;min-width:44px;justify-content:center;padding:0;font-size:0;border:2px solid var(--line-strong)}
+  .navdd summary::before{content:"";display:block;width:18px;height:12px;background:linear-gradient(currentColor,currentColor) top/100% 2px no-repeat,linear-gradient(currentColor,currentColor) center/100% 2px no-repeat,linear-gradient(currentColor,currentColor) bottom/100% 2px no-repeat}
+  .navdd[open] summary::before{background:linear-gradient(45deg,transparent calc(50% - 1px),currentColor calc(50% - 1px),currentColor calc(50% + 1px),transparent calc(50% + 1px)),linear-gradient(-45deg,transparent calc(50% - 1px),currentColor calc(50% - 1px),currentColor calc(50% + 1px),transparent calc(50% + 1px));width:16px;height:16px}
+}
 .langdd li a,.navdd li a{min-height:44px}
 .calc .faq-i p a{display:inline-flex;align-items:center;min-height:44px}
 
