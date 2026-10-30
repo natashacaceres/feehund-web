@@ -2,16 +2,10 @@
   X-Content-Type-Options: nosniff
   Referrer-Policy: strict-origin-when-cross-origin
 
-/assets/*
-  Cache-Control: public, max-age=86400
-
-# CSS y JS cambian con cada exportación: el navegador comprueba siempre si hay versión nueva.
-/assets/app.css
-  ! Cache-Control
-  Cache-Control: no-cache
-/assets/app.js
-  ! Cache-Control
-  Cache-Control: no-cache
+# Sin caché larga: el navegador y Cloudflare comprueban siempre si hay versión nueva.
+# Solo las fuentes, que no cambian, se guardan un año.
+/assets/fonts/*
+  Cache-Control: public, max-age=31536000, immutable
 
 /data/*
   Cache-Control: no-cache
