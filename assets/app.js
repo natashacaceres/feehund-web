@@ -136,7 +136,7 @@ let REFERENCIA = null;
 // Título en una sola línea: reduce la letra hasta que quepa (mínimo 22 px; por debajo, deja que se parta).
 (function fitTitle(){
   const h = document.querySelector(".c-hero h1, .home-title h1"); if (!h) return;
-  const MAX = 44, MIN = 14;
+  const MAX = 53, MIN = 14;
   const fit = () => {
     h.style.whiteSpace = "nowrap"; h.style.fontSize = MAX + "px";
     const w = h.scrollWidth, a = h.clientWidth;
@@ -395,7 +395,7 @@ function iniciarUI(){
     x.fillStyle = "#FFF8EC"; x.fillRect(0, 0, 1080, 1080);
     const L0 = 260, R0 = 860, T0 = 300, B0 = 880, SC = 0.3, BW = 22 * SC, INK = "#14213D";
     x.fillStyle = "#FFFDF7"; x.fillRect(L0, T0, R0 - L0, B0 - T0);
-    x.fillStyle = INK; x.fillRect(L0, T0, R0 - L0 - 118 * SC, BW); x.fillRect(L0, T0, BW, B0 - T0); x.fillRect(R0 - BW, T0 + 108 * SC, BW, B0 - T0 - 108 * SC);
+    x.fillStyle = INK; x.fillRect(L0, T0, R0 - L0, BW); x.fillRect(L0, T0, BW, B0 - T0); x.fillRect(R0 - BW, T0, BW, B0 - T0);
     x.lineWidth = BW; x.strokeStyle = INK; x.lineCap = "round"; x.lineJoin = "round";
     const NZ = Math.round((R0 - L0) / (81 * SC)), ZW = (R0 - L0) / NZ, ZH = 40 * SC; x.beginPath(); x.moveTo(L0, B0);
     for (let k = 0; k < NZ; k++) { x.lineTo(L0 + k * ZW + ZW / 2, B0 + ZH); x.lineTo(L0 + (k + 1) * ZW, B0); }
@@ -677,6 +677,7 @@ const PAISES = [{codigo:"ES", nombre:"España", ruta:"/es/", idiomas:"Español �
   const on = sel => pp.querySelector(sel + ' .chip[aria-pressed="true"]');
   const steps = [...pp.querySelectorAll(":scope > .q")], N = steps.length;
   const LAB = ["ventas","cobros","pagado","prov","perm","neg","forma","iva","imp"];
+  const CORTO = { es: ["Ventas tarjeta","Cobros","Pagado","Banco","Permanencia","Negocio","Forma","IVA","Importe"], ca: ["Vendes targeta","Cobraments","Pagat","Banc","Permanència","Negoci","Forma","IVA","Import"], en: ["Card sales","Payments","Paid","Bank","Term","Business","Form","VAT","Entry"] };
   const valor = i => {
     const T = TX[lang()];
     if (i === 0) { const v = ["pPart","pEmp","pNoe","pAmex","pBiz"].reduce((a, id) => a + (num($(id).value) || 0), 0); return v > 0 ? eur(v) : ""; }
@@ -699,7 +700,8 @@ const PAISES = [{codigo:"ES", nombre:"España", ruta:"/es/", idiomas:"Español �
     const hasta = done ? N : cur;
     let html = "";
     for (let i = 0; i < hasta; i++) { const v = valor(i); if (!v) continue; const k = T[LAB[i]];
-      html += '<li><button type="button" class="r-line" data-goto="' + i + '" aria-label="' + esc(k + ": " + v + ". " + T.edit) + '"><span class="r-k">' + esc(k) + '</span><span class="r-dots" aria-hidden="true"></span><span class="r-v">' + esc(v) + '</span></button></li>'; }
+      const ks = (CORTO[lang()] || CORTO.es)[i];
+      html += '<li><button type="button" class="r-line" data-goto="' + i + '" aria-label="' + esc(k + ": " + v + ". " + T.edit) + '"><span class="r-k"><span class="kl">' + esc(k) + '</span><span class="ks">' + esc(ks) + '</span></span><span class="r-dots" aria-hidden="true"></span><span class="r-v">' + esc(v) + '</span></button></li>'; }
     $("rLines").innerHTML = html; $("rLines").hidden = !html;
     const n = Math.max(0, cur) + 1;
     $("rN").textContent = (done ? N : n) + " " + T.de + " " + N;
@@ -730,7 +732,7 @@ const PAISES = [{codigo:"ES", nombre:"España", ruta:"/es/", idiomas:"Español �
 
 // ---------- «¿Cobra fuera de España?»: lista de espera en ventana emergente (páginas /es/)
 (function espera(){
-  const dlg = document.getElementById("espera"), abrir = document.getElementById("esperaBtn"); if (!dlg || !abrir) return;
+  const dlg = document.getElementById("espera"), abridores = document.querySelectorAll("[data-espera]"); if (!dlg || !abridores.length) return;
   const $ = id => document.getElementById(id);
   const lang = ["es","ca","en"].indexOf(document.documentElement.lang) >= 0 ? document.documentElement.lang : "es";
   const sel = $("wPais"); let lleno = false;
@@ -740,8 +742,8 @@ const PAISES = [{codigo:"ES", nombre:"España", ruta:"/es/", idiomas:"Español �
     ISO_PAISES.map(c => dn ? dn.of(c) : c).sort((a, b) => a.localeCompare(b, lang))
       .forEach(n => { const o = document.createElement("option"); o.value = n; o.textContent = n; sel.appendChild(o); });
   };
-  const cerrar = () => { if (dlg.open) dlg.close(); };
-  abrir.addEventListener("click", e => { e.preventDefault(); llenar(); if (dlg.showModal) dlg.showModal(); else dlg.setAttribute("open", ""); sel.focus(); });
+  const cerrar = () => { if (dlg.open) { if (dlg.close) dlg.close(); else dlg.removeAttribute("open"); } };
+  abridores.forEach(b => b.addEventListener("click", e => { e.preventDefault(); const dd = b.closest("details"); if (dd) dd.open = false; llenar(); if (dlg.showModal) dlg.showModal(); else dlg.setAttribute("open", ""); sel.focus(); }));
   $("esperaX").addEventListener("click", cerrar);
   dlg.addEventListener("click", e => { if (e.target === dlg) cerrar(); });
   const f = $("wForm");
