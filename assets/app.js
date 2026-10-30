@@ -19,7 +19,7 @@ const TITULAR = {nombre:"Natasha Cáceres", nif:"61759305G", domicilio:"Gran Via
 // ---------- pago: configuración en un solo sitio
 const PAGO = {
   enlace: "https://buy.stripe.com/3cI5kEffNfIK5r93fb2VG00",
-  activo: false, // en pruebas: el enlace de Stripe vuelve todavía a la web antigua
+  activo: true, // activo desde el 30/10/2026: el enlace de Stripe vuelve a https://feehund.com/es/?pago=ok
   precio: 10,
   umbralAhorro: 50
 };
