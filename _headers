@@ -5,5 +5,13 @@
 /assets/*
   Cache-Control: public, max-age=86400
 
+# CSS y JS cambian con cada exportación: el navegador comprueba siempre si hay versión nueva.
+/assets/app.css
+  ! Cache-Control
+  Cache-Control: no-cache
+/assets/app.js
+  ! Cache-Control
+  Cache-Control: no-cache
+
 /data/*
   Cache-Control: no-cache
