@@ -136,7 +136,7 @@ let REFERENCIA = null;
 // Título en una sola línea: reduce la letra hasta que quepa (mínimo 22 px; por debajo, deja que se parta).
 (function fitTitle(){
   const h = document.querySelector(".c-hero h1, .home-title h1"); if (!h) return;
-  const MAX = 53, MIN = 14;
+  const MAX = 53, MIN = 28;
   const fit = () => {
     h.style.whiteSpace = "nowrap"; h.style.fontSize = MAX + "px";
     const w = h.scrollWidth, a = h.clientWidth;

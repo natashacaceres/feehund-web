@@ -515,7 +515,8 @@ picture:has(> .tiqui){display:contents}
 @media (max-width:640px){
   .hdr-r > .hdr-out{display:none}.navdd-out{display:block}.navdd ul{min-width:220px}
   .hdr-r .navdd{order:2}
-  .navdd summary{width:44px;min-width:44px;justify-content:center;padding:0;font-size:0;border:2px solid var(--line-strong)}
+  .navdd summary{width:44px;min-width:44px;justify-content:center;gap:0;padding:0;font-size:0;border:2px solid var(--line-strong)}
+  .navdd summary > *{display:none}
   .navdd summary::before{content:"";display:block;width:18px;height:12px;background:linear-gradient(currentColor,currentColor) top/100% 2px no-repeat,linear-gradient(currentColor,currentColor) center/100% 2px no-repeat,linear-gradient(currentColor,currentColor) bottom/100% 2px no-repeat}
   .navdd[open] summary::before{background:linear-gradient(45deg,transparent calc(50% - 1px),currentColor calc(50% - 1px),currentColor calc(50% + 1px),transparent calc(50% + 1px)),linear-gradient(-45deg,transparent calc(50% - 1px),currentColor calc(50% - 1px),currentColor calc(50% + 1px),transparent calc(50% + 1px));width:16px;height:16px}
 }
