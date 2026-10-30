@@ -1,0 +1,12 @@
+# Mientras la web está en pruebas: que ningún buscador la indexe.
+# QUITAR la línea X-Robots-Tag al lanzar con el dominio definitivo.
+/*
+  X-Robots-Tag: noindex, nofollow
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+
+/assets/*
+  Cache-Control: public, max-age=86400
+
+/data/*
+  Cache-Control: no-cache
