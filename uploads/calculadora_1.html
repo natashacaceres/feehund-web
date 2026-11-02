@@ -1,0 +1,321 @@
+<!doctype html>
+<html lang="es" data-title-es="Calculadora de comisiones por transacción | Natasha Cáceres" data-title-ca="Calculadora de comissions per transacció | Natasha Cáceres" data-title-en="Transaction fee calculator | Natasha Cáceres" data-desc-es="Compare gratis lo que paga por su datáfono con 28 tarifas de bancos y fintech en España. Con su resumen mensual, en 5 minutos." data-desc-ca="Compari gratis el que paga pel seu datàfon amb 28 tarifes de bancs i fintech a Espanya. Amb el seu resum mensual, en 5 minuts." data-desc-en="Compare what you pay for your card terminal with 28 rates from banks and fintechs in Spain, free. With your monthly statement, in 5 minutes."><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Calculadora de comisiones por transacción | Natasha Cáceres</title>
+<meta name="description" content="Compare gratis lo que paga por su datáfono con 28 tarifas de bancos y fintech en España. Con su resumen mensual, en 5 minutos.">
+<link rel="canonical" href="https://natashacaceres.com/calculadora">
+<link rel="alternate" hreflang="es" href="https://natashacaceres.com/calculadora?lang=es">
+<link rel="alternate" hreflang="ca" href="https://natashacaceres.com/calculadora?lang=ca">
+<link rel="alternate" hreflang="en" href="https://natashacaceres.com/calculadora?lang=en">
+<link rel="alternate" hreflang="x-default" href="https://natashacaceres.com/calculadora">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://natashacaceres.com/calculadora">
+<meta property="og:description" content="Compare gratis lo que paga por su datáfono con 28 tarifas de bancos y fintech en España. Con su resumen mensual, en 5 minutos.">
+<meta property="og:locale" content="es_ES">
+<meta property="og:locale:alternate" content="ca_ES">
+<meta property="og:locale:alternate" content="en_GB">
+<script>(function(){var L=['es','ca','en'],l=null;try{var q=location.search.match(/[?&]lang=(es|ca|en)(&|$)/);if(q)l=q[1];else{var s=localStorage.getItem('nc-lang');if(L.indexOf(s)>=0)l=s}}catch(e){}if(!l){var n=navigator.languages&&navigator.languages.length?navigator.languages:[navigator.language||''];for(var i=0;i<n.length&&!l;i++){var c=String(n[i]).toLowerCase().slice(0,2);if(L.indexOf(c)>=0)l=c}}document.documentElement.lang=l||'es'})();</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400&amp;display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/site.css?v=20261026-2">
+<link rel="stylesheet" href="/assets/calculadora.css?v=24">
+<meta property="og:image" content="https://natashacaceres.com/og-image.jpg">
+<meta property="og:title" content="Calculadora de comisiones por transacción | Natasha Cáceres">
+<meta property="og:site_name" content="Natasha Cáceres">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="icon" type="image/png" href="/favicon-96.png" sizes="96x96">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+</head>
+<body>
+<a class="skip" href="#main"><span data-l="es">Ir al contenido</span><span data-l="ca">Anar al contingut</span><span data-l="en">Skip to content</span></a>
+
+<header class="hdr">
+  <div class="wrap">
+    <a class="brand" href="/">Natasha Cáceres</a>
+    <nav class="nav" aria-label="Main" data-aria-es="Principal" data-aria-ca="Principal" data-aria-en="Main">
+      <ul>
+        <li><a href="/reports"><span data-l="en">Reports</span><span data-l="es">Informes</span><span data-l="ca">Informes</span></a></li>
+        <li><a href="/advisory"><span data-l="en">Advisory</span><span data-l="es">Asesoría</span><span data-l="ca">Assessoria</span></a></li>
+        <li><a href="/academy">Academy</a></li>
+        <li class="dd is-current" data-dd=""><button class="dd-btn" type="button" aria-expanded="false" aria-controls="dd-res"><span data-l="en">Resources</span><span data-l="es">Recursos</span><span data-l="ca">Recursos</span><svg width="10" height="6" viewBox="0 0 10 6" aria-hidden="true"><path d="M1 1l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.4"></path></svg></button>
+          <ul class="dd-menu" id="dd-res">
+            <li><a href="/calculadora" aria-current="page"><span data-l="en">Calculator</span><span data-l="es">Calculadora</span><span data-l="ca">Calculadora</span></a></li>
+            <li><a href="/observatorio"><span data-l="en">Observatory</span><span data-l="es">Observatorio</span><span data-l="ca">Observatori</span></a></li>
+            <li><a href="/blog">Blog</a></li>
+          </ul>
+        </li>
+        <li><a href="/about"><span data-l="en">About</span><span data-l="es">Sobre mí</span><span data-l="ca">Sobre mi</span></a></li>
+      </ul>
+      <div class="dd dd--lang" data-dd=""><button class="dd-btn lang-btn" type="button" aria-expanded="false" aria-controls="dd-lang"><span data-lang-label="">Español</span><svg width="10" height="6" viewBox="0 0 10 6" aria-hidden="true"><path d="M1 1l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.4"></path></svg></button><ul class="dd-menu" id="dd-lang"><li><button type="button" data-set-lang="es" lang="es" aria-pressed="false">Español</button></li><li><button type="button" data-set-lang="ca" lang="ca" aria-pressed="false">Català</button></li><li><button type="button" data-set-lang="en" lang="en" aria-pressed="false">English</button></li></ul></div>
+    </nav>
+    <div class="dd dd--lang dd--m" data-dd=""><button class="dd-btn lang-btn" type="button" aria-expanded="false" aria-controls="dd-lang-h"><span data-lang-code="">ES</span><svg width="10" height="6" viewBox="0 0 10 6" aria-hidden="true"><path d="M1 1l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.4"></path></svg></button><ul class="dd-menu" id="dd-lang-h"><li><button type="button" data-set-lang="es" lang="es" aria-pressed="false">Español</button></li><li><button type="button" data-set-lang="ca" lang="ca" aria-pressed="false">Català</button></li><li><button type="button" data-set-lang="en" lang="en" aria-pressed="false">English</button></li></ul></div>
+    <button class="nav-toggle" type="button" data-nav-toggle="" aria-expanded="false" aria-controls="mnav" aria-label="Menu" data-aria-es="Menú" data-aria-ca="Menú" data-aria-en="Menu">☰</button>
+  </div>
+  <div class="mnav" id="mnav">
+    <div class="mnav-top">
+      <a class="brand" href="/">Natasha Cáceres</a>
+      <button class="nav-toggle" type="button" data-nav-toggle="" aria-expanded="false" aria-label="Close" data-aria-es="Cerrar" data-aria-ca="Tancar" data-aria-en="Close">✕</button>
+    </div>
+    <ul>
+      <li><a href="/reports"><span data-l="en">Reports</span><span data-l="es">Informes</span><span data-l="ca">Informes</span></a></li>
+      <li><a href="/advisory"><span data-l="en">Advisory</span><span data-l="es">Asesoría</span><span data-l="ca">Assessoria</span></a></li>
+      <li><a href="/academy">Academy</a></li>
+      <li class="mnav-group"><p class="mnav-h"><span data-l="en">Resources</span><span data-l="es">Recursos</span><span data-l="ca">Recursos</span></p>
+        <ul>
+          <li><a href="/calculadora" aria-current="page"><span data-l="en">Calculator</span><span data-l="es">Calculadora</span><span data-l="ca">Calculadora</span></a></li>
+          <li><a href="/observatorio"><span data-l="en">Observatory</span><span data-l="es">Observatorio</span><span data-l="ca">Observatori</span></a></li>
+          <li><a href="/blog">Blog</a></li>
+        </ul>
+      </li>
+      <li><a href="/about"><span data-l="en">About</span><span data-l="es">Sobre mí</span><span data-l="ca">Sobre mi</span></a></li>
+    </ul>
+  </div>
+</header>
+
+<main id="main" class="calc">
+<div id="calcApp">
+  <section class="c-hero">
+    <p class="kicker c-kick"><span data-l="es">Calculadora de comisiones</span><span data-l="ca">Calculadora de comissions</span><span data-l="en">Fee calculator</span></p>
+    <h1><span data-l="es">¿Paga de más por cobrar con tarjeta?</span><span data-l="ca">Paga de més per cobrar amb targeta?</span><span data-l="en">Paying too much for card payments?</span></h1>
+    <p class="desc"><span data-l="es"><span class="ln">Calcule cuánto paga de más al mes por cobrar con tarjeta y si le compensa cambiar de datáfono.</span><span class="ln">Necesita dos documentos: <strong>el resumen mensual de su datáfono</strong> y <strong>su contrato con el banco o proveedor</strong>.</span></span><span data-l="ca"><span class="ln">Calculi quant paga de més al mes per cobrar amb targeta i si li compensa canviar de datàfon.</span><span class="ln">Necessita dos documents: <strong>el resum mensual del seu datàfon</strong> i <strong>el seu contracte amb el banc o proveïdor</strong>.</span></span><span data-l="en"><span class="ln">Find out how much extra you pay each month to take card payments and whether switching card machine is worth it.</span><span class="ln">You need two documents: <strong>your card machine's monthly statement</strong> and <strong>your contract with your bank or provider</strong>.</span></span></p>
+  </section>
+
+  <div class="c-grid" id="work">
+    <div class="c-main">
+    <section class="panel" id="calc" aria-label="Calculadora" data-aria-es="Calculadora" data-aria-ca="Calculadora" data-aria-en="Calculator">
+      <div class="q">
+        <p class="n"><span data-l="es">1 de 9</span><span data-l="ca">1 de 9</span><span data-l="en">1 of 9</span></p><div class="prog" aria-hidden="true"><span style="width:11%"></span></div><h2 tabindex="-1"><span data-l="es">¿Cuánto vendió con tarjeta el mes pasado?</span><span data-l="ca">Quant va vendre amb targeta el mes passat?</span><span data-l="en">How much did you take by card last month?</span></h2>
+        <p class="hint"><span data-l="es">Si su resumen no separa por tipo de tarjeta, póngalo todo en la primera casilla.</span><span data-l="ca">Si el resum no separa per tipus de targeta, posi-ho tot a la primera casella.</span><span data-l="en">If your statement does not split by card type, put it all in the first box.</span></p>
+        <div class="fields">
+          <div class="field"><label for="pPart"><span data-l="es">Tarjetas españolas o europeas de particulares</span><span data-l="ca">Targetes espanyoles o europees de particulars</span><span data-l="en">Spanish or European consumer cards</span></label><div class="in"><input id="pPart" type="text" inputmode="decimal" autocomplete="off" placeholder="4800"><span class="u">€</span></div></div>
+          <div class="field"><label for="pEmp"><span data-l="es">Tarjetas de empresa</span><span data-l="ca">Targetes d'empresa</span><span data-l="en">Business cards</span></label><div class="in"><input id="pEmp" type="text" inputmode="decimal" autocomplete="off" placeholder="0"><span class="u">€</span></div></div>
+          <div class="field"><label for="pNoe"><span data-l="es">Tarjetas de fuera de Europa</span><span data-l="ca">Targetes de fora d'Europa</span><span data-l="en">Non-European cards</span></label><div class="in"><input id="pNoe" type="text" inputmode="decimal" autocomplete="off" placeholder="0"><span class="u">€</span></div></div>
+          <div class="field"><label for="pAmex"><span data-l="es">American Express</span><span data-l="ca">American Express</span><span data-l="en">American Express</span></label><div class="in"><input id="pAmex" type="text" inputmode="decimal" autocomplete="off" placeholder="0"><span class="u">€</span></div></div>
+          <div class="field"><label for="pBiz"><span data-l="es">Bizum en el datáfono</span><span data-l="ca">Bizum al datàfon</span><span data-l="en">Bizum on the terminal</span></label><div class="in"><input id="pBiz" type="text" inputmode="decimal" autocomplete="off" placeholder="0"><span class="u">€</span></div></div>
+        </div>
+        <div class="qnav"><span></span><button type="button" class="btn btn--gold" data-pnext="" disabled><span data-l="es">Siguiente →</span><span data-l="ca">Següent →</span><span data-l="en">Next →</span></button></div>
+      </div>
+      <div class="q" hidden>
+        <p class="n"><span data-l="es">2 de 9</span><span data-l="ca">2 de 9</span><span data-l="en">2 of 9</span></p><div class="prog" aria-hidden="true"><span style="width:22%"></span></div><h2 tabindex="-1"><span data-l="es">¿Cuántos cobros con tarjeta hizo ese mes?</span><span data-l="ca">Quants cobraments amb targeta va fer aquell mes?</span><span data-l="en">How many card payments did you take that month?</span></h2>
+        <div class="money"><input id="pOps" type="text" inputmode="numeric" autocomplete="off" placeholder="240" aria-label="Número de cobros" data-aria-es="Número de cobros" data-aria-ca="Nombre de cobraments" data-aria-en="Number of payments"></div>
+        <div class="qnav"><button type="button" class="back" data-pback=""><span data-l="es">← Anterior</span><span data-l="ca">← Anterior</span><span data-l="en">← Back</span></button><button type="button" class="btn btn--gold" data-pnext="" disabled><span data-l="es">Siguiente →</span><span data-l="ca">Següent →</span><span data-l="en">Next →</span></button></div>
+      </div>
+      <div class="q" hidden>
+        <p class="n"><span data-l="es">3 de 9</span><span data-l="ca">3 de 9</span><span data-l="en">3 of 9</span></p><div class="prog" aria-hidden="true"><span style="width:33%"></span></div><h2 tabindex="-1"><span data-l="es">¿Cuánto le cobraron en total ese mes?</span><span data-l="ca">Quant li van cobrar en total aquell mes?</span><span data-l="en">How much were you charged in total that month?</span></h2>
+        <p class="hint"><span data-l="es">Comisiones + cuotas + alquiler del datáfono.</span><span data-l="ca">Comissions + quotes + lloguer del datàfon.</span><span data-l="en">Fees + monthly charges + terminal rental.</span></p>
+        <div class="money"><input id="pPaid" type="text" inputmode="decimal" autocomplete="off" placeholder="89,40" aria-label="Total en euros" data-aria-es="Total en euros" data-aria-ca="Total en euros" data-aria-en="Total in euros"><span aria-hidden="true">€</span></div>
+        <div class="qrow"><button type="button" class="chip" data-paid-no="" aria-pressed="false"><span data-l="es">No lo sé</span><span data-l="ca">No ho sé</span><span data-l="en">I don't know</span></button></div>
+        <div class="qnav"><button type="button" class="back" data-pback=""><span data-l="es">← Anterior</span><span data-l="ca">← Anterior</span><span data-l="en">← Back</span></button><button type="button" class="btn btn--gold" data-pnext="" disabled><span data-l="es">Siguiente →</span><span data-l="ca">Següent →</span><span data-l="en">Next →</span></button></div>
+      </div>
+      <div class="q" hidden>
+        <p class="n"><span data-l="es">4 de 9</span><span data-l="ca">4 de 9</span><span data-l="en">4 of 9</span></p><div class="prog" aria-hidden="true"><span style="width:44%"></span></div><h2 tabindex="-1"><span data-l="es">¿Con quién cobra hoy?</span><span data-l="ca">Amb qui cobra avui?</span><span data-l="en">Who do you use today?</span></h2>
+        <div class="chips" data-name="prov" id="pProvChips"></div>
+        <div class="chips" data-name="plan" id="pPlanChips" hidden></div>
+        <select class="sel" id="pProv" hidden aria-label="Proveedor y plan que tiene hoy" data-aria-es="Proveedor y plan que tiene hoy" data-aria-ca="Proveïdor i pla que té avui" data-aria-en="Provider and plan you have today"></select>
+        <div id="pContract" hidden>
+          <p class="hint"><span data-l="es">Deje vacío lo que no sepa.</span><span data-l="ca">Deixi buit el que no sàpiga.</span><span data-l="en">Leave blank anything you do not know.</span></p>
+          <div class="fields">
+            <div class="field"><label for="cP"><span data-l="es">Comisión tarjetas de particulares</span><span data-l="ca">Comissió targetes de particulars</span><span data-l="en">Fee on consumer cards</span></label><div class="in"><input id="cP" type="text" inputmode="decimal" autocomplete="off" placeholder="0,45"><span class="u">%</span></div></div>
+            <div class="field"><label for="cE"><span data-l="es">Comisión tarjetas de empresa</span><span data-l="ca">Comissió targetes d'empresa</span><span data-l="en">Fee on business cards</span></label><div class="in"><input id="cE" type="text" inputmode="decimal" autocomplete="off" placeholder="1,00"><span class="u">%</span></div></div>
+            <div class="field"><label for="cN"><span data-l="es">Comisión tarjetas de fuera de Europa</span><span data-l="ca">Comissió targetes de fora d'Europa</span><span data-l="en">Fee on non-European cards</span></label><div class="in"><input id="cN" type="text" inputmode="decimal" autocomplete="off" placeholder="1,50"><span class="u">%</span></div></div>
+            <div class="field"><label for="cA"><span data-l="es">Comisión American Express</span><span data-l="ca">Comissió American Express</span><span data-l="en">American Express fee</span></label><div class="in"><input id="cA" type="text" inputmode="decimal" autocomplete="off" placeholder="2,50"><span class="u">%</span></div></div>
+            <div class="field"><label for="cB"><span data-l="es">Comisión Bizum</span><span data-l="ca">Comissió Bizum</span><span data-l="en">Bizum fee</span></label><div class="in"><input id="cB" type="text" inputmode="decimal" autocomplete="off" placeholder="0,40"><span class="u">%</span></div></div>
+            <div class="field"><label for="cF"><span data-l="es">Fijo por cobro</span><span data-l="ca">Fix per cobrament</span><span data-l="en">Fixed fee per payment</span></label><div class="in"><input id="cF" type="text" inputmode="decimal" autocomplete="off" placeholder="0,00"><span class="u">€</span></div></div>
+            <div class="field"><label for="cQ"><span data-l="es">Cuota mensual</span><span data-l="ca">Quota mensual</span><span data-l="en">Monthly fee</span></label><div class="in"><input id="cQ" type="text" inputmode="decimal" autocomplete="off" placeholder="0"><span class="u">€</span></div></div>
+            <div class="field"><label for="cL"><span data-l="es">Alquiler del datáfono al mes, sin IVA</span><span data-l="ca">Lloguer del datàfon al mes, sense IVA</span><span data-l="en">Terminal rental per month, excl. VAT</span></label><div class="in"><input id="cL" type="text" inputmode="decimal" autocomplete="off" placeholder="0"><span class="u">€</span></div></div>
+          </div>
+        </div>
+        <div class="qnav"><button type="button" class="back" data-pback=""><span data-l="es">← Anterior</span><span data-l="ca">← Anterior</span><span data-l="en">← Back</span></button><button type="button" class="btn btn--gold" data-pnext="" id="pContractNext" hidden disabled><span data-l="es">Siguiente →</span><span data-l="ca">Següent →</span><span data-l="en">Next →</span></button></div>
+      </div>
+      <div class="q" hidden>
+        <p class="n"><span data-l="es">5 de 9</span><span data-l="ca">5 de 9</span><span data-l="en">5 of 9</span></p><div class="prog" aria-hidden="true"><span style="width:56%"></span></div><h2 tabindex="-1"><span data-l="es">¿Le queda permanencia?</span><span data-l="ca">Li queda permanència?</span><span data-l="en">Any minimum term left?</span></h2>
+        <p class="hint"><span data-l="es">Deje vacío si no tiene.</span><span data-l="ca">Deixi buit si no en té.</span><span data-l="en">Leave blank if you have none.</span></p>
+        <div class="fields">
+          <div class="field"><label for="pPerm"><span data-l="es">Meses que le quedan</span><span data-l="ca">Mesos que li queden</span><span data-l="en">Months left</span></label><div class="in"><input id="pPerm" type="text" inputmode="numeric" autocomplete="off" placeholder="0"></div></div>
+          <div class="field"><label for="pPen"><span data-l="es">Penalización si se va hoy</span><span data-l="ca">Penalització si se'n va avui</span><span data-l="en">Penalty if you leave today</span></label><div class="in"><input id="pPen" type="text" inputmode="decimal" autocomplete="off" placeholder="0"><span class="u">€</span></div></div>
+        </div>
+        <div class="qnav"><button type="button" class="back" data-pback=""><span data-l="es">← Anterior</span><span data-l="ca">← Anterior</span><span data-l="en">← Back</span></button><button type="button" class="btn btn--gold" data-pnext="" disabled><span data-l="es">Siguiente →</span><span data-l="ca">Següent →</span><span data-l="en">Next →</span></button></div>
+      </div>
+      <div class="q" hidden>
+        <p class="n"><span data-l="es">6 de 9</span><span data-l="ca">6 de 9</span><span data-l="en">6 of 9</span></p><div class="prog" aria-hidden="true"><span style="width:67%"></span></div><h2 tabindex="-1"><span data-l="es">¿Qué tipo de negocio tiene?</span><span data-l="ca">Quin tipus de negoci té?</span><span data-l="en">What type of business do you have?</span></h2>
+        <div class="chips" data-name="pSector" id="pSectorChips"></div>
+        <div class="qnav"><button type="button" class="back" data-pback=""><span data-l="es">← Anterior</span><span data-l="ca">← Anterior</span><span data-l="en">← Back</span></button></div>
+      </div>
+      <div class="q" hidden>
+        <p class="n"><span data-l="es">7 de 9</span><span data-l="ca">7 de 9</span><span data-l="en">7 of 9</span></p><div class="prog" aria-hidden="true"><span style="width:78%"></span></div><h2 tabindex="-1"><span data-l="es">¿Es autónomo o sociedad?</span><span data-l="ca">És autònom o societat?</span><span data-l="en">Self-employed or company?</span></h2>
+        <div class="chips" data-name="pForma"><button type="button" class="chip" aria-pressed="false" data-v="Autónomo"><span data-l="es">Autónomo</span><span data-l="ca">Autònom</span><span data-l="en">Self-employed</span></button><button type="button" class="chip" aria-pressed="false" data-v="Sociedad"><span data-l="es">Sociedad (SL, SA…)</span><span data-l="ca">Societat (SL, SA…)</span><span data-l="en">Company (SL, SA…)</span></button></div>
+        <div class="qnav"><button type="button" class="back" data-pback=""><span data-l="es">← Anterior</span><span data-l="ca">← Anterior</span><span data-l="en">← Back</span></button></div>
+      </div>
+      <div class="q" hidden>
+        <p class="n"><span data-l="es">8 de 9</span><span data-l="ca">8 de 9</span><span data-l="en">8 of 9</span></p><div class="prog" aria-hidden="true"><span style="width:89%"></span></div><h2 tabindex="-1"><span data-l="es">¿Recupera el IVA de sus gastos?</span><span data-l="ca">Recupera l'IVA de les seves despeses?</span><span data-l="en">Do you reclaim VAT on your expenses?</span></h2>
+        <div class="chips" data-name="pIva"><button type="button" class="chip" aria-pressed="false" data-v="Sí"><span data-l="es">Sí</span><span data-l="ca">Sí</span><span data-l="en">Yes</span></button><button type="button" class="chip" aria-pressed="false" data-v="No"><span data-l="es">No</span><span data-l="ca">No</span><span data-l="en">No</span></button><button type="button" class="chip" aria-pressed="false" data-v="No sé"><span data-l="es">No lo sé</span><span data-l="ca">No ho sé</span><span data-l="en">I don't know</span></button></div>
+        <div class="qnav"><button type="button" class="back" data-pback=""><span data-l="es">← Anterior</span><span data-l="ca">← Anterior</span><span data-l="en">← Back</span></button></div>
+      </div>
+      <div class="q" hidden>
+        <p class="n"><span data-l="es">9 de 9</span><span data-l="ca">9 de 9</span><span data-l="en">9 of 9</span></p><div class="prog" aria-hidden="true"><span style="width:100%"></span></div><h2 tabindex="-1"><span data-l="es">¿Cómo llega el importe al datáfono?</span><span data-l="ca">Com arriba l'import al datàfon?</span><span data-l="en">How does the amount reach the terminal?</span></h2>
+        <div class="chips" data-name="pLock" id="pLockChips"></div>
+        <div id="pLockMore" hidden>
+          <p class="hint"><span data-l="es">Pregunte a quien le vendió la caja cuánto cuesta adaptarla.</span><span data-l="ca">Pregunti a qui li va vendre la caixa quant costa adaptar-la.</span><span data-l="en">Ask whoever sold you the till how much it costs to adapt it.</span></p>
+          <div class="fields">
+            <div class="field"><label for="pCaja"><span data-l="es">Coste de cambiar de programa de caja</span><span data-l="ca">Cost de canviar de programa de caixa</span><span data-l="en">Cost of changing till software</span></label><div class="in"><input id="pCaja" type="text" inputmode="decimal" autocomplete="off" placeholder="0"><span class="u">€</span></div></div>
+            <div class="field"><label for="pSwF"><span data-l="es">Cuota de su programa actual al mes</span><span data-l="ca">Quota del seu programa actual al mes</span><span data-l="en">Monthly fee of your current software</span></label><div class="in"><input id="pSwF" type="text" inputmode="decimal" autocomplete="off" placeholder="0"><span class="u">€</span></div></div>
+            <div class="field"><label for="pSwN"><span data-l="es">Cuota del programa nuevo al mes</span><span data-l="ca">Quota del programa nou al mes</span><span data-l="en">Monthly fee of the new software</span></label><div class="in"><input id="pSwN" type="text" inputmode="decimal" autocomplete="off" placeholder="0"><span class="u">€</span></div></div>
+          </div>
+        </div>
+        <div class="qnav"><button type="button" class="back" data-pback=""><span data-l="es">← Anterior</span><span data-l="ca">← Anterior</span><span data-l="en">← Back</span></button><button type="button" class="btn btn--gold" data-pnext="" id="pLockNext" hidden disabled><span data-l="es">Ver resultado →</span><span data-l="ca">Veure el resultat →</span><span data-l="en">See result →</span></button></div>
+      </div>
+    </section>
+    </div>
+    <div class="c-side">
+    <div class="load" id="resLoad" hidden aria-live="polite">
+      <h2><span data-l="es">Analizando…</span><span data-l="ca">Analitzant…</span><span data-l="en">Analysing…</span></h2>
+      <div class="bar"><span></span></div>
+    </div>
+
+    <section id="res" hidden aria-live="polite">
+      <div class="res-top">
+        <p class="kicker"><span data-l="es">Su resultado</span><span data-l="ca">El seu resultat</span><span data-l="en">Your result</span></p>
+        <h2 class="verdict" id="rVerdict" tabindex="-1"></h2>
+        <p class="no-sub" id="rNo" hidden></p>
+        <div class="hero-fig" id="rHero">
+          <p id="rPre"></p>
+          <div class="big" id="rBig"></div>
+          <p id="rPost"></p>
+        </div>
+        <div class="facts" id="rFacts">
+          <div><div class="v" id="f24"></div><p class="k"><span data-l="es">Ahorro en 2 años</span><span data-l="ca">Estalvi en 2 anys</span><span data-l="en">Saving over 2 years</span></p></div>
+          <div><div class="v" id="fPay"></div><p class="k"><span data-l="es">Para recuperar el cambio</span><span data-l="ca">Per recuperar el canvi</span><span data-l="en">To recover the cost of switching</span></p></div>
+          <div><div class="v" id="fCheap"></div><p class="k" id="fCheapK"></p></div>
+        </div>
+      </div>
+      <div class="cmp">
+        <p class="k"><span data-l="es">Su coste efectivo</span><span data-l="ca">El seu cost efectiu</span><span data-l="en">Your effective cost</span></p>
+        <div class="v" id="rEff"></div>
+        <p class="ref" id="rRef" hidden></p>
+      </div>
+      <div class="res-actions">
+        <button type="button" class="btn" id="rShare"><span data-l="es">Compartir mi resultado</span><span data-l="ca">Compartir el meu resultat</span><span data-l="en">Share my result</span></button>
+        <button type="button" class="back" id="rChange"><span data-l="es">← Cambiar respuestas</span><span data-l="ca">← Canviar respostes</span><span data-l="en">← Change answers</span></button>
+      </div>
+      <p class="share-msg" id="shareMsg" role="status" hidden></p>
+    </section>
+
+    <section class="pay" id="pay" hidden>
+      <h2><span data-l="es">A quién cambiarse, exactamente</span><span data-l="ca">A qui canviar-se, exactament</span><span data-l="en">Who to switch to, exactly</span></h2>
+      <p class="pay-line" id="payLine"></p>
+      <p class="iva"><span data-l="es">IVA incluido · pago único</span><span data-l="ca">IVA inclòs · pagament únic</span><span data-l="en">VAT included · one-off payment</span></p>
+      <ul class="incl">
+        <li><span data-l="es">Proveedor y plan concretos, y 2 alternativas</span><span data-l="ca">Proveïdor i pla concrets, i 2 alternatives</span><span data-l="en">The exact provider and plan, plus 2 alternatives</span></li>
+        <li><span data-l="es">Cuándo salir según su permanencia</span><span data-l="ca">Quan sortir segons la permanència</span><span data-l="en">When to leave, given your minimum term</span></li>
+        <li><span data-l="es">Qué pedir a su banco para negociar</span><span data-l="ca">Què demanar al seu banc per negociar</span><span data-l="en">What to ask your bank for when negotiating</span></li>
+        <li><span data-l="es">Pasos para cambiar</span><span data-l="ca">Passos per canviar</span><span data-l="en">Steps to switch</span></li>
+      </ul>
+      <p class="guarantee"><span data-l="es">Si la recomendación le ahorra menos de 50 € al año según el cálculo, se devuelve el importe.</span><span data-l="ca">Si la recomanació li estalvia menys de 50 € l'any segons el càlcul, es retorna l'import.</span><span data-l="en">If the recommendation saves you less than 50 € a year according to the calculation, the amount is refunded.</span></p>
+      <label class="consent"><input type="checkbox" id="payOk" required> <span><span data-l="es">Acepto que el informe se entrega al momento y que, por eso, pierdo el derecho de desistimiento.</span><span data-l="ca">Accepto que l'informe s'entrega al moment i que, per això, perdo el dret de desistiment.</span><span data-l="en">I accept that the report is delivered immediately and that I therefore lose the right of withdrawal.</span> <a href="/legal-notice"><span data-l="es">Condiciones</span><span data-l="ca">Condicions</span><span data-l="en">Terms</span></a></span></label>
+      <!-- Configuración del pago: objeto PAGO al principio de assets/calculadora.js -->
+      <button type="button" class="btn btn--gold pay-btn" id="payBtn" disabled><span data-l="es">Ver mi recomendación · 10 €</span><span data-l="ca">Veure la meva recomanació · 10 €</span><span data-l="en">See my recommendation · 10 €</span></button>
+      <p class="pay-soon" id="paySoon" hidden><span data-l="es">Disponible muy pronto</span><span data-l="ca">Disponible molt aviat</span><span data-l="en">Available very soon</span></p>
+      <p class="human"><span data-l="es">¿Prefiere que una persona revise su factura?</span><span data-l="ca">Prefereix que una persona revisi la seva factura?</span><span data-l="en">Would you rather have a person review your invoice?</span><br><a href="#contacto" id="ctaBtn"><span data-l="es">Análisis personalizado con presupuesto cerrado →</span><span data-l="ca">Anàlisi personalitzada amb pressupost tancat →</span><span data-l="en">Personalised analysis with a fixed quote →</span></a><br><span data-l="es">Si ya compró el informe, se le descuentan los 10 €.</span><span data-l="ca">Si ja va comprar l'informe, se li descompten els 10 €.</span><span data-l="en">If you already bought the report, the 10 € is deducted.</span></p>
+    </section>
+
+    <section class="informe" id="informe" hidden>
+      <h2><span data-l="es">Su recomendación</span><span data-l="ca">La seva recomanació</span><span data-l="en">Your recommendation</span></h2>
+      <div id="iBody">
+        <p class="big" id="iPlan"></p>
+        <p class="save" id="iSave"></p>
+        <h3><span data-l="es">Alternativas</span><span data-l="ca">Alternatives</span><span data-l="en">Alternatives</span></h3>
+        <ul id="iAlts"></ul>
+        <h3><span data-l="es">Cuándo salir</span><span data-l="ca">Quan sortir</span><span data-l="en">When to leave</span></h3>
+        <p class="when" id="iWhen"></p>
+        <h3><span data-l="es">Qué pedir a su banco</span><span data-l="ca">Què demanar al seu banc</span><span data-l="en">What to ask your bank</span></h3>
+        <p class="when" id="iBank"></p>
+        <h3><span data-l="es">Pasos para cambiar</span><span data-l="ca">Passos per canviar</span><span data-l="en">Steps to switch</span></h3>
+        <ol id="iSteps"></ol>
+        <button type="button" class="btn btn--gold i-print" id="iPrint"><span data-l="es">Imprimir o guardar en PDF</span><span data-l="ca">Imprimir o desar en PDF</span><span data-l="en">Print or save as PDF</span></button>
+      </div>
+      <p class="when" id="iMissing" hidden><span data-l="es">No se encontraron sus respuestas en este navegador. Escriba a <a href="mailto:caceresg.natasha@gmail.com">caceresg.natasha@gmail.com</a> con el recibo de pago y se le enviará el informe.</span><span data-l="ca">No s'han trobat les seves respostes en aquest navegador. Escrigui a <a href="mailto:caceresg.natasha@gmail.com">caceresg.natasha@gmail.com</a> amb el rebut de pagament i se li enviarà l'informe.</span><span data-l="en">Your answers were not found in this browser. Write to <a href="mailto:caceresg.natasha@gmail.com">caceresg.natasha@gmail.com</a> with your payment receipt and the report will be sent to you.</span></p>
+    </section>
+    </div>
+  </div>
+
+  <section class="col contact" id="contacto" hidden>
+    <div class="contact-in">
+      <h2><span data-l="es">Análisis personalizado</span><span data-l="ca">Anàlisi personalitzada</span><span data-l="en">Personalised analysis</span></h2>
+      <p class="contact-lead"><span data-l="es">Deje sus datos y recibirá el presupuesto.</span><span data-l="ca">Deixi les seves dades i rebrà el pressupost.</span><span data-l="en">Leave your details to receive the quote.</span></p>
+      <form class="obs-visit-form" method="POST" action="https://formsubmit.co/FORMSUBMIT_ALIAS" data-ajax-form="">
+        <input type="hidden" name="_subject" value="Análisis de datáfono">
+        <input type="hidden" name="_template" value="table">
+        <input type="hidden" name="_captcha" value="false">
+        <input type="text" name="_honey" class="obs-hp" tabindex="-1" autocomplete="off" aria-hidden="true">
+        <div class="obs-vf"><label for="ct-n"><span data-l="es">Su nombre</span><span data-l="ca">El seu nom</span><span data-l="en">Your name</span></label><input id="ct-n" name="Nombre" type="text" autocomplete="name" required></div>
+        <div class="obs-vf"><label for="ct-c"><span data-l="es">Teléfono o correo</span><span data-l="ca">Telèfon o correu</span><span data-l="en">Phone or email</span></label><input id="ct-c" name="Teléfono o correo" type="text" autocomplete="email" required></div>
+        <div class="obs-vf"><label for="ct-m"><span data-l="es">Mensaje (opcional)</span><span data-l="ca">Missatge (opcional)</span><span data-l="en">Message (optional)</span></label><textarea id="ct-m" name="Mensaje" rows="3"></textarea></div>
+        <label class="obs-consent"><input type="checkbox" name="Consentimiento" value="Sí" required> <span><span data-l="es">Acepto que me contacten para enviarme el presupuesto.</span><span data-l="ca">Accepto que em contactin per enviar-me el pressupost.</span><span data-l="en">I agree to be contacted to receive the quote.</span> <a href="/privacy-policy"><span data-l="es">Política de privacidad</span><span data-l="ca">Política de privacitat</span><span data-l="en">Privacy Policy</span></a></span></label>
+        <button class="btn btn--gold obs-visit-btn" type="submit"><span data-l="es">Enviar</span><span data-l="ca">Enviar</span><span data-l="en">Send</span></button>
+        <p class="obs-visit-err" role="alert" hidden><span data-l="es">No se ha podido enviar. Inténtelo de nuevo en unos minutos.</span><span data-l="ca">No s'ha pogut enviar. Torni-ho a provar d'aquí a uns minuts.</span><span data-l="en">The request could not be sent. Please try again in a few minutes.</span></p>
+      </form>
+      <p class="obs-visit-ok" role="status" tabindex="-1" hidden><span data-l="es">Gracias. Recibirá respuesta en los próximos días.</span><span data-l="ca">Gràcies. Rebrà resposta els propers dies.</span><span data-l="en">Thank you. A reply will follow in the next few days.</span></p>
+    </div>
+  </section>
+
+  <section class="faq" aria-labelledby="faqH">
+    <h2 id="faqH"><span data-l="es">Dudas más comunes sobre la calculadora de comisiones</span><span data-l="ca">Dubtes més habituals sobre la calculadora de comissions</span><span data-l="en">Common questions about the fee calculator</span></h2>
+    <div class="faq-list">
+      <details class="faq-i" name="faq" open>
+        <summary><span data-l="es">¿Es independiente?</span><span data-l="ca">És independent?</span><span data-l="en">Is it independent?</span></summary>
+        <p><span data-l="es">Sí. Esta calculadora no cobra comisiones de ningún banco ni proveedor, no usa enlaces de afiliación y no publica anuncios ni posiciones patrocinadas. Ningún proveedor puede pagar por aparecer, ni por salir mejor o peor. Compara las tarifas públicas de 25 proveedores, bancos y fintech, con el mismo método para todos, y le recomienda el que le sale más barato a usted, sea quien sea. Solo se cobra por la recomendación detallada (10 €), que paga usted y no el proveedor.</span><span data-l="ca">Sí. Aquesta calculadora no cobra comissions de cap banc ni proveïdor, no fa servir enllaços d'afiliació i no publica anuncis ni posicions patrocinades. Cap proveïdor pot pagar per aparèixer, ni per sortir-ne millor o pitjor. Compara les tarifes públiques de 25 proveïdors, bancs i fintech, amb el mateix mètode per a tots, i li recomana el que li surt més barat a vostè, sigui qui sigui. Només es cobra per la recomanació detallada (10 €), que paga vostè i no el proveïdor.</span><span data-l="en">Yes. This calculator takes no commission from any bank or provider, uses no affiliate links and publishes no ads or sponsored placements. No provider can pay to appear, or to come out better or worse. It compares the public rates of 25 providers, banks and fintechs, with the same method for all, and recommends whichever is cheapest for you, whoever it is. The only charge is for the detailed recommendation (10 €), paid by you and not by the provider.</span></p>
+      </details>
+      <details class="faq-i" name="faq">
+        <summary><span data-l="es">¿Con qué tarifas se compara?</span><span data-l="ca">Amb quines tarifes es compara?</span><span data-l="en">Which rates is it compared with?</span></summary>
+        <p><span data-l="es">Con 28 tarifas públicas de 25 proveedores que operan en España, revisadas cada mes en la web oficial de cada uno. Fecha de la última revisión: <span class="fechaTarifas" data-fl="es">28 de octubre de 2026</span>.</span><span data-l="ca">Amb 28 tarifes públiques de 25 proveïdors que operen a Espanya, revisades cada mes a la web oficial de cadascun. Data de l'última revisió: <span class="fechaTarifas" data-fl="ca">28 d'octubre de 2026</span>.</span><span data-l="en">With 28 public rates from 25 providers operating in Spain, checked every month on each provider's official website. Date of last review: <span class="fechaTarifas" data-fl="en">28 October 2026</span>.</span></p>
+      </details>
+      <details class="faq-i" name="faq">
+        <summary><span data-l="es">¿Qué documentos necesito?</span><span data-l="ca">Quins documents necessito?</span><span data-l="en">What documents do I need?</span></summary>
+        <p><span data-l="es">El resumen mensual de su datáfono, el que le envía su banco o proveedor. Los datos no se envían ni se guardan: todo se calcula en su navegador.</span><span data-l="ca">El resum mensual del seu datàfon, el que li envia el seu banc o proveïdor. Les dades no s'envien ni es guarden: tot es calcula al seu navegador.</span><span data-l="en">Your card machine's monthly statement, the one your bank or provider sends you. Your data is neither sent nor stored: everything is calculated in your browser.</span></p>
+      </details>
+      <details class="faq-i" name="faq">
+        <summary><span data-l="es">¿Cuánto cuesta?</span><span data-l="ca">Quant costa?</span><span data-l="en">How much does it cost?</span></summary>
+        <p><span data-l="es">El resultado es gratis. La recomendación exacta, con proveedor, plan, cuándo salir y cómo cambiar, cuesta 10 € IVA incluido, y solo se ofrece si le compensa cambiar. Si el ahorro anual no supera 10 €, se devuelve el importe.</span><span data-l="ca">El resultat és gratuït. La recomanació exacta, amb proveïdor, pla, quan sortir i com canviar, costa 10 € IVA inclòs, i només s'ofereix si li compensa canviar. Si l'estalvi anual no supera 10 €, es retorna l'import.</span><span data-l="en">The result is free. The exact recommendation, with provider, plan, when to leave and how to switch, costs 10 € VAT included, and is only offered if switching is worth it. If the annual saving is not more than 10 €, the amount is refunded.</span></p>
+      </details>
+    </div>
+    <script type="application/ld+json" id="faq-ld-es">{"@context":"https://schema.org","@type":"FAQPage","inLanguage":"es","mainEntity":[{"@type":"Question","name":"¿Es independiente?","acceptedAnswer":{"@type":"Answer","text":"Sí. Esta calculadora no cobra comisiones de ningún banco ni proveedor, no usa enlaces de afiliación y no publica anuncios ni posiciones patrocinadas. Ningún proveedor puede pagar por aparecer, ni por salir mejor o peor. Compara las tarifas públicas de 25 proveedores, bancos y fintech, con el mismo método para todos, y le recomienda el que le sale más barato a usted, sea quien sea. Solo se cobra por la recomendación detallada (10 €), que paga usted y no el proveedor."}},{"@type":"Question","name":"¿Con qué tarifas se compara?","acceptedAnswer":{"@type":"Answer","text":"Con 28 tarifas públicas de 25 proveedores que operan en España, revisadas cada mes en la web oficial de cada uno. Fecha de la última revisión: 28 de octubre de 2026."}},{"@type":"Question","name":"¿Qué documentos necesito?","acceptedAnswer":{"@type":"Answer","text":"El resumen mensual de su datáfono, el que le envía su banco o proveedor. Los datos no se envían ni se guardan: todo se calcula en su navegador."}},{"@type":"Question","name":"¿Cuánto cuesta?","acceptedAnswer":{"@type":"Answer","text":"El resultado es gratis. La recomendación exacta, con proveedor, plan, cuándo salir y cómo cambiar, cuesta 10 € IVA incluido, y solo se ofrece si le compensa cambiar. Si el ahorro anual no supera 10 €, se devuelve el importe."}}]}</script>
+    <script type="application/ld+json" id="faq-ld-ca">{"@context":"https://schema.org","@type":"FAQPage","inLanguage":"ca","mainEntity":[{"@type":"Question","name":"És independent?","acceptedAnswer":{"@type":"Answer","text":"Sí. Aquesta calculadora no cobra comissions de cap banc ni proveïdor, no fa servir enllaços d'afiliació i no publica anuncis ni posicions patrocinades. Cap proveïdor pot pagar per aparèixer, ni per sortir-ne millor o pitjor. Compara les tarifes públiques de 25 proveïdors, bancs i fintech, amb el mateix mètode per a tots, i li recomana el que li surt més barat a vostè, sigui qui sigui. Només es cobra per la recomanació detallada (10 €), que paga vostè i no el proveïdor."}},{"@type":"Question","name":"Amb quines tarifes es compara?","acceptedAnswer":{"@type":"Answer","text":"Amb 28 tarifes públiques de 25 proveïdors que operen a Espanya, revisades cada mes a la web oficial de cadascun. Data de l'última revisió: 28 d'octubre de 2026."}},{"@type":"Question","name":"Quins documents necessito?","acceptedAnswer":{"@type":"Answer","text":"El resum mensual del seu datàfon, el que li envia el seu banc o proveïdor. Les dades no s'envien ni es guarden: tot es calcula al seu navegador."}},{"@type":"Question","name":"Quant costa?","acceptedAnswer":{"@type":"Answer","text":"El resultat és gratuït. La recomanació exacta, amb proveïdor, pla, quan sortir i com canviar, costa 10 € IVA inclòs, i només s'ofereix si li compensa canviar. Si l'estalvi anual no supera 10 €, es retorna l'import."}}]}</script>
+    <script type="application/ld+json" id="faq-ld-en">{"@context":"https://schema.org","@type":"FAQPage","inLanguage":"en","mainEntity":[{"@type":"Question","name":"Is it independent?","acceptedAnswer":{"@type":"Answer","text":"Yes. This calculator takes no commission from any bank or provider, uses no affiliate links and publishes no ads or sponsored placements. No provider can pay to appear, or to come out better or worse. It compares the public rates of 25 providers, banks and fintechs, with the same method for all, and recommends whichever is cheapest for you, whoever it is. The only charge is for the detailed recommendation (10 €), paid by you and not by the provider."}},{"@type":"Question","name":"Which rates is it compared with?","acceptedAnswer":{"@type":"Answer","text":"With 28 public rates from 25 providers operating in Spain, checked every month on each provider's official website. Date of last review: 28 October 2026."}},{"@type":"Question","name":"What documents do I need?","acceptedAnswer":{"@type":"Answer","text":"Your card machine's monthly statement, the one your bank or provider sends you. Your data is neither sent nor stored: everything is calculated in your browser."}},{"@type":"Question","name":"How much does it cost?","acceptedAnswer":{"@type":"Answer","text":"The result is free. The exact recommendation, with provider, plan, when to leave and how to switch, costs 10 € VAT included, and is only offered if switching is worth it. If the annual saving is not more than 10 €, the amount is refunded."}}]}</script>
+  </section>
+</div>
+</main>
+
+<footer class="ftr">
+  <div class="wrap">
+    <div class="ftr-cols">
+      <div>
+        <h2 class="label"><span data-l="en">Location</span><span data-l="es">Ubicación</span><span data-l="ca">Ubicació</span></h2>
+        <address>Barcelona</address>
+      </div>
+      <div>
+        <h2 class="label"><span data-l="en">Contact</span><span data-l="es">Contacto</span><span data-l="ca">Contacte</span></h2>
+        <div class="icons">
+          <a href="mailto:caceresg.natasha@gmail.com" aria-label="Email" data-aria-es="Correo electrónico" data-aria-ca="Correu electrònic" data-aria-en="Email"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><rect x="3" y="5" width="18" height="14"></rect><path d="M3 6l9 7 9-7"></path></svg></a>
+          <a href="https://www.linkedin.com/in/natasha-c%C3%A1ceres-9912b73b0/" target="_blank" rel="noopener" aria-label="LinkedIn"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><rect x="3" y="3" width="18" height="18"></rect><path d="M8 10.5V17M8 7.2v.1M11.5 17v-6.5M11.5 13.5c0-2 1.2-3 2.7-3s2.3 1 2.3 3V17"></path></svg></a>
+        </div>
+      </div>
+      <div>
+        <h2 class="label"><span data-l="en">Other links</span><span data-l="es">Otros enlaces</span><span data-l="ca">Altres enllaços</span></h2>
+        <ul class="ftr-links">
+          <li><a href="/privacy-policy"><span data-l="en">Privacy Policy</span><span data-l="es">Política de privacidad</span><span data-l="ca">Política de privacitat</span></a></li>
+          <li><a href="/legal-notice"><span data-l="en">Legal Notice</span><span data-l="es">Aviso legal</span><span data-l="ca">Avís legal</span></a></li>
+          <li><a href="/cookie-policy"><span data-l="en">Cookies</span><span data-l="es">Cookies</span><span data-l="ca">Galetes</span></a></li>
+          <li><a href="/about#intereses"><span data-l="en">Declared interests</span><span data-l="es">Intereses declarados</span><span data-l="ca">Interessos declarats</span></a></li>
+        </ul>
+      </div>
+    </div>
+    <p class="ftr-bottom"><span data-l="en">© 2026 Natasha Cáceres. All rights reserved.</span><span data-l="es">© 2026 Natasha Cáceres. Todos los derechos reservados.</span><span data-l="ca">© 2026 Natasha Cáceres. Tots els drets reservats.</span></p>
+  </div>
+</footer>
+<script src="/assets/site.js?v=20261026-2"></script>
+<script>const RESPALDO = {"actualizado":"2026-10-28","planes":[{"id":"SUMUP_PPU","prov":"SumUp","plan":"SumUp · Pago por uso","tipo":"Fintech","modelo":"Porcentaje","sim":"Sí","fiab":"Alta","rp":0.0149,"fp":0,"re":0.0149,"fe":0,"rn":0.0149,"fn":0,"ra":0.0149,"fa":0,"rb":null,"fb":0,"bz":0,"minop":0,"inc":[0,0,0,0],"incb":0,"exc":null,"excmin":null,"cuota":0,"cuenta":0,"alq":0,"adic":null,"compra":34,"dias":1,"pm":0,"pv":null,"pn":null,"sector":"Todos","tramos":[],"forma":"Todos"},{"id":"SUMUP_TP","prov":"SumUp","plan":"SumUp · Tarifa Plana","tipo":"Fintech","modelo":"Tramos","sim":"Sí","fiab":"Media","rp":0.0149,"fp":0,"re":0.0149,"fe":0,"rn":0.0149,"fn":0,"ra":0.0149,"fa":0,"rb":null,"fb":0,"bz":0,"minop":0,"inc":[1,0,0,0],"incb":0,"exc":0.0079,"excmin":null,"cuota":0,"cuenta":0,"alq":0,"adic":null,"compra":34,"dias":1,"pm":0,"pv":null,"pn":null,"sector":"Todos","tramos":[[2500,25]],"forma":"Todos"},{"id":"SQUARE","prov":"Square","plan":"Square · Estándar","tipo":"Fintech","modelo":"Porcentaje","sim":"Sí","fiab":"Media","rp":0.0125,"fp":0.05,"re":0.0125,"fe":0.05,"rn":0.0275,"fn":0.05,"ra":0.0125,"fa":0.05,"rb":null,"fb":0,"bz":0,"minop":0,"inc":[0,0,0,0],"incb":0,"exc":null,"excmin":null,"cuota":0,"cuenta":0,"alq":0,"adic":null,"compra":19,"dias":1,"pm":0,"pv":null,"pn":null,"sector":"Todos","tramos":[],"forma":"Todos"},{"id":"MYPOS","prov":"myPOS","plan":"myPOS · Estándar","tipo":"Fintech","modelo":"Porcentaje","sim":"Sí","fiab":"Alta","rp":0.0145,"fp":0.05,"re":0.0285,"fe":0.05,"rn":0.0285,"fn":0.05,"ra":0.0245,"fa":0.05,"rb":null,"fb":0,"bz":0,"minop":0,"inc":[0,0,0,0],"incb":0,"exc":null,"excmin":null,"cuota":0,"cuenta":0,"alq":0,"adic":null,"compra":39,"dias":0,"pm":0,"pv":null,"pn":null,"sector":"Todos","tramos":[],"forma":"Todos"},{"id":"ZETTLE","prov":"Zettle","plan":"Zettle (PayPal) · Estándar","tipo":"Fintech","modelo":"Porcentaje","sim":"Sí","fiab":"Alta","rp":0.0149,"fp":0,"re":0.0149,"fe":0,"rn":0.0149,"fn":0,"ra":0.0149,"fa":0,"rb":null,"fb":0,"bz":0,"minop":0,"inc":[0,0,0,0],"incb":0,"exc":null,"excmin":null,"cuota":0,"cuenta":0,"alq":0,"adic":null,"compra":29,"dias":2,"pm":0,"pv":null,"pn":null,"sector":"Todos","tramos":[],"forma":"Todos"},{"id":"REVOLUT","prov":"Revolut","plan":"Revolut Business · Basic","tipo":"Fintech","modelo":"Porcentaje","sim":"Sí","fiab":"Alta","rp":0.008,"fp":0.02,"re":0.026,"fe":0.02,"rn":0.026,"fn":0.02,"ra":0.017,"fa":0.02,"rb":null,"fb":0,"bz":0,"minop":0,"inc":[0,0,0,0],"incb":0,"exc":null,"excmin":null,"cuota":10,"cuenta":0,"alq":0,"adic":null,"compra":139,"dias":1,"pm":0,"pv":null,"pn":null,"sector":"Todos","tramos":[],"forma":"Todos"},{"id":"VIVA","prov":"Viva.com","plan":"Viva.com · Estándar","tipo":"Fintech","modelo":"Porcentaje","sim":"Sí","fiab":"Media","rp":0.0169,"fp":0,"re":0.0236,"fe":0,"rn":0.0236,"fn":0,"ra":0.0275,"fa":0,"rb":null,"fb":0,"bz":0,"minop":0.03,"inc":[0,0,0,0],"incb":0,"exc":null,"excmin":null,"cuota":0,"cuenta":0,"alq":8.99,"adic":2,"compra":0,"dias":0,"pm":0,"pv":null,"pn":null,"sector":"Todos","tramos":[],"forma":"Todos"},{"id":"STRIPE","prov":"Stripe","plan":"Stripe Terminal","tipo":"Fintech","modelo":"Porcentaje","sim":"Sí","fiab":"Media","rp":0.014,"fp":0.1,"re":0.014,"fe":0.1,"rn":0.029,"fn":0.1,"ra":null,"fa":0,"rb":null,"fb":0,"bz":0,"minop":0,"inc":[0,0,0,0],"incb":0,"exc":null,"excmin":null,"cuota":0,"cuenta":0,"alq":0,"adic":null,"compra":59,"dias":null,"pm":0,"pv":null,"pn":null,"sector":"Todos","tramos":[],"forma":"Todos"},{"id":"CAIXA","prov":"CaixaBank","plan":"CaixaBank · MyCommerce+","tipo":"Banco","modelo":"Tramos","sim":"Sí","fiab":"Alta","rp":null,"fp":0,"re":null,"fe":0,"rn":null,"fn":0,"ra":null,"fa":0,"rb":null,"fb":0,"bz":1,"minop":0,"inc":[1,1,1,0],"incb":1,"exc":0.0115,"excmin":0.05,"cuota":0,"cuenta":0,"alq":0,"adic":9,"compra":0,"dias":1,"pm":12,"pv":2000,"pn":null,"sector":"Todos","tramos":[[2000,12],[4000,24],[6000,36],[8000,44],[10000,55],[15000,80],[20000,100],[25000,120]],"forma":"Todos"},{"id":"BBVA","prov":"BBVA","plan":"BBVA · Bono TPV","tipo":"Banco","modelo":"Tramos","sim":"Sí","fiab":"Media","rp":null,"fp":0,"re":null,"fe":0,"rn":null,"fn":0,"ra":null,"fa":0,"rb":null,"fb":0,"bz":1,"minop":0,"inc":[1,1,1,0],"incb":1,"exc":0.01,"excmin":null,"cuota":0,"cuenta":0,"alq":0,"adic":3.5,"compra":0,"dias":1,"pm":12,"pv":null,"pn":null,"sector":"Todos","tramos":[[1500,10],[3000,20],[5000,30],[7000,40],[10000,55],[15000,75],[20000,95],[25000,115]],"forma":"Todos"},{"id":"GETNET_B","prov":"Santander-Getnet","plan":"Santander (Getnet) · Básica","tipo":"Banco","modelo":"Porcentaje","sim":"Sí","fiab":"Media","rp":0.004,"fp":0.18,"re":0.0175,"fe":0,"rn":0.0175,"fn":0,"ra":null,"fa":0,"rb":0.004,"fb":0.18,"bz":1,"minop":0,"inc":[0,0,0,0],"incb":0,"exc":null,"excmin":null,"cuota":0,"cuenta":0,"alq":0,"adic":10,"compra":0,"dias":0,"pm":0,"pv":null,"pn":null,"sector":"Todos","tramos":[],"forma":"Todos"},{"id":"SABADELL","prov":"Sabadell","plan":"Sabadell (Paycomet) · Por operación 2026","tipo":"Banco","modelo":"Porcentaje","sim":"Sí","fiab":"Baja","rp":0.002,"fp":0,"re":0.008,"fe":0,"rn":null,"fn":0,"ra":null,"fa":0,"rb":0.004,"fb":0,"bz":1,"minop":0.07,"inc":[0,0,0,0],"incb":0,"exc":null,"excmin":null,"cuota":0,"cuenta":0,"alq":0,"adic":null,"compra":0,"dias":1,"pm":0,"pv":null,"pn":null,"sector":"Todos","tramos":[[1000,6],[2000,12],[3000,18],[4000,24],[5000,30],[6000,36],[7000,40],[8000,44],[9000,50],[10000,55]],"forma":"Todos"},{"id":"UNICAJA","prov":"Unicaja","plan":"Unicaja · Tarifa plana","tipo":"Banco","modelo":"Tramos","sim":"Sí","fiab":"Media","rp":null,"fp":0,"re":null,"fe":0,"rn":null,"fn":0,"ra":null,"fa":0,"rb":null,"fb":0,"bz":1,"minop":0,"inc":[1,0,0,0],"incb":0,"exc":0.011,"excmin":0.35,"cuota":0,"cuenta":0,"alq":0,"adic":10,"compra":0,"dias":null,"pm":0,"pv":null,"pn":null,"sector":"Todos","tramos":[[1000,9],[2000,19],[4000,30],[6000,42],[10000,60]],"forma":"Todos"},{"id":"BANKINTER","prov":"Bankinter","plan":"Bankinter · Plan Empresas","tipo":"Banco","modelo":"Porcentaje","sim":"Sí","fiab":"Media","rp":0.0045,"fp":0,"re":0.01,"fe":0,"rn":0.015,"fn":0,"ra":null,"fa":0,"rb":null,"fb":0,"bz":1,"minop":0,"inc":[0,0,0,0],"incb":0,"exc":null,"excmin":null,"cuota":0,"cuenta":10,"alq":0,"adic":null,"compra":0,"dias":null,"pm":0,"pv":null,"pn":null,"sector":"Todos","tramos":[],"forma":"Todos"},{"id":"CAJAMAR","prov":"Cajamar","plan":"Cajamar · Tarifa Restauración","tipo":"Banco","modelo":"Porcentaje","sim":"Sí","fiab":"Media","rp":0.002,"fp":0,"re":0.02,"fe":0,"rn":0.019,"fn":0,"ra":null,"fa":0,"rb":null,"fb":0,"bz":1,"minop":0.02,"inc":[0,0,0,0],"incb":0,"exc":null,"excmin":null,"cuota":0,"cuenta":0,"alq":0,"adic":6,"compra":0,"dias":null,"pm":0,"pv":null,"pn":null,"sector":"Restauración","tramos":[],"forma":"Todos"},{"id":"ABANCA","prov":"Abanca","plan":"Abanca · Premium","tipo":"Banco","modelo":"Porcentaje","sim":"Sí","fiab":"Baja","rp":0.0035,"fp":0,"re":null,"fe":0,"rn":null,"fn":0,"ra":null,"fa":0,"rb":null,"fb":0,"bz":1,"minop":0,"inc":[0,0,0,0],"incb":0,"exc":null,"excmin":null,"cuota":0,"cuenta":0,"alq":0,"adic":null,"compra":0,"dias":null,"pm":0,"pv":null,"pn":null,"sector":"Todos","tramos":[],"forma":"Todos"},{"id":"GETNET_P","prov":"Santander-Getnet","plan":"Santander (Getnet) · Plana","tipo":"Banco","modelo":"Tramos","sim":"Sí","fiab":"Media","rp":null,"fp":0,"re":0.03,"fe":0,"rn":0.0175,"fn":0,"ra":0.0175,"fa":0,"rb":null,"fb":0,"bz":1,"minop":0,"inc":[1,0,0,0],"incb":1,"exc":0.015,"excmin":null,"cuota":0,"cuenta":0,"alq":0,"adic":10,"compra":0,"dias":0,"pm":12,"pv":null,"pn":null,"sector":"Todos","tramos":[[500,6],[1000,9],[2000,16],[4000,32],[6000,42],[8000,55],[10000,65],[15000,80],[20000,100],[25000,120]],"forma":"Todos"},{"id":"QONTO_S","prov":"Qonto","plan":"Qonto · Starter","tipo":"Fintech","modelo":"Porcentaje","sim":"Sí","fiab":"Media","rp":0.012,"fp":0,"re":0.026,"fe":0,"rn":0.026,"fn":0,"ra":null,"fa":0,"rb":null,"fb":0,"bz":0,"minop":0,"inc":[0,0,0,0],"incb":0,"exc":null,"excmin":null,"cuota":0,"cuenta":0,"alq":0,"adic":null,"compra":99,"dias":1,"pm":0,"pv":null,"pn":null,"sector":"Todos","tramos":[],"forma":"Todos"},{"id":"QONTO_B","prov":"Qonto","plan":"Qonto · Basic","tipo":"Fintech","modelo":"Porcentaje","sim":"Sí","fiab":"Media","rp":0.008,"fp":0,"re":0.026,"fe":0,"rn":0.026,"fn":0,"ra":null,"fa":0,"rb":null,"fb":0,"bz":0,"minop":0,"inc":[0,0,0,0],"incb":0,"exc":null,"excmin":null,"cuota":9,"cuenta":0,"alq":0,"adic":null,"compra":99,"dias":1,"pm":0,"pv":null,"pn":null,"sector":"Todos","tramos":[],"forma":"Todos"},{"id":"MOLLIE_G","prov":"Mollie","plan":"Mollie · Pay as you go","tipo":"Fintech","modelo":"Porcentaje","sim":"Sí","fiab":"Media","rp":0.012,"fp":0,"re":0.029,"fe":0,"rn":0.018,"fn":0,"ra":0.021,"fa":0,"rb":null,"fb":0,"bz":0,"minop":0,"inc":[0,0,0,0],"incb":0,"exc":null,"excmin":null,"cuota":0,"cuenta":0,"alq":0,"adic":null,"compra":95,"dias":null,"pm":0,"pv":null,"pn":null,"sector":"Todos","tramos":[],"forma":"Todos"},{"id":"MOLLIE_P","prov":"Mollie","plan":"Mollie · Pro","tipo":"Fintech","modelo":"Porcentaje","sim":"Sí","fiab":"Media","rp":0.0085,"fp":0.1,"re":0.025,"fe":0.1,"rn":0.015,"fn":0.1,"ra":0.018,"fa":0.1,"rb":null,"fb":0,"bz":0,"minop":0,"inc":[0,0,0,0],"incb":0,"exc":null,"excmin":null,"cuota":20,"cuenta":0,"alq":0,"adic":20,"compra":95,"dias":null,"pm":0,"pv":null,"pn":null,"sector":"Todos","tramos":[],"forma":"Todos"},{"id":"MONEI","prov":"MONEI","plan":"MONEI Pay (IC++)","tipo":"Fintech","modelo":"Porcentaje","sim":"Sí","fiab":"Media","rp":0.0068,"fp":0,"re":0.0235,"fe":0,"rn":0.0235,"fn":0,"ra":null,"fa":0,"rb":null,"fb":0,"bz":0,"minop":0,"inc":[0,0,0,0],"incb":0,"exc":null,"excmin":null,"cuota":8.5,"cuenta":0,"alq":0,"adic":null,"compra":0,"dias":3,"pm":0,"pv":null,"pn":null,"sector":"Todos","tramos":[],"forma":"Todos"},{"id":"DISH","prov":"DISH Pay","plan":"DISH Pay (Metro) · Alquiler","tipo":"Fintech","modelo":"Porcentaje","sim":"Sí","fiab":"Media","rp":0.0082,"fp":0.03,"re":0.0289,"fe":0.03,"rn":0.0289,"fn":0.03,"ra":0.035,"fa":0.03,"rb":null,"fb":0,"bz":0,"minop":0,"inc":[0,0,0,0],"incb":0,"exc":null,"excmin":null,"cuota":0,"cuenta":0,"alq":16.9,"adic":16.9,"compra":0,"dias":null,"pm":0,"pv":null,"pn":null,"sector":"Todos","tramos":[],"forma":"Todos"},{"id":"LASTPAY","prov":"Last.app","plan":"LastPay · Tap to Pay (con Last.app)","tipo":"Fintech","modelo":"Porcentaje","sim":"Sí","fiab":"Media","rp":0.012,"fp":0.05,"re":0.012,"fe":0.05,"rn":0.012,"fn":0.05,"ra":0.012,"fa":0.05,"rb":null,"fb":0,"bz":0,"minop":0,"inc":[0,0,0,0],"incb":0,"exc":null,"excmin":null,"cuota":0,"cuenta":0,"alq":0,"adic":null,"compra":0,"dias":2,"pm":0,"pv":null,"pn":null,"sector":"Restauración","tramos":[],"forma":"Todos"},{"id":"TREATWELL","prov":"Treatwell","plan":"Treatwell Pay (presencial)","tipo":"Fintech","modelo":"Porcentaje","sim":"Sí","fiab":"Media","rp":0.0079,"fp":0.2,"re":0.0079,"fe":0.2,"rn":0.0079,"fn":0.2,"ra":0.0079,"fa":0.2,"rb":null,"fb":0,"bz":0,"minop":0,"inc":[0,0,0,0],"incb":0,"exc":null,"excmin":null,"cuota":0,"cuenta":0,"alq":0,"adic":null,"compra":229,"dias":null,"pm":0,"pv":null,"pn":null,"sector":"Belleza","tramos":[],"forma":"Todos"},{"id":"BOOKSY","prov":"Booksy","plan":"Booksy · Tap to Pay (iPhone)","tipo":"Fintech","modelo":"Porcentaje","sim":"Sí","fiab":"Media","rp":0.012,"fp":0.24,"re":0.012,"fe":0.24,"rn":0.012,"fn":0.24,"ra":0.012,"fa":0.24,"rb":null,"fb":0,"bz":0,"minop":0,"inc":[0,0,0,0],"incb":0,"exc":null,"excmin":null,"cuota":0,"cuenta":0,"alq":0,"adic":null,"compra":0,"dias":null,"pm":0,"pv":null,"pn":null,"sector":"Belleza","tramos":[],"forma":"Todos"},{"id":"REVOLUT_PRO","prov":"Revolut","plan":"Revolut Pro (autónomos) · Reader","tipo":"Fintech","modelo":"Porcentaje","sim":"Sí","fiab":"Media","rp":0.015,"fp":0,"re":0.015,"fe":0,"rn":0.015,"fn":0,"ra":0.017,"fa":0,"rb":null,"fb":0,"bz":0,"minop":0,"inc":[0,0,0,0],"incb":0,"exc":null,"excmin":null,"cuota":0,"cuenta":0,"alq":0,"adic":null,"compra":57,"dias":1,"pm":0,"pv":null,"pn":null,"sector":"Todos","tramos":[],"forma":"Autónomo"},{"id":"DOJO","prov":"Dojo","plan":"Dojo · Plan acordado","tipo":"Fintech","modelo":"Porcentaje","sim":"Sí","fiab":"Baja","rp":0.009,"fp":0,"re":null,"fe":0,"rn":null,"fn":0,"ra":null,"fa":0,"rb":null,"fb":0,"bz":0,"minop":0,"inc":[0,0,0,0],"incb":0,"exc":null,"excmin":null,"cuota":19,"cuenta":0,"alq":0,"adic":null,"compra":0,"dias":1,"pm":0,"pv":null,"pn":null,"sector":"Todos","tramos":[],"forma":"Todos"},{"id":"TEYA","prov":"Teya","plan":"Teya · Única","tipo":"Fintech","modelo":"Tramos","sim":"No","fiab":"Baja","rp":null,"fp":0,"re":null,"fe":0,"rn":null,"fn":0,"ra":null,"fa":0,"rb":null,"fb":0,"bz":1,"minop":0,"inc":[1,0,0,0],"incb":0,"exc":0.015,"excmin":null,"cuota":0,"cuenta":0,"alq":0,"adic":6,"compra":0,"dias":1,"pm":0,"pv":null,"pn":null,"sector":"Todos","tramos":[[2500,29.9]],"forma":"Todos"},{"id":"IBERCAJA","prov":"Ibercaja","plan":"Ibercaja · Tarifa plana","tipo":"Banco","modelo":"Tramos","sim":"No","fiab":"Baja","rp":null,"fp":0,"re":null,"fe":0,"rn":null,"fn":0,"ra":null,"fa":0,"rb":null,"fb":0,"bz":1,"minop":0,"inc":[1,0,0,0],"incb":0,"exc":null,"excmin":null,"cuota":0,"cuenta":0,"alq":0,"adic":null,"compra":0,"dias":null,"pm":12,"pv":null,"pn":null,"sector":"Todos","tramos":[],"forma":"Todos"}]};</script>
+<script src="/assets/calculadora.js?v=18" defer></script>
+</body></html>
