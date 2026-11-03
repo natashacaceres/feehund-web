@@ -6,11 +6,11 @@ const MARCA = "Feehund";
   if (!document.documentElement.hasAttribute("data-title-fijo")) document.title = t ? t + " · " + MARCA : MARCA;
 })();
 
-/* TITULAR: datos del titular en un solo sitio. Se insertan en /aviso-legal/, /privacidad/, /condiciones/ y /contacto/. */
-const TITULAR = {nombre:"Natasha Cáceres", nif:"61759305G", domicilio:"Gran Via de les Corts Catalanes, 734B, Principal 2A, 08013 Barcelona (España)", email:"caceresg.natasha@gmail.com"};
+/* Contacto: un solo correo. Se inserta en los elementos [data-titular]. */
+const TITULAR = {email:"hola@feehund.com"};
 (function titular(){
   document.querySelectorAll("[data-titular]").forEach(el => {
-    const k = el.dataset.titular; el.textContent = TITULAR[k] || "";
+    const k = el.dataset.titular; const v = TITULAR[k]; if (!v) return; el.textContent = v;
     if (k === "email" && el.tagName === "A") el.href = "mailto:" + TITULAR.email;
   });
 })();
