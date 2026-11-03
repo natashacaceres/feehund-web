@@ -18,9 +18,9 @@ const TITULAR = {email:"hola@feehund.com"};
 /* Calculadora del datáfono. Todo se calcula en el navegador: no se envía ni se guarda nada. Las tarifas se leen de /data/tarifas-datafono.json. */
 // ---------- pago: configuración en un solo sitio
 const PAGO = {
-  enlace: "https://buy.stripe.com/3cI5kEffNfIK5r93fb2VG00",
+  enlace: "https://buy.stripe.com/dRm6oI9Vtbsu4n51732VG01",
   activo: true, // el enlace de Stripe vuelve a https://feehund.com/es/?pago=ok
-  precio: 10,
+  precio: 4,
   umbralAhorro: 50
 };
 let PLANS = [];
