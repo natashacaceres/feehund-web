@@ -172,7 +172,7 @@ function iniciarUI(){
       iBankX: (x, y) => "Pida igualar " + x + "/mes o la tarifa " + y + "; si no, solicite la baja.",
       iSteps2: ["Contrate el nuevo proveedor.", "Reciba y active el nuevo datáfono.", "Pida por escrito la baja del anterior.", "Si su datáfono actual es de alquiler, devuélvalo."],
       prog: (i, n) => i + " de " + n, pre: "Paga", post: "de más", one: x => x + "/mes",
-      instant: "Al instante", months: n => "≈ " + n + (n === 1 ? " mes" : " meses"), cheap: n => "de " + n + " tarifas le salen más baratas",
+      instant: "Al instante", months: n => "≈ " + n + (n === 1 ? " mes" : " meses"), cheap: n => "tarifas le salen más baratas",
       ref: (v, s) => "La comisión media de los bancos en España es del " + v + "\u00a0% (" + s + "Banco de España). No incluye cuotas ni alquiler.",
       shareTxtYes: x => x + " de más por cobrar con tarjeta. Calcule lo suyo, gratis:", shareTxtNo: "¿Paga de más por cobrar con tarjeta? Calcúlelo gratis:",
       shTop: "Calculadora del datáfono", shYes: "de más por cobrar con tarjeta", shNo: "de coste efectivo por cobrar con tarjeta", shAsk: "¿Y usted?",
@@ -190,7 +190,7 @@ function iniciarUI(){
       iBankX: (x, y) => "Demani igualar " + x + "/mes o la tarifa " + y + "; si no, sol·liciti la baixa.",
       iSteps2: ["Contracti el nou proveïdor.", "Rebi i activi el nou datàfon.", "Demani per escrit la baixa de l'anterior.", "Si el seu datàfon actual és de lloguer, torni'l."],
       prog: (i, n) => i + " de " + n, pre: "Paga", post: "de més", one: x => x + "/mes",
-      instant: "A l'instant", months: n => "≈ " + n + (n === 1 ? " mes" : " mesos"), cheap: n => "de " + n + " tarifes li surten més barates",
+      instant: "A l'instant", months: n => "≈ " + n + (n === 1 ? " mes" : " mesos"), cheap: n => "tarifes li surten més barates",
       ref: (v, s) => "La comissió mitjana dels bancs a Espanya és del " + v + "\u00a0% (" + s + "Banc d'Espanya). No inclou quotes ni lloguer.",
       shareTxtYes: x => x + " de més per cobrar amb targeta. Calculi el seu, gratis:", shareTxtNo: "Paga de més per cobrar amb targeta? Calculi-ho gratis:",
       shTop: "Calculadora del datàfon", shYes: "de més per cobrar amb targeta", shNo: "de cost efectiu per cobrar amb targeta", shAsk: "I vostè?",
@@ -208,7 +208,7 @@ function iniciarUI(){
       iBankX: (x, y) => "Ask them to match " + x + "/month or the " + y + " rate; if not, request cancellation.",
       iSteps2: ["Sign up with the new provider.", "Receive and activate the new card machine.", "Cancel the previous one in writing.", "If your current card machine is rented, return it."],
       prog: (i, n) => i + " of " + n, pre: "You pay", post: "too much", one: x => x + "/month",
-      instant: "Straight away", months: n => "≈ " + n + (n === 1 ? " month" : " months"), cheap: n => "of " + n + " rates are cheaper for you",
+      instant: "Straight away", months: n => "≈ " + n + (n === 1 ? " month" : " months"), cheap: n => "rates are cheaper for you",
       ref: (v, s) => "The average bank fee in Spain is " + v + "\u00a0% (" + s + "Bank of Spain). It excludes monthly fees and rental.",
       shareTxtYes: x => x + " too much to take card payments. Check yours, free:", shareTxtNo: "Paying too much for card payments? Check for free:",
       shTop: "Card terminal calculator", shYes: "too much to take card payments", shNo: "effective cost of card payments", shAsk: "What about you?",
@@ -803,10 +803,11 @@ const PAISES = [{codigo:"ES", nombre:"España", ruta:"/es/", idiomas:"Español �
 (function fechaPie(){
   if (document.getElementById("calcApp")) return;
   const els = document.querySelectorAll(".fechaTarifas"); if (!els.length) return;
-  const M = ["enero","febrero","marzo","abril","mayo","junio","julio","agosto","septiembre","octubre","noviembre","diciembre"];
+  const M = {es:["enero","febrero","marzo","abril","mayo","junio","julio","agosto","septiembre","octubre","noviembre","diciembre"],ca:["gener","febrer","març","abril","maig","juny","juliol","agost","setembre","octubre","novembre","desembre"],en:["January","February","March","April","May","June","July","August","September","October","November","December"]};
   fetch("/data/tarifas-datafono.json", { cache: "no-store" }).then(r => r.ok ? r.json() : null).then(d => {
     if (!d || !/^\d{4}-\d{2}-\d{2}$/.test(d.actualizado)) return;
     const [y, m, dd] = d.actualizado.split("-").map(Number);
-    els.forEach(el => el.textContent = dd + " de " + M[m - 1] + " de " + y);
+    els.forEach(el => { const l = el.dataset.fl || "es", n = M[l] || M.es, mo = n[m - 1];
+      el.textContent = l === "en" ? dd + " " + mo + " " + y : l === "ca" ? dd + (/^[ao]/.test(mo) ? " d'" : " de ") + mo + " de " + y : dd + " de " + mo + " de " + y; });
   }).catch(() => {});
 })();
