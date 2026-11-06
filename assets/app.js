@@ -32,10 +32,10 @@ function calcular(PLANS, I) {
   let plans = PLANS.slice();
   if (I.contrato) {
     const c = I.contrato, d = v => (v === null || v === undefined || v === "" ? null : v);
-    plans.push({ id: "CONTRATO", prov: "Su contrato", plan: "Su contrato actual", tipo: "Contrato", modelo: "Porcentaje", sim: "Contrato", fiab: "Contrato",
+    plans.push({ id: "CONTRATO", prov: "Tu contrato", plan: "Tu contrato actual", tipo: "Contrato", modelo: "Porcentaje", sim: "Contrato", fiab: "Contrato",
       rp: d(c.rp), fp: N(c.f), re: d(c.re), fe: N(c.f), rn: d(c.rn), fn: N(c.f), ra: d(c.ra), fa: N(c.f), rb: d(c.rb), fb: N(c.f), bz: 1, minop: 0,
       inc: [0, 0, 0, 0], incb: 0, exc: null, excmin: null, cuota: N(c.cuota), cuenta: 0, alq: N(c.alq), adic: null, compra: 0, dias: null,
-      pm: 0, pv: null, pn: null, sector: "Todos", aviso: "Precios de su propio contrato.", tramos: [] });
+      pm: 0, pv: null, pn: null, sector: "Todos", aviso: "Precios de tu propio contrato.", tramos: [] });
   }
   const cur = plans.find(p => p.id === I.cur);
   const iva = 1 + I.IVA;
@@ -99,7 +99,7 @@ function calcular(PLANS, I) {
     r.meses_promo = r.promo * Math.min(N(r.p.pm), 12);
     r.promo_m = r.meses_promo > 0 ? r.ahorro_promo / r.meses_promo : 0;
     const a = r.ahorro_m, pm = r.promo_m, mp = r.meses_promo, cc = r.coste_cambio;
-    if (r.es_actual) r.payback = "Es su plan";
+    if (r.es_actual) r.payback = "Es tu plan";
     else if (cc <= 0) r.payback = a + pm > 0 ? 0 : "Nunca";
     else if (mp > 0 && (a + pm) * mp >= cc) r.payback = cc / (a + pm);
     else if (a <= 0) r.payback = "Nunca";
@@ -110,7 +110,7 @@ function calcular(PLANS, I) {
     r.total2 = r.ano1 + r.ano2;
     const pct = x => (x * 100).toFixed(x < 0.01 ? 2 : 1).replace(".", ",") + " %";
     r.razon = (r.p.modelo === "Tramos"
-      ? "una cuota fija cubre el " + Math.round(r.cubierto * 100) + " % de sus ventas con tarjeta"
+      ? "una cuota fija cubre el " + Math.round(r.cubierto * 100) + " % de tus ventas con tarjeta"
       : "cobra " + pct(r.rp) + " en tarjetas europeas de particular" + (r.fp > 0 ? " + " + r.fp.toFixed(2).replace(".", ",") + " € por cobro" : " sin fijo por cobro"))
       + (I.wN >= 0.15 ? "; tarjetas de turistas: " + (r.p.modelo === "Tramos" && r.p.inc[2] === 1 ? "incluidas en la cuota" : pct(r.rn)) : "");
   });
@@ -120,13 +120,13 @@ function calcular(PLANS, I) {
   const eur = x => String(Math.round(x)).replace(/\B(?=(\d{3})+(?!\d))/g, "\u202F");
   const minimo = I.cons ? " como mínimo" : "";
   let verdict, tono;
-  if (best.es_actual) { verdict = "Ya está en la opción más barata. No le compensa cambiar."; tono = "igual"; }
+  if (best.es_actual) { verdict = "Ya estás en la opción más barata. No te compensa cambiar."; tono = "igual"; }
   else if (best.ahorro_m <= 0) {
     if (best.neto24 > 0) { verdict = "Solo compensa por la promoción de bienvenida de " + best.p.plan + ". Al acabar, pagaría unos " + eur(-best.ahorro_m) + "\u00a0€/mes más que hoy."; tono = "dudoso"; }
-    else { verdict = "No compensa cambiar: ninguna opción le cuesta menos al mes que lo que paga hoy."; tono = "no"; }
-  } else if (Math.max(best.neto24, best.neto24_espera) <= 0) { verdict = "No compensa: " + best.p.plan + " le ahorra " + best.ahorro_m.toFixed(2).replace(".", ",") + "\u00a0€/mes, pero en 2 años no recupera lo que cuesta cambiar."; tono = "no"; }
-  else if (best.neto24_espera > best.neto24) { verdict = "Compensa, pero espere: cambie a " + best.p.plan + " cuando acabe su permanencia, en " + I.MREM + " meses, y se ahorra la penalización."; tono = "si"; }
-  else { verdict = "Compensa cambiar a " + best.p.plan + ": ahorra unos " + eur(best.ahorro_m) + "\u00a0€/mes" + minimo + "."; tono = "si"; }
+    else { verdict = "No compensa cambiar: ninguna opción te cuesta menos al mes que lo que pagas hoy."; tono = "no"; }
+  } else if (Math.max(best.neto24, best.neto24_espera) <= 0) { verdict = "No compensa: " + best.p.plan + " te ahorra " + best.ahorro_m.toFixed(2).replace(".", ",") + "\u00a0€/mes, pero en 2 años no recuperas lo que cuesta cambiar."; tono = "no"; }
+  else if (best.neto24_espera > best.neto24) { verdict = "Compensa, pero espera: cambia a " + best.p.plan + " cuando acabe tu permanencia, en " + I.MREM + " meses, y te ahorras la penalización."; tono = "si"; }
+  else { verdict = "Compensa cambiar a " + best.p.plan + ": ahorras unos " + eur(best.ahorro_m) + "\u00a0€/mes" + minimo + "."; tono = "si"; }
   return { CURANN, cur: c, best, ranked, out, verdict, tono };
 }
 if (typeof module !== "undefined") module.exports = { calcular };
@@ -165,40 +165,40 @@ function iniciarUI(){
 
   const TX = {
     es: {
-      vYes: "Sí, paga de más.", vNo: "No, está bien.", noSub: "Ninguna tarifa le ahorra lo bastante para que compense cambiar.",
+      vYes: "Sí, pagas de más.", vNo: "No, está bien.", noSub: "Ninguna tarifa te ahorra lo bastante para que compense cambiar.",
       payLine: (x, p) => "Ahorro estimado de " + x + " al año · Recomendación por " + p,
-      iCost: (c, s) => "Cuesta " + c + " al mes y ahorra " + s + " al año", iAltCost: c => c + "/mes",
-      iWait2: (d, pen) => "Cuando acabe su permanencia, en " + d + "." + (pen ? " Así evita la penalización de " + pen + "." : ""),
-      iBankX: (x, y) => "Pida igualar " + x + "/mes o la tarifa " + y + "; si no, solicite la baja.",
-      iSteps2: ["Contrate el nuevo proveedor.", "Reciba y active el nuevo datáfono.", "Pida por escrito la baja del anterior.", "Si su datáfono actual es de alquiler, devuélvalo."],
-      prog: (i, n) => i + " de " + n, pre: "Paga", post: "de más", one: x => x + "/mes",
-      instant: "Al instante", months: n => "≈ " + n + (n === 1 ? " mes" : " meses"), cheap: n => "tarifas le salen más baratas",
+      iCost: (c, s) => "Cuesta " + c + " al mes y ahorras " + s + " al año", iAltCost: c => c + "/mes",
+      iWait2: (d, pen) => "Cuando acabe tu permanencia, en " + d + "." + (pen ? " Así evitas la penalización de " + pen + "." : ""),
+      iBankX: (x, y) => "Pide igualar " + x + "/mes o la tarifa " + y + "; si no, solicita la baja.",
+      iSteps2: ["Contrata el nuevo proveedor.", "Recibe y activa el nuevo datáfono.", "Pide por escrito la baja del anterior.", "Si tu datáfono actual es de alquiler, devuélvelo."],
+      prog: (i, n) => i + " de " + n, pre: "Pagas", post: "de más", one: x => x + "/mes",
+      instant: "Al instante", months: n => "≈ " + n + (n === 1 ? " mes" : " meses"), cheap: n => "tarifas te salen más baratas",
       ref: (v, s) => "La comisión media de los bancos en España es del " + v + "\u00a0% (" + s + "Banco de España). No incluye cuotas ni alquiler.",
-      shareTxtYes: x => x + " de más por cobrar con tarjeta. Calcule lo suyo, gratis:", shareTxtNo: "¿Paga de más por cobrar con tarjeta? Calcúlelo gratis:",
-      shTop: "Calculadora del datáfono", shYes: "de más por cobrar con tarjeta", shNo: "de coste efectivo por cobrar con tarjeta", shAsk: "¿Y usted?",
+      shareTxtYes: x => x + " de más por cobrar con tarjeta. Calcula lo tuyo, gratis:", shareTxtNo: "¿Pagas de más por cobrar con tarjeta? Calcúlalo gratis:",
+      shTop: "Calculadora del datáfono", shYes: "de más por cobrar con tarjeta", shNo: "de coste efectivo por cobrar con tarjeta", shAsk: "¿Y tú?",
       shared: "Imagen descargada y enlace copiado.",
-      chooseProv: "Elija su banco o empresa y su plan", banks: "Bancos", fin: "Otras empresas de datáfonos", own: "Escribir mis propios precios", own2: "Su contrato actual",
-      iSave: x => "Ahorra unos " + x + " al mes", iWait: d => "Cuando acabe su permanencia, en " + d + ". Así evita la penalización.", iNow: "Ya. Cambiar no le cuesta nada.", iNowCost: x => "Ya. Cambiar le cuesta " + x + " y lo recupera con el ahorro.",
-      iBank1: p => "Que le iguale " + p + " por cobro con tarjeta europea de particular.", iBank2: "Que le quite la cuota mensual y el alquiler del datáfono.", iBank3: "Que se lo dé por escrito, con la fecha de inicio.",
-      iSteps: ["Pida al nuevo proveedor las condiciones por escrito.", "Confirme que el datáfono funciona con su caja o programa de ventas.", "Active el nuevo datáfono antes de dar de baja el antiguo.", "Pida la baja por escrito y guarde el justificante."]
+      chooseProv: "Elige tu banco o empresa y tu plan", banks: "Bancos", fin: "Otras empresas de datáfonos", own: "Escribir mis propios precios", own2: "Tu contrato actual",
+      iSave: x => "Ahorras unos " + x + " al mes", iWait: d => "Cuando acabe tu permanencia, en " + d + ". Así evitas la penalización.", iNow: "Ya. Cambiar no te cuesta nada.", iNowCost: x => "Ya. Cambiar te cuesta " + x + " y lo recuperas con el ahorro.",
+      iBank1: p => "Que te iguale " + p + " por cobro con tarjeta europea de particular.", iBank2: "Que te quite la cuota mensual y el alquiler del datáfono.", iBank3: "Que te lo dé por escrito, con la fecha de inicio.",
+      iSteps: ["Pide al nuevo proveedor las condiciones por escrito.", "Confirma que el datáfono funciona con tu caja o programa de ventas.", "Activa el nuevo datáfono antes de dar de baja el antiguo.", "Pide la baja por escrito y guarda el justificante."]
     },
     ca: {
-      vYes: "Sí, paga de més.", vNo: "No, està bé.", noSub: "Cap tarifa li estalvia prou perquè compensi canviar.",
+      vYes: "Sí, pagues de més.", vNo: "No, està bé.", noSub: "Cap tarifa t'estalvia prou perquè compensi canviar.",
       payLine: (x, p) => "Estalvi estimat de " + x + " l'any · Recomanació per " + p,
-      iCost: (c, s) => "Costa " + c + " al mes i estalvia " + s + " l'any", iAltCost: c => c + "/mes",
-      iWait2: (d, pen) => "Quan acabi la permanència, el " + d + "." + (pen ? " Així evita la penalització de " + pen + "." : ""),
-      iBankX: (x, y) => "Demani igualar " + x + "/mes o la tarifa " + y + "; si no, sol·liciti la baixa.",
-      iSteps2: ["Contracti el nou proveïdor.", "Rebi i activi el nou datàfon.", "Demani per escrit la baixa de l'anterior.", "Si el seu datàfon actual és de lloguer, torni'l."],
-      prog: (i, n) => i + " de " + n, pre: "Paga", post: "de més", one: x => x + "/mes",
-      instant: "A l'instant", months: n => "≈ " + n + (n === 1 ? " mes" : " mesos"), cheap: n => "tarifes li surten més barates",
+      iCost: (c, s) => "Costa " + c + " al mes i estalvies " + s + " l'any", iAltCost: c => c + "/mes",
+      iWait2: (d, pen) => "Quan acabi la permanència, el " + d + "." + (pen ? " Així evites la penalització de " + pen + "." : ""),
+      iBankX: (x, y) => "Demana igualar " + x + "/mes o la tarifa " + y + "; si no, sol·licita la baixa.",
+      iSteps2: ["Contracta el nou proveïdor.", "Rep i activa el nou datàfon.", "Demana per escrit la baixa de l'anterior.", "Si el teu datàfon actual és de lloguer, torna'l."],
+      prog: (i, n) => i + " de " + n, pre: "Pagues", post: "de més", one: x => x + "/mes",
+      instant: "A l'instant", months: n => "≈ " + n + (n === 1 ? " mes" : " mesos"), cheap: n => "tarifes et surten més barates",
       ref: (v, s) => "La comissió mitjana dels bancs a Espanya és del " + v + "\u00a0% (" + s + "Banc d'Espanya). No inclou quotes ni lloguer.",
-      shareTxtYes: x => x + " de més per cobrar amb targeta. Calculi el seu, gratis:", shareTxtNo: "Paga de més per cobrar amb targeta? Calculi-ho gratis:",
-      shTop: "Calculadora del datàfon", shYes: "de més per cobrar amb targeta", shNo: "de cost efectiu per cobrar amb targeta", shAsk: "I vostè?",
+      shareTxtYes: x => x + " de més per cobrar amb targeta. Calcula el teu, gratis:", shareTxtNo: "Pagues de més per cobrar amb targeta? Calcula-ho gratis:",
+      shTop: "Calculadora del datàfon", shYes: "de més per cobrar amb targeta", shNo: "de cost efectiu per cobrar amb targeta", shAsk: "I tu?",
       shared: "Imatge descarregada i enllaç copiat.",
-      chooseProv: "Triï el seu banc o empresa i el seu pla", banks: "Bancs", fin: "Altres empreses de datàfons", own: "Escriure els meus propis preus", own2: "El seu contracte actual",
-      iSave: x => "Estalvia uns " + x + " al mes", iWait: d => "Quan acabi la permanència, el " + d + ". Així evita la penalització.", iNow: "Ja. Canviar no li costa res.", iNowCost: x => "Ja. Canviar li costa " + x + " i ho recupera amb l'estalvi.",
-      iBank1: p => "Que li iguali " + p + " per cobrament amb targeta europea de particular.", iBank2: "Que li tregui la quota mensual i el lloguer del datàfon.", iBank3: "Que l'hi doni per escrit, amb la data d'inici.",
-      iSteps: ["Demani al nou proveïdor les condicions per escrit.", "Confirmi que el datàfon funciona amb la seva caixa o programa de vendes.", "Activi el nou datàfon abans de donar de baixa l'antic.", "Demani la baixa per escrit i guardi'n el justificant."]
+      chooseProv: "Tria el teu banc o empresa i el teu pla", banks: "Bancs", fin: "Altres empreses de datàfons", own: "Escriure els meus propis preus", own2: "El teu contracte actual",
+      iSave: x => "Estalvies uns " + x + " al mes", iWait: d => "Quan acabi la permanència, el " + d + ". Així evites la penalització.", iNow: "Ja. Canviar no et costa res.", iNowCost: x => "Ja. Canviar et costa " + x + " i ho recuperes amb l'estalvi.",
+      iBank1: p => "Que t'iguali " + p + " per cobrament amb targeta europea de particular.", iBank2: "Que et tregui la quota mensual i el lloguer del datàfon.", iBank3: "Que te'l doni per escrit, amb la data d'inici.",
+      iSteps: ["Demana al nou proveïdor les condicions per escrit.", "Confirma que el datàfon funciona amb la teva caixa o programa de vendes.", "Activa el nou datàfon abans de donar de baixa l'antic.", "Demana la baixa per escrit i guarda'n el justificant."]
     },
     en: {
       vYes: "Yes, you are paying too much.", vNo: "No, you are fine.", noSub: "No rate saves you enough to make switching worth it.",
@@ -472,13 +472,12 @@ function iniciarUI(){
   if (qs.get("pago") === "ok") {
     let saved = null;
     try { saved = JSON.parse(sessionStorage.getItem(KEY)); } catch(_) {}
-    // Stripe vuelve siempre a /es/: si se pagó desde /es/ca/ o /es/en/, el informe se muestra en ese idioma.
+    // Stripe vuelve a /es/ (redirige a /datafono/): si se pagó desde /ca/datafon/ o /en/card-machine/, el informe se muestra en ese idioma.
     const ruta = saved && typeof saved.ruta === "string" ? saved.ruta : "";
-    const idioma = /\/es\/ca\/(index\.html)?$/.test(ruta) ? "ca" : /\/es\/en\/(index\.html)?$/.test(ruta) ? "en" : "";
-    const aqui = /\/es\/ca\/(index\.html)?$/.test(location.pathname) ? "ca" : /\/es\/en\/(index\.html)?$/.test(location.pathname) ? "en" : "";
+    const cual = p => /\/(es\/ca|ca\/datafon)\/(index\.html)?$/.test(p) ? "ca" : /\/(es\/en|en\/card-machine)\/(index\.html)?$/.test(p) ? "en" : "";
+    const idioma = cual(ruta), aqui = cual(location.pathname);
     if (idioma && idioma !== aqui) {
-      const base = location.pathname.replace(/\/es\/((ca|en)\/)?(index\.html)?$/, "/es/");
-      location.replace(base + idioma + "/index.html?pago=ok"); return;
+      location.replace((idioma === "ca" ? "/ca/datafon/" : "/en/card-machine/") + "?pago=ok"); return;
     }
     try { history.replaceState(null, "", location.pathname); } catch(_) {}
     pp.hidden = true;
@@ -563,7 +562,7 @@ function iniciarUI(){
 const ISO_PAISES = "AD AE AF AG AI AL AM AO AQ AR AS AT AU AW AX AZ BA BB BD BE BF BG BH BI BJ BL BM BN BO BQ BR BS BT BV BW BY BZ CA CC CD CF CG CH CI CK CL CM CN CO CR CU CV CW CX CY CZ DE DJ DK DM DO DZ EC EE EG EH ER ES ET FI FJ FK FM FO FR GA GB GD GE GF GG GH GI GL GM GN GP GQ GR GS GT GU GW GY HK HM HN HR HT HU ID IE IL IM IN IO IQ IR IS IT JE JM JO JP KE KG KH KI KM KN KP KR KW KY KZ LA LB LC LI LK LR LS LT LU LV LY MA MC MD ME MF MG MH MK ML MM MN MO MP MQ MR MS MT MU MV MW MX MY MZ NA NC NE NF NG NI NL NO NP NR NU NZ OM PA PE PF PG PH PK PL PM PN PR PS PT PW PY QA RE RO RS RU RW SA SB SC SD SE SG SH SI SJ SK SL SM SN SO SR SS ST SV SX SY SZ TC TD TF TG TH TJ TK TL TM TN TO TR TT TV TW TZ UA UG UM US UY UZ VA VC VE VG VI VN VU WF WS XK YE YT ZA ZM ZW".split(" ");
 
 // ---------- página de entrada: países (añada aquí los nuevos)
-const PAISES = [{codigo:"ES", nombre:"España", ruta:"/es/", idiomas:"Español · Català · English", activo:true}];
+const PAISES = [{codigo:"ES", nombre:"España", ruta:"/datafono/", idiomas:"Español · Català · English", activo:true}];
 (function entrada(){
   const lista = document.getElementById("paises"); if (!lista) return;
   const $ = id => document.getElementById(id);
@@ -732,7 +731,7 @@ const PAISES = [{codigo:"ES", nombre:"España", ruta:"/es/", idiomas:"Español �
   pintar();
 })();
 
-// ---------- «¿Cobra fuera de España?»: lista de espera en ventana emergente (páginas /es/)
+// ---------- «¿Cobras fuera de España?»: lista de espera en ventana emergente (páginas /es/)
 (function espera(){
   const dlg = document.getElementById("espera"), abridores = document.querySelectorAll("[data-espera]"); if (!dlg || !abridores.length) return;
   const $ = id => document.getElementById(id);
