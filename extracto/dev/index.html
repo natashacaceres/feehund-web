@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Lector de extractos · página de prueba</title>
+<link rel="icon" href="data:,">
+<link rel="stylesheet" href="/extracto/dev/dev.css">
+<script type="module" src="/extracto/dev/dev.js"></script>
+</head>
+<body>
+<a class="saltar" href="#principal" data-t="saltar">Saltar al contenido</a>
+<header class="cabecera">
+  <h1 data-t="titulo">Lector de extractos</h1>
+  <p data-t="intro">Página de prueba del motor. Tus archivos se leen en este dispositivo y no se envían a ningún sitio.</p>
+  <div class="fila">
+    <label for="idioma" data-t="idioma">Idioma</label>
+    <select id="idioma">
+      <option value="es" lang="es">Español</option>
+      <option value="ca" lang="ca">Català</option>
+      <option value="en" lang="en">English</option>
+    </select>
+  </div>
+  <p id="red" class="red" role="status" aria-live="polite"></p>
+</header>
+<main id="principal" tabindex="-1">
+  <form id="entrada" novalidate>
+    <h2 data-t="archivos">Tus extractos</h2>
+    <div id="zona" class="zona">
+      <p data-t="soltar">Suelta aquí los archivos del banco</p>
+      <p class="suave" data-t="formatos">Excel, CSV, Norma 43, OFX, QIF, camt.053, MT940, ZIP, PDF o fotos. Hasta 10 MB por archivo.</p>
+      <button type="button" id="elegir" class="boton" data-t="elegir">Elegir archivos</button>
+      <input type="file" id="archivos" multiple hidden accept=".xlsx,.xls,.ods,.numbers,.csv,.tsv,.txt,.n43,.q43,.aeb,.ofx,.qfx,.qif,.xml,.sta,.940,.mt940,.zip,.pdf,.png,.jpg,.jpeg,.webp,.heic,.heif,.html,.htm,text/csv,text/plain,application/pdf,image/*">
+      <ul id="elegidos" class="elegidos"></ul>
+    </div>
+    <label for="pegado" data-t="pegar">O pega aquí los movimientos copiados de la web del banco</label>
+    <textarea id="pegado" rows="5" spellcheck="false" autocomplete="off"></textarea>
+    <div class="acciones">
+      <button type="submit" id="analizar" class="boton primario" data-t="analizar">Analizar</button>
+      <button type="button" id="ejemplo" class="boton" data-t="ejemplo">Probar con un extracto de ejemplo</button>
+    </div>
+  </form>
+  <p id="aviso" class="aviso" role="status" aria-live="polite"></p>
+  <section id="contrasena" class="bloque" hidden aria-labelledby="t-contrasena"></section>
+  <section id="mapeo" class="bloque" hidden aria-labelledby="t-mapeo"></section>
+  <section id="confirmar" class="bloque" hidden aria-labelledby="t-confirmar"></section>
+  <section id="resultado" class="bloque" hidden aria-labelledby="t-resultado" aria-busy="false"></section>
+  <div class="acciones pie">
+    <button type="button" id="olvidar" class="boton" data-t="olvidar">Olvidar todo</button>
+  </div>
+</main>
+</body>
+</html>

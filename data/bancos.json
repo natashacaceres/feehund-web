@@ -1,0 +1,622 @@
+{
+  "version": "2026-11-06",
+  "aviso": {
+    "es": "Estos pasos son generales y están por comprobar con cada banco. Los bancos cambian sus menús a menudo.",
+    "ca": "Aquests passos són generals i falta comprovar-los amb cada banc. Els bancs canvien els menús sovint.",
+    "en": "These steps are general and still need checking with each bank. Banks change their menus often."
+  },
+  "bancos": [
+    {
+      "id": "caixabank",
+      "nombre": "CaixaBank",
+      "estado": "por_verificar",
+      "pasos": [
+        {
+          "es": "Entra en la web o en la app de CaixaBank.",
+          "ca": "Entra al web o a l'app de CaixaBank.",
+          "en": "Sign in to the CaixaBank website or app."
+        },
+        {
+          "es": "Busca los movimientos de tu cuenta y elige el periodo más largo que te deje, mejor 12 meses.",
+          "ca": "Busca els moviments del teu compte i tria el període més llarg que et deixi, millor 12 mesos.",
+          "en": "Find your account transactions and pick the longest period it allows, ideally 12 months."
+        },
+        {
+          "es": "Descarga el archivo en Excel, CSV, PDF o Norma 43, el que aparezca. Si puedes elegir, mejor Excel o CSV.",
+          "ca": "Descarrega el fitxer en Excel, CSV, PDF o Norma 43, el que surti. Si pots triar, millor Excel o CSV.",
+          "en": "Download the file as Excel, CSV, PDF or Norma 43, whichever appears. If you can choose, Excel or CSV is better."
+        }
+      ],
+      "formatos_probables": {
+        "estado": "por_verificar",
+        "lista": [
+          "xls",
+          "pdf",
+          "norma43"
+        ]
+      },
+      "notas": []
+    },
+    {
+      "id": "imagin",
+      "nombre": "imagin",
+      "estado": "por_verificar",
+      "pasos": [
+        {
+          "es": "Entra en la web o en la app de imagin.",
+          "ca": "Entra al web o a l'app de imagin.",
+          "en": "Sign in to the imagin website or app."
+        },
+        {
+          "es": "Busca los movimientos de tu cuenta y elige el periodo más largo que te deje, mejor 12 meses.",
+          "ca": "Busca els moviments del teu compte i tria el període més llarg que et deixi, millor 12 mesos.",
+          "en": "Find your account transactions and pick the longest period it allows, ideally 12 months."
+        },
+        {
+          "es": "Descarga el archivo en Excel, CSV o PDF, el que aparezca. Si puedes elegir, mejor Excel o CSV.",
+          "ca": "Descarrega el fitxer en Excel, CSV o PDF, el que surti. Si pots triar, millor Excel o CSV.",
+          "en": "Download the file as Excel, CSV or PDF, whichever appears. If you can choose, Excel or CSV is better."
+        }
+      ],
+      "formatos_probables": {
+        "estado": "por_verificar",
+        "lista": [
+          "xlsx",
+          "pdf"
+        ]
+      },
+      "notas": []
+    },
+    {
+      "id": "santander",
+      "nombre": "Santander",
+      "estado": "por_verificar",
+      "pasos": [
+        {
+          "es": "Entra en la web o en la app de Santander.",
+          "ca": "Entra al web o a l'app de Santander.",
+          "en": "Sign in to the Santander website or app."
+        },
+        {
+          "es": "Busca los movimientos de tu cuenta y elige el periodo más largo que te deje, mejor 12 meses.",
+          "ca": "Busca els moviments del teu compte i tria el període més llarg que et deixi, millor 12 mesos.",
+          "en": "Find your account transactions and pick the longest period it allows, ideally 12 months."
+        },
+        {
+          "es": "Descarga el archivo en Excel, CSV, PDF o Norma 43, el que aparezca. Si puedes elegir, mejor Excel o CSV.",
+          "ca": "Descarrega el fitxer en Excel, CSV, PDF o Norma 43, el que surti. Si pots triar, millor Excel o CSV.",
+          "en": "Download the file as Excel, CSV, PDF or Norma 43, whichever appears. If you can choose, Excel or CSV is better."
+        }
+      ],
+      "formatos_probables": {
+        "estado": "por_verificar",
+        "lista": [
+          "xlsx",
+          "pdf",
+          "norma43"
+        ]
+      },
+      "notas": []
+    },
+    {
+      "id": "bbva",
+      "nombre": "BBVA",
+      "estado": "por_verificar",
+      "pasos": [
+        {
+          "es": "Entra en la web o en la app de BBVA.",
+          "ca": "Entra al web o a l'app de BBVA.",
+          "en": "Sign in to the BBVA website or app."
+        },
+        {
+          "es": "Busca los movimientos de tu cuenta y elige el periodo más largo que te deje, mejor 12 meses.",
+          "ca": "Busca els moviments del teu compte i tria el període més llarg que et deixi, millor 12 mesos.",
+          "en": "Find your account transactions and pick the longest period it allows, ideally 12 months."
+        },
+        {
+          "es": "Descarga el archivo en Excel, CSV, PDF o Norma 43, el que aparezca. Si puedes elegir, mejor Excel o CSV.",
+          "ca": "Descarrega el fitxer en Excel, CSV, PDF o Norma 43, el que surti. Si pots triar, millor Excel o CSV.",
+          "en": "Download the file as Excel, CSV, PDF or Norma 43, whichever appears. If you can choose, Excel or CSV is better."
+        }
+      ],
+      "formatos_probables": {
+        "estado": "por_verificar",
+        "lista": [
+          "xlsx",
+          "pdf",
+          "norma43"
+        ]
+      },
+      "notas": []
+    },
+    {
+      "id": "ing",
+      "nombre": "ING",
+      "estado": "por_verificar",
+      "pasos": [
+        {
+          "es": "Entra en la web o en la app de ING.",
+          "ca": "Entra al web o a l'app de ING.",
+          "en": "Sign in to the ING website or app."
+        },
+        {
+          "es": "Busca los movimientos de tu cuenta y elige el periodo más largo que te deje, mejor 12 meses.",
+          "ca": "Busca els moviments del teu compte i tria el període més llarg que et deixi, millor 12 mesos.",
+          "en": "Find your account transactions and pick the longest period it allows, ideally 12 months."
+        },
+        {
+          "es": "Descarga el archivo en Excel, CSV o PDF, el que aparezca. Si puedes elegir, mejor Excel o CSV.",
+          "ca": "Descarrega el fitxer en Excel, CSV o PDF, el que surti. Si pots triar, millor Excel o CSV.",
+          "en": "Download the file as Excel, CSV or PDF, whichever appears. If you can choose, Excel or CSV is better."
+        }
+      ],
+      "formatos_probables": {
+        "estado": "por_verificar",
+        "lista": [
+          "xls",
+          "pdf"
+        ]
+      },
+      "notas": [
+        {
+          "id": "limite_250",
+          "estado": "por_verificar",
+          "es": "Puede que cada descarga traiga como mucho 250 movimientos. Si ves que faltan meses, descarga el año en dos partes y suelta los dos archivos a la vez.",
+          "ca": "Pot ser que cada descàrrega porti com a molt 250 moviments. Si veus que hi falten mesos, descarrega l'any en dues parts i deixa anar els dos fitxers alhora.",
+          "en": "Each download may hold at most 250 transactions. If some months are missing, download the year in two parts and drop both files at once."
+        }
+      ]
+    },
+    {
+      "id": "sabadell",
+      "nombre": "Banco Sabadell",
+      "estado": "por_verificar",
+      "pasos": [
+        {
+          "es": "Entra en la web o en la app de Banco Sabadell.",
+          "ca": "Entra al web o a l'app de Banco Sabadell.",
+          "en": "Sign in to the Banco Sabadell website or app."
+        },
+        {
+          "es": "Busca los movimientos de tu cuenta y elige el periodo más largo que te deje, mejor 12 meses.",
+          "ca": "Busca els moviments del teu compte i tria el període més llarg que et deixi, millor 12 mesos.",
+          "en": "Find your account transactions and pick the longest period it allows, ideally 12 months."
+        },
+        {
+          "es": "Descarga el archivo en Excel, CSV, PDF o Norma 43, el que aparezca. Si puedes elegir, mejor Excel o CSV.",
+          "ca": "Descarrega el fitxer en Excel, CSV, PDF o Norma 43, el que surti. Si pots triar, millor Excel o CSV.",
+          "en": "Download the file as Excel, CSV, PDF or Norma 43, whichever appears. If you can choose, Excel or CSV is better."
+        }
+      ],
+      "formatos_probables": {
+        "estado": "por_verificar",
+        "lista": [
+          "xls",
+          "pdf",
+          "norma43"
+        ]
+      },
+      "notas": []
+    },
+    {
+      "id": "abanca",
+      "nombre": "Abanca",
+      "estado": "por_verificar",
+      "pasos": [
+        {
+          "es": "Entra en la web o en la app de Abanca.",
+          "ca": "Entra al web o a l'app de Abanca.",
+          "en": "Sign in to the Abanca website or app."
+        },
+        {
+          "es": "Busca los movimientos de tu cuenta y elige el periodo más largo que te deje, mejor 12 meses.",
+          "ca": "Busca els moviments del teu compte i tria el període més llarg que et deixi, millor 12 mesos.",
+          "en": "Find your account transactions and pick the longest period it allows, ideally 12 months."
+        },
+        {
+          "es": "Descarga el archivo en Excel, CSV, PDF o Norma 43, el que aparezca. Si puedes elegir, mejor Excel o CSV.",
+          "ca": "Descarrega el fitxer en Excel, CSV, PDF o Norma 43, el que surti. Si pots triar, millor Excel o CSV.",
+          "en": "Download the file as Excel, CSV, PDF or Norma 43, whichever appears. If you can choose, Excel or CSV is better."
+        }
+      ],
+      "formatos_probables": {
+        "estado": "por_verificar",
+        "lista": [
+          "xls",
+          "pdf",
+          "norma43"
+        ]
+      },
+      "notas": []
+    },
+    {
+      "id": "bankinter",
+      "nombre": "Bankinter",
+      "estado": "por_verificar",
+      "pasos": [
+        {
+          "es": "Entra en la web o en la app de Bankinter.",
+          "ca": "Entra al web o a l'app de Bankinter.",
+          "en": "Sign in to the Bankinter website or app."
+        },
+        {
+          "es": "Busca los movimientos de tu cuenta y elige el periodo más largo que te deje, mejor 12 meses.",
+          "ca": "Busca els moviments del teu compte i tria el període més llarg que et deixi, millor 12 mesos.",
+          "en": "Find your account transactions and pick the longest period it allows, ideally 12 months."
+        },
+        {
+          "es": "Descarga el archivo en Excel, CSV, PDF o Norma 43, el que aparezca. Si puedes elegir, mejor Excel o CSV.",
+          "ca": "Descarrega el fitxer en Excel, CSV, PDF o Norma 43, el que surti. Si pots triar, millor Excel o CSV.",
+          "en": "Download the file as Excel, CSV, PDF or Norma 43, whichever appears. If you can choose, Excel or CSV is better."
+        }
+      ],
+      "formatos_probables": {
+        "estado": "por_verificar",
+        "lista": [
+          "xlsx",
+          "pdf",
+          "norma43"
+        ]
+      },
+      "notas": []
+    },
+    {
+      "id": "openbank",
+      "nombre": "Openbank",
+      "estado": "por_verificar",
+      "pasos": [
+        {
+          "es": "Entra en la web o en la app de Openbank.",
+          "ca": "Entra al web o a l'app de Openbank.",
+          "en": "Sign in to the Openbank website or app."
+        },
+        {
+          "es": "Busca los movimientos de tu cuenta y elige el periodo más largo que te deje, mejor 12 meses.",
+          "ca": "Busca els moviments del teu compte i tria el període més llarg que et deixi, millor 12 mesos.",
+          "en": "Find your account transactions and pick the longest period it allows, ideally 12 months."
+        },
+        {
+          "es": "Descarga el archivo en Excel, CSV o PDF, el que aparezca. Si puedes elegir, mejor Excel o CSV.",
+          "ca": "Descarrega el fitxer en Excel, CSV o PDF, el que surti. Si pots triar, millor Excel o CSV.",
+          "en": "Download the file as Excel, CSV or PDF, whichever appears. If you can choose, Excel or CSV is better."
+        }
+      ],
+      "formatos_probables": {
+        "estado": "por_verificar",
+        "lista": [
+          "xls",
+          "pdf"
+        ]
+      },
+      "notas": []
+    },
+    {
+      "id": "unicaja",
+      "nombre": "Unicaja",
+      "estado": "por_verificar",
+      "pasos": [
+        {
+          "es": "Entra en la web o en la app de Unicaja.",
+          "ca": "Entra al web o a l'app de Unicaja.",
+          "en": "Sign in to the Unicaja website or app."
+        },
+        {
+          "es": "Busca los movimientos de tu cuenta y elige el periodo más largo que te deje, mejor 12 meses.",
+          "ca": "Busca els moviments del teu compte i tria el període més llarg que et deixi, millor 12 mesos.",
+          "en": "Find your account transactions and pick the longest period it allows, ideally 12 months."
+        },
+        {
+          "es": "Descarga el archivo en Excel, CSV, PDF o Norma 43, el que aparezca. Si puedes elegir, mejor Excel o CSV.",
+          "ca": "Descarrega el fitxer en Excel, CSV, PDF o Norma 43, el que surti. Si pots triar, millor Excel o CSV.",
+          "en": "Download the file as Excel, CSV, PDF or Norma 43, whichever appears. If you can choose, Excel or CSV is better."
+        }
+      ],
+      "formatos_probables": {
+        "estado": "por_verificar",
+        "lista": [
+          "xls",
+          "pdf",
+          "norma43"
+        ]
+      },
+      "notas": []
+    },
+    {
+      "id": "kutxabank",
+      "nombre": "Kutxabank",
+      "estado": "por_verificar",
+      "pasos": [
+        {
+          "es": "Entra en la web o en la app de Kutxabank.",
+          "ca": "Entra al web o a l'app de Kutxabank.",
+          "en": "Sign in to the Kutxabank website or app."
+        },
+        {
+          "es": "Busca los movimientos de tu cuenta y elige el periodo más largo que te deje, mejor 12 meses.",
+          "ca": "Busca els moviments del teu compte i tria el període més llarg que et deixi, millor 12 mesos.",
+          "en": "Find your account transactions and pick the longest period it allows, ideally 12 months."
+        },
+        {
+          "es": "Descarga el archivo en Excel, CSV, PDF o Norma 43, el que aparezca. Si puedes elegir, mejor Excel o CSV.",
+          "ca": "Descarrega el fitxer en Excel, CSV, PDF o Norma 43, el que surti. Si pots triar, millor Excel o CSV.",
+          "en": "Download the file as Excel, CSV, PDF or Norma 43, whichever appears. If you can choose, Excel or CSV is better."
+        }
+      ],
+      "formatos_probables": {
+        "estado": "por_verificar",
+        "lista": [
+          "xls",
+          "pdf",
+          "norma43"
+        ]
+      },
+      "notas": []
+    },
+    {
+      "id": "ibercaja",
+      "nombre": "Ibercaja",
+      "estado": "por_verificar",
+      "pasos": [
+        {
+          "es": "Entra en la web o en la app de Ibercaja.",
+          "ca": "Entra al web o a l'app de Ibercaja.",
+          "en": "Sign in to the Ibercaja website or app."
+        },
+        {
+          "es": "Busca los movimientos de tu cuenta y elige el periodo más largo que te deje, mejor 12 meses.",
+          "ca": "Busca els moviments del teu compte i tria el període més llarg que et deixi, millor 12 mesos.",
+          "en": "Find your account transactions and pick the longest period it allows, ideally 12 months."
+        },
+        {
+          "es": "Descarga el archivo en Excel, CSV, PDF o Norma 43, el que aparezca. Si puedes elegir, mejor Excel o CSV.",
+          "ca": "Descarrega el fitxer en Excel, CSV, PDF o Norma 43, el que surti. Si pots triar, millor Excel o CSV.",
+          "en": "Download the file as Excel, CSV, PDF or Norma 43, whichever appears. If you can choose, Excel or CSV is better."
+        }
+      ],
+      "formatos_probables": {
+        "estado": "por_verificar",
+        "lista": [
+          "xls",
+          "pdf",
+          "norma43"
+        ]
+      },
+      "notas": []
+    },
+    {
+      "id": "cajamar",
+      "nombre": "Cajamar",
+      "estado": "por_verificar",
+      "pasos": [
+        {
+          "es": "Entra en la web o en la app de Cajamar.",
+          "ca": "Entra al web o a l'app de Cajamar.",
+          "en": "Sign in to the Cajamar website or app."
+        },
+        {
+          "es": "Busca los movimientos de tu cuenta y elige el periodo más largo que te deje, mejor 12 meses.",
+          "ca": "Busca els moviments del teu compte i tria el període més llarg que et deixi, millor 12 mesos.",
+          "en": "Find your account transactions and pick the longest period it allows, ideally 12 months."
+        },
+        {
+          "es": "Descarga el archivo en Excel, CSV, PDF o Norma 43, el que aparezca. Si puedes elegir, mejor Excel o CSV.",
+          "ca": "Descarrega el fitxer en Excel, CSV, PDF o Norma 43, el que surti. Si pots triar, millor Excel o CSV.",
+          "en": "Download the file as Excel, CSV, PDF or Norma 43, whichever appears. If you can choose, Excel or CSV is better."
+        }
+      ],
+      "formatos_probables": {
+        "estado": "por_verificar",
+        "lista": [
+          "xlsx",
+          "pdf",
+          "norma43"
+        ]
+      },
+      "notas": []
+    },
+    {
+      "id": "myinvestor",
+      "nombre": "MyInvestor",
+      "estado": "por_verificar",
+      "pasos": [
+        {
+          "es": "Entra en la web o en la app de MyInvestor.",
+          "ca": "Entra al web o a l'app de MyInvestor.",
+          "en": "Sign in to the MyInvestor website or app."
+        },
+        {
+          "es": "Busca los movimientos de tu cuenta y elige el periodo más largo que te deje, mejor 12 meses.",
+          "ca": "Busca els moviments del teu compte i tria el període més llarg que et deixi, millor 12 mesos.",
+          "en": "Find your account transactions and pick the longest period it allows, ideally 12 months."
+        },
+        {
+          "es": "Descarga el archivo en Excel, CSV o PDF, el que aparezca. Si puedes elegir, mejor Excel o CSV.",
+          "ca": "Descarrega el fitxer en Excel, CSV o PDF, el que surti. Si pots triar, millor Excel o CSV.",
+          "en": "Download the file as Excel, CSV or PDF, whichever appears. If you can choose, Excel or CSV is better."
+        }
+      ],
+      "formatos_probables": {
+        "estado": "por_verificar",
+        "lista": [
+          "csv",
+          "pdf"
+        ]
+      },
+      "notas": []
+    },
+    {
+      "id": "revolut",
+      "nombre": "Revolut",
+      "estado": "por_verificar",
+      "pasos": [
+        {
+          "es": "Entra en la web o en la app de Revolut.",
+          "ca": "Entra al web o a l'app de Revolut.",
+          "en": "Sign in to the Revolut website or app."
+        },
+        {
+          "es": "Busca los movimientos de tu cuenta y elige el periodo más largo que te deje, mejor 12 meses.",
+          "ca": "Busca els moviments del teu compte i tria el període més llarg que et deixi, millor 12 mesos.",
+          "en": "Find your account transactions and pick the longest period it allows, ideally 12 months."
+        },
+        {
+          "es": "Descarga el extracto en CSV o PDF, el que aparezca. Si puedes elegir, mejor CSV.",
+          "ca": "Descarrega l'extracte en CSV o PDF, el que surti. Si pots triar, millor CSV.",
+          "en": "Download the statement as CSV or PDF, whichever appears. If you can choose, CSV is better."
+        }
+      ],
+      "formatos_probables": {
+        "estado": "por_verificar",
+        "lista": [
+          "csv",
+          "pdf"
+        ]
+      },
+      "notas": [
+        {
+          "id": "solo_completados",
+          "estado": "por_verificar",
+          "es": "Solo contamos los movimientos completados. Los pendientes, anulados o rechazados no suman, y las comisiones salen como un cargo aparte.",
+          "ca": "Només comptem els moviments completats. Els pendents, anul·lats o rebutjats no sumen, i les comissions surten com un càrrec a part.",
+          "en": "We only count completed transactions. Pending, reverted or declined ones do not count, and fees show up as a separate charge."
+        }
+      ]
+    },
+    {
+      "id": "n26",
+      "nombre": "N26",
+      "estado": "por_verificar",
+      "pasos": [
+        {
+          "es": "Entra en la web o en la app de N26.",
+          "ca": "Entra al web o a l'app de N26.",
+          "en": "Sign in to the N26 website or app."
+        },
+        {
+          "es": "Busca los movimientos de tu cuenta y elige el periodo más largo que te deje, mejor 12 meses.",
+          "ca": "Busca els moviments del teu compte i tria el període més llarg que et deixi, millor 12 mesos.",
+          "en": "Find your account transactions and pick the longest period it allows, ideally 12 months."
+        },
+        {
+          "es": "Descarga el extracto en CSV o PDF, el que aparezca. Si puedes elegir, mejor CSV.",
+          "ca": "Descarrega l'extracte en CSV o PDF, el que surti. Si pots triar, millor CSV.",
+          "en": "Download the statement as CSV or PDF, whichever appears. If you can choose, CSV is better."
+        }
+      ],
+      "formatos_probables": {
+        "estado": "por_verificar",
+        "lista": [
+          "csv",
+          "pdf"
+        ]
+      },
+      "notas": [
+        {
+          "id": "sin_saldo",
+          "estado": "por_verificar",
+          "es": "Su archivo no trae el saldo, así que no podremos comprobar que las cuentas cuadran.",
+          "ca": "El seu fitxer no porta el saldo, així que no podrem comprovar que els comptes quadren.",
+          "en": "Its file has no balance, so we cannot check that the numbers add up."
+        }
+      ]
+    },
+    {
+      "id": "wise",
+      "nombre": "Wise",
+      "estado": "por_verificar",
+      "pasos": [
+        {
+          "es": "Entra en la web o en la app de Wise.",
+          "ca": "Entra al web o a l'app de Wise.",
+          "en": "Sign in to the Wise website or app."
+        },
+        {
+          "es": "Busca los movimientos de tu cuenta y elige el periodo más largo que te deje, mejor 12 meses.",
+          "ca": "Busca els moviments del teu compte i tria el període més llarg que et deixi, millor 12 mesos.",
+          "en": "Find your account transactions and pick the longest period it allows, ideally 12 months."
+        },
+        {
+          "es": "Descarga el extracto en CSV o PDF, el que aparezca. Si puedes elegir, mejor CSV.",
+          "ca": "Descarrega l'extracte en CSV o PDF, el que surti. Si pots triar, millor CSV.",
+          "en": "Download the statement as CSV or PDF, whichever appears. If you can choose, CSV is better."
+        }
+      ],
+      "formatos_probables": {
+        "estado": "por_verificar",
+        "lista": [
+          "csv",
+          "zip",
+          "pdf"
+        ]
+      },
+      "notas": [
+        {
+          "id": "archivo_por_divisa",
+          "estado": "por_verificar",
+          "es": "Puede que te dé un archivo por cada moneda y año. Suéltalos todos a la vez, o el ZIP tal cual.",
+          "ca": "Pot ser que et doni un fitxer per cada moneda i any. Deixa'ls anar tots alhora, o el ZIP tal com és.",
+          "en": "It may give you one file per currency and year. Drop them all at once, or the ZIP as it is."
+        }
+      ]
+    },
+    {
+      "id": "bunq",
+      "nombre": "bunq",
+      "estado": "por_verificar",
+      "pasos": [
+        {
+          "es": "Entra en la web o en la app de bunq.",
+          "ca": "Entra al web o a l'app de bunq.",
+          "en": "Sign in to the bunq website or app."
+        },
+        {
+          "es": "Busca los movimientos de tu cuenta y elige el periodo más largo que te deje, mejor 12 meses.",
+          "ca": "Busca els moviments del teu compte i tria el període més llarg que et deixi, millor 12 mesos.",
+          "en": "Find your account transactions and pick the longest period it allows, ideally 12 months."
+        },
+        {
+          "es": "Descarga el extracto en CSV o PDF, el que aparezca. Si puedes elegir, mejor CSV.",
+          "ca": "Descarrega l'extracte en CSV o PDF, el que surti. Si pots triar, millor CSV.",
+          "en": "Download the statement as CSV or PDF, whichever appears. If you can choose, CSV is better."
+        }
+      ],
+      "formatos_probables": {
+        "estado": "por_verificar",
+        "lista": [
+          "csv",
+          "mt940"
+        ]
+      },
+      "notas": []
+    },
+    {
+      "id": "trade_republic",
+      "nombre": "Trade Republic",
+      "estado": "por_verificar",
+      "pasos": [
+        {
+          "es": "Entra en la web o en la app de Trade Republic.",
+          "ca": "Entra al web o a l'app de Trade Republic.",
+          "en": "Sign in to the Trade Republic website or app."
+        },
+        {
+          "es": "Busca los movimientos de tu cuenta y elige el periodo más largo que te deje, mejor 12 meses.",
+          "ca": "Busca els moviments del teu compte i tria el període més llarg que et deixi, millor 12 mesos.",
+          "en": "Find your account transactions and pick the longest period it allows, ideally 12 months."
+        },
+        {
+          "es": "Descarga el extracto en CSV o PDF, el que aparezca. Si puedes elegir, mejor CSV.",
+          "ca": "Descarrega l'extracte en CSV o PDF, el que surti. Si pots triar, millor CSV.",
+          "en": "Download the statement as CSV or PDF, whichever appears. If you can choose, CSV is better."
+        }
+      ],
+      "formatos_probables": {
+        "estado": "por_verificar",
+        "lista": [
+          "pdf"
+        ]
+      },
+      "notas": []
+    }
+  ]
+}

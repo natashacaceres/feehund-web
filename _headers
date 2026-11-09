@@ -9,3 +9,45 @@
 
 /data/*
   Cache-Control: no-cache
+
+# Lector de extractos: la página solo puede cargar y pedir archivos de esta misma web.
+# connect-src 'self' impide enviar el extracto a cualquier otro sitio.
+# 'wasm-unsafe-eval' deja usar WebAssembly (PDF, fotos, HEIC) sin permitir eval de JavaScript.
+# blob: en worker-src e img-src porque el lector de fotos y la imagen para compartir se crean en el propio navegador.
+# Las cuatro últimas directivas cierran plugins, cambios de base, envíos de formularios fuera y que nos metan en un marco.
+# Permissions-Policy apaga cámara, micrófono, ubicación, pagos y USB, que esta página no usa.
+# Cross-Origin-Opener-Policy aísla la pestaña de las ventanas de otras webs.
+/extracto/*
+  Content-Security-Policy: default-src 'self'; connect-src 'self'; script-src 'self' 'wasm-unsafe-eval'; worker-src 'self' blob:; img-src 'self' data: blob:; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'
+  Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=()
+  Cross-Origin-Opener-Policy: same-origin
+
+# Motor del lector y sus workers. Un worker se rige por la política de su propio archivo, así que lleva la misma.
+/assets/extracto/*
+  Content-Security-Policy: default-src 'self'; connect-src 'self'; script-src 'self' 'wasm-unsafe-eval'; worker-src 'self' blob:; img-src 'self' data: blob:; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'
+
+# Librerías copiadas en la web. La carpeta lleva la versión, así que su contenido nunca cambia y se guarda un año.
+# Misma política que el motor porque algunas se cargan como worker (OCR).
+/vendor/*
+  Content-Security-Policy: default-src 'self'; connect-src 'self'; script-src 'self' 'wasm-unsafe-eval'; worker-src 'self' blob:; img-src 'self' data: blob:; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'
+  Cache-Control: public, max-age=31536000, immutable
+
+# Service worker del lector: el navegador lo comprueba en cada visita y solo puede controlar /extracto/.
+/extracto/sw.js
+  Cache-Control: no-cache
+  Service-Worker-Allowed: /extracto/
+
+# Página de prueba para conectar la interfaz: fuera de los buscadores.
+/extracto/dev/*
+  X-Robots-Tag: noindex, nofollow
+
+# Las páginas del lector en catalán e inglés llevan la misma política que /extracto/.
+/ca/extracte/*
+  Content-Security-Policy: default-src 'self'; connect-src 'self'; script-src 'self' 'wasm-unsafe-eval'; worker-src 'self' blob:; img-src 'self' data: blob:; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'
+  Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=()
+  Cross-Origin-Opener-Policy: same-origin
+
+/en/statement/*
+  Content-Security-Policy: default-src 'self'; connect-src 'self'; script-src 'self' 'wasm-unsafe-eval'; worker-src 'self' blob:; img-src 'self' data: blob:; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'
+  Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=()
+  Cross-Origin-Opener-Policy: same-origin
