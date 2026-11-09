@@ -174,7 +174,10 @@
 
     let ul = lista, despues = lista;
     grupos.forEach((g, k) => {
-      if (k > 0) { ul = el("ul", "ext-list"); despues.after(ul); despues = ul; extras.push(ul); }
+      // Si #xList es un contenedor (el diseño nuevo usa <div class="ext-groups">), cada grupo va en su propia tarjeta
+      // dentro de él; si es la lista antigua (<ul>), el primer grupo va en ella y los demás detrás.
+      if (lista.tagName !== "UL") { ul = el("ul", "ext-list"); lista.appendChild(ul); }
+      else if (k > 0) { ul = el("ul", "ext-list"); despues.after(ul); despues = ul; extras.push(ul); }
       ul.setAttribute("aria-label", g.titulo);
       const cab = el("li", "ext-row"), h = el("h2", "ext-n", g.titulo);
       const cm = el("div", "ext-row-m"); cm.appendChild(h); cab.appendChild(cm);

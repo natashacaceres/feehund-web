@@ -712,5 +712,12 @@ a,a:hover{text-decoration:none}
 .ext [hidden],.baja [hidden]{display:none!important}
 .home-dog,.ext-dog{margin-left:auto;margin-right:auto}
 .home-sub{margin-top:calc(var(--s-3) * -1);font-size:17px;line-height:1.5;color:var(--ink-2);text-wrap:balance}
+.ext-groups{display:grid;gap:12px;width:100%}
+.ext-groups:empty{display:none}
+.ext-list > :first-child:has(> h2.ext-n){display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding:var(--s-3) 0;border-bottom:1px solid var(--ink)}
+.ext-list h2.ext-n{margin:0;font:800 19px/1.3 var(--f-head);text-align:left}
+.ext-list > :first-child:has(> h2.ext-n) .ext-y{font-size:18px;font-weight:800}
+.ext-groups > .ext-priv{display:block;width:100%}
+.ext-priv > p:only-child{flex:1}
 
 /* rs-tam */.rs-hero{max-width:760px;margin-inline:auto}.rs-img{max-width:560px;margin-inline:auto}
