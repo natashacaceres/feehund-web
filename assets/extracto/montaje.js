@@ -294,7 +294,7 @@ export async function montarResultado(lecturas, deps) {
   // 4. Cobros que se repiten (solo cargos en euros). Sin nada leído no hay total: null, nunca un 0 que parezca
   //    «no tienes cobros». Lo mismo si falta la lista de comercios o falla la búsqueda.
   progreso({ fase: 'cobros' });
-  let det = { cobros: [], gastos_fijos: [], terminados: [], no_contados: [], total_seguro: null, total_posible: null, avisos: [] };
+  let det = { cobros: [], gastos_fijos: [], terminados: [], devoluciones: [], grupos: [], no_contados: [], total_seguro: null, total_posible: null, total_devuelto: null, avisos: [] };
   const sinEuros = leidas.length > 0 && !eur.length; // solo otras monedas: el total (solo euros) es 0 y se dice por qué
   if (leidas.length && !deps.diccionario) {
     errores.push({ archivo: null, codigo: 'diccionario_no_disponible', texto: texto('diccionario_no_disponible', idioma) });
@@ -379,9 +379,12 @@ export async function montarResultado(lecturas, deps) {
     cobros: ordenarPorCoste(enSuIdioma(det.cobros, idioma)),
     gastos_fijos: enSuIdioma(det.gastos_fijos, idioma),
     terminados: enSuIdioma(det.terminados, idioma),
+    devoluciones: enSuIdioma(det.devoluciones, idioma),
+    grupos: gruposConTitulo(det.grupos, idioma),
     no_contados: noContados(det.no_contados, idioma),
     total_seguro: aImporte(det.total_seguro),
     total_posible: aImporte(det.total_posible),
+    total_devuelto: aImporte(det.total_devuelto ?? null),
     necesita_mapeo: necesitaMapeo,
     necesita_contrasena: necesitaContrasena.length ? necesitaContrasena : null,
     necesita_confirmacion: fotos.length > 0 && !deps.confirmado,
@@ -392,6 +395,14 @@ export async function montarResultado(lecturas, deps) {
 /** Comisiones, gastos fijos y pasarelas tienen su nombre en los tres idiomas (nombre_codigo): se pone el del idioma pedido. */
 function enSuIdioma(cobros, idioma) {
   return (Array.isArray(cobros) ? cobros : []).map((c) => (c && c.nombre_codigo && textosDe(c.nombre_codigo) ? { ...c, nombre: texto(c.nombre_codigo, idioma) } : c));
+}
+
+/** Grupos del resultado con su título en el idioma pedido («Te han subido el precio», «Series y películas»…). */
+function gruposConTitulo(grupos, idioma) {
+  return (Array.isArray(grupos) ? grupos : []).map((g) => {
+    const codigo = g.codigo.startsWith('sector_') ? 'categoria_' + g.codigo.slice(7) : 'grupo_' + g.codigo;
+    return { ...g, titulo: texto(textosDe(codigo) ? codigo : 'categoria_otros', idioma) };
+  });
 }
 
 /** Lo que no se ha contado (supermercado, Bizum, cajero…) con su código y su frase en el idioma pedido. */

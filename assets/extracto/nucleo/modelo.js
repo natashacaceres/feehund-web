@@ -6,7 +6,7 @@ import { redondear2 } from './numeros.js';
 export const NIVELES = ['A', 'B', 'C']; // A estructurado, B PDF con texto, C imagen/OCR
 export const VALIDACIONES = ['verificada', 'no_cuadra', 'sin_verificar'];
 export const ESTADOS = ['seguro', 'posible', 'terminado'];
-export const ETIQUETAS = ['subio', 'evitable', 'doble', 'nuevo', 'reclamable', 'varias_posibles'];
+export const ETIQUETAS = ['subio', 'bajo', 'evitable', 'doble', 'nuevo', 'reclamable', 'devuelto', 'varias_posibles'];
 export const PERIODICIDADES = {
   semanal: { dias: 7, margen: 2, alAnio: 52, meses: 7 / 30.4375 },
   mensual: { dias: 30.4375, min: 28, max: 35, alAnio: 12, meses: 1 },

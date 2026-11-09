@@ -273,6 +273,14 @@ function esPagoDeTarjeta(set, limpio) {
   return algun(set, VERBOS_PAGO) && algun(set, DE_CREDITO) && soloTarjeta;
 }
 
+// Referencia del mandato SEPA de un recibo («REF. MANDATO CWF8RVF»): cada contrato tiene la suya. Una misma empresa
+// puede cobrar dos (la luz y el gas de Octopus), y así no se mezclan.
+const MANDATO = /\b(?:REF(?:ERENCIA)?\.?\s*(?:DEL?\s+)?MANDATO|ID\.?\s*MANDATO|MANDATO|MANDATE\s*(?:REF(?:ERENCE)?|ID)|REF\.?\s*MANDATE)\s*[:.]?\s*(?:N[º°O]?\.?\s*)?([A-Z0-9][A-Z0-9/-]{3,34})/;
+export function mandatoDe(n) {
+  const m = MANDATO.exec(n);
+  return m && /\d/.test(m[1]) ? m[1] : null;
+}
+
 // Comisión por combinación de palabras cuando el concepto dice COMISION (o COM., FEE) en cualquier orden.
 function comisionPorPalabras(set) {
   if (algun(set, ['RECLAMACION', 'DEUDORA', 'DEUDORAS', 'IMPAGADO', 'IMPAGADOS', 'IMPAGO'])) return 'comision_reclamacion';
@@ -324,9 +332,10 @@ function clasificarSinCache(m, imp, dic) {
   // Compra con tarjeta (no un recibo): la luz o el teléfono no se pagan así cada mes, una compra en su tienda sí.
   const tarjeta = !recibo && (cc === '12' || tt.has('CARD') || algun(set, ['COMPRA', 'COMPRAS', 'TARJETA', 'TARJ', 'CARD', 'TPV', 'DATAFONO'])
     || /\d{4,6}[X*•·]{4,10}\d{2,4}|[X*•]{4}/.test(n));
+  const mandato = recibo ? mandatoDe(n) : null;
   const res = (tipo, clave, extra = {}) => ({
     clave, nombre: extra.nombre ?? null, comercio: extra.comercio ?? null, pasarela: extra.pasarela ?? null, tipo,
-    categoria: extra.categoria ?? extra.comercio?.categoria ?? null, recibo, tarjeta, concepto_limpio: limpio, ...(extra.motivo ? { motivo: extra.motivo } : {}),
+    categoria: extra.categoria ?? extra.comercio?.categoria ?? null, recibo, tarjeta, mandato, concepto_limpio: limpio, ...(extra.motivo ? { motivo: extra.motivo } : {}),
   });
   const deId = (id) => dic.porId.get(id)?.comercio ?? null;
   const conComercio = (tipo, c, extra = {}) => res(tipo, c.id, { comercio: c, nombre: c.nombre, ...extra });

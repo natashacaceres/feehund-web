@@ -7,6 +7,7 @@ export default {
   categoria_streaming: t('Series y películas', 'Sèries i pel·lícules', 'Films and series'),
   categoria_musica: t('Música', 'Música', 'Music'),
   categoria_nube_apps: t('Nube y apps', 'Núvol i aplicacions', 'Cloud and apps'),
+  categoria_ia: t('Inteligencia artificial', 'Intel·ligència artificial', 'AI tools'),
   categoria_suscripciones: t('Otras suscripciones', 'Altres subscripcions', 'Other subscriptions'),
   categoria_prensa: t('Prensa', 'Premsa', 'News'),
   categoria_telecos: t('Teléfono e internet', 'Telèfon i internet', 'Phone and internet'),
@@ -37,6 +38,8 @@ export default {
 
   // Etiquetas
   etiqueta_subio: t('Ha subido', 'Ha pujat', 'Price went up'),
+  etiqueta_bajo: t('Ha bajado', 'Ha baixat', 'Price went down'),
+  etiqueta_devuelto: t('Te lo han devuelto', 'Te l\'han retornat', 'Refunded to you'),
   etiqueta_evitable: t('Lo puedes evitar', 'El pots evitar', 'You can avoid it'),
   etiqueta_doble: t('Cobrado dos veces', 'Cobrat dues vegades', 'Charged twice'),
   etiqueta_nuevo: t('Nuevo', 'Nou', 'New'),
@@ -47,7 +50,7 @@ export default {
   importe_tipo_fijo: t('Importe fijo', 'Import fix', 'Fixed amount'),
   importe_tipo_variable: t('Importe variable', 'Import variable', 'Variable amount'),
   formula_ultimo_x_cargos_anio: t('Último importe por {cargos} cargos al año.', 'Últim import per {cargos} càrrecs l\'any.', 'Last amount times {cargos} charges a year.'),
-  formula_media3_x_cargos_anio: t('Media de los últimos importes por {cargos} cargos al año.', 'Mitjana dels últims imports per {cargos} càrrecs l\'any.', 'Average of the latest amounts times {cargos} charges a year.'),
+  formula_media_x_cargos_anio: t('Lo que has pagado de media en cada periodo por {cargos} periodos al año.', 'El que has pagat de mitjana a cada període per {cargos} períodes l\'any.', 'What you paid on average each period times {cargos} periods a year.'),
   formula_suma_12_meses: t('Suma de lo cobrado en los últimos 12 meses.', 'Suma del que s\'ha cobrat els últims 12 mesos.', 'Total charged in the last 12 months.'),
 
   // Por qué un cobro tiene su estado
@@ -62,8 +65,15 @@ export default {
   motivo_mes_saltado_uno: t('Hay un periodo sin cargo, pero el ritmo se mantiene.', 'Hi ha un període sense càrrec, però el ritme es manté.', 'There is one period without a charge, but the pattern holds.'),
   motivo_hueco_irregular: t('En {n} ocasiones el cargo llegó en una fecha poco habitual.', 'En {n} ocasions el càrrec va arribar en una data poc habitual.', 'On {n} occasions the charge came on an unusual date.'),
   motivo_hueco_irregular_uno: t('Una vez el cargo llegó en una fecha poco habitual.', 'Una vegada el càrrec va arribar en una data poc habitual.', 'Once the charge came on an unusual date.'),
-  motivo_importe_variable: t('El importe cambia cada vez. Usamos la media de los tres últimos.', 'L\'import canvia cada vegada. Fem servir la mitjana dels tres últims.', 'The amount changes each time. We use the average of the last three.'),
+  motivo_importe_variable: t('El importe cambia cada vez. Para el año usamos lo que has pagado de media en cada periodo.', 'L\'import canvia cada vegada. Per a l\'any fem servir el que has pagat de mitjana a cada període.', 'The amount changes each time. For the year we use what you paid on average each period.'),
   motivo_precio_subio: t('El precio ha subido respecto a los cargos anteriores.', 'El preu ha pujat respecte dels càrrecs anteriors.', 'The price has gone up compared with earlier charges.'),
+  motivo_precio_bajo: t('El precio ha bajado respecto a los cargos anteriores.', 'El preu ha baixat respecte dels càrrecs anteriors.', 'The price has gone down compared with earlier charges.'),
+  motivo_meses_sin_cargo: t('Es un cobro de cada mes, pero hay {n} meses sin cargo.', 'És un cobrament de cada mes, però hi ha {n} mesos sense càrrec.', 'It is a monthly charge, but there are {n} months with no charge.'),
+  motivo_meses_sin_cargo_uno: t('Es un cobro de cada mes, pero hay un mes sin cargo.', 'És un cobrament de cada mes, però hi ha un mes sense càrrec.', 'It is a monthly charge, but there is one month with no charge.'),
+  motivo_ritmo_del_diccionario: t('Te ha cobrado {n} veces. Este servicio cobra así de normal, aunque en tu extracto hay huecos.', 'T\'ha cobrat {n} vegades. Aquest servei cobra així normalment, encara que al teu extracte hi ha buits.', 'It charged you {n} times. This service usually charges like this, although there are gaps in your statement.'),
+  motivo_importes_parecidos: t('El importe cambia un poco de una vez a otra, por el cambio de moneda o el IVA. Es el mismo cobro.', 'L\'import canvia una mica d\'una vegada a l\'altra, pel canvi de moneda o l\'IVA. És el mateix cobrament.', 'The amount changes a little each time, because of the exchange rate or VAT. It is the same charge.'),
+  motivo_quiza_en_tarjeta: t('Ya no se cobra en esta cuenta. Puede que ahora lo pagues con la tarjeta de crédito.', 'Ja no es cobra en aquest compte. Potser ara el pagues amb la targeta de crèdit.', 'It is no longer charged to this account. You may now be paying it with your credit card.'),
+  motivo_comision_devuelta: t('El banco te devolvió esta comisión más tarde.', 'El banc et va retornar aquesta comissió més tard.', 'The bank refunded this fee to you later.'),
   motivo_doble_cobro: t('Te ha cobrado dos veces lo mismo en pocos días. Revisa si es un error.', 'T\'ha cobrat dues vegades el mateix en pocs dies. Revisa si és un error.', 'It charged you the same amount twice within a few days. Check if it is a mistake.'),
   motivo_cargo_aparte: t('Hay {n} cargos que no encajan con el ritmo habitual. Te los enseñamos, pero no los sumamos.', 'Hi ha {n} càrrecs que no encaixen amb el ritme habitual. Te\'ls ensenyem, però no els sumem.', '{n} charges do not fit the usual pattern. We show them, but we do not add them up.'),
   motivo_cargo_aparte_uno: t('Hay un cargo que no encaja con el ritmo habitual. Te lo enseñamos, pero no lo sumamos.', 'Hi ha un càrrec que no encaixa amb el ritme habitual. Te l\'ensenyem, però no el sumem.', 'One charge does not fit the usual pattern. We show it, but we do not add it up.'),
@@ -86,6 +96,9 @@ export default {
   cobros_pasarelas: t('Algunos cobros llegan a través de PayPal, Apple, Google o Amazon. Detrás puede haber varios servicios. Te contamos cómo ver cuáles son.',
     'Alguns cobraments arriben a través de PayPal, Apple, Google o Amazon. Al darrere hi pot haver diversos serveis. T\'expliquem com veure quins són.',
     'Some charges come through PayPal, Apple, Google or Amazon. There may be several services behind them. We explain how to see which ones.'),
+  cobros_tarjeta_credito: t('Desde esta cuenta pagas una tarjeta de crédito ({n} pagos). Lo que compras con ella no sale aquí. Sube también el extracto de la tarjeta para verlo todo.',
+    'Des d\'aquest compte pagues una targeta de crèdit ({n} pagaments). El que hi compres no surt aquí. Puja també l\'extracte de la targeta per veure-ho tot.',
+    'You pay a credit card from this account ({n} payments). What you buy with it does not show here. Add the card statement too to see everything.'),
   cobros_sin_diccionario: t('No hemos podido cargar la lista de comercios. Los cobros que ves pueden estar incompletos.',
     'No hem pogut carregar la llista de comerços. Els cobraments que veus poden estar incomplets.',
     'We could not load the list of shops and services. The charges you see may be incomplete.'),
@@ -122,4 +135,13 @@ export default {
   nombre_apple: t('Apple', 'Apple', 'Apple'),
   nombre_google: t('Google', 'Google', 'Google'),
   nombre_amazon: t('Amazon', 'Amazon', 'Amazon'),
+
+  // Grupos del resultado (los sectores usan categoria_<sector>)
+  grupo_subidas: t('Te han subido el precio', 'T\'han apujat el preu', 'Prices that went up'),
+  grupo_bajadas: t('Te han bajado el precio', 'T\'han abaixat el preu', 'Prices that went down'),
+  grupo_dobles: t('Te han cobrado dos veces', 'T\'han cobrat dues vegades', 'Charged twice'),
+  grupo_comisiones: t('Comisiones del banco', 'Comissions del banc', 'Bank fees'),
+  grupo_devoluciones: t('Te han devuelto', 'T\'han retornat', 'Refunded to you'),
+  grupo_recibos: t('Recibos que cambian cada vez', 'Rebuts que canvien cada vegada', 'Bills that change each time'),
+  grupo_terminados: t('Ya no se cobra', 'Ja no es cobra', 'No longer charged'),
 };

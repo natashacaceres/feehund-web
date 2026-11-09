@@ -28,13 +28,20 @@ const CAMBIO_PRECIO = { conocido: [1 / 3, 3], otro: [1 / 1.3, 1.3], tienda: [1, 
 const PASARELA_CON_COMPRAS = 2.5; // más cargos al mes que esto en PayPal, Apple, Google o Amazon: hay compras sueltas mezcladas
 // Se pagan con recibo: un cargo con tarjeta en su tienda (un móvil, un cargador) no es la factura del mes.
 const CATEGORIAS_DOMICILIADAS = new Set(['telecos', 'energia', 'agua', 'alarmas']);
+// En un servicio conocido, importes que se mueven poco (el cambio de dólares a euros, el IVA) son el mismo cobro.
+const IMPORTES_PARECIDOS = 0.1;
+const DIAS_ENTRE_CARGOS_PARECIDOS = 20; // dos cargos parecidos en menos días son dos cosas (dos cuentas, una compra)
+const DIAS_DEVOLUCION_COMISION = 180; // una comisión devuelta: el abono llega en los meses siguientes
 
 /** Códigos que puede llevar un cobro (para las pruebas de textos). */
 export const MOTIVOS = ['cargos_regulares', 'anual_dos_cargos', 'solo_dos_cargos', 'un_cargo_conocido', 'cadencia_irregular',
   'comision_suelta', 'periodicidad_supuesta', 'mes_saltado', 'mes_saltado_uno', 'hueco_irregular', 'hueco_irregular_uno', 'importe_variable',
-  'precio_subio', 'doble_cobro', 'cargo_aparte', 'cargo_aparte_uno', 'via_pasarela', 'nuevo_reciente', 'sin_cargo_desde', 'periodo_corto',
-  'lectura_sin_verificar', 'gasto_fijo', 'transferencia_periodica', 'compras_mezcladas'];
-export const AVISOS = ['cobros_periodo_corto', 'cobros_sin_verificar', 'cobros_pasarelas', 'cobros_sin_diccionario'];
+  'precio_subio', 'precio_bajo', 'doble_cobro', 'cargo_aparte', 'cargo_aparte_uno', 'via_pasarela', 'nuevo_reciente', 'sin_cargo_desde', 'periodo_corto',
+  'lectura_sin_verificar', 'gasto_fijo', 'transferencia_periodica', 'compras_mezcladas', 'meses_sin_cargo', 'meses_sin_cargo_uno',
+  'ritmo_del_diccionario', 'importes_parecidos', 'quiza_en_tarjeta', 'comision_devuelta'];
+export const AVISOS = ['cobros_periodo_corto', 'cobros_sin_verificar', 'cobros_pasarelas', 'cobros_sin_diccionario', 'cobros_tarjeta_credito'];
+/** Grupos del resultado, en el orden en que se enseñan (los sectores van en «sector_<categoría>»). */
+export const GRUPOS = ['subidas', 'bajadas', 'dobles', 'comisiones', 'devoluciones', 'sectores', 'recibos', 'terminados'];
 
 // ---------------------------------------------------------------------------------------------
 // Utilidades
@@ -243,8 +250,11 @@ function partirPorDobles(cargos) {
   return cadenas.map((ch) => ({ cargos: ch, dobles: [], aparte: [] }));
 }
 
-/** Cargos que llegan antes de tiempo dentro de una serie con cadencia clara: se enseñan aparte y no cuentan. */
-function depurar(serie) {
+/**
+ * Cargos que llegan antes de tiempo dentro de una serie con cadencia clara: se enseñan aparte y no cuentan.
+ * Con `guardarUltimo` (recibos de luz, agua o teléfono) el último se queda: un recibo que llega antes también se paga.
+ */
+function depurar(serie, guardarUltimo = false) {
   const c = serie.cargos;
   if (c.length < 4) return serie;
   const cad = analizarCadencia(fechasDe(c));
@@ -252,7 +262,7 @@ function depurar(serie) {
   const min = bandaDias(cad.periodicidad)[0] - HOLGURA[cad.periodicidad];
   const dentro = [c[0]], fuera = [];
   for (let i = 1; i < c.length; i++) {
-    if (diasEntre(dentro.at(-1).fecha, c[i].fecha) < min) fuera.push(c[i]); else dentro.push(c[i]);
+    if (diasEntre(dentro.at(-1).fecha, c[i].fecha) < min && !(guardarUltimo && i === c.length - 1)) fuera.push(c[i]); else dentro.push(c[i]);
   }
   if (!fuera.length || dentro.length < 3 || !esRegular(analizarCadencia(fechasDe(dentro)))) return serie;
   return { cargos: dentro, dobles: serie.dobles, aparte: serie.aparte.concat(fuera) };
@@ -335,7 +345,7 @@ function seriesVariables(cargos) {
     if (mejor) mejor.cargos.push(c); else cadenas.push({ cargos: [c], dobles: [], aparte: [] });
   }
   for (const par of base.dobles) (cadenas.find((ch) => ch.cargos.includes(par[0])) ?? cadenas[0]).dobles.push(par);
-  return cadenas.map(depurar);
+  return cadenas.map((ch) => depurar(ch, true));
 }
 
 /** Cuántos cargos quedan en series con cadencia clara (para elegir entre leer el importe como fijo o como variable). */
@@ -351,8 +361,51 @@ const COMISIONES_POR_USO = new Set(['comision_cajero', 'comision_transferencia',
 
 const conModo = (series, modo) => series.map((s) => ({ ...s, modo }));
 
+/**
+ * Recibos de una misma empresa con dos mandatos SEPA (la luz y el gas): cada mandato es su propio cobro.
+ * Solo se parte si al menos dos mandatos se repiten; lo que no lleva mandato (o lo lleva una sola vez) va aparte.
+ */
+function partirPorMandato(g) {
+  const por = new Map();
+  for (const c of g.cargos) {
+    const k = c.mandato ?? '';
+    if (!por.has(k)) por.set(k, []);
+    por.get(k).push(c);
+  }
+  const repetidos = [...por.entries()].filter(([k, xs]) => k && xs.length >= 2);
+  if (repetidos.length < 2) return null;
+  const resto = [...por.entries()].filter(([k, xs]) => !(k && xs.length >= 2)).flatMap(([, xs]) => xs).sort(porFecha);
+  return [...repetidos.map(([, xs]) => xs), ...(resto.length ? [resto] : [])];
+}
+
+/**
+ * Un servicio conocido de importe fijo con importes parecidos (108,90 y 100,35 por el cambio de divisa): una sola serie.
+ * Solo si todos caen a ±10 % de la mediana y nunca hay dos en menos de 20 días (eso serían dos cuentas). Si no, null.
+ */
+function juntarParecidos(series) {
+  const todos = series.flatMap((s) => [...s.cargos, ...s.dobles.map(([, b]) => b), ...s.aparte]).sort(porFecha);
+  if (todos.length < 2) return null;
+  const med = mediana(todos.map((c) => c.importe));
+  if (!todos.every((c) => Math.abs(c.importe - med) <= IMPORTES_PARECIDOS * med + 1e-9)) return null;
+  for (let i = 1; i < todos.length; i++) if (diasEntre(todos[i - 1].fecha, todos[i].fecha) < DIAS_ENTRE_CARGOS_PARECIDOS) return null;
+  return { ...depurar(quitarDobles(todos)), parecidos: true };
+}
+
 /** Series de un grupo, cada una con su modo ('fijo' o 'variable'), y los cargos que se dejan fuera por ser compras sueltas. */
 function seriesDelGrupo(g) {
+  const mandatos = partirPorMandato(g);
+  if (mandatos) {
+    const r = { series: [], fuera: [] };
+    for (const cargos of mandatos) {
+      const parte = seriesDelGrupo({ ...g, cargos, sinMandato: true });
+      r.series.push(...parte.series); r.fuera.push(...parte.fuera);
+    }
+    return r;
+  }
+  return seriesDelGrupoSinMandato(g);
+}
+
+function seriesDelGrupoSinMandato(g) {
   if (g.kind === 'comision' && COMISIONES_POR_USO.has(g.cl.comercio?.id ?? g.clave)) {
     return { series: [{ cargos: g.cargos, dobles: [], aparte: [], modo: 'variable' }], fuera: [] };
   }
@@ -384,6 +437,10 @@ function seriesDelGrupo(g) {
   const tiendaDesconocida = g.kind === 'desconocido' && !recibos;
   const cambio = g.kind === 'comercio' || g.kind === 'comision' ? CAMBIO_PRECIO.conocido : tiendaDesconocida ? CAMBIO_PRECIO.tienda : CAMBIO_PRECIO.otro;
   let fijas = seriesFijas(g.cargos, true, tiendaDesconocida, cambio, 1, g.kind === 'comercio');
+  if (g.kind === 'comercio' && g.cl.comercio && g.cl.comercio.importe !== 'variable' && fijas.length > 1) {
+    const junta = juntarParecidos(fijas);
+    if (junta) fijas = [junta];
+  }
   // Compras con tarjeta en un comercio que no conocemos: la serie tiene que caer siempre el mismo día y,
   // si la tienda cobra más cosas, ser buena parte de lo que cobra (o repetirse mucho). Si no, es casualidad.
   if (tiendaDesconocida) fijas = fijas.filter((s) => s.cargos.length < 2 || conPeso(s, g.cargos));
@@ -498,6 +555,74 @@ function slug(s) {
   return String(s).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '') || 'cobro';
 }
 
+/** Periodos que faltan entre dos cargos (0 si llegan a su hora): 62 días en un cobro mensual son 1. */
+function perdidosEnHueco(dias, p) {
+  return Math.max(0, Math.round(dias / PERIODICIDADES[p].dias) - 1);
+}
+
+/** Meses del calendario sin ningún cargo entre el primero y el último (de mayo a octubre sin junio a septiembre: 4). */
+function mesesSinCargo(fechas) {
+  const meses = new Set(fechas.map((f) => f.slice(0, 7)));
+  let n = 0;
+  for (let m = sumarMeses(fechas[0].slice(0, 8) + '01', 1); m.slice(0, 7) < fechas.at(-1).slice(0, 7); m = sumarMeses(m, 1)) if (!meses.has(m.slice(0, 7))) n++;
+  return n;
+}
+
+/** Cadencia contada contra una periodicidad dada. */
+function cadenciaCon(fechas, p) {
+  const huecos = [];
+  for (let i = 1; i < fechas.length; i++) huecos.push(diasEntre(fechas[i - 1], fechas[i]));
+  let regulares = 0, saltados = 0, irregulares = 0;
+  for (const g of huecos) { const t = tipoHueco(g, p); if (t === 'regular') regulares++; else if (t === 'saltado') saltados++; else irregulares++; }
+  return { periodicidad: p, huecos, regulares, saltados, irregulares, mediana: huecos.length ? mediana(huecos) : null };
+}
+
+/**
+ * Recibos que cambian de importe sin un ritmo limpio (Aigües con 3 recibos a 38 y 63 días): la frecuencia que mejor
+ * explica cuántos recibos hay entre el primero y el último, entre las del diccionario (o mensual, bimestral, trimestral).
+ * Si ninguna cuadra con un recibo de margen, null.
+ */
+function ritmoPorRecibos(fechas, comercio) {
+  let cand = (comercio?.periodos ?? []).filter((p) => PERIODICIDADES[p] && p !== 'semanal' && p !== 'anual');
+  if (!cand.length) cand = ['mensual', 'bimestral', 'trimestral'];
+  const n = fechas.length;
+  const span = diasEntre(fechas[0], fechas.at(-1));
+  let mejor = null;
+  for (const p of cand) {
+    const cad = cadenciaCon(fechas, p);
+    if (cad.huecos.some((h) => h < 0.5 * bandaDias(p)[0])) continue; // dos recibos demasiado juntos para esta frecuencia
+    const dif = Math.abs(n - (span / PERIODICIDADES[p].dias + 1));
+    if (!mejor || dif < mejor.dif - 1e-9) mejor = { cad, dif };
+  }
+  if (!mejor || mejor.dif > Math.max(1, 0.25 * n)) return null;
+  return mejor.cad;
+}
+
+/**
+ * Un servicio conocido que deja de cobrar unos meses y vuelve (Claude en mayo, octubre y noviembre): manda la frecuencia
+ * del diccionario si ningún hueco es más corto que ella y al menos uno le cuadra. Si no, null.
+ */
+function ritmoDelDiccionario(fechas, comercio) {
+  const huecos = [];
+  for (let i = 1; i < fechas.length; i++) huecos.push(diasEntre(fechas[i - 1], fechas[i]));
+  if (!huecos.length) return null;
+  for (const p of comercio?.periodos ?? []) {
+    if (!PERIODICIDADES[p] || p === 'semanal') continue;
+    const min = bandaDias(p)[0] - HOLGURA[p];
+    if (huecos.every((h) => h >= min) && huecos.some((h) => tipoHueco(h, p) === 'regular')) {
+      return { periodicidad: p, ultimoRegular: tipoHueco(huecos.at(-1), p) === 'regular' };
+    }
+  }
+  return null;
+}
+
+/** Cuántos cargos seguidos tienen el mismo importe que el de la posición i, hacia atrás. */
+function tramoHastaAqui(cargos, i) {
+  let k = i;
+  while (k > 0 && aCentimos(cargos[k - 1].importe) === aCentimos(cargos[i].importe)) k--;
+  return i - k + 1;
+}
+
 // ---------------------------------------------------------------------------------------------
 // De una serie a un cobro
 // ---------------------------------------------------------------------------------------------
@@ -508,8 +633,8 @@ function evaluar(serie, g, ctx, unicaDelGrupo) {
   if (!n) return null;
   const modo = serie.modo;
   const ultimo = cargos.at(-1);
-  const cad = analizarCadencia(fechasDe(cargos));
-  const regular = esRegular(cad);
+  let cad = analizarCadencia(fechasDe(cargos));
+  let regular = esRegular(cad);
   const comercio = g.cl.comercio;
   const enDiccionario = g.kind === 'comercio' && Boolean(comercio);
   const suscripcion = enDiccionario && esSuscripcion(comercio);
@@ -517,6 +642,13 @@ function evaluar(serie, g, ctx, unicaDelGrupo) {
   // no se supone ninguna frecuencia (un móvil de 299 € no son 3.588 € al año).
   const soloCompras = suscripcion && CATEGORIAS_DOMICILIADAS.has(comercio.categoria) && cargos.every((c) => c.tarjeta);
   const motivos = [];
+  // Recibos que cambian de importe sin un ritmo limpio: la frecuencia que mejor explica cuántos recibos hay
+  if (modo === 'variable' && g.kind !== 'comision' && n >= 3 && (!regular || cad.saltados || cad.irregulares)) {
+    const r = ritmoPorRecibos(fechasDe(cargos), comercio);
+    if (r && (!regular || r.periodicidad !== cad.periodicidad)) { cad = r; regular = true; }
+  }
+  // Un servicio conocido que dejó de cobrar unos meses: manda la frecuencia de su diccionario
+  const ritmoDic = !regular && suscripcion && n >= 2 && modo !== 'variable' && !soloCompras ? ritmoDelDiccionario(fechasDe(cargos), comercio) : null;
   let periodicidad = cad.periodicidad;
   let estado;
 
@@ -527,6 +659,10 @@ function evaluar(serie, g, ctx, unicaDelGrupo) {
   } else if (regular && n === 2) {
     estado = 'posible';
     motivos.push({ codigo: 'solo_dos_cargos' });
+  } else if (ritmoDic) {
+    periodicidad = ritmoDic.periodicidad;
+    estado = n >= 3 && ritmoDic.ultimoRegular ? 'seguro' : 'posible';
+    motivos.push({ codigo: 'ritmo_del_diccionario', datos: { n } });
   } else if (g.kind === 'comision') {
     periodicidad = 'puntual'; // las comisiones siempre se enseñan, aunque no se repitan
     estado = 'posible';
@@ -538,8 +674,11 @@ function evaluar(serie, g, ctx, unicaDelGrupo) {
   } else {
     return null; // no hay repetición clara: no se enseña
   }
-  if (regular && cad.saltados) motivos.push(motivoContado('mes_saltado', cad.saltados));
+  const sinCargo = periodicidad === 'mensual' && n >= 2 ? mesesSinCargo(fechasDe(cargos)) : 0;
+  if (sinCargo && ritmoDic) motivos.push(motivoContado('meses_sin_cargo', sinCargo));
+  else if (regular && cad.saltados) motivos.push(motivoContado('mes_saltado', cad.saltados));
   if (regular && cad.irregulares) motivos.push(motivoContado('hueco_irregular', cad.irregulares));
+  if (serie.parecidos && !cargos.every((c) => aCentimos(c.importe) === aCentimos(ultimo.importe))) motivos.push({ codigo: 'importes_parecidos' });
   if (serie.tope === 'posible' && estado === 'seguro') {
     estado = 'posible';
     motivos.push({ codigo: 'compras_mezcladas' });
@@ -579,27 +718,41 @@ function evaluar(serie, g, ctx, unicaDelGrupo) {
     coste = sumaCentimos(importes);
     calculo = { formula: 'suma_12_meses', base: coste, cargos_al_anio: importes.length, importes };
   } else if (importeTipo === 'variable') {
-    const importes = cargos.slice(-3).map((c) => c.importe);
-    const base = redondear2(sumaCentimos(importes) / importes.length);
-    coste = redondear2(base * P.alAnio);
-    calculo = { formula: 'media3_x_cargos_anio', base, cargos_al_anio: P.alAnio, importes };
+    // Lo pagado en los últimos 12 meses (o en todo el extracto si es más corto), repartido entre los periodos que
+    // cubre (un mes sin recibo cuenta: el siguiente suele traer los dos) y llevado a un año.
+    // Con 12 meses o más es justo lo pagado en un año; con menos, la media de cada periodo por los periodos del año.
+    const desde12 = sumarMeses(ctx.hasta, -12);
+    const enAnio = cargos.filter((c) => c.fecha > desde12);
+    const centimos = enAnio.reduce((sum, c) => sum + aCentimos(c.importe), 0);
+    let periodos = enAnio.length;
+    for (let i = 1; i < enAnio.length; i++) periodos += perdidosEnHueco(diasEntre(enAnio[i - 1].fecha, enAnio[i].fecha), periodicidad);
+    coste = Math.round((centimos * P.alAnio) / periodos) / 100;
+    calculo = { formula: 'media_x_cargos_anio', base: Math.round(centimos / periodos) / 100, cargos_al_anio: P.alAnio, pagado: centimos / 100, periodos, importes: enAnio.map((c) => c.importe) };
   } else {
     coste = redondear2(ultimo.importe * P.alAnio);
     calculo = { formula: 'ultimo_x_cargos_anio', base: ultimo.importe, cargos_al_anio: P.alAnio, importes: [ultimo.importe] };
   }
 
-  // Subida de precio: el último importe frente al anterior distinto
-  let subida = null, subidaMensual = null;
+  // Subida o bajada de precio: el último importe frente al anterior distinto. Uno de los dos precios se tiene que haber
+  // repetido (108,90 → 100,35 → 108,90 es el cambio de divisa, no una subida). Una bajada pide que el precio de antes
+  // se repitiera: el primer recibo de un gimnasio con la matrícula no es una bajada.
+  let subida = null, subidaMensual = null, bajada = null, bajadaMensual = null;
   if (importeTipo === 'fijo' && periodicidad !== 'puntual') {
     let j = n - 2;
     while (j >= 0 && aCentimos(cargos[j].importe) === aCentimos(ultimo.importe)) j--;
     if (j >= 0) {
       const antes = cargos[j].importe;
       const dif = redondear2(ultimo.importe - antes);
-      if (dif >= 0.5 - 1e-9 && dif >= 0.03 * antes - 1e-9) {
+      const tramoAntes = tramoHastaAqui(cargos, j), tramoAhora = n - 1 - j;
+      const cambio = { antes, ahora: ultimo.importe, diferencia: Math.abs(dif), desde: cargos[j + 1].fecha };
+      if (dif >= 0.5 - 1e-9 && dif >= 0.03 * antes - 1e-9 && (tramoAntes >= 2 || tramoAhora >= 2)) {
         subidaMensual = redondear2((dif * P.alAnio) / 12);
-        subida = { antes, ahora: ultimo.importe, diferencia: dif, desde: cargos[j + 1].fecha };
+        subida = cambio;
         motivos.push({ codigo: 'precio_subio', datos: { antes, ahora: ultimo.importe } });
+      } else if (-dif >= 0.5 - 1e-9 && -dif >= 0.03 * antes - 1e-9 && tramoAntes >= 2) {
+        bajadaMensual = redondear2((-dif * P.alAnio) / 12);
+        bajada = cambio;
+        motivos.push({ codigo: 'precio_bajo', datos: { antes, ahora: ultimo.importe } });
       }
     }
   }
@@ -607,6 +760,7 @@ function evaluar(serie, g, ctx, unicaDelGrupo) {
   // Etiquetas
   const etiquetas = new Set();
   if (subida) etiquetas.add('subio');
+  if (bajada) etiquetas.add('bajo');
   if (serie.dobles.length) {
     etiquetas.add('doble');
     motivos.push({ codigo: 'doble_cobro', datos: { n: serie.dobles.length } });
@@ -650,6 +804,12 @@ function evaluar(serie, g, ctx, unicaDelGrupo) {
     etiquetas: [...etiquetas].sort(),
     subida_mensual: subidaMensual,
     subida,
+    bajada_mensual: bajadaMensual,
+    bajada,
+    importe_min: Math.min(...cargos.map((c) => c.importe)),
+    importe_max: Math.max(...cargos.map((c) => c.importe)),
+    pagado: sumaCentimos([...cargos, ...serie.dobles.map(([, b]) => b), ...serie.aparte].map((c) => c.importe)),
+    meses_sin_cargo: sinCargo,
     baja: comercio && (enDiccionario || g.kind === 'comision') ? (comercio.baja ?? `/baja/${comercio.id}/`) : null,
     ayuda: pasarela ? `/baja/${pasarela}/` : null,
     calculo,
@@ -713,17 +873,22 @@ export function detectar(movimientosEUR, ctx = {}) {
   };
   for (const m of enEuros) if (m.importe < 0 && !fechaPosible(m.fecha)) apartar('fecha_fuera_de_rango', -m.importe);
   let orden = 0;
+  const pagosTarjeta = []; // fechas en que se paga la tarjeta de crédito: lo comprado con ella no sale en este extracto
   for (const m of lista) {
     if (!(m.importe < 0)) continue;
     const cl = clasificar(m, dic);
-    if (!TIPOS_QUE_CUENTAN.has(cl.tipo)) { apartar(cl.motivo ?? cl.tipo, -m.importe); continue; }
+    if (!TIPOS_QUE_CUENTAN.has(cl.tipo)) {
+      apartar(cl.motivo ?? cl.tipo, -m.importe);
+      if (cl.motivo === 'tarjeta_credito') pagosTarjeta.push(m.fecha);
+      continue;
+    }
     let g = grupos.get(cl.clave);
     if (!g) {
       const kind = cl.tipo === 'comercio' && cl.comercio?.categoria === 'pasarelas' ? 'pasarela' : cl.tipo;
       g = { clave: cl.clave, cl, kind, cargos: [], variableCategoria: Boolean(cl.comercio && CATEGORIAS_VARIABLES.has(cl.comercio.categoria)) };
       grupos.set(cl.clave, g);
     }
-    g.cargos.push({ mov: m, fecha: m.fecha, importe: redondear2(-m.importe), recibo: cl.recibo, tarjeta: Boolean(cl.tarjeta), pasarela: cl.pasarela, n: orden++ });
+    g.cargos.push({ mov: m, fecha: m.fecha, importe: redondear2(-m.importe), recibo: cl.recibo, tarjeta: Boolean(cl.tarjeta), pasarela: cl.pasarela, mandato: cl.mandato ?? null, n: orden++ });
   }
 
   // 2. Series y cobros de cada grupo
@@ -773,6 +938,16 @@ export function detectar(movimientosEUR, ctx = {}) {
   gastos.sort(porCoste);
   terminados.sort((a, b) => (a.ultimo_cargo > b.ultimo_cargo ? -1 : a.ultimo_cargo < b.ultimo_cargo ? 1 : porCoste(a, b)));
 
+  // Lo que ya no se cobra en esta cuenta pero se pagó con tarjeta: puede que ahora vaya en la tarjeta de crédito
+  for (const t of terminados) {
+    if (t.tipo !== 'comercio' || !pagosTarjeta.some((f) => f > t.ultimo_cargo)) continue;
+    t.quiza_en_tarjeta = true;
+    t.motivos.push({ codigo: 'quiza_en_tarjeta' });
+  }
+
+  // Lo que te han devuelto: abonos de un comercio que también te cobra (y no es tu nómina) y comisiones devueltas
+  const devoluciones = buscarDevoluciones(lista, dic, grupos, [...cobros, ...terminados]);
+
   // 3. Totales (solo seguros en el destacado; los posibles, aparte) y avisos
   const total = (estado) => sumaCentimos(cobros.filter((x) => x.estado === estado).map((x) => x.coste_anual));
   const avisos = [];
@@ -780,14 +955,120 @@ export function detectar(movimientosEUR, ctx = {}) {
   if (c.fotoSinVerificar && cobros.length) avisos.push(aviso('cobros_sin_verificar'));
   if (cobros.some((x) => x.tipo === 'pasarela')) avisos.push(aviso('cobros_pasarelas'));
   if (!dic.porId.size) avisos.push(aviso('cobros_sin_diccionario'));
+  const tarjeta = noContados.get('tarjeta_credito');
+  if (tarjeta) avisos.push(aviso('cobros_tarjeta_credito', { n: tarjeta.movimientos, importe: tarjeta.centimos / 100 }));
 
   return {
     cobros,
     gastos_fijos: gastos,
     terminados,
+    devoluciones,
+    grupos: agrupar(cobros, terminados, devoluciones),
     total_seguro: total('seguro'),
     total_posible: total('posible'),
+    total_devuelto: sumaCentimos(devoluciones.map((d) => d.importe)),
     avisos,
     no_contados: [...noContados.values()].map((x) => ({ motivo: x.motivo, movimientos: x.movimientos, importe: x.centimos / 100 })),
   };
+}
+
+// ---------------------------------------------------------------------------------------------
+// Devoluciones y grupos del resultado
+// ---------------------------------------------------------------------------------------------
+
+const PALABRAS_NOMINA = ['NOMINA', 'NOMINAS', 'SALARIO', 'SUELDO', 'PAYROLL', 'SALARY', 'HABERES', 'PENSION'];
+
+/**
+ * Abonos que te devuelven algo que te cobraron: de un comercio del diccionario que también te cobra en este extracto
+ * (Vodafone te devuelve 20 €), o de una comisión del banco («RETROCESION COMISIONES»). Una comisión devuelta se busca
+ * entre las comisiones cobradas antes por el mismo importe y se marca en ese cobro.
+ */
+function buscarDevoluciones(lista, dic, grupos, cobros) {
+  const comisiones = cobros.filter((c) => c.tipo === 'comision');
+  const usados = new Set();
+  const porClave = new Map();
+  for (const m of lista) {
+    if (!(m.importe > 0)) continue;
+    const palabras = new Set(String(m.concepto ?? '').toUpperCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').split(/[^A-Z0-9]+/));
+    if (PALABRAS_NOMINA.some((p) => palabras.has(p))) continue;
+    const cl = clasificar({ ...m, importe: -m.importe }, dic);
+    const deComercio = cl.tipo === 'comercio' && cl.comercio && cl.comercio.categoria !== 'pasarelas' && grupos.has(cl.clave);
+    if (!deComercio && cl.tipo !== 'comision') continue;
+    let cobro = null;
+    if (cl.tipo === 'comision') {
+      // la comisión cobrada por el mismo importe en los meses de antes, la más reciente
+      for (const c of comisiones) {
+        for (const x of c.movimientos) {
+          if (usados.has(x.id) || aCentimos(-x.importe) !== aCentimos(m.importe) || x.fecha > m.fecha || diasEntre(x.fecha, m.fecha) > DIAS_DEVOLUCION_COMISION) continue;
+          if (!cobro || x.fecha > cobro.mov.fecha) cobro = { c, mov: x };
+        }
+      }
+      if (cobro) {
+        usados.add(cobro.mov.id);
+        const c = cobro.c;
+        c.devuelto = { importe: redondear2((c.devuelto?.importe ?? 0) + m.importe), fecha: m.fecha };
+        if (!c.etiquetas.includes('devuelto')) c.etiquetas = [...c.etiquetas, 'devuelto'].sort();
+        if (!c.motivos.some((x) => x.codigo === 'comision_devuelta')) c.motivos.push({ codigo: 'comision_devuelta' });
+      }
+    }
+    const clave = cobro ? 'cobro:' + cobro.c.id : cl.clave;
+    let d = porClave.get(clave);
+    if (!d) {
+      const c = cobro?.c;
+      const idComercio = cl.comercio?.id ?? (/^[a-z_]+$/.test(cl.clave) ? cl.clave : null);
+      d = {
+        id: 'devolucion-' + (c?.id ?? idComercio ?? slug(cl.clave)),
+        nombre: c?.nombre ?? cl.nombre ?? cl.concepto_limpio,
+        nombre_codigo: c?.nombre_codigo ?? (cl.tipo === 'comision' && idComercio ? 'nombre_' + idComercio : null),
+        tipo: cl.tipo,
+        categoria: cl.comercio?.categoria ?? (cl.tipo === 'comision' ? 'comisiones' : 'otros'),
+        comercio_id: c?.comercio_id ?? idComercio,
+        cobro_id: c?.id ?? null,
+        centimos: 0,
+        movimientos: [],
+      };
+      porClave.set(clave, d);
+    }
+    d.centimos += aCentimos(m.importe);
+    d.movimientos.push(movimientoDe({ mov: m }));
+  }
+  return [...porClave.values()].map(({ centimos, ...d }) => ({
+    ...d, importe: centimos / 100, num: d.movimientos.length, ultima_fecha: d.movimientos.at(-1).fecha,
+  })).sort((a, b) => b.importe - a.importe || String(a.nombre).localeCompare(String(b.nombre)));
+}
+
+/**
+ * Los cobros agrupados por lo que importa para ahorrar, en este orden: lo que te han subido o bajado, lo cobrado dos
+ * veces, las comisiones, lo devuelto, las suscripciones por sector (categorías del diccionario), los recibos que
+ * cambian de importe y lo que ya no se cobra. Un cobro sale en su sector y, además, en los avisos de arriba.
+ * Cada cobro lleva su grupo propio en `grupo`.
+ */
+export function agrupar(cobros, terminados = [], devoluciones = []) {
+  const grupos = [];
+  const sumar = (xs, f) => sumaCentimos(xs.map(f).filter((x) => Number.isFinite(x)));
+  const poner = (codigo, lista, total) => { if (lista.length) grupos.push({ codigo, ids: lista.map((x) => x.id), total }); };
+  poner('subidas', cobros.filter((c) => c.subida), sumar(cobros.filter((c) => c.subida), (c) => redondear2(c.subida_mensual * 12)));
+  poner('bajadas', cobros.filter((c) => c.bajada), sumar(cobros.filter((c) => c.bajada), (c) => redondear2(c.bajada_mensual * 12)));
+  poner('dobles', cobros.filter((c) => c.doble), sumar(cobros.filter((c) => c.doble), (c) => c.doble.importe));
+  const comisiones = cobros.filter((c) => c.tipo === 'comision');
+  for (const c of comisiones) c.grupo = 'comisiones';
+  poner('comisiones', comisiones, sumar(comisiones, (c) => c.coste_anual));
+  poner('devoluciones', devoluciones, sumar(devoluciones, (d) => d.importe));
+  const porSector = new Map();
+  const recibos = [];
+  for (const c of cobros) {
+    if (c.tipo === 'comision') continue;
+    if (c.importe_tipo === 'variable') { c.grupo = 'recibos'; recibos.push(c); continue; }
+    const codigo = 'sector_' + (c.categoria || 'otros');
+    c.grupo = codigo;
+    if (!porSector.has(codigo)) porSector.set(codigo, []);
+    porSector.get(codigo).push(c);
+  }
+  const sectores = [...porSector.entries()].map(([codigo, lista]) => ({ codigo, lista, total: sumar(lista, (c) => c.coste_anual) }))
+    .sort((a, b) => b.total - a.total || a.codigo.localeCompare(b.codigo));
+  for (const x of sectores) poner(x.codigo, x.lista, x.total);
+  poner('recibos', recibos, sumar(recibos, (c) => c.coste_anual));
+  for (const t of terminados) t.grupo = 'terminados';
+  poner('terminados', terminados, null);
+  return grupos;
 }
