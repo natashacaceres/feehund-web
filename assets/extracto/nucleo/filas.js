@@ -1037,6 +1037,8 @@ function textoDeContinuacion(L, ref, usada) {
 function unirConceptos(lineas, cands) {
   const usada = new Set(cands.map((c) => c.linea));
   const indice = new Map(lineas.map((L, i) => [L, i]));
+  // 1) Las líneas de concepto que hay entre cada movimiento y el siguiente
+  const tramos = [];
   for (let a = 0; a < cands.length; a++) {
     const A = cands[a], B = cands[a + 1];
     const ia = indice.get(A.linea);
@@ -1050,12 +1052,37 @@ function unirConceptos(lineas, cands) {
       if (L.pagina !== A.linea.pagina) break;
       if (CLASES_SALTO.has(L.clase) || L.clase === 'fecha_sola') continue;
       const t = textoDeContinuacion(L, A, usada);
+      // Texto fuera de la tabla, a la izquierda de la columna de concepto (el pie legal en vertical de algunos
+      // bancos): no corta el concepto, se salta
+      if (t === null && L.palabras.length && L.palabras.every((w) => w.x1 <= A.conceptoX0 - L.charW) && !L.campos.some((c) => c.tipo === 'fecha' || c.tipo === 'importe')) continue;
       if (t === null || L.y - yPrev > 2.5 * L.espaciado) { cortado = true; break; }
       entre.push({ L, ...t });
       yPrev = L.y;
     }
+    tramos.push({ A, B, mismaPagina, entre, cortado });
+  }
+  // 2) ¿Celdas centradas en vertical? Entonces la primera línea de debajo de cada movimiento queda a media línea
+  //    (y la primera del siguiente concepto, por encima de su fecha). Se mira en todo el documento a la vez.
+  //    Se compara lo que baja la primera línea desde la fecha con lo que hay entre dos líneas del mismo concepto:
+  //    centradas, la mitad más o menos (4 frente a 10); alineadas arriba, lo mismo (10 frente a 10).
+  const medias = [];
+  for (const { A, entre } of tramos) {
+    if (entre.length < 2) continue;
+    const interlinea = entre[1].L.y - entre[0].L.y;
+    if (interlinea > 0) medias.push((entre[0].L.y - A.linea.y) / interlinea);
+  }
+  // Con alinear arriba nunca baja media línea; con 2 líneas centradas, sí. Basta con que pase en una cuarta parte
+  // (los conceptos de 3 líneas centrados bajan una línea entera y se parecen a los alineados arriba).
+  const medias_ = medias.filter((x) => x < 0.7).length;
+  const centradas = medias_ >= 2 && medias_ >= 0.25 * medias.length;
+  // 3) Reparto
+  for (const { A, B, mismaPagina, entre, cortado } of tramos) {
     let paraA = entre, paraB = [];
-    if (mismaPagina && !cortado && entre.length) {
+    if (centradas && mismaPagina && entre.length) {
+      // cada línea va con el movimiento que tiene más cerca
+      paraA = entre.filter((e) => e.L.y - A.linea.y <= B.linea.y - e.L.y);
+      paraB = entre.filter((e) => e.L.y - A.linea.y > B.linea.y - e.L.y);
+    } else if (mismaPagina && !cortado && entre.length) {
       // ¿celdas centradas en vertical? el hueco más grande separa las líneas de A de las de B
       const ys = [A.linea.y, ...entre.map((e) => e.L.y), B.linea.y];
       const huecos = [];
