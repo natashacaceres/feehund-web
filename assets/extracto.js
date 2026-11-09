@@ -94,7 +94,20 @@
   let motorP = null;
   const motor = () => (motorP = motorP || import(new URL(ROOT + "assets/extracto/motor.js", location.href).href));
   addEventListener("load", () => {
-    motor().then((m) => { if (location.pathname.indexOf("/extracto/") === 0) m.registrarSinConexion().catch(() => {}); }).catch(() => {});
+    motor().then(async (m) => {
+      if (location.pathname.indexOf("/extracto/") !== 0 || !navigator.serviceWorker) return;
+      const reg = await m.registrarSinConexion().catch(() => null);
+      if (!reg) return;
+      // Versión nueva del lector: si la página está quieta (sin análisis a medias), entra ya y la página se recarga una vez.
+      // Si no, entra la próxima vez. Así nadie se queda con un lector viejo por tener la pestaña abierta.
+      const quieta = () => !actual && scr.res.hidden && scr.load.hidden;
+      let recargada = false;
+      navigator.serviceWorker.addEventListener("controllerchange", () => { if (!recargada && quieta()) { recargada = true; location.reload(); } });
+      const activar = (w) => { if (w && navigator.serviceWorker.controller && quieta()) w.postMessage({ tipo: "activar" }); };
+      activar(reg.waiting);
+      reg.addEventListener("updatefound", () => { const w = reg.installing; if (w) w.addEventListener("statechange", () => { if (w.state === "installed") activar(w); }); });
+      reg.update().catch(() => {});
+    }).catch(() => {});
   });
 
   const scr = { up: $("xUp"), load: $("xLoad"), res: $("xRes") };

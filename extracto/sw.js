@@ -266,6 +266,9 @@ self.addEventListener('message', (event) => {
   if (tipo === 'precachear-ocr') {
     if (!ocrEnCurso) ocrEnCurso = precachearOcr().catch(() => {}).finally(() => { ocrEnCurso = null; });
     event.waitUntil(ocrEnCurso);
+  } else if (tipo === 'activar') {
+    // La página lo pide solo cuando no está analizando nada: así la versión nueva entra sin esperar a cerrar pestañas
+    self.skipWaiting();
   } else if (tipo === 'estado') {
     event.waitUntil(estado().then((e) => avisar(mensajes(e), event.source)).catch(() => {}));
   }
