@@ -295,7 +295,9 @@ export async function leer(entrada, ctx = {}) {
   try {
     if (tipo === 'html' || tipo === 'xml' || tipo === 'fods') {
       // HTML: raw para que «05/01/2026» o «1.234,56» no se conviertan con reglas de EE. UU.; lo leemos nosotros
-      wb = XLSX.read(decodificarMarcado(bytes), { ...opciones, type: 'string', raw: tipo === 'html' });
+      // Sin espacios ni saltos delante: SheetJS solo reconoce el HTML si empieza por «<» (algunos bancos, como el
+      // Sabadell, mandan «\n\t<!DOCTYPE html…» y se leía como texto con punto y coma).
+      wb = XLSX.read(decodificarMarcado(bytes).replace(/^[\s\uFEFF]+/, ''), { ...opciones, type: 'string', raw: tipo === 'html' });
     } else {
       wb = XLSX.read(bytes, { ...opciones, type: 'array' });
     }

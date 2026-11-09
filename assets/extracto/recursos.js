@@ -5,18 +5,18 @@
 //   ACTUALIZAR_RECURSOS=1 node --test tests/unit/worker-montaje.test.mjs
 // La versión es una huella de todos los archivos de las listas: cambia en cuanto cambia cualquiera de ellos.
 globalThis.RECURSOS_EXTRACTO = {
-  version: '5127adbf4735',
+  version: 'b41070befe80',
   // Página, fuentes, motor, núcleo, lectores y textos: se guardan al instalar.
   PAGINA: [
     '/extracto/',
     '/extracto/dev/',
-    '/assets/app.css?v=202611061716',
-    '/assets/app.js?v=202611061716',
-    '/assets/brand/apple-touch-icon.png?v=202611061716',
-    '/assets/brand/favicon.ico?v=202611061716',
-    '/assets/brand/feehund-logo-h64.png?v=202611061716',
-    '/assets/brand/icon-16.png?v=202611061716',
-    '/assets/brand/icon-32.png?v=202611061716',
+    '/assets/app.css?v=202611091803',
+    '/assets/app.js?v=202611091803',
+    '/assets/brand/apple-touch-icon.png?v=202611091803',
+    '/assets/brand/favicon.ico?v=202611091803',
+    '/assets/brand/feehund-logo-h64.png?v=202611091803',
+    '/assets/brand/icon-16.png?v=202611091803',
+    '/assets/brand/icon-32.png?v=202611091803',
     '/assets/extracto.js?v=20261106',
     '/assets/extracto/lectores/camt053.js',
     '/assets/extracto/lectores/csv.js',
@@ -63,7 +63,7 @@ globalThis.RECURSOS_EXTRACTO = {
     '/assets/fonts/atkinson-next-800.woff2',
     '/assets/fonts/fredoka-600.woff2',
     '/assets/fonts/nunito-var.woff2',
-    '/assets/img/blog-lupa.png?v=202611061716',
+    '/assets/img/blog-lupa.png?v=202611091803',
     '/extracto/dev/dev.css',
     '/extracto/dev/dev.js',
     '/manifest.webmanifest',
