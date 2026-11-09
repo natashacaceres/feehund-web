@@ -8,6 +8,18 @@
   const LANG = ["es", "ca", "en"].indexOf(document.documentElement.lang) >= 0 ? document.documentElement.lang : "es";
   const TX = {
     es: { year: "€/año", menos: " menos/año",
+      si: "Sí", no: "No", el: "el", yMas: (n) => " y " + n + " más", deA: (x, a, b) => x + ", de " + a + " a " + b + " €", enExtracto: (x) => x + " € en este extracto",
+      preguntas: [["doble", "¿Te cobran algo dos veces?"], ["subida", "¿Te han subido algún precio?"], ["recibo", "¿Algún recibo ha venido más alto de lo normal?"], ["comision", "¿Pagas comisiones al banco?"]],
+      pagas: ["Pagas ", " al año en suscripciones y domiciliaciones"], nada: "No hemos visto cobros que se repitan.",
+      avisosN: (n) => (n === 0 ? "Todo en orden. No vemos nada raro." : n === 1 ? "Revisa este aviso" : "Revisa estos " + n + " avisos"),
+      aDoble: ["Te cobraron dos veces", (x, i, f) => x + " te cobró " + i + " € dos veces el " + f, "Pide al comercio que te lo devuelva"],
+      aSubida: ["Te subieron el precio", (x, a, b, c, p) => x + " pasó de " + a + " a " + b + " € " + c + " (+" + p + " %)", "Dar de baja"],
+      aRecibo: ["Recibo más alto de lo normal", (x, i, f, p, m) => x + " te cobró " + i + " € el " + f + ", un " + p + " % más que tu media (" + m + " €)", "Revisa esa factura"],
+      aComision: ["Comisiones del banco", (l) => "En este extracto te han cobrado " + l, "Pregunta a tu banco cómo evitarlas"],
+      aReclamar: ["Comisión que puedes reclamar", (x) => x, "Pide que te la devuelvan"],
+      aTarjeta: ["Pagos con tarjeta de crédito", (i, n) => "Pagas " + i + " € con tu tarjeta de crédito (" + n + " pagos). Lo que compras con ella no sale en este extracto.", "Sube también el extracto de la tarjeta"],
+      nDevol: (x, i) => x + " te devolvió " + i + " €", nBaja: (x, a, b) => x + " bajó de " + a + " a " + b + " €", nFin: (x, f) => "Ya no te cobran " + x + " (último cargo el " + f + ")", nFinT: (x, f) => x + " ya no sale en esta cuenta desde el " + f + ". Puede que ahora lo pagues con la tarjeta de crédito", nDevC: (x, i) => "Te devolvieron la " + x.toLowerCase() + " (" + i + " €)", otroC: " (otro contrato)",
+      eEstable: "Estable", eVaria: "Varía mucho", totalSec: (x, suf) => "Total: " + x + " €" + suf,
       cada: { semanal: "cada semana", mensual: "cada mes", bimestral: "cada 2 meses", trimestral: "cada 3 meses", semestral: "cada 6 meses", anual: "cada año" },
       head: (n, m) => n
         ? "Es lo que pagas al año en " + n + (n === 1 ? " cobro que se repite." : " cobros que se repiten.") + (m ? (m === 1 ? " Hay 1 más que no sumamos porque lo hemos visto pocas veces." : " Hay " + m + " más que no sumamos porque los hemos visto pocas veces.") : "")
@@ -21,6 +33,18 @@
       none: "No ha encontrado cobros que se repitan. Prueba con más meses.", bad: "No se ha podido leer. Prueba con Excel o CSV.", mapeo: "No reconocemos las columnas de este archivo. Prueba a descargarlo en Excel o CSV.",
       dl: "Imagen descargada.", ics: "Archivo de avisos descargado.", sinIcs: "No hay cobros para avisar.", share: (x) => x + " €/año en cobros que se repiten · feehund.com", lista: "Cobros que se repiten" },
     ca: { year: "€/any", menos: " menys/any",
+      si: "Sí", no: "No", el: "el", yMas: (n) => " i " + n + " més", deA: (x, a, b) => x + ", de " + a + " a " + b + " €", enExtracto: (x) => x + " € en aquest extracte",
+      preguntas: [["doble", "Et cobren alguna cosa dues vegades?"], ["subida", "T'han pujat algun preu?"], ["recibo", "Algun rebut ha vingut més alt del normal?"], ["comision", "Pagues comissions al banc?"]],
+      pagas: ["Pagues ", " l'any en subscripcions i domiciliacions"], nada: "No hem vist cobraments que es repeteixin.",
+      avisosN: (n) => (n === 0 ? "Tot en ordre. No veiem res d'estrany." : n === 1 ? "Revisa aquest avís" : "Revisa aquests " + n + " avisos"),
+      aDoble: ["T'han cobrat dues vegades", (x, i, f) => x + " t'ha cobrat " + i + " € dues vegades el " + f, "Demana al comerç que te'l retorni"],
+      aSubida: ["T'han pujat el preu", (x, a, b, c, p) => x + " ha passat de " + a + " a " + b + " € " + c + " (+" + p + " %)", "Donar de baixa"],
+      aRecibo: ["Rebut més alt del normal", (x, i, f, p, m) => x + " t'ha cobrat " + i + " € el " + f + ", un " + p + " % més que la teva mitjana (" + m + " €)", "Revisa aquesta factura"],
+      aComision: ["Comissions del banc", (l) => "En aquest extracte t'han cobrat " + l, "Pregunta al teu banc com evitar-les"],
+      aReclamar: ["Comissió que pots reclamar", (x) => x, "Demana que te la retornin"],
+      aTarjeta: ["Pagaments amb targeta de crèdit", (i, n) => "Pagues " + i + " € amb la teva targeta de crèdit (" + n + " pagaments). El que compres amb ella no surt en aquest extracte.", "Puja també l'extracte de la targeta"],
+      nDevol: (x, i) => x + " t'ha retornat " + i + " €", nBaja: (x, a, b) => x + " ha baixat de " + a + " a " + b + " €", nFin: (x, f) => "Ja no et cobren " + x + " (últim càrrec el " + f + ")", nFinT: (x, f) => x + " ja no surt en aquest compte des del " + f + ". Potser ara el pagues amb la targeta de crèdit", nDevC: (x, i) => "T'han retornat la " + x.toLowerCase() + " (" + i + " €)", otroC: " (un altre contracte)",
+      eEstable: "Estable", eVaria: "Varia molt", totalSec: (x, suf) => "Total: " + x + " €" + suf,
       cada: { semanal: "cada setmana", mensual: "cada mes", bimestral: "cada 2 mesos", trimestral: "cada 3 mesos", semestral: "cada 6 mesos", anual: "cada any" },
       head: (n, m) => n
         ? "És el que pagues cada any en " + n + (n === 1 ? " cobrament que es repeteix." : " cobraments que es repeteixen.") + (m ? (m === 1 ? " N'hi ha 1 més que no sumem perquè l'hem vist poques vegades." : " N'hi ha " + m + " més que no sumem perquè els hem vist poques vegades.") : "")
@@ -34,6 +58,18 @@
       none: "No ha trobat cobraments que es repeteixin. Prova amb més mesos.", bad: "No s'ha pogut llegir. Prova amb Excel o CSV.", mapeo: "No reconeixem les columnes d'aquest fitxer. Prova de descarregar-lo en Excel o CSV.",
       dl: "Imatge descarregada.", ics: "Fitxer d'avisos descarregat.", sinIcs: "No hi ha cobraments per avisar.", share: (x) => x + " €/any en cobraments que es repeteixen · feehund.com", lista: "Cobraments que es repeteixen" },
     en: { year: "€/year", menos: " less/year",
+      si: "Yes", no: "No", el: "on", yMas: (n) => " and " + n + " more", deA: (x, a, b) => x + ", from " + a + " to " + b + " €", enExtracto: (x) => x + " € in this statement",
+      preguntas: [["doble", "Are you charged twice for anything?"], ["subida", "Has any price gone up?"], ["recibo", "Has any bill come in higher than usual?"], ["comision", "Do you pay bank fees?"]],
+      pagas: ["You pay ", " a year in subscriptions and direct debits"], nada: "We have not seen any repeating charges.",
+      avisosN: (n) => (n === 0 ? "All in order. We see nothing unusual." : n === 1 ? "Check this alert" : "Check these " + n + " alerts"),
+      aDoble: ["You were charged twice", (x, i, f) => x + " charged you " + i + " € twice on " + f, "Ask the company for a refund"],
+      aSubida: ["Your price went up", (x, a, b, c, p) => x + " went from " + a + " to " + b + " € " + c + " (+" + p + " %)", "Cancel"],
+      aRecibo: ["Bill higher than usual", (x, i, f, p, m) => x + " charged you " + i + " € on " + f + ", " + p + " % more than your average (" + m + " €)", "Check that bill"],
+      aComision: ["Bank fees", (l) => "In this statement you were charged " + l, "Ask your bank how to avoid them"],
+      aReclamar: ["A fee you can claim back", (x) => x, "Ask for it back"],
+      aTarjeta: ["Credit card payments", (i, n) => "You pay " + i + " € with your credit card (" + n + " payments). What you buy with it is not in this statement.", "Upload the card statement too"],
+      nDevol: (x, i) => x + " refunded you " + i + " €", nBaja: (x, a, b) => x + " went down from " + a + " to " + b + " €", nFin: (x, f) => "You are no longer charged for " + x + " (last charge on " + f + ")", nFinT: (x, f) => x + " has not appeared in this account since " + f + ". You may now pay it with your credit card", nDevC: (x, i) => "Your " + x.toLowerCase() + " was refunded (" + i + " €)", otroC: " (another contract)",
+      eEstable: "Stable", eVaria: "Varies a lot", totalSec: (x, suf) => "Total: " + x + " €" + suf,
       cada: { semanal: "every week", mensual: "every month", bimestral: "every 2 months", trimestral: "every 3 months", semestral: "every 6 months", anual: "every year" },
       head: (n, m) => n
         ? "This is what you pay each year in " + n + (n === 1 ? " repeating charge." : " repeating charges.") + (m ? (m === 1 ? " 1 more is not added in because we have only seen it a few times." : " " + m + " more are not added in because we have only seen them a few times.") : "")
@@ -108,7 +144,7 @@
   const cada = (c) => TX.cada[c.periodicidad] || "";
   const el = (tag, clase, texto) => { const x = document.createElement(tag); if (clase) x.className = clase; if (texto !== undefined) x.textContent = texto; return x; };
   const extras = [];
-  function limpiar() { while (extras.length) extras.pop().remove(); $("xList").textContent = ""; }
+  function limpiar() { while (extras.length) extras.pop().remove(); ["xList", "xAlertas", "xNoticias", "xTodo"].forEach((id) => { if ($(id)) $(id).textContent = ""; }); }
 
   // Una fila: nombre con etiquetas, una línea debajo (y otra si hace falta), enlace de baja y la cifra a la derecha
   function fila(nombre, tags, lineas, cifra, sufijo, baja) {
@@ -154,6 +190,11 @@
   }
 
   function render(r, cobros) {
+    if ($("tAlerta") && $("xAlertas")) return renderAccion(r, cobros);
+    renderLista(r, cobros);
+  }
+
+  function renderLista(r, cobros) {
     limpiar();
     const seguros = cobros.filter((c) => c.estado === "seguro");
     const posibles = cobros.filter((c) => c.estado === "posible" && c.tipo !== "comision");
@@ -206,6 +247,167 @@
         }
       });
     });
+  }
+
+  // ---------- Resultado accionable (plantillas <template> de Design: tAlerta, tNoticia, tSeccion, tFila) ----------
+  // Reglas de los avisos (decididas el 9 nov 2026):
+  //   subida: la del motor (último importe ≥ 0,50 € y ≥ 3 % sobre el anterior)
+  //   recibo alto: un cargo más de un 20 % por encima de la media de los demás cargos de ese recibo
+  //   doble: la del motor (mismo importe en 0 a 3 días)
+  const RECIBO_ALTO = 0.2;
+  const ICONOS = {
+    doble: "M3 9h13v10H3zM8 5h13v10",
+    subida: "M4 17l6-6 4 4 6-7M14 8h6v6",
+    recibo: "M6 3h12v18l-3-2-3 2-3-2-3 2zM9 8h6M9 12h6",
+    comision: "M12 3v18M17 7.5c0-1.9-2.2-3-5-3s-5 1.1-5 3 2.2 2.6 5 3.4 5 1.6 5 3.6-2.2 3-5 3-5-1.1-5-3",
+    tarjeta: "M3 6h18v12H3zM3 10h18",
+  };
+  function plantilla(id) { return $(id).content.firstElementChild.cloneNode(true); }
+  function poner(raiz, campo, texto) { const x = raiz.querySelector('[data-c="' + campo + '"]'); if (x) x.textContent = texto; return x; }
+  function icono(raiz, tipo) {
+    // La plantilla trae el icono de un tipo; los demás se dibujan aquí con la misma clase
+    if (raiz.querySelector(".al-i--" + tipo)) return;
+    const vieja = raiz.querySelector(".al-i"); if (!vieja) return;
+    const span = el("span", "al-i al-i--" + tipo); span.setAttribute("role", "img"); span.setAttribute("aria-label", TX["a" + tipo[0].toUpperCase() + tipo.slice(1)][0]);
+    const ns = "http://www.w3.org/2000/svg", svg = document.createElementNS(ns, "svg"), path = document.createElementNS(ns, "path");
+    svg.setAttribute("viewBox", "0 0 24 24"); svg.setAttribute("aria-hidden", "true"); path.setAttribute("d", ICONOS[tipo]);
+    svg.appendChild(path); span.appendChild(svg); vieja.replaceWith(span);
+  }
+  function alerta(tipo, titulo, detalle, cifra, accion, enlace) {
+    const a = plantilla("tAlerta");
+    a.dataset.tipo = tipo; icono(a, tipo);
+    poner(a, "titulo", titulo); poner(a, "detalle", detalle); poner(a, "cifra", cifra || "");
+    const ac = a.querySelector('[data-c="accion"]');
+    if (ac) { if (accion) { ac.textContent = accion + " →"; if (enlace) ac.href = enlace; else ac.replaceWith(el("p", ac.className, accion)); } else ac.remove(); }
+    return a;
+  }
+  const media = (xs) => xs.reduce((t, x) => t + x, 0) / xs.length;
+  const pct = (x) => Math.round(x * 100);
+
+  function renderAccion(r, cobros) {
+    limpiar();
+    const seguros = cobros.filter((c) => c.estado === "seguro");
+    const total = seguros.length ? r.total_seguro || 0 : r.total_posible || 0;
+    // Cabecera: «Pagas 3.532 € al año en suscripciones y domiciliaciones»
+    const cuenta = $("xCount"), sr = $("xTotal");
+    cuenta.textContent = "";
+    if (total > 0) { cuenta.append(TX.pagas[0]); cuenta.appendChild(el("strong", "", e0(total) + " €")); cuenta.append(TX.pagas[1]); }
+    else cuenta.append(TX.nada);
+    if (sr) { sr.textContent = ""; cuenta.appendChild(sr); }
+
+    const porId = {};
+    (r.cobros || []).concat(r.terminados || []).forEach((c) => { porId[c.id] = c; });
+    (r.devoluciones || []).forEach((d) => { porId[d.id] = d; });
+    const grupo = (cod) => (r.grupos || []).find((g) => g.codigo === cod);
+    const deGrupo = (cod) => ((grupo(cod) || {}).ids || []).map((id) => porId[id]).filter(Boolean);
+
+    // ---- Para revisar ----
+    const avisos = [];
+    for (const c of deGrupo("dobles")) {
+      const rep = (c.movimientos || []).find((m) => m.doble);
+      const imp = (c.doble && c.doble.importe) || (rep && Math.abs(rep.importe)) || c.importe;
+      avisos.push({ tipo: "doble", corto: c.nombre + ", " + e2(imp) + " € " + TX.el + " " + fecha(rep ? rep.fecha : c.ultimo_cargo), euros: imp, nodo: alerta("doble", TX.aDoble[0], TX.aDoble[1](c.nombre, e2(imp), fecha(rep ? rep.fecha : c.ultimo_cargo)), e2(imp) + " €", TX.aDoble[2]) });
+    }
+    for (const c of deGrupo("subidas")) {
+      const s1 = c.subida || {}, anual = (c.subida_mensual || 0) * 12;
+      avisos.push({ tipo: "subida", corto: TX.deA(c.nombre, e2(s1.antes), e2(s1.ahora)), euros: anual, nodo: alerta("subida", TX.aSubida[0], TX.aSubida[1](c.nombre, e2(s1.antes), e2(s1.ahora), cada(c), pct((s1.ahora - s1.antes) / s1.antes)), "+" + e2(anual) + " " + TX.year, TX.aSubida[2], enlaceBaja(c)) });
+    }
+    const vistosR = {};
+    for (const c of cobros.concat(r.terminados || [])) {
+      const kR = c.comercio_id || c.nombre, nombreR = c.nombre + (vistosR[kR] ? TX.otroC : ""); vistosR[kR] = true;
+      const movs = (c.movimientos || []).filter((m) => !m.doble && !m.aparte && m.importe < 0);
+      if (c.importe_tipo !== "variable" || movs.length < 3) continue;
+      // el cargo que más se aleja hacia arriba de la media de los demás
+      let peor = null;
+      for (const m of movs) {
+        const otros = movs.filter((x) => x !== m).map((x) => Math.abs(x.importe)), med = media(otros), v = Math.abs(m.importe);
+        if (v > med * (1 + RECIBO_ALTO) && (!peor || v - med > peor.dif)) peor = { m, v, med, dif: v - med };
+      }
+      if (peor) avisos.push({ tipo: "recibo", corto: nombreR + ", " + e2(peor.v) + " € " + TX.el + " " + fecha(peor.m.fecha), euros: peor.dif, nodo: alerta("recibo", TX.aRecibo[0], TX.aRecibo[1](nombreR, e2(peor.v), fecha(peor.m.fecha), pct(peor.dif / peor.med), e2(peor.med)), "+" + e2(peor.dif) + " €", TX.aRecibo[2]) });
+    }
+    const comisiones = deGrupo("comisiones");
+    for (const c of comisiones.filter((x) => (x.etiquetas || []).indexOf("reclamable") >= 0 && (x.etiquetas || []).indexOf("devuelto") < 0)) {
+      avisos.push({ tipo: "comision", corto: c.nombre + ", " + e2(c.coste_anual || c.importe) + " €", euros: c.coste_anual || c.importe, nodo: alerta("comision", TX.aReclamar[0], TX.aReclamar[1](c.nombre), e2(c.coste_anual || c.importe) + " €", TX.aReclamar[2]) });
+    }
+    const pagadas = comisiones.filter((x) => (x.etiquetas || []).indexOf("devuelto") < 0 && (x.etiquetas || []).indexOf("reclamable") < 0);
+    if (pagadas.length) {
+      const suma = pagadas.reduce((t, x) => t + (x.coste_anual || x.importe || 0), 0);
+      const lista = pagadas.map((x) => x.nombre.toLowerCase() + " (" + e2(x.coste_anual || x.importe) + " €)").join(", ");
+      avisos.push({ tipo: "comision", corto: TX.enExtracto(e2(suma)), euros: suma, nodo: alerta("comision", TX.aComision[0], TX.aComision[1](lista), e2(suma) + " €", TX.aComision[2]) });
+    }
+    avisos.sort((a, b) => b.euros - a.euros);
+    const tarjeta = ((r.lectura && r.lectura.avisos) || []).find((a) => a.codigo === "cobros_tarjeta_credito");
+    const textoTarjeta = tarjeta && tarjeta.datos ? TX.aTarjeta[1](e2(tarjeta.datos.importe || 0), tarjeta.datos.n || 0) : "";
+    const nota = $("xNota");
+    // Con sitio para la nota (diseño de preguntas), la tarjeta de crédito va ahí y no como aviso
+    if (textoTarjeta && !nota) avisos.push({ tipo: "tarjeta", euros: 0, nodo: alerta("tarjeta", TX.aTarjeta[0], textoTarjeta, "", TX.aTarjeta[2]) });
+    if (nota) { nota.textContent = textoTarjeta ? textoTarjeta + " " + TX.aTarjeta[2] + "." : ""; nota.hidden = !textoTarjeta; }
+    avisos.forEach((a) => $("xAlertas").appendChild(a.nodo));
+    if ($("xAvisosN")) $("xAvisosN").textContent = TX.avisosN(avisos.length);
+    mostrar($("xAlertas"), avisos.length);
+
+    // ---- Las grandes preguntas: Sí o No, y una línea solo si es Sí ----
+    if ($("xPreguntas") && $("tPregunta")) {
+      for (const [tipo, pregunta] of TX.preguntas) {
+        const deEste = avisos.filter((a) => a.tipo === tipo);
+        const q = plantilla("tPregunta");
+        q.dataset.respuesta = deEste.length ? "si" : "no";
+        poner(q, "pregunta", pregunta);
+        poner(q, "respuesta", deEste.length ? TX.si : TX.no);
+        const d = poner(q, "detalle", deEste.length ? deEste[0].corto + (deEste.length > 1 ? TX.yMas(deEste.length - 1) : "") : "");
+        if (d && !deEste.length) d.remove();
+        $("xPreguntas").appendChild(q);
+      }
+    }
+
+    // ---- Buenas noticias ----
+    const noticias = [];
+    for (const d of deGrupo("devoluciones")) noticias.push([d.tipo === "comision" || /^comisi|^comissi|fee/i.test(d.nombre) ? TX.nDevC(d.nombre, e2(d.importe)) : TX.nDevol(d.nombre, e2(d.importe)), ""]);
+    for (const c of deGrupo("bajadas")) if (c.bajada) noticias.push([TX.nBaja(c.nombre, e2(c.bajada.antes), e2(c.bajada.ahora)), ""]);
+    for (const c of r.terminados || []) noticias.push([(c.quiza_en_tarjeta ? TX.nFinT : TX.nFin)(c.nombre, fecha(c.ultimo_cargo)), ""]);
+    for (const [t, cifra] of noticias) { const n = plantilla("tNoticia"); poner(n, "texto", t); const cx = poner(n, "cifra", cifra); if (cx && !cifra) cx.remove(); $("xNoticias").appendChild(n); }
+    mostrar($("xNoticias"), noticias.length);
+
+    // ---- Todo lo que pagas: por sector, recibos y comisiones ----
+    const secciones = (r.grupos || []).filter((g) => g.codigo.indexOf("sector_") === 0 || g.codigo === "recibos" || g.codigo === "comisiones");
+    for (const g of secciones) {
+      const items = g.ids.map((id) => porId[id]).filter(Boolean);
+      if (!items.length) continue;
+      const sec = plantilla("tSeccion");
+      // «.sec» ya es la clase de las secciones grandes de la web (con mucho relleno): aquí se cambia por «res-sec»
+      if (sec.classList.contains("sec")) { sec.classList.remove("sec"); sec.classList.add("res-sec"); if ($("xTodo").children.length) sec.style.borderTop = "1px solid var(--ink)"; }
+      poner(sec, "titulo", g.titulo);
+      const sueltas = items.some((c) => c.periodicidad === "puntual");
+      // lo que te devolvieron no cuenta en el total de la sección
+      const tot = g.codigo === "comisiones" ? items.filter((c) => (c.etiquetas || []).indexOf("devuelto") < 0).reduce((t, c) => t + (c.coste_anual || 0), 0) : typeof g.total === "number" ? g.total : items.reduce((t, c) => t + (c.coste_anual || 0), 0);
+      poner(sec, "total", TX.totalSec(e2(tot), sueltas ? "" : TX.year.replace("€", "")));
+      const filas = sec.querySelector('[data-c="filas"]');
+      const vistos = {};
+      for (const c of items) {
+        const f = plantilla("tFila"), et = c.etiquetas || [];
+        const k2 = c.comercio_id || c.nombre, otro = Boolean(vistos[k2]); vistos[k2] = true;
+        poner(f, "nombre", c.nombre + (otro ? " · " + TX.otro : ""));
+        let estado = "estable", texto = TX.eEstable;
+        if (et.indexOf("subio") >= 0) { estado = "subio"; texto = TX.up; }
+        else if (et.indexOf("bajo") >= 0) { estado = "bajo"; texto = TX.down; }
+        else if (c.estado === "posible" && c.periodicidad !== "puntual") { estado = "visto"; texto = TX.visto(c.num_cargos || 1); }
+        else if (c.importe_tipo === "variable" && c.importe_min > 0 && c.importe_max > c.importe_min * (1 + RECIBO_ALTO)) { estado = "varia"; texto = TX.eVaria; }
+        else if (c.periodicidad === "puntual") { estado = "visto"; texto = et.indexOf("devuelto") >= 0 ? TX.devuelta : et.indexOf("reclamable") >= 0 ? TX.reclamar : TX.fee; }
+        const e = poner(f, "estado", texto); if (e) e.dataset.estado = estado;
+        poner(f, "detalle", lineaPrecio(c).filter(Boolean).join(" · "));
+        poner(f, "cifra", e2(c.coste_anual || 0) + " " + (c.periodicidad === "puntual" ? "€" : TX.year));
+        filas.appendChild(f);
+      }
+      $("xTodo").appendChild(sec);
+    }
+    mostrar($("xTodo"), $("xTodo").querySelectorAll('[data-c="nombre"]').length);
+  }
+
+  // Cada bloque va dentro de un botón (<details>) o de una sección: se oculta si está vacío y su contador dice cuántos hay
+  function mostrar(cont, n) {
+    if (!cont) return;
+    const caja = cont.closest("details") || cont.closest("section");
+    if (caja) { caja.hidden = !n; const c = caja.querySelector("[data-n]"); if (c) c.textContent = n ? String(n) : ""; if (caja.tagName === "DETAILS") caja.open = false; }
   }
 
   function download(blob, name) { const u = URL.createObjectURL(blob), a = document.createElement("a"); a.href = u; a.download = name; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(u), 4000); }
