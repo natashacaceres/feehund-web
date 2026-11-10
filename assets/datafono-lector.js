@@ -38,7 +38,23 @@
    * a pedir a la web todos los archivos del motor y la página se recarga una sola vez. No se guarda nada nuevo:
    * solo se renueva la caché normal del navegador.
    */
+  // ¿La copia del motor que guarda el navegador es la de la web? Se compara la versión de recursos.js (la huella de
+  // todos los archivos del motor) de la caché con la de la web. Cloudflare guarda los .js 4 horas en cada navegador.
+  let revisada = null;
+  function revisarVersion(motivo) {
+    revisada = revisada || (async () => {
+      const url = new URL(ROOT + "assets/extracto/recursos.js", location.href).href;
+      const version = (t) => (String(t).match(/version:\s*'([^']+)'/) || [])[1] || null;
+      try {
+        const [web, guardada] = await Promise.all([fetch(url, { cache: "no-store" }).then((r) => r.text()), fetch(url).then((r) => r.text())]);
+        if (version(web) && version(guardada) && version(web) !== version(guardada)) await renovarMotor(motivo);
+      } catch (e) { /* sin conexión: se sigue con lo que hay */ }
+    })();
+    return revisada;
+  }
+
   async function motorAlDia(motivo) {
+    await revisarVersion(motivo);
     const m = await motor();
     if (typeof m.analizarResumen === "function") return m;
     await renovarMotor(motivo);
