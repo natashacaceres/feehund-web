@@ -47,7 +47,10 @@
       const version = (t) => (String(t).match(/version:\s*'([^']+)'/) || [])[1] || null;
       try {
         const [web, guardada] = await Promise.all([fetch(url, { cache: "no-store" }).then((r) => r.text()), fetch(url).then((r) => r.text())]);
-        if (version(web) && version(guardada) && version(web) !== version(guardada)) await renovarMotor(motivo);
+        if (!version(web) || !version(guardada) || version(web) === version(guardada)) return;
+        // Con archivos esperando en la lista no se recarga (se perderían): se renueva la caché y el motor se carga ya
+        // nuevo, porque todavía no se ha abierto. Sin archivos, se recarga como siempre.
+        if (bandeja && bandeja.total) await refrescarCache(); else await renovarMotor(motivo);
       } catch (e) { /* sin conexión: se sigue con lo que hay */ }
     })();
     return revisada;
@@ -62,6 +65,13 @@
   }
   async function renovarMotor(motivo) {
     if (RENOVADO) return; // ya se intentó: no se recarga en bucle
+    await refrescarCache();
+    const u = new URL(location.href); u.searchParams.set("motor", motivo || "repite");
+    location.replace(u.href);
+    await new Promise(() => {}); // la página se recarga
+  }
+  /** Vuelve a pedir a la web todos los archivos del motor (solo la caché normal del navegador). */
+  async function refrescarCache() {
     let lista = ["/assets/extracto/motor.js"];
     try {
       await import(new URL(ROOT + "assets/extracto/recursos.js?v=" + Date.now(), location.href).href);
@@ -69,9 +79,6 @@
       if (R && R.PAGINA) lista = R.PAGINA.filter((u) => u.indexOf("/assets/extracto/") === 0);
     } catch (e) { /* sin la lista, al menos el motor */ }
     await Promise.all(lista.map((u) => fetch(new URL(u, location.origin).href, { cache: "reload", credentials: "same-origin" }).catch(() => null)));
-    const u = new URL(location.href); u.searchParams.set("motor", motivo || "repite");
-    location.replace(u.href);
-    await new Promise(() => {}); // la página se recarga
   }
   const piezas = () => Promise.all([motor(), cargar("textos", "assets/extracto/textos.js").then((t) => t.cargarTextos().then(() => t)),
     cargar("confirmar", "assets/extracto/datafono/confirmar.js"), cargar("rellenar", "assets/extracto/datafono/rellenar.js")]);
