@@ -34,11 +34,34 @@ const MESES = { ENERO: 1, GENER: 1, JANUARY: 1, FEBRERO: 2, FEBRER: 2, FEBRUARY:
  * @property {string|null} [iva]   'incluido' | 'sin' si la etiqueta lo dice
  */
 
-/** Líneas → {hechos, periodo, cabeceras, sin_entender}. */
+/**
+ * ¿Es un movimiento de cuenta («02/03 NETFLIX.COM -13,99», «05/10/2026 BIZUM DE ANA 20,00»)? Fecha, concepto con
+ * letras e importe en la misma línea. Un resumen del datáfono no pone fecha en sus líneas de totales; sus filas por día
+ * no llevan concepto. Estas líneas nunca dan cifras: en un extracto del banco «BIZUM» o «CUOTA HIPOTECA» no son del datáfono.
+ */
+const MES_SOLO = /^(ENE|FEB|MAR|ABR|MAY|JUN|JUL|AGO|SEP|SET|OCT|NOV|DIC|GEN|JAN|APR|AUG|DEC)[A-Z]*\.?$/i;
+const FECHA_CORTA = /^(\d{1,2}[/.-]\d{1,2}|\d{1,2}\s?(ENE|FEB|MAR|ABR|MAY|JUN|JUL|AGO|SEP|SET|OCT|NOV|DIC|GEN|JAN|APR|AUG|DEC)[A-Z]*\.?)(\s|$)/i;
+export function esMovimiento(L) {
+  if (!L.trozos.some((t) => t.tipo === 'importe')) return false;
+  const textos = L.trozos.filter((t) => t.tipo === 'texto').map((t) => t.texto);
+  // fecha completa, o corta al principio de un texto («02/03», «1 nov», «02 MAR»), o el número de una fecha de Excel
+  const MES = /^(ENE|FEB|MAR|ABR|MAY|JUN|JUL|AGO|SEP|SET|OCT|NOV|DIC|GEN|JAN|APR|AUG|DEC)/i;
+  const partida = L.trozos.some((t, i) => t.tipo === 'entero' && t.valor >= 1 && t.valor <= 31 && L.trozos[i + 1]?.tipo === 'texto' && MES.test(L.trozos[i + 1].texto)); // «1» «nov» «2025»
+  const fecha = partida || L.trozos.some((t) => t.tipo === 'fecha') || textos.some((t) => FECHA_CORTA.test(t.trim()))
+    || (L.hoja_de_calculo && L.trozos.some((t) => t.tipo === 'entero' && t.valor >= 36526 && t.valor <= 54789));
+  if (!fecha) return false;
+  const letras = textos.map((t) => t.replace(FECHA_CORTA, ' ').replace(MES_SOLO, ' ')).join(' ').replace(/[^A-Za-zÀ-ÿ]/g, '');
+  if (letras.length < 3) return false;
+  return !L.palabras.some((p) => p === 'PERIODO' || p === 'PERIOD' || p === 'PERIODE'); // «Periodo 01/10 - 31/10»
+}
+
+/** Líneas → {hechos, periodo, cabeceras, sin_entender, movimientos}. */
 export function extraerResumen(lineas) {
   const hechos = [], sinEntender = [];
   const usadas = new Set();
   const cabeceras = [];
+  let movimientos = 0;
+  lineas.forEach((L, i) => { if (esMovimiento(L)) { usadas.add(i); movimientos++; } });
 
   // 1. tablas con fila de títulos
   for (let i = 0; i < lineas.length; i++) {
@@ -50,6 +73,7 @@ export function extraerResumen(lineas) {
     for (; j < lineas.length && j <= i + MAX_FILAS_TABLA; j++) {
       const L = lineas[j], prev = lineas[j - 1];
       if (!mismaTabla(prev, L) || columnasDeCabecera(L)) break;
+      if (usadas.has(j)) continue; // un movimiento de cuenta dentro de la tabla
       if (!L.trozos.some((t) => NUM.has(t.tipo))) {
         // una línea solo con texto dentro de la tabla: título de grupo («Visa») o fin de la tabla
         if (tipoDeTarjeta(etiquetaDe(L.trozos)) && j + 1 < lineas.length && mismaTabla(L, lineas[j + 1])) { usadas.add(j); continue; }
@@ -76,7 +100,7 @@ export function extraerResumen(lineas) {
     }
     for (const seg of segmentos(L.trozos)) segmentoSuelto(seg, L, L, hechos, sinEntender);
   }
-  return { hechos, periodo: buscarPeriodo(lineas), cabeceras: cabeceras.length, sin_entender: sinEntender };
+  return { hechos, periodo: buscarPeriodo(lineas), cabeceras: cabeceras.length, sin_entender: sinEntender, movimientos };
 }
 
 // ───────────── tablas ─────────────

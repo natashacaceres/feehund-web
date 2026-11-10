@@ -8,15 +8,15 @@
   const $ = (id) => document.getElementById(id);
   const LANG = ["es", "ca", "en"].indexOf(document.documentElement.lang) >= 0 ? document.documentElement.lang : "es";
   const TX = {
-    es: { banco: "Esto es el extracto de tu cuenta del banco, no el resumen del datáfono. Se lee en Mi banco.", irBanco: "Ir a Mi banco", seguro: "Leído y comprobado", revisar: "Revísalo", vacio: "No sale en el resumen. Escríbelo si lo sabes.", con: "Con quién cobras",
+    es: { renovado: "Hemos puesto al día el lector. Vuelve a soltar tu resumen.", banco: "Esto es el extracto de tu cuenta del banco, no el resumen del datáfono. Se lee en Mi banco.", irBanco: "Ir a Mi banco", seguro: "Leído y comprobado", revisar: "Revísalo", vacio: "No sale en el resumen. Escríbelo si lo sabes.", con: "Con quién cobras",
       mes: (d, h) => "Del " + d + " al " + h, suma: (n) => "Suma de " + n + " filas", noCifra: "Escribe solo la cifra, por ejemplo 1234,56.",
       bad: "No se ha podido leer. Prueba con el PDF o el Excel del resumen.", nada: "No encontramos las ventas con tarjeta en este archivo. Prueba con el resumen del mes o escríbelo a mano.",
       clave: (a) => "Contraseña de " + a, listo: (n) => "Hemos rellenado " + n + " casillas de la calculadora. Revísalas y sigue con las preguntas." },
-    ca: { banco: "Això és l'extracte del teu compte del banc, no el resum del datàfon. Es llegeix a El meu banc.", irBanco: "Anar a El meu banc", seguro: "Llegit i comprovat", revisar: "Revisa-ho", vacio: "No surt al resum. Escriu-ho si ho saps.", con: "Amb qui cobres",
+    ca: { renovado: "Hem posat al dia el lector. Torna a deixar anar el teu resum.", banco: "Això és l'extracte del teu compte del banc, no el resum del datàfon. Es llegeix a El meu banc.", irBanco: "Anar a El meu banc", seguro: "Llegit i comprovat", revisar: "Revisa-ho", vacio: "No surt al resum. Escriu-ho si ho saps.", con: "Amb qui cobres",
       mes: (d, h) => "Del " + d + " al " + h, suma: (n) => "Suma de " + n + " files", noCifra: "Escriu només la xifra, per exemple 1234,56.",
       bad: "No s'ha pogut llegir. Prova amb el PDF o l'Excel del resum.", nada: "No trobem les vendes amb targeta en aquest arxiu. Prova amb el resum del mes o escriu-ho a mà.",
       clave: (a) => "Contrasenya de " + a, listo: (n) => "Hem omplert " + n + " caselles de la calculadora. Revisa-les i continua amb les preguntes." },
-    en: { banco: "This is your bank account statement, not the card machine summary. It goes in My bank.", irBanco: "Go to My bank", seguro: "Read and checked", revisar: "Please check", vacio: "Not in the summary. Type it in if you know it.", con: "Who you use",
+    en: { renovado: "We have updated the reader. Please drop your summary again.", banco: "This is your bank account statement, not the card machine summary. It goes in My bank.", irBanco: "Go to My bank", seguro: "Read and checked", revisar: "Please check", vacio: "Not in the summary. Type it in if you know it.", con: "Who you use",
       mes: (d, h) => "From " + d + " to " + h, suma: (n) => "Sum of " + n + " rows", noCifra: "Type just the number, for example 1234.56.",
       bad: "We could not read it. Try the PDF or Excel version of the summary.", nada: "We could not find your card sales in this file. Try the monthly summary or type the figures in.",
       clave: (a) => "Password for " + a, listo: (n) => "We filled in " + n + " boxes in the calculator. Check them and carry on with the questions." },
@@ -30,6 +30,33 @@
   const mods = {};
   const cargar = (k, ruta) => (mods[k] = mods[k] || import(new URL(ROOT + ruta, location.href).href));
   const motor = () => cargar("motor", "assets/extracto/motor.js");
+  const RENOVADO = new URLSearchParams(location.search).get("motor"); // "nuevo" (al abrir) o "repite" (a mitad de una lectura)
+  if (RENOVADO) { const u = new URL(location.href); u.searchParams.delete("motor"); history.replaceState(null, "", u.pathname + u.search + u.hash); }
+
+  /**
+   * El motor de esta versión. Si el navegador tenía guardada una copia vieja (de cuando se usó «Mi banco»), se vuelven
+   * a pedir a la web todos los archivos del motor y la página se recarga una sola vez. No se guarda nada nuevo:
+   * solo se renueva la caché normal del navegador.
+   */
+  async function motorAlDia(motivo) {
+    const m = await motor();
+    if (typeof m.analizarResumen === "function") return m;
+    await renovarMotor(motivo);
+    throw Object.assign(new Error("motor viejo"), { viejo: true });
+  }
+  async function renovarMotor(motivo) {
+    if (RENOVADO) return; // ya se intentó: no se recarga en bucle
+    let lista = ["/assets/extracto/motor.js"];
+    try {
+      await import(new URL(ROOT + "assets/extracto/recursos.js?v=" + Date.now(), location.href).href);
+      const R = globalThis.RECURSOS_EXTRACTO;
+      if (R && R.PAGINA) lista = R.PAGINA.filter((u) => u.indexOf("/assets/extracto/") === 0);
+    } catch (e) { /* sin la lista, al menos el motor */ }
+    await Promise.all(lista.map((u) => fetch(new URL(u, location.origin).href, { cache: "reload", credentials: "same-origin" }).catch(() => null)));
+    const u = new URL(location.href); u.searchParams.set("motor", motivo || "repite");
+    location.replace(u.href);
+    await new Promise(() => {}); // la página se recarga
+  }
   const piezas = () => Promise.all([motor(), cargar("textos", "assets/extracto/textos.js").then((t) => t.cargarTextos().then(() => t)),
     cargar("confirmar", "assets/extracto/datafono/confirmar.js"), cargar("rellenar", "assets/extracto/datafono/rellenar.js")]);
 
@@ -53,6 +80,12 @@
     const a = document.createElement("a"); a.href = MI_BANCO; a.textContent = TX.irBanco + " →";
     el.appendChild(a); el.hidden = false;
   }
+  async function esExtractoBanco(entrada) {
+    try {
+      const rb = await (await motor()).analizar(entrada, { idioma: LANG });
+      return Boolean(rb && rb.lectura && (rb.lectura.movimientos || []).length);
+    } catch (e) { return false; }
+  }
   const esBanco = (r) => (r.errores || []).some((x) => x.codigo === "es_extracto_banco");
 
   async function analyze(entrada) {
@@ -61,7 +94,7 @@
     let r = null, error = null;
     const progreso = (p) => { if (cargando && p && p.texto) cargando.textContent = p.texto; };
     try {
-      const m = await motor();
+      const m = await motorAlDia("repite");
       r = await m.analizarResumen(entrada, { idioma: LANG, contrasenas, onProgreso: progreso });
       // PDF con contraseña: se pide aquí mismo y se vuelve a leer
       while (r && r.necesita_contrasena && r.necesita_contrasena.length) {
@@ -70,14 +103,22 @@
         if (!pedida) break;
         r = await m.analizarResumen(entrada, { idioma: LANG, contrasenas, onProgreso: progreso });
       }
-    } catch (e) { error = e; }
+    } catch (e) {
+      error = e;
+      // un fallo del propio código (no un archivo que no se deja leer): puede ser una copia vieja de alguna pieza
+      if (!e || (!e.codigo && !e.viejo)) await renovarMotor("repite");
+    }
     await new Promise((ok) => setTimeout(ok, Math.max(0, 700 - (Date.now() - t0))));
     if (cargando) cargando.textContent = textoCarga;
     if (error || !r) { show("up"); msg($("dErr"), (error && error.message) || TX.bad); return; }
-    const vacio = Object.keys(r.campos).every((k) => r.campos[k].valor === null || r.campos[k].valor === undefined);
+    // sin ventas ni número de cobros no es un resumen del datáfono (un extracto del banco puede traer «comisiones» sueltas)
+    const vacio = !["ventas_particulares", "ventas_empresa", "ventas_fuera_europa", "ventas_amex", "ventas_bizum", "operaciones"]
+      .some((k) => r.campos[k] && typeof r.campos[k].valor === "number" && r.campos[k].valor > 0);
     if (vacio) {
+      // ¿un extracto del banco en PDF, Excel o CSV? Si «Mi banco» le lee movimientos, se dice y se enlaza
+      const banco = esBanco(r) || await esExtractoBanco(entrada);
       show("up");
-      if (esBanco(r)) aMiBanco($("dErr")); else msg($("dErr"), r.errores && r.errores[0] ? r.errores[0].texto : TX.nada);
+      if (banco) aMiBanco($("dErr")); else msg($("dErr"), r.errores && r.errores[0] ? r.errores[0].texto : TX.nada);
       return;
     }
     actual = r;
@@ -190,6 +231,10 @@
 
   // aviso para lectores de pantalla al pasar a la calculadora (no se ve)
   const vivo = document.createElement("p"); vivo.id = "dListo"; vivo.className = "sr"; vivo.setAttribute("role", "status"); $("dLector").appendChild(vivo);
+
+  // Al abrir la página se mira que el motor sea de esta versión (y si no, se renueva antes de que la persona haga nada)
+  if (RENOVADO === "repite") msg($("dErr"), TX.renovado);
+  addEventListener("load", () => { motorAlDia("nuevo").catch(() => {}); });
 
   const input = $("dFile"), drop = $("dDrop");
   // Los mismos formatos que «Mi banco» (assets/extracto.js), y varios archivos a la vez: lo que es de una cuenta y no

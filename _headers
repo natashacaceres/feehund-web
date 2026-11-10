@@ -25,6 +25,16 @@
 # Motor del lector y sus workers. Un worker se rige por la política de su propio archivo, así que lleva la misma.
 /assets/extracto/*
   Content-Security-Policy: default-src 'self'; connect-src 'self'; script-src 'self' 'wasm-unsafe-eval'; worker-src 'self' blob:; img-src 'self' data: blob:; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'
+  Cache-Control: no-cache
+
+# El motor y los puentes de las páginas: el navegador pregunta siempre si hay versión nueva (si no la hay, la web
+# contesta «sin cambios» y no se descarga nada). Con la caché de 4 horas de Cloudflare, /datafono/ (que no tiene
+# service worker) mezclaba un motor viejo con una página nueva.
+/assets/extracto.js
+  Cache-Control: no-cache
+
+/assets/datafono-lector.js
+  Cache-Control: no-cache
 
 # Librerías copiadas en la web. La carpeta lleva la versión, así que su contenido nunca cambia y se guarda un año.
 # Misma política que el motor porque algunas se cargan como worker (OCR).

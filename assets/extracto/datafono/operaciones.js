@@ -46,8 +46,10 @@ export function cabeceraDeOperaciones(filas) {
       if (/^GLOBAL CARD BRAND$/.test(t)) cols.marca = k;
       if (/^PAYMENT METHOD VARIANT$/.test(t)) cols.categoria = k;
     });
-    if (cols.fecha !== undefined && cols.importe !== undefined && (cols.comision !== undefined || cols.comision_parte || cols.marca !== undefined
-      || cols.estado !== undefined || cols.neto !== undefined || cols.tipo_operacion !== undefined)) {
+    // una columna de saldo es de un extracto del banco, no de una exportación del datáfono
+    if (f.some((c) => /^(SALDO|SALDOS|BALANCE|SALDO DISPONIBLE|SALDO CONTABLE|SALDO EUR|BALANCE EUR|RUNNING BALANCE|SALDO ACTUAL)$/.test(tituloColumna(c)))) return null;
+    // lo que dice que es del datáfono: la comisión de cada cobro o la marca de la tarjeta
+    if (cols.fecha !== undefined && cols.importe !== undefined && (cols.comision !== undefined || cols.comision_parte || cols.marca !== undefined)) {
       return { fila: i, cols, titulos: f.map((c) => (typeof c === 'string' ? c : '')) };
     }
   }

@@ -88,6 +88,9 @@ export function montarResumen(lecturas, deps = {}) {
     if (!cab) continue;
     const r = operacionesDeTabla(t, cab);
     if (!r.operaciones.length) continue;
+    // casi todo cobros (en positivo): en un extracto del banco la mayoría de las líneas son cargos
+    const ventas = r.operaciones.filter((o) => o.clase === 'venta').length;
+    if (ventas < 0.6 * r.operaciones.length) continue;
     operaciones.push(...r.operaciones);
     fuera = sumarFuera(fuera, r.fuera);
     const info = archivos.find((a) => a.nombre === t.archivo);
@@ -103,7 +106,17 @@ export function montarResumen(lecturas, deps = {}) {
     // cada archivo es un resumen: si hay varios (dos meses), se usa uno, nunca la suma de los dos
     const porArchivo = new Map();
     for (const L of lineas) { if (!porArchivo.has(L.archivo)) porArchivo.set(L.archivo, []); porArchivo.get(L.archivo).push(L); }
-    const leidos = [...porArchivo.entries()].map(([archivo, ls]) => ({ archivo, r: extraerResumen(ls) })).filter((x) => x.r.hechos.length);
+    const todos = [...porArchivo.entries()].map(([archivo, ls]) => ({ archivo, r: extraerResumen(ls) }));
+    // un archivo con movimientos de cuenta y sin ventas ni cobros es un extracto del banco: se dice y no da cifras
+    const conVentas = (r) => r.hechos.some((h) => (h.papel === 'ventas' || h.papel === 'operaciones' || h.papel === 'dia_ventas') && h.valor > 0);
+    for (const x of todos) {
+      if (x.r.movimientos >= 5 && !conVentas(x.r)) {
+        errores.push({ archivo: x.archivo, codigo: 'es_extracto_banco' });
+        const info = archivos.find((a) => a.nombre === x.archivo); if (info) info.error = 'es_extracto_banco';
+        x.r.hechos = [];
+      }
+    }
+    const leidos = todos.filter((x) => x.r.hechos.length && conVentas(x.r));
     if (leidos.length) {
       leidos.sort((a, b) => (a.r.periodo?.hasta ?? '').localeCompare(b.r.periodo?.hasta ?? ''));
       const elegido = leidos[leidos.length - 1];
