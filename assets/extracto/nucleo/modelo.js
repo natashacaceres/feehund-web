@@ -9,6 +9,8 @@ export const ESTADOS = ['seguro', 'posible', 'terminado'];
 export const ETIQUETAS = ['subio', 'bajo', 'evitable', 'doble', 'nuevo', 'reclamable', 'devuelto', 'varias_posibles'];
 export const PERIODICIDADES = {
   semanal: { dias: 7, margen: 2, alAnio: 52, meses: 7 / 30.4375 },
+  // cada 4 semanas (Basic-Fit y otros gimnasios): 13 cargos al año, no 12
+  cuatrisemanal: { dias: 28, margen: 2, alAnio: 13, meses: 28 / 30.4375 },
   mensual: { dias: 30.4375, min: 28, max: 35, alAnio: 12, meses: 1 },
   bimestral: { dias: 61, margen: 6, alAnio: 6, meses: 2 },
   trimestral: { dias: 91, margen: 10, alAnio: 4, meses: 3 },

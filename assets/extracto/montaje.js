@@ -634,6 +634,7 @@ function ordenarComoElArchivo(movs) {
 
 const REGLAS = {
   semanal: { regla: 'FREQ=WEEKLY', dias: 7 },
+  cuatrisemanal: { regla: 'FREQ=WEEKLY;INTERVAL=4', dias: 28 },
   mensual: { regla: 'FREQ=MONTHLY', meses: 1 },
   bimestral: { regla: 'FREQ=MONTHLY;INTERVAL=2', meses: 2 },
   trimestral: { regla: 'FREQ=MONTHLY;INTERVAL=3', meses: 3 },

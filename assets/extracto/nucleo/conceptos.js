@@ -7,7 +7,7 @@ import { normalizar } from './texto.js';
 /** Categorías del diccionario con importe que cambia cada vez (luz, gas, agua, teléfono). */
 export const CATEGORIAS_VARIABLES = new Set(['telecos', 'energia', 'agua']);
 /** Categorías del diccionario que no son un servicio al que estás suscrito. */
-const NO_SUSCRIPCION = new Set(['comisiones', 'pasarelas', 'gastos_fijos']);
+const NO_SUSCRIPCION = new Set(['comisiones', 'pasarelas', 'gastos_fijos', 'impuestos', 'tarjetas']);
 
 /** ¿Es un comercio del diccionario al que se paga por estar dado de alta? (para «posible» con 1 cargo y «nuevo»). */
 export function esSuscripcion(comercio) {
@@ -139,7 +139,8 @@ export function nombreLegible(palabras) {
 // ---------------------------------------------------------------------------------------------
 
 const PREPARADOS = new WeakMap();
-const TIPO_DE_CATEGORIA = { comisiones: 'comision', pasarelas: 'pasarela', gastos_fijos: 'gasto_fijo' };
+// impuestos (IBI, IVTM...) y tarjetas (lo que se devuelve de una tarjeta o un crédito) son gastos fijos, no suscripciones
+const TIPO_DE_CATEGORIA = { comisiones: 'comision', pasarelas: 'pasarela', gastos_fijos: 'gasto_fijo', impuestos: 'gasto_fijo', tarjetas: 'gasto_fijo' };
 
 /**
  * Índice del diccionario para buscar rápido. Se hace una vez por diccionario (queda en caché).
@@ -162,18 +163,21 @@ export function prepararDiccionario(dic) {
   const pasarelas = [];
   for (const c of llave.comercios ?? []) {
     if (!c || !c.id) continue;
-    const ref = { comercio: c, tipo: TIPO_DE_CATEGORIA[c.categoria] ?? 'comercio' };
+    // grupo: la entrada de un grupo de empresas (Xfera, Telefónica); una marca concreta le gana
+    const ref = { comercio: c, tipo: TIPO_DE_CATEGORIA[c.categoria] ?? 'comercio', grupo: Array.isArray(c.marcas) && c.marcas.length > 0 };
     porId.set(c.id, ref);
     if (ref.tipo === 'pasarela') pasarelas.push(ref);
     for (const pat of c.patrones ?? []) agregar(pat, ref);
   }
   for (const g of llave.excluir ?? []) {
-    const ref = { excluir: true, motivo: g.motivo || 'compra_frecuente' };
+    // solo_sin_recibo: REPSOL es gasolinera cuando se paga con tarjeta, pero un recibo de Repsol es la luz o el gas
+    const ref = { excluir: true, motivo: g.motivo || 'compra_frecuente', soloSinRecibo: g.solo_sin_recibo === true };
     for (const pat of g.patrones ?? []) agregar(pat, ref);
   }
   // La lista general de pasarelas («PAYPAL *») se asocia a su entrada por la primera palabra.
+  // (cada una puede venir sola, «PAYPAL *», o con su nota: { patron: 'PAYPAL *', nota, verificado })
   for (const s of llave.pasarelas ?? []) {
-    const t = tokensDe(s);
+    const t = tokensDe(typeof s === 'string' ? s : s?.patron);
     const ref = pasarelas.find((r) => r.comercio.patrones.some((x) => tokensDe(x)[0] === t[0]));
     if (ref) agregar(s, ref);
   }
@@ -212,14 +216,19 @@ function buscar(tokens, dic) {
   return r;
 }
 
-// Gana el patrón más largo; a igualdad, el de excluir (mejor no marcar una compra que marcarla de más).
+// Gana una marca a un grupo de empresas; entre iguales, el patrón más largo; a igualdad, el de excluir (mejor no
+// marcar una compra que marcarla de más). Si dos marcas distintas empatan, se apuntan las dos en «empate».
 function mejor(coincidencias, filtro) {
-  let m = null;
+  let m = null, empate = null;
+  const nivel = (x) => (x.ref.grupo ? 1 : 0);
   for (const x of coincidencias) {
     if (!filtro(x.ref)) continue;
-    if (!m || x.largo > m.largo || (x.largo === m.largo && x.ref.excluir && !m.ref.excluir)) m = x;
+    if (!m) { m = x; continue; }
+    const dn = nivel(m) - nivel(x);
+    if (dn > 0 || (dn === 0 && x.largo > m.largo) || (dn === 0 && x.largo === m.largo && x.ref.excluir && !m.ref.excluir)) { m = x; empate = null; continue; }
+    if (dn === 0 && x.largo === m.largo && !x.ref.excluir && !m.ref.excluir && x.ref.comercio && m.ref.comercio && x.ref.comercio.id !== m.ref.comercio.id) empate = x;
   }
-  return m;
+  return m && empate ? { ...m, empate } : m;
 }
 
 function hayFrase(tokens, frase) {
@@ -327,8 +336,10 @@ function clasificarSinCache(m, imp, dic) {
   const tt = new Set(tokensDe(recortarConcepto(m.tipo))); // tipo de operación que da el banco (Revolut, N26)
   const cc = m.concepto_comun ? String(m.concepto_comun).padStart(2, '0') : '';
   const limpio = limpiarConcepto(concepto);
+  // Una compra con tarjeta escrita así no es un recibo aunque el banco la marque como adeudo (código 03 o NDDT)
+  const compraConTarjeta = algun(set, ['COMPRA', 'COMPRAS']) && algun(set, ['TARJETA', 'TARJ', 'CARD']);
   const recibo = algun(set, ['RECIBO', 'RECIBOS', 'ADEUDO', 'DOMICILIACION', 'DOMICILIADO', 'DOMICILIADA', 'REBUT'])
-    || hayFrase(tokens, 'DIRECT DEBIT') || cc === '03' || (tt.has('DIRECT') && tt.has('DEBIT'));
+    || hayFrase(tokens, 'DIRECT DEBIT') || (cc === '03' && !compraConTarjeta) || (tt.has('DIRECT') && tt.has('DEBIT'));
   // Compra con tarjeta (no un recibo): la luz o el teléfono no se pagan así cada mes, una compra en su tienda sí.
   const tarjeta = !recibo && (cc === '12' || tt.has('CARD') || algun(set, ['COMPRA', 'COMPRAS', 'TARJETA', 'TARJ', 'CARD', 'TPV', 'DATAFONO'])
     || /\d{4,6}[X*•·]{4,10}\d{2,4}|[X*•]{4}/.test(n));
@@ -346,8 +357,11 @@ function clasificarSinCache(m, imp, dic) {
   if (m.nota === 'traspaso' || m.nota === 'cambio_divisa' || tt.has('EXCHANGE')
     || algun(set, PALABRAS_TRASPASO) || FRASES_TRASPASO.some((f) => hayFrase(tokens, f))) return res('traspaso', 'traspaso');
 
+  // Retenciones y verificaciones de tarjeta: «PP*1234» (PayPal comprueba la tarjeta con un cargo pequeño)
+  if (/(?:^|\s)PP\s?\*\s?\d{4}(?:\s|$)/.test(n)) return res('excluido', 'excluido:retencion_temporal', { motivo: 'retencion_temporal' });
+
   const coinc = buscar(tokens, dic);
-  const comercioM = mejor(coinc, (x) => x.excluir || x.tipo === 'comercio');
+  const comercioM = mejor(coinc, (x) => (x.excluir && !(x.soloSinRecibo && recibo)) || x.tipo === 'comercio');
   const comisionM = mejor(coinc, (x) => x.tipo === 'comision');
   const gastoM = mejor(coinc, (x) => x.tipo === 'gasto_fijo');
   const pasarelaM = mejor(coinc, (x) => x.tipo === 'pasarela');
@@ -392,6 +406,12 @@ function clasificarSinCache(m, imp, dic) {
 
   // Comercio del diccionario o algo que no se cuenta (supermercado, gasolinera...)
   if (comercioM?.ref.excluir) return res('excluido', 'excluido:' + comercioM.ref.motivo, { motivo: comercioM.ref.motivo });
+  if (suscripcion?.empate) {
+    // Dos marcas igual de probables: no se elige ninguna («Posible X o Y»)
+    const a = suscripcion.ref.comercio, b = suscripcion.empate.ref.comercio;
+    const ids = [a.id, b.id].sort();
+    return res('desconocido', 'empate:' + ids.join('|'), { nombre: a.nombre + ' o ' + b.nombre, categoria: a.categoria === b.categoria ? a.categoria : null, motivo: 'empate' });
+  }
   if (suscripcion) {
     const separadas = pasarelaM && (pasarelaM.fin <= suscripcion.inicio || pasarelaM.inicio >= suscripcion.fin);
     return conComercio('comercio', suscripcion.ref.comercio, { pasarela: separadas ? pasarelaM.ref.comercio.id : null });

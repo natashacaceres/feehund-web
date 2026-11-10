@@ -10,7 +10,7 @@ import { clasificar, prepararDiccionario, esSuscripcion, CATEGORIAS_VARIABLES } 
 
 const ORDEN = ['semanal', 'mensual', 'bimestral', 'trimestral', 'semestral', 'anual'];
 // Margen extra para cada hueco suelto (la mediana debe caer en la banda exacta del encargo).
-const HOLGURA = { semanal: 1, mensual: 3, bimestral: 4, trimestral: 5, semestral: 7, anual: 10 };
+const HOLGURA = { semanal: 1, cuatrisemanal: 2, mensual: 3, bimestral: 4, trimestral: 5, semestral: 7, anual: 10 };
 const DIAS_DOBLE = 3; // mismo importe en 0–3 días
 const DIAS_NUEVO = 45; // primer cargo en los últimos 45 días
 const CARGOS_MES_DISPERSO = 4; // más de 4 al mes con importes dispersos: compra frecuente
@@ -28,6 +28,7 @@ const CAMBIO_PRECIO = { conocido: [1 / 3, 3], otro: [1 / 1.3, 1.3], tienda: [1, 
 const PASARELA_CON_COMPRAS = 2.5; // más cargos al mes que esto en PayPal, Apple, Google o Amazon: hay compras sueltas mezcladas
 // Se pagan con recibo: un cargo con tarjeta en su tienda (un móvil, un cargador) no es la factura del mes.
 const CATEGORIAS_DOMICILIADAS = new Set(['telecos', 'energia', 'agua', 'alarmas']);
+const RECONOCIDAS_POR_PALABRAS = new Set(['comisiones', 'gastos_fijos', 'pasarelas']);
 // En un servicio conocido, importes que se mueven poco (el cambio de dólares a euros, el IVA) son el mismo cobro.
 const IMPORTES_PARECIDOS = 0.1;
 const DIAS_ENTRE_CARGOS_PARECIDOS = 20; // dos cargos parecidos en menos días son dos cosas (dos cuentas, una compra)
@@ -37,7 +38,7 @@ const DIAS_DEVOLUCION_COMISION = 180; // una comisión devuelta: el abono llega 
 export const MOTIVOS = ['cargos_regulares', 'anual_dos_cargos', 'solo_dos_cargos', 'un_cargo_conocido', 'cadencia_irregular',
   'comision_suelta', 'periodicidad_supuesta', 'mes_saltado', 'mes_saltado_uno', 'hueco_irregular', 'hueco_irregular_uno', 'importe_variable',
   'precio_subio', 'precio_bajo', 'doble_cobro', 'cargo_aparte', 'cargo_aparte_uno', 'via_pasarela', 'nuevo_reciente', 'sin_cargo_desde', 'periodo_corto',
-  'lectura_sin_verificar', 'gasto_fijo', 'transferencia_periodica', 'compras_mezcladas', 'meses_sin_cargo', 'meses_sin_cargo_uno',
+  'lectura_sin_verificar', 'patron_sin_verificar', 'gasto_fijo', 'transferencia_periodica', 'compras_mezcladas', 'meses_sin_cargo', 'meses_sin_cargo_uno',
   'ritmo_del_diccionario', 'importes_parecidos', 'quiza_en_tarjeta', 'comision_devuelta'];
 export const AVISOS = ['cobros_periodo_corto', 'cobros_sin_verificar', 'cobros_pasarelas', 'cobros_sin_diccionario', 'cobros_tarjeta_credito'];
 /** Grupos del resultado, en el orden en que se enseñan (los sectores van en «sector_<categoría>»). */
@@ -104,6 +105,9 @@ export function analizarCadencia(fechas) {
     p = mejorP;
   }
   if (!p) return { ...vacio, mediana: med };
+  // Cada 4 semanas cae dentro de la banda mensual (28 a 35 días). Se distingue porque nunca hay un hueco de 31:
+  // tres meses seguidos siempre incluyen uno de 31 días, y un cobro cada 28 días nunca se alarga.
+  if (p === 'mensual' && huecos.length >= 3 && med <= 28.5 && huecos.every((g) => g >= 26 && g <= 30)) p = 'cuatrisemanal';
   let regulares = 0, saltados = 0, irregulares = 0;
   for (const g of huecos) {
     const t = tipoHueco(g, p);
@@ -529,6 +533,7 @@ function periodoSupuesto(comercio, ultimo, hasta) {
 function proximo(cargos, p) {
   const ultimo = cargos.at(-1).fecha;
   if (p === 'semanal') return sumarDias(ultimo, 7);
+  if (p === 'cuatrisemanal') return sumarDias(ultimo, 28);
   const siguiente = sumarMeses(ultimo, PERIODICIDADES[p].meses);
   const dia = Number(ultimo.slice(8, 10));
   if (dia !== diasDelMes(ultimo)) return siguiente;
@@ -682,6 +687,13 @@ function evaluar(serie, g, ctx, unicaDelGrupo) {
   if (serie.tope === 'posible' && estado === 'seguro') {
     estado = 'posible';
     motivos.push({ codigo: 'compras_mezcladas' });
+  }
+  // El nombre del comercio sale de un patrón que aún no se ha confirmado con un extracto real (verificado: false):
+  // con la regla encendida, nunca pasa de «posible». No cuenta para comisiones, gastos fijos ni pasarelas, que se reconocen
+  // por palabras generales.
+  if (ctx.topeSinVerificar && estado === 'seguro' && comercio && comercio.verificado === false && !RECONOCIDAS_POR_PALABRAS.has(comercio.categoria)) {
+    estado = 'posible';
+    motivos.push({ codigo: 'patron_sin_verificar' });
   }
 
   const P = PERIODICIDADES[periodicidad];
@@ -861,7 +873,9 @@ export function detectar(movimientosEUR, ctx = {}) {
   const desde = ctx.desde && (!primera || ctx.desde <= primera) ? ctx.desde : primera;
   const hasta = ctx.hasta && (!ultima || ctx.hasta >= ultima) ? ctx.hasta : ultima;
   const meses = Number.isFinite(ctx.meses) ? ctx.meses : desde && hasta ? mesesEntre(desde, hasta) : 0;
-  const c = { desde, hasta, meses, fotoSinVerificar: ctx.nivel === 'C' && ctx.validacion !== 'verificada' };
+  // no_verificado_solo_posible (en data/comercios.json): si está a true, un comercio con verificado:false nunca pasa de «posible»
+  const c = { desde, hasta, meses, fotoSinVerificar: ctx.nivel === 'C' && ctx.validacion !== 'verificada',
+    topeSinVerificar: ctx.diccionario?.no_verificado_solo_posible === true };
 
   // 1. Agrupar los cargos por comercio (o por lo que sean) y apartar lo que no cuenta
   const grupos = new Map();
