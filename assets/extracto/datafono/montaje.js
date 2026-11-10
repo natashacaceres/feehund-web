@@ -103,16 +103,20 @@ export function montarResumen(lecturas, deps = {}) {
     modo = 'operaciones';
     res = desdeOperaciones(operaciones, { hoy, mes: opciones.mes, avisos, comprobaciones, fuera });
   } else {
-    // cada archivo es un resumen: si hay varios (dos meses), se usa uno, nunca la suma de los dos
+    // cada archivo es un resumen: si hay varios (dos meses), se usa uno, nunca la suma de los dos. Las fotos son las
+    // páginas de un mismo resumen (la gente fotografía cada hoja): van juntas, en el orden en que se subieron.
+    const fotos = new Set(crudas.filter((c) => c.l.formato === 'imagen').map((c) => c.l.archivo));
+    const docDe = (a) => (fotos.size > 1 && fotos.has(a) ? [...fotos][0] : a);
     const porArchivo = new Map();
-    for (const L of lineas) { if (!porArchivo.has(L.archivo)) porArchivo.set(L.archivo, []); porArchivo.get(L.archivo).push(L); }
+    for (const L of lineas) { const d = docDe(L.archivo); if (!porArchivo.has(d)) porArchivo.set(d, []); porArchivo.get(d).push(L); }
     const todos = [...porArchivo.entries()].map(([archivo, ls]) => ({ archivo, r: extraerResumen(ls) }));
+    const deDoc = (d) => archivos.filter((a) => docDe(a.nombre) === d);
     // un archivo con movimientos de cuenta y sin ventas ni cobros es un extracto del banco: se dice y no da cifras
     const conVentas = (r) => r.hechos.some((h) => (h.papel === 'ventas' || h.papel === 'operaciones' || h.papel === 'dia_ventas') && h.valor > 0);
     for (const x of todos) {
       if (x.r.movimientos >= 5 && !conVentas(x.r)) {
         errores.push({ archivo: x.archivo, codigo: 'es_extracto_banco' });
-        const info = archivos.find((a) => a.nombre === x.archivo); if (info) info.error = 'es_extracto_banco';
+        for (const info of deDoc(x.archivo)) info.error = 'es_extracto_banco';
         x.r.hechos = [];
       }
     }
@@ -122,8 +126,7 @@ export function montarResumen(lecturas, deps = {}) {
       const elegido = leidos[leidos.length - 1];
       if (leidos.length > 1) avisos.push({ codigo: 'varios_resumenes', datos: { n: leidos.length, archivo: elegido.archivo } });
       modo = 'resumen';
-      const info = archivos.find((a) => a.nombre === elegido.archivo);
-      if (info) info.modo = 'resumen';
+      for (const info of deDoc(elegido.archivo)) info.modo = 'resumen';
       res = desdeHechos(elegido.r, { hoy, nivel, avisos, comprobaciones });
     }
   }

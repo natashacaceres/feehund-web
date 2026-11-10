@@ -1,0 +1,25 @@
+/* La bandeja de «Mi banco» y «Mi datáfono» (assets/extracto/bandeja.js), con los colores y medidas de app.css */
+.bj{display:grid;gap:var(--s-3,12px);width:100%;animation:bj-in .18s ease-out}
+.bj[hidden]{display:none}
+.bj-lista{display:grid;gap:var(--s-2,8px);margin:0;padding:0;list-style:none}
+.bj-it{display:grid;grid-template-columns:48px minmax(0,1fr) 44px;align-items:center;gap:var(--s-3,12px);padding:8px 6px 8px 8px;background:#fff;border:1px solid var(--line,#E9DFCC);border-radius:var(--r,12px);text-align:left;animation:bj-in .18s ease-out}
+.bj-ic{display:grid;place-items:center;width:48px;height:48px;overflow:hidden;border-radius:8px;background:var(--brand-tint,#E3EEF0);color:var(--brand,#0E5E6F);font:800 12px/1 var(--f-text,system-ui);letter-spacing:.04em;text-transform:uppercase}
+.bj-ic img{width:100%;height:100%;object-fit:cover;object-position:left top}
+.bj-ic:has(img){border:1px solid var(--line,#E9DFCC);background:#fff}
+.bj-tx{display:grid;gap:2px;min-width:0}
+.bj-n{overflow:hidden;font-weight:700;color:var(--ink,#14213D);text-overflow:ellipsis;white-space:nowrap}
+.bj-d{font-size:14px;color:var(--ink-2,#4F5667)}
+.bj-it.is-mal{border-color:var(--error,#8A5300);box-shadow:inset 3px 0 0 var(--error,#8A5300)}
+.bj-it.is-mal .bj-d{font-weight:600;color:var(--error,#8A5300)}
+.bj-x{display:grid;place-items:center;width:44px;height:44px;padding:0;border:0;border-radius:50%;background:none;color:var(--ink-2,#4F5667);cursor:pointer;transition:background .18s,color .18s}
+.bj-x:hover{background:var(--brand-tint,#E3EEF0);color:var(--ink,#14213D)}
+.bj-x:focus-visible{outline:2px solid var(--brand,#0E5E6F);outline-offset:2px}
+.bj-x svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round}
+.bj-leer{width:100%}
+/* con archivos en la lista, la zona de soltar se queda pequeña y su botón pasa a «Añadir más» */
+.drop.bj-con{gap:4px;padding:var(--s-4,16px)}
+.drop.bj-con>svg,.drop.bj-con .drop-s{display:none}
+.drop.bj-con .drop-t{font-size:17px}
+.drop.bj-con .btn{margin-top:var(--s-2,8px);background:#fff}
+@keyframes bj-in{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.bj,.bj-it{animation:none}}

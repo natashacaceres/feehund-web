@@ -127,6 +127,7 @@
     await new Promise((ok) => setTimeout(ok, Math.max(0, 700 - (Date.now() - t0))));
     if (cargando) cargando.textContent = textoCarga;
     if (error || !r) { show("up"); msg($("dErr"), (error && error.message) || TX.bad); return; }
+    if (bandeja) bandeja.marcar(r.errores);
     // sin ventas ni número de cobros no es un resumen del datáfono (un extracto del banco puede traer «comisiones» sueltas)
     const vacio = !["ventas_particulares", "ventas_empresa", "ventas_fuera_europa", "ventas_amex", "ventas_bizum", "operaciones"]
       .some((k) => r.campos[k] && typeof r.campos[k].valor === "number" && r.campos[k].valor > 0);
@@ -258,23 +259,32 @@
   input.accept = ".csv,.tsv,.txt,.xls,.xlsx,.xlsm,.ods,.numbers,.pdf,.n43,.q43,.aeb,.ofx,.qfx,.qif,.xml,.sta,.mt940,.zip,.png,.jpg,.jpeg,.webp,.heic,.heif,text/csv,application/pdf,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,image/*";
   input.multiple = true;
   const archivos = (lista) => Array.prototype.slice.call(lista || []);
+  // La bandeja: lo que se suelta, se elige o se pega va a una lista y se lee al pulsar «Leer» (assets/extracto/bandeja.js).
+  // Varias fotos se leen como las páginas de un mismo resumen. Si la bandeja no carga, se lee en el momento, como antes.
+  let bandeja = null;
+  const bandejaP = import(new URL(ROOT + "assets/extracto/bandeja.js", location.href).href)
+    .then((b) => (bandeja = b.crearBandeja({ zona: drop, boton: $("dPick"), idioma: LANG, alLeer: (e) => { contrasenas = {}; analyze(e); } })));
+  const anadir = (x) => { msg($("dErr"), ""); bandejaP.then((b) => b.anadir(x), () => { contrasenas = {}; analyze(x); }); };
   $("dPick").addEventListener("click", () => input.click());
-  input.addEventListener("change", () => { const fs = archivos(input.files); if (fs.length) { contrasenas = {}; analyze(fs); } input.value = ""; });
+  input.addEventListener("change", () => { const fs = archivos(input.files); if (fs.length) anadir(fs); input.value = ""; });
   ["dragenter", "dragover"].forEach((ev) => drop.addEventListener(ev, (e) => { e.preventDefault(); drop.classList.add("is-over"); }));
   ["dragleave", "drop"].forEach((ev) => drop.addEventListener(ev, (e) => { e.preventDefault(); drop.classList.remove("is-over"); }));
-  drop.addEventListener("drop", (e) => { const fs = archivos(e.dataTransfer && e.dataTransfer.files); if (fs.length) { contrasenas = {}; analyze(fs); } });
-  // Texto pegado (Ctrl+V con el resumen copiado de la web del banco), solo en la primera pantalla y fuera de las casillas
+  drop.addEventListener("drop", (e) => { const fs = archivos(e.dataTransfer && e.dataTransfer.files); if (fs.length) anadir(fs); });
+  // Texto pegado (Ctrl+V con el resumen copiado de la web del banco) o una captura copiada, solo en la primera
+  // pantalla y fuera de las casillas
   addEventListener("paste", (e) => {
     if (scr.up.hidden || (e.target && /INPUT|TEXTAREA|SELECT/.test(e.target.tagName)) || (e.target && e.target.closest && e.target.closest("#calcApp"))) return;
+    const fs = archivos(e.clipboardData && e.clipboardData.files);
+    if (fs.length) { e.preventDefault(); anadir(fs); return; }
     const t = e.clipboardData && e.clipboardData.getData("text");
-    if (t && t.split("\n").length > 2) { contrasenas = {}; analyze(t); }
+    if (t && t.split("\n").length > 2) anadir(t);
   });
   $("dDemo").addEventListener("click", () => { contrasenas = {}; ejemplo().then(analyze, () => msg($("dErr"), TX.bad)); });
   $("dHand").addEventListener("click", (e) => { e.preventDefault(); irACalculadora(""); });
   $("dForm").addEventListener("submit", (e) => { e.preventDefault(); confirmar().catch(() => {}); });
   $("dAgain").addEventListener("click", (e) => {
     e.preventDefault();
-    actual = null; contrasenas = {};
+    actual = null; contrasenas = {}; if (bandeja) bandeja.vaciar();
     ["dCampos", "dContrato", "dComp", "dAvisos"].forEach((id) => { if ($(id)) $(id).textContent = ""; });
     motor().then((m) => m.olvidar()).catch(() => {});
     show("up");

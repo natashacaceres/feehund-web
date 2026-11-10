@@ -98,9 +98,9 @@
       if (location.pathname.indexOf("/extracto/") !== 0 || !navigator.serviceWorker) return;
       const reg = await m.registrarSinConexion().catch(() => null);
       if (!reg) return;
-      // Versión nueva del lector: si la página está quieta (sin análisis a medias), entra ya y la página se recarga una vez.
-      // Si no, entra la próxima vez. Así nadie se queda con un lector viejo por tener la pestaña abierta.
-      const quieta = () => !actual && scr.res.hidden && scr.load.hidden;
+      // Versión nueva del lector: si la página está quieta (sin análisis a medias ni archivos esperando en la lista), entra
+      // ya y la página se recarga una vez. Si no, entra la próxima vez. Así nadie se queda con un lector viejo.
+      const quieta = () => !actual && scr.res.hidden && scr.load.hidden && !(bandeja && bandeja.total);
       let recargada = false;
       navigator.serviceWorker.addEventListener("controllerchange", () => { if (!recargada && quieta()) { recargada = true; location.reload(); } });
       const activar = (w) => { if (w && navigator.serviceWorker.controller && quieta()) w.postMessage({ tipo: "activar" }); };
@@ -140,6 +140,7 @@
     await new Promise((ok) => setTimeout(ok, Math.max(0, 900 - (Date.now() - t0))));
     if (cargando) cargando.textContent = textoCarga;
     if (error || !r) { show("up"); msg($("xErr"), (error && error.message) || TX.bad); return; }
+    if (bandeja) bandeja.marcar(r.errores);
     const cobros = (r.cobros || []).filter((c) => c.estado === "seguro" || c.estado === "posible");
     if (!cobros.length && !(r.terminados || []).length && !(r.devoluciones || []).length) {
       // sin ningún movimiento leído: ¿es el resumen del datáfono? Entonces se dice y se enlaza «Mi datáfono»
@@ -482,23 +483,31 @@
   input.accept = ".csv,.tsv,.txt,.xls,.xlsx,.xlsm,.ods,.numbers,.pdf,.n43,.q43,.aeb,.ofx,.qfx,.qif,.xml,.sta,.mt940,.zip,.png,.jpg,.jpeg,.webp,.heic,.heif,text/csv,application/pdf,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,image/*";
   input.multiple = true;
   const archivos = (lista) => Array.prototype.slice.call(lista || []);
+  // La bandeja: lo que se suelta, se elige o se pega va a una lista y se lee al pulsar «Leer» (assets/extracto/bandeja.js).
+  // Si no carga, se lee en el momento, como antes.
+  let bandeja = null;
+  const bandejaP = import(new URL(ROOT + "assets/extracto/bandeja.js", location.href).href)
+    .then((b) => (bandeja = b.crearBandeja({ zona: drop, boton: $("xPick"), idioma: LANG, alLeer: (e) => { contrasenas = {}; analyze(e); } })));
+  const anadir = (x) => { msg($("xErr"), ""); bandejaP.then((b) => b.anadir(x), () => { contrasenas = {}; analyze(x); }); };
   $("xPick").addEventListener("click", () => input.click());
-  input.addEventListener("change", () => { const fs = archivos(input.files); if (fs.length) { contrasenas = {}; analyze(fs); } input.value = ""; });
+  input.addEventListener("change", () => { const fs = archivos(input.files); if (fs.length) anadir(fs); input.value = ""; });
   ["dragenter", "dragover"].forEach((ev) => drop.addEventListener(ev, (e) => { e.preventDefault(); drop.classList.add("is-over"); }));
   ["dragleave", "drop"].forEach((ev) => drop.addEventListener(ev, (e) => { e.preventDefault(); drop.classList.remove("is-over"); }));
-  drop.addEventListener("drop", (e) => { const fs = archivos(e.dataTransfer && e.dataTransfer.files); if (fs.length) { contrasenas = {}; analyze(fs); } });
-  // Texto pegado (Ctrl+V con el extracto copiado de la web del banco)
+  drop.addEventListener("drop", (e) => { const fs = archivos(e.dataTransfer && e.dataTransfer.files); if (fs.length) anadir(fs); });
+  // Texto pegado (Ctrl+V con el extracto copiado de la web del banco) o una captura copiada
   addEventListener("paste", (e) => {
     if (!scr.up || scr.up.hidden || (e.target && /INPUT|TEXTAREA/.test(e.target.tagName))) return;
+    const fs = archivos(e.clipboardData && e.clipboardData.files);
+    if (fs.length) { e.preventDefault(); anadir(fs); return; }
     const t = e.clipboardData && e.clipboardData.getData("text");
-    if (t && t.split("\n").length > 2) { contrasenas = {}; analyze(t); }
+    if (t && t.split("\n").length > 2) anadir(t);
   });
   $("xDemo").addEventListener("click", () => { contrasenas = {}; ejemplo().then(analyze, () => msg($("xErr"), TX.bad)); });
   $("xShare").addEventListener("click", () => share().catch(() => {}));
   $("xIcs").addEventListener("click", () => ics().catch(() => {}));
   $("xAgain").addEventListener("click", () => {
     actual = null; entradaActual = null; contrasenas = {};
-    limpiar(); msg($("xMsg"), "");
+    limpiar(); msg($("xMsg"), ""); if (bandeja) bandeja.vaciar();
     motor().then((m) => m.olvidar()).catch(() => {});
     show("up");
   });
