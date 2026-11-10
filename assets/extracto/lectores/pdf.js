@@ -269,10 +269,12 @@ async function leerDocumento(doc, pdfjs, archivo, ctx) {
     return crearLectura({ archivo, formato: soloImagen ? 'pdf_escaneado' : 'pdf', perfil, nivel: soloImagen ? 'C' : 'B', avisos, extra: extraBase });
   }
   const ctxFilas = () => ({ archivo, idArchivo: ctx.idArchivo ?? 0, nivel: conOcr.length ? 'C' : 'B', hoy: ctx.opciones?.hoy, mapeo: ctx.opciones?.mapeo?.[archivo] });
-  let res = reconstruir(paginas, ctxFilas());
+  // crudo (lector del datáfono): las páginas tal cual, sin buscar movimientos
+  const crudo = ctx.opciones?.crudo === true;
+  let res = crudo ? null : reconstruir(paginas, ctxFilas());
   // texto que no se deja leer (fuentes sin tabla de caracteres): un extracto sin cifras no es normal, se lee la imagen
   const conTexto = paginas.filter((p) => p.nivel === 'B').length;
-  if (!res.movimientos.length && typeof ctx.ocr === 'function' && sinCifras.length && sinCifras.length === conTexto) {
+  if ((crudo || !res.movimientos.length) && typeof ctx.ocr === 'function' && sinCifras.length && sinCifras.length === conTexto) {
     let cambiadas = 0;
     for (const n of sinCifras) {
       if (limite.usadas >= limite.max) break;
@@ -297,9 +299,14 @@ async function leerDocumento(doc, pdfjs, archivo, ctx) {
       }
     }
     if (cambiadas) {
-      res = reconstruir(paginas, ctxFilas());
+      if (!crudo) res = reconstruir(paginas, ctxFilas());
       if (!avisos.some((a) => a.codigo === 'pdf_paginas_ocr')) avisos.push(aviso('pdf_paginas_ocr', { archivo, n: conOcr.length }));
     }
+  }
+  if (crudo) {
+    const nivelCrudo = conOcr.length ? 'C' : 'B';
+    return crearLectura({ archivo, formato: nivelCrudo === 'C' ? 'pdf_escaneado' : 'pdf', perfil, nivel: nivelCrudo, avisos,
+      extra: { ...extraBase, paginas } });
   }
   // nivel C solo si algún movimiento sale de una página leída por OCR
   const deOcr = new Set(conOcr);

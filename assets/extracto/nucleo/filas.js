@@ -285,7 +285,8 @@ function juntarPegadas(ws, charW, nivel) {
   return out;
 }
 
-function lineasDePagina(pagina, nivel) {
+/** Palabras con posición de una página → líneas ordenadas, con sus palabras y celdas. La usa también el lector del datáfono. */
+export function lineasDePagina(pagina, nivel) {
   const palabras = prepararPalabras(pagina?.tokens);
   if (!palabras.length) return [];
   const hMed = mediana(palabras.map((p) => p.y1 - p.y0)) || 1;
@@ -329,7 +330,7 @@ function lineasDePagina(pagina, nivel) {
 
 // Confusiones típicas del OCR dentro de cifras: O→0, l/I/|→1, S→5, B→8. Con dos cifras al menos, o con una si el
 // trozo es corto («O4» delante de «ene»): «IO» o «Ol» sin ninguna cifra se quedan como texto.
-function corregirOCR(t) {
+export function corregirOCR(t) {
   const cifras = (t.match(/\d/g) || []).length;
   if (cifras < 2 && !(cifras === 1 && t.length <= 3)) return null;
   if (!/^[\d.,:'()/+\-−–—€$£OoIl|SB]+$/.test(t)) return null;

@@ -197,6 +197,8 @@ export async function leer(entrada, ctx = {}) {
   if (texto.length > LIMITE) return lecturaConError(nombre, 'texto_pegado', 'grande', { archivo: nombre });
   texto = texto.replace(/^﻿/, '').replace(/\r\n?/g, '\n');
   if (!texto.trim()) return lecturaConError(nombre, 'texto_pegado', 'vacio', { archivo: nombre });
+  // lector del datáfono: el texto tal cual (él separa las líneas y las celdas)
+  if (ctx.opciones?.crudo === true) return crearLectura({ archivo: nombre, formato: 'texto_pegado', nivel: 'B', extra: { texto } });
 
   // filas partidas por un salto de línea dentro de una celda (copiar una tabla de la web). Antes de reconocer el
   // formato: con pocas filas, las partidas pueden hacer que no parezca una tabla. La coma no se mira: con la coma

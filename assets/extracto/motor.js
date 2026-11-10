@@ -1,6 +1,5 @@
-// API del lector de extractos (hilo principal). Al importarse no carga nada: el worker, el OCR y el resto llegan
-// cuando hacen falta. Nada sale del dispositivo ni se guarda. Contrato en DESARROLLO.md. Los workers arrancan desde
-// un blob: que importa el archivo real: así heredan el service worker de /extracto/ y leen sin conexión.
+// API del lector de extractos y del datáfono (hilo principal). Al importarse no carga nada. Nada sale del dispositivo
+// ni se guarda (DESARROLLO.md). Los workers arrancan desde un blob: que importa el archivo real (sin conexión).
 
 const MAX_BYTES = 10 * 1024 * 1024; // por archivo; de una vez, 100 archivos o 100 MB como mucho
 const ESPERA_LISTO = 60000; // ms que se espera a que un worker arranque
@@ -22,12 +21,20 @@ const mod = {}; // módulos cargados a demanda (o su promesa mientras llegan)
  * Lee los extractos y busca los cobros que se repiten, en este dispositivo. Lo que falla en un archivo va en
  * resultado.errores; si no se puede analizar nada, falla con un Error (message: frase para la persona; .codigo).
  * @param {File|Blob|File[]|FileList|string|{archivos?, texto?}} entrada archivos o texto pegado
- * @param {{idioma?: 'es'|'ca'|'en', hoy?: string, contrasenas?: Object, mapeo?: Object, onProgreso?: Function}} [opciones]
- *   contrasenas y mapeo van por nombre de archivo. onProgreso (o progreso) recibe {fase, texto, archivo?, pagina?,
- *   total?, progreso?}: fase leyendo|foto|pagina|preparando_fotos|saldo|cobros, texto en su idioma, progreso 0..1.
+ * @param {Object} [opciones] idioma, hoy, contrasenas y mapeo (por archivo), onProgreso ({fase, texto, archivo?,
+ *   pagina?, total?, progreso?}; fase leyendo|foto|pagina|preparando_fotos|saldo|cobros; progreso 0..1).
  * @returns {Promise<Object>} resultado (DESARROLLO.md, «Resultado de la API», más no_contados)
  */
 export async function analizar(entrada, opciones = {}) {
+  return pedirLectura('analizar', entrada, opciones, ['contrasenas', 'mapeo', 'hoy']);
+}
+
+/** Lector del datáfono (DESARROLLO.md): opciones idioma, hoy, mes, contrasenas y onProgreso. */
+export async function analizarResumen(entrada, opciones = {}) {
+  return pedirLectura('resumen', entrada, opciones, ['contrasenas', 'hoy', 'mes']);
+}
+
+function pedirLectura(tipo, entrada, opciones, claves) {
   const idioma = idiomaDe(opciones.idioma);
   const t = tarea(idioma, opciones);
   (async () => {
@@ -46,8 +53,9 @@ export async function analizar(entrada, opciones = {}) {
       }
       lista.push(a);
     }
-    const { contrasenas, mapeo, hoy } = opciones;
-    await enviar(t, 'analizar', { archivos: lista, texto, opciones: { idioma, hoy, contrasenas, mapeo } }, transferir);
+    const o = { idioma };
+    for (const k of claves) o[k] = opciones[k];
+    await enviar(t, tipo, { archivos: lista, texto, opciones: o }, transferir);
   })().catch(() => acabar(t, sinRed() ? 'necesita_conexion' : 'desconocido_interno'));
   return t.promesa;
 }
@@ -72,9 +80,8 @@ export function recalcular(resultado, idsDesmarcados = []) {
 }
 
 /**
- * Calendario .ics: un evento por cobro seguro o posible en su próximo cargo, que se repite y avisa 3 días antes
- * (20 los anuales). Solo nombre e importe. Síncrona, como recalcular(). Opciones: {idioma?, hoy?, desmarcados?}.
- * @returns {string|null} el .ics, o null si no hay ningún cobro que poner: entonces no se ofrece descargar nada
+ * Calendario .ics: un evento por cobro en su próximo cargo, con aviso 3 días antes (20 los anuales). Síncrona.
+ * Opciones: {idioma?, hoy?, desmarcados?}. @returns {string|null} null si no hay ningún cobro (no se ofrece nada)
  */
 export function generarICS(resultado, opciones = {}) {
   return cargado('montaje').generarICS(resultado, opciones);
@@ -199,7 +206,7 @@ function abrirWorker(ruta) {
 
 function obtenerMotor() {
   const conControl = Boolean(sw()?.controller);
-  // Uno nuevo si la página ya tiene service worker y este se abrió sin él, o si le falló algo; nunca si trabaja
+  // Uno nuevo si hay service worker y este se abrió sin él, o si falló; nunca si trabaja
   if (motor && (renovar || (conControl && !motorConControl)) && ![...tareas.values()].some((t) => t.enviada)) cerrarMotor();
   if (!motor) {
     motorConControl = conControl;

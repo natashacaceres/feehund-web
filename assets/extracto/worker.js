@@ -27,6 +27,7 @@ self.onmessage = (e) => {
   const m = e.data || {};
   if (m.tipo === 'ocr_hecho' || m.tipo === 'heic_hecho' || m.tipo === 'fallo_peticion') responder(m);
   else if (m.tipo === 'analizar' || m.tipo === 'confirmar') cola = cola.then(() => atender(m)).catch(() => {});
+  else if (m.tipo === 'resumen') cola = cola.then(() => atenderResumen(m)).catch(() => {}); // lector del datáfono
 };
 self.postMessage({ tipo: 'listo' }); // motor.js espera esta señal para saber que el worker ha arrancado
 
@@ -75,6 +76,48 @@ async function atender(m) {
     const resultado = await montarResultado(lecturas, {
       opciones, diccionario: dicc, nucleo: { ...piezasNucleo, detectar: detectarCargado }, progreso, alFallar: (err) => console.error(err), ...extra,
     });
+    lecturas = null;
+    self.postMessage({ id, tipo: 'resultado', resultado });
+  } catch (err) {
+    console.error(err);
+    const codigo = err?.codigo && textosDe(err.codigo) ? err.codigo : sinConexion() ? 'necesita_conexion' : 'desconocido_interno';
+    self.postMessage({ id, tipo: 'fallo', codigo, texto: texto(codigo, opciones.idioma) });
+  }
+}
+
+/**
+ * Lector del datáfono: los mismos lectores en modo crudo (páginas, filas y texto tal cual) y datafono/montaje.js.
+ * No usa el diccionario de comercios ni la búsqueda de cobros.
+ */
+async function atenderResumen(m) {
+  const id = m.id;
+  const o = m.opciones || {};
+  const opciones = {
+    idioma: ['es', 'ca', 'en'].includes(o.idioma) ? o.idioma : 'es',
+    hoy: /^\d{4}-\d{2}-\d{2}$/.test(o.hoy || '') ? o.hoy : hoyISO(),
+    contrasenas: o.contrasenas || {},
+    mapeo: {},
+    crudo: true,
+    mes: /^\d{4}-\d{2}$/.test(o.mes || '') ? o.mes : undefined,
+  };
+  const progreso = (ev) => {
+    const p = { ...ev, fase: DE_LECTOR[ev?.fase] ?? (FASES.has(ev?.fase) ? ev.fase : 'leyendo') };
+    const codigo = p.pagina && p.total && (p.fase === 'pagina' || p.fase === 'foto') ? 'progreso_pagina' : p.fase === 'foto' ? 'progreso_foto' : 'progreso_resumen';
+    self.postMessage({ id, tipo: 'progreso', ...p, texto: texto(codigo, opciones.idioma, p) });
+  };
+  try {
+    await cargarTextos();
+    const resumen = await import('./datafono/montaje.js');
+    const entradas = prepararEntradas(m, opciones.idioma);
+    m.archivos = null;
+    let lecturas = await leerEntradas(entradas, {
+      opciones,
+      detectarFormato: (e) => resumen.detectarParaResumen(e, detectarFormato),
+      importarLector, cargar, progreso, sinConexion,
+      alFallar: (err) => console.error(err),
+      ocr: (imagen, info) => pedir(id, 'ocr', { imagen, info }),
+    });
+    const resultado = resumen.montarResumen(lecturas, { opciones, texto });
     lecturas = null;
     self.postMessage({ id, tipo: 'resultado', resultado });
   } catch (err) {

@@ -251,6 +251,14 @@ function filasDeHoja(ws, convertir) {
   return { filas, celdas: datos };
 }
 
+/** Celdas con formato de porcentaje (0,004 que se ve «0,40 %») → «0.4%», para no leerlas como importes. */
+function conPorcentajes(filas, celdas) {
+  return filas.map((f, r) => (f || []).map((v, c) => {
+    const x = celdas[r]?.[c];
+    return x && x.t === 'n' && typeof x.v === 'number' && /%/.test(String(x.z ?? '')) ? `${Math.round(x.v * 1e8) / 1e6}%` : v;
+  }));
+}
+
 function tieneContenido(filas) {
   for (const f of filas) if (f && f.some((v) => v !== null && v !== undefined && String(v).trim() !== '')) return true;
   return false;
@@ -333,6 +341,14 @@ export async function leer(entrada, ctx = {}) {
     for (const n of visibles.slice(0, MAX_HOJAS)) tablas.push({ hoja: n, ...filasDeHoja(wb.Sheets[n], convertir) });
   }
 
+  if (ctx.opciones?.crudo === true) { // lector del datáfono: las filas de cada hoja tal cual, con su texto visible
+    const conDatosCrudo = tablas.filter((t) => tieneContenido(t.filas));
+    if (!conDatosCrudo.length) return lecturaConError(nombre, formato, 'vacio', { archivo: nombre });
+    const avisosCrudo = ocultas ? [aviso('hojas_ocultas', { archivo: nombre, n: ocultas })] : [];
+    return crearLectura({ archivo: nombre, formato, nivel: 'A', avisos: avisosCrudo, extra: {
+      tablas: conDatosCrudo.map((t) => ({ hoja: t.hoja, filas: conPorcentajes(t.filas, t.celdas), textos: t.filas.map((_, i) => textoDeCeldas(t.celdas[i], convertir)) })),
+    } });
+  }
   const mapeo = ctx.opciones?.mapeo?.[nombre];
   const hojaMapeo = mapeo ? (mapeo.hoja ?? tablas.find((t) => tieneContenido(t.filas))?.hoja) : undefined;
   let primerN = 1;

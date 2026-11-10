@@ -296,6 +296,9 @@ export async function leer(entrada, ctx = {}) {
   }
 
   const formato = sep === '\t' ? 'tsv' : !sep ? 'txt' : porNombre === 'tsv' ? 'csv' : porNombre;
+  if (ctx.opciones?.crudo === true) { // lector del datáfono: las filas tal cual
+    return crearLectura({ archivo: nombre, formato, nivel: 'A', avisos, extra: { tablas: [{ filas }], separador: sep ?? 'espacios', codificacion } });
+  }
   const res = deTablaAMovimientos(filas, {
     archivo: nombre,
     idArchivo: ctx.idArchivo ?? 0,

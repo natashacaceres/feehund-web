@@ -7,7 +7,7 @@
   const $ = (id) => document.getElementById(id);
   const LANG = ["es", "ca", "en"].indexOf(document.documentElement.lang) >= 0 ? document.documentElement.lang : "es";
   const TX = {
-    es: { year: "€/año", menos: " menos/año",
+    es: { datafono: "Esto es el resumen de tu datáfono, no el extracto de tu cuenta. Se lee en Mi datáfono.", irDatafono: "Ir a Mi datáfono", year: "€/año", menos: " menos/año",
       si: "Sí", no: "No", el: "el", yMas: (n) => " y " + n + " más", deA: (x, a, b) => x + ", de " + a + " a " + b + " €", enExtracto: (x) => x + " € en este extracto",
       preguntas: [["doble", "¿Te cobran algo dos veces?"], ["subida", "¿Te han subido algún precio?"], ["recibo", "¿Algún recibo ha venido más alto de lo normal?"], ["comision", "¿Pagas comisiones al banco?"]],
       pagas: ["Pagas ", " al año en suscripciones y domiciliaciones"], nada: "No hemos visto cobros que se repitan.",
@@ -32,7 +32,7 @@
       tarjeta: "Puede que ahora lo pagues con la tarjeta de crédito.", darBaja: "Dar de baja", priv: "Se lee en tu dispositivo. No se sube.",
       none: "No ha encontrado cobros que se repitan. Prueba con más meses.", bad: "No se ha podido leer. Prueba con Excel o CSV.", mapeo: "No reconocemos las columnas de este archivo. Prueba a descargarlo en Excel o CSV.",
       dl: "Imagen descargada.", ics: "Archivo de avisos descargado.", sinIcs: "No hay cobros para avisar.", share: (x) => x + " €/año en cobros que se repiten · feehund.com", lista: "Cobros que se repiten" },
-    ca: { year: "€/any", menos: " menys/any",
+    ca: { datafono: "Això és el resum del teu datàfon, no l'extracte del teu compte. Es llegeix a El meu datàfon.", irDatafono: "Anar a El meu datàfon", year: "€/any", menos: " menys/any",
       si: "Sí", no: "No", el: "el", yMas: (n) => " i " + n + " més", deA: (x, a, b) => x + ", de " + a + " a " + b + " €", enExtracto: (x) => x + " € en aquest extracte",
       preguntas: [["doble", "Et cobren alguna cosa dues vegades?"], ["subida", "T'han pujat algun preu?"], ["recibo", "Algun rebut ha vingut més alt del normal?"], ["comision", "Pagues comissions al banc?"]],
       pagas: ["Pagues ", " l'any en subscripcions i domiciliacions"], nada: "No hem vist cobraments que es repeteixin.",
@@ -57,7 +57,7 @@
       tarjeta: "Potser ara el pagues amb la targeta de crèdit.", darBaja: "Donar de baixa", priv: "Es llegeix al teu dispositiu. No es puja.",
       none: "No ha trobat cobraments que es repeteixin. Prova amb més mesos.", bad: "No s'ha pogut llegir. Prova amb Excel o CSV.", mapeo: "No reconeixem les columnes d'aquest fitxer. Prova de descarregar-lo en Excel o CSV.",
       dl: "Imatge descarregada.", ics: "Fitxer d'avisos descarregat.", sinIcs: "No hi ha cobraments per avisar.", share: (x) => x + " €/any en cobraments que es repeteixen · feehund.com", lista: "Cobraments que es repeteixen" },
-    en: { year: "€/year", menos: " less/year",
+    en: { datafono: "This is your card machine summary, not your bank statement. It goes in My card machine.", irDatafono: "Go to My card machine", year: "€/year", menos: " less/year",
       si: "Yes", no: "No", el: "on", yMas: (n) => " and " + n + " more", deA: (x, a, b) => x + ", from " + a + " to " + b + " €", enExtracto: (x) => x + " € in this statement",
       preguntas: [["doble", "Are you charged twice for anything?"], ["subida", "Has any price gone up?"], ["recibo", "Has any bill come in higher than usual?"], ["comision", "Do you pay bank fees?"]],
       pagas: ["You pay ", " a year in subscriptions and direct debits"], nada: "We have not seen any repeating charges.",
@@ -142,6 +142,8 @@
     if (error || !r) { show("up"); msg($("xErr"), (error && error.message) || TX.bad); return; }
     const cobros = (r.cobros || []).filter((c) => c.estado === "seguro" || c.estado === "posible");
     if (!cobros.length && !(r.terminados || []).length && !(r.devoluciones || []).length) {
+      // sin ningún movimiento leído: ¿es el resumen del datáfono? Entonces se dice y se enlaza «Mi datáfono»
+      if (!((r.lectura && r.lectura.movimientos) || []).length && await esResumenDatafono(entrada)) { show("up"); aMiDatafono($("xErr")); return; }
       show("up");
       const err = (r.errores || [])[0];
       msg($("xErr"), err ? err.texto : r.necesita_mapeo ? TX.mapeo : TX.none);
@@ -150,6 +152,25 @@
     actual = r;
     render(r, cobros); show("res");
     const h = $("xResH"); if (h) h.focus({ preventScroll: true });
+  }
+
+  /** ¿Lo lee el lector del datáfono con ventas o cobros? Solo se mira cuando aquí no se ha leído ningún movimiento. */
+  async function esResumenDatafono(entrada) {
+    try {
+      const m = await motor();
+      const rr = await m.analizarResumen(entrada, { idioma: LANG });
+      const c = (rr && rr.campos) || {};
+      return Boolean(rr && rr.lectura && rr.lectura.modo) && ["ventas_particulares", "ventas_empresa", "ventas_fuera_europa", "ventas_amex", "ventas_bizum", "operaciones"]
+        .some((k) => c[k] && typeof c[k].valor === "number" && c[k].valor > 0);
+    } catch (e) { return false; }
+  }
+  function aMiDatafono(el) {
+    if (!el) return;
+    el.textContent = TX.datafono + " ";
+    const a = document.createElement("a");
+    a.href = ROOT + { es: "datafono/", ca: "ca/datafon/", en: "en/card-machine/" }[LANG];
+    a.textContent = TX.irDatafono + " →";
+    el.appendChild(a); el.hidden = false;
   }
 
   // Fecha corta: 17/06

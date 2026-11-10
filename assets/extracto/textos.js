@@ -4,7 +4,7 @@
 import comun from './textos/comun.js';
 
 const MODULOS = [comun];
-const PARTES = ['tablas', 'formatos', 'pdf', 'validacion', 'deteccion', 'web'];
+const PARTES = ['tablas', 'formatos', 'pdf', 'validacion', 'deteccion', 'web', 'datafono'];
 
 let TEXTOS = Object.assign({}, comun);
 let cargadas = null;

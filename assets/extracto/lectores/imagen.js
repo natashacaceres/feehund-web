@@ -113,6 +113,10 @@ export async function leer(entrada, ctx) {
 
   if (!palabras.length) return lecturaConError(nombre, 'imagen', 'ilegible');
   const confianza = Math.round((confianzaSuma / palabras.length) * 100) / 100;
+  if (ctx.opciones?.crudo === true) { // lector del datáfono: las palabras tal cual, sin buscar movimientos
+    return crearLectura({ archivo: nombre, formato: 'imagen', nivel: 'C',
+      extra: { paginas: [{ numero: 1, ancho, alto, tokens: palabras, nivel: 'C' }], confianza, palabras: palabras.length, trozos, ancho, alto, invertida, tipo, foto } });
+  }
 
   const { reconstruir } = await import('../nucleo/filas.js');
   const r = reconstruir([{ numero: 1, ancho, alto, tokens: palabras }], {

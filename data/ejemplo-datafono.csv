@@ -1,0 +1,17 @@
+Resumen mensual de operaciones con tarjeta;;;;
+Comercio;CAFETERÍA DE EJEMPLO;;;
+Periodo;01/10/2026;31/10/2026;;
+;;;;
+Tipo de tarjeta;Operaciones;Importe;Tasa;Comisión
+Visa Débito;188;4.512,30;0,40 %;18,05
+Mastercard Crédito;64;1.840,00;0,55 %;10,12
+Tarjetas de empresa;11;812,40;1,20 %;9,75
+Tarjetas no UE;7;390,00;2,00 %;7,80
+American Express;4;260,00;2,50 %;6,50
+Bizum;16;214,00;0,50 %;1,07
+Total;290;8.028,70;;53,29
+;;;;
+Cuota mensual de servicio;;;;9,90
+Alquiler del terminal;;;;15,00
+IVA 21 % sobre cuota y alquiler;;;;5,23
+Total cargos;;;;83,42
