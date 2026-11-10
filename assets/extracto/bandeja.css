@@ -16,6 +16,9 @@
 .bj-x:focus-visible{outline:2px solid var(--brand,#0E5E6F);outline-offset:2px}
 .bj-x svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round}
 .bj-leer{width:100%}
+.bj-leer[hidden]{display:none}
+.bj-nota{margin:0;font-size:15px;font-weight:600;color:var(--error,#8A5300);text-align:left}
+.bj-nota[hidden]{display:none}
 /* con archivos en la lista, la zona de soltar se queda pequeña y su botón pasa a «Añadir más» */
 .drop.bj-con{gap:4px;padding:var(--s-4,16px)}
 .drop.bj-con>svg,.drop.bj-con .drop-s{display:none}

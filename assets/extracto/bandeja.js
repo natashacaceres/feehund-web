@@ -22,13 +22,29 @@ const TX = {
     mas: 'Add more', quitar: (x) => 'Remove ' + x, texto: 'Pasted text', lineas: (n) => n + ' lines', lista: 'Files to read',
     mal: 'Could not be read', banco: 'This is an account statement', datafono: 'This is the card machine summary', clave: 'It has a password' },
 };
+// Lo que no se ha añadido por pasar de un límite, con cuántos se han quedado fuera
+const FUERA = {
+  es: { fotos: (n) => 'Se leen hasta 20 fotos de una vez. ' + (n === 1 ? 'Esta no se ha añadido.' : 'No hemos añadido ' + n + ' más.'),
+    archivos: (n) => 'Se leen hasta 100 archivos de una vez. ' + (n === 1 ? 'Este no se ha añadido.' : 'No hemos añadido ' + n + ' más.'),
+    grande: (x) => x + ' pesa más de 10 MB y no se puede leer.', total: 'Entre todos pasan de 100 MB. Lo último no se ha añadido.' },
+  ca: { fotos: (n) => 'Es llegeixen fins a 20 fotos de cop. ' + (n === 1 ? "Aquesta no s'ha afegit." : "No n'hem afegit " + n + ' més.'),
+    archivos: (n) => 'Es llegeixen fins a 100 arxius de cop. ' + (n === 1 ? "Aquest no s'ha afegit." : "No n'hem afegit " + n + ' més.'),
+    grande: (x) => x + ' pesa més de 10 MB i no es pot llegir.', total: "Entre tots passen de 100 MB. L'últim no s'ha afegit." },
+  en: { fotos: (n) => 'Up to 20 photos are read at once. ' + (n === 1 ? 'This one was not added.' : n + ' more were not added.'),
+    archivos: (n) => 'Up to 100 files are read at once. ' + (n === 1 ? 'This one was not added.' : n + ' more were not added.'),
+    grande: (x) => x + ' is over 10 MB and cannot be read.', total: 'Together they are over 100 MB. The last ones were not added.' },
+};
 const FOTO = /\.(png|jpe?g|webp|heic|heif|gif|bmp|avif)$/i;
 const esFoto = (f) => /^image\//.test(f.type || '') || FOTO.test(f.name || '');
 const clave = (f) => [f.name, f.size, f.lastModified].join('|');
-const MAX = 100; // lo que lee el motor de una vez
+// Lo que lee el motor de una vez (motor.js y montaje.js; una prueba mira que coincidan). Lo que pasa de ahí no entra.
+export const MAX_ARCHIVOS = 100;
+export const MAX_FOTOS = 20;
+export const MAX_MB = 10;
+const MAX_TOTAL = MAX_ARCHIVOS * MAX_MB * 1024 * 1024;
 
 export function crearBandeja({ zona, boton, idioma = 'es', alLeer }) {
-  const t = TX[idioma] || TX.es;
+  const t = TX[idioma] || TX.es, fuera = FUERA[idioma] || FUERA.es;
   const doc = zona.ownerDocument;
   const el = (tag, clase, texto) => { const x = doc.createElement(tag); if (clase) x.className = clase; if (texto !== undefined) x.textContent = texto; return x; };
   const textoBoton = boton ? boton.textContent : '';
@@ -44,7 +60,8 @@ export function crearBandeja({ zona, boton, idioma = 'es', alLeer }) {
   const caja = el('div', 'bj'); caja.hidden = true;
   const lista = el('ul', 'bj-lista'); lista.setAttribute('aria-label', t.lista);
   const leer = el('button', 'btn btn--gold bj-leer'); leer.type = 'button';
-  caja.append(lista, leer);
+  const nota = el('p', 'bj-nota'); nota.hidden = true; nota.setAttribute('role', 'status');
+  caja.append(lista, nota, leer);
   zona.after(caja);
 
   /** @type {{id: string, archivo?: File, texto?: string, nodo: HTMLElement, url?: string}[]} */
@@ -52,12 +69,14 @@ export function crearBandeja({ zona, boton, idioma = 'es', alLeer }) {
 
   function pintar() {
     const n = elementos.length;
-    caja.hidden = !n;
+    caja.hidden = !n && nota.hidden; // sin nada en la lista solo se ve el aviso, si lo hay
+    leer.hidden = !n;
     zona.classList.toggle('bj-con', n > 0);
     if (boton) { boton.textContent = n ? t.mas : textoBoton; boton.classList.toggle('btn--gold', !n); }
     const fotos = n > 0 && elementos.every((x) => x.archivo && esFoto(x.archivo));
     leer.textContent = n === 1 && !elementos[0].archivo ? t.leerTexto : t.leer(n, fotos);
   }
+  function avisar(texto) { nota.textContent = texto || ''; nota.hidden = !texto; }
 
   function fila(x) {
     const li = el('li', 'bj-it');
@@ -77,6 +96,7 @@ export function crearBandeja({ zona, boton, idioma = 'es', alLeer }) {
     quitar.addEventListener('click', () => {
       const i = elementos.indexOf(x);
       quitarElemento(x);
+      avisar('');
       pintar();
       // el foco sigue en la lista: el siguiente «quitar», o «Leer», o el botón de elegir si ya no queda nada
       const sig = elementos[Math.min(i, elementos.length - 1)];
@@ -95,7 +115,18 @@ export function crearBandeja({ zona, boton, idioma = 'es', alLeer }) {
 
   function anadir(cosa) {
     const nuevos = [];
-    const meter = (x) => { if (elementos.length + nuevos.length < MAX) nuevos.push(x); };
+    // al llegar a un límite no entra nada más: se dice cuántos se han quedado fuera
+    const sobran = { fotos: 0, archivos: 0, grande: null, total: false };
+    const cuenta = (lista, f) => lista.filter((x) => x.archivo && f(x.archivo)).length;
+    const meter = (x) => {
+      const f = x.archivo;
+      if (elementos.length + nuevos.length >= MAX_ARCHIVOS) { sobran.archivos++; return; }
+      if (f && f.size > MAX_MB * 1024 * 1024) { sobran.grande = sobran.grande || f.name; return; }
+      if (f && esFoto(f) && cuenta(elementos, esFoto) + cuenta(nuevos, esFoto) >= MAX_FOTOS) { sobran.fotos++; return; }
+      const peso = (lista) => lista.reduce((s, y) => s + (y.archivo ? y.archivo.size : 0), 0);
+      if (f && peso(elementos) + peso(nuevos) + f.size > MAX_TOTAL) { sobran.total = true; return; }
+      nuevos.push(x);
+    };
     if (typeof cosa === 'string') {
       if (!cosa.trim()) return;
       const ya = elementos.find((x) => typeof x.texto === 'string');
@@ -109,7 +140,9 @@ export function crearBandeja({ zona, boton, idioma = 'es', alLeer }) {
         meter({ id, archivo: f });
       }
     }
-    if (!nuevos.length) return;
+    avisar(sobran.fotos ? fuera.fotos(sobran.fotos) : sobran.archivos ? fuera.archivos(sobran.archivos)
+      : sobran.grande ? fuera.grande(sobran.grande) : sobran.total ? fuera.total : '');
+    if (!nuevos.length) { pintar(); return; }
     limpiarMarcas();
     for (const x of nuevos) { elementos.push(x); lista.appendChild(fila(x)); }
     pintar();
@@ -128,9 +161,10 @@ export function crearBandeja({ zona, boton, idioma = 'es', alLeer }) {
       x.nodo.querySelector('.bj-d').textContent = e.codigo === 'es_extracto_banco' ? t.banco : e.codigo === 'es_datafono' ? t.datafono
         : /contrasena/.test(e.codigo || '') ? t.clave : t.mal;
     }
+    pintar();
   }
 
-  function vaciar() { for (const x of elementos.slice()) quitarElemento(x); pintar(); }
+  function vaciar() { for (const x of elementos.slice()) quitarElemento(x); avisar(''); pintar(); }
 
   leer.addEventListener('click', () => {
     if (!elementos.length) return;
