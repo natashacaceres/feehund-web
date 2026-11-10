@@ -20,7 +20,7 @@
       aTarjeta: ["Pagos con tarjeta de crédito", (i, n) => "Pagas " + i + " € con tu tarjeta de crédito (" + n + " pagos). Lo que compras con ella no sale en este extracto.", "Sube también el extracto de la tarjeta"],
       nDevol: (x, i) => x + " te devolvió " + i + " €", nBaja: (x, a, b) => x + " bajó de " + a + " a " + b + " €", nFin: (x, f) => "Ya no te cobran " + x + " (último cargo el " + f + ")", nFinT: (x, f) => x + " ya no sale en esta cuenta desde el " + f + ". Puede que ahora lo pagues con la tarjeta de crédito", nDevC: (x, i) => "Te devolvieron la " + x.toLowerCase() + " (" + i + " €)", otroC: " (otro contrato)",
       eEstable: "Estable", eVaria: "Varía mucho", totalSec: (x, suf) => "Total: " + x + " €" + suf,
-      cada: { semanal: "cada semana", mensual: "cada mes", bimestral: "cada 2 meses", trimestral: "cada 3 meses", semestral: "cada 6 meses", anual: "cada año" },
+      cada: { semanal: "cada semana", cuatrisemanal: "cada 4 semanas", mensual: "cada mes", bimestral: "cada 2 meses", trimestral: "cada 3 meses", semestral: "cada 6 meses", anual: "cada año" },
       head: (n, m) => n
         ? "Es lo que pagas al año en " + n + (n === 1 ? " cobro que se repite." : " cobros que se repiten.") + (m ? (m === 1 ? " Hay 1 más que no sumamos porque lo hemos visto pocas veces." : " Hay " + m + " más que no sumamos porque los hemos visto pocas veces.") : "")
         : m ? (m === 1 ? "Es lo que pagarías al año si se repite 1 cobro que solo hemos visto pocas veces." : "Es lo que pagarías al año si se repiten " + m + " cobros que solo hemos visto pocas veces.") : "No hemos visto cobros que se repitan.",
@@ -45,7 +45,7 @@
       aTarjeta: ["Pagaments amb targeta de crèdit", (i, n) => "Pagues " + i + " € amb la teva targeta de crèdit (" + n + " pagaments). El que compres amb ella no surt en aquest extracte.", "Puja també l'extracte de la targeta"],
       nDevol: (x, i) => x + " t'ha retornat " + i + " €", nBaja: (x, a, b) => x + " ha baixat de " + a + " a " + b + " €", nFin: (x, f) => "Ja no et cobren " + x + " (últim càrrec el " + f + ")", nFinT: (x, f) => x + " ja no surt en aquest compte des del " + f + ". Potser ara el pagues amb la targeta de crèdit", nDevC: (x, i) => "T'han retornat la " + x.toLowerCase() + " (" + i + " €)", otroC: " (un altre contracte)",
       eEstable: "Estable", eVaria: "Varia molt", totalSec: (x, suf) => "Total: " + x + " €" + suf,
-      cada: { semanal: "cada setmana", mensual: "cada mes", bimestral: "cada 2 mesos", trimestral: "cada 3 mesos", semestral: "cada 6 mesos", anual: "cada any" },
+      cada: { semanal: "cada setmana", cuatrisemanal: "cada 4 setmanes", mensual: "cada mes", bimestral: "cada 2 mesos", trimestral: "cada 3 mesos", semestral: "cada 6 mesos", anual: "cada any" },
       head: (n, m) => n
         ? "És el que pagues cada any en " + n + (n === 1 ? " cobrament que es repeteix." : " cobraments que es repeteixen.") + (m ? (m === 1 ? " N'hi ha 1 més que no sumem perquè l'hem vist poques vegades." : " N'hi ha " + m + " més que no sumem perquè els hem vist poques vegades.") : "")
         : m ? (m === 1 ? "És el que pagaries cada any si es repeteix 1 cobrament que només hem vist poques vegades." : "És el que pagaries cada any si es repeteixen " + m + " cobraments que només hem vist poques vegades.") : "No hem vist cobraments que es repeteixin.",
@@ -70,7 +70,7 @@
       aTarjeta: ["Credit card payments", (i, n) => "You pay " + i + " € with your credit card (" + n + " payments). What you buy with it is not in this statement.", "Upload the card statement too"],
       nDevol: (x, i) => x + " refunded you " + i + " €", nBaja: (x, a, b) => x + " went down from " + a + " to " + b + " €", nFin: (x, f) => "You are no longer charged for " + x + " (last charge on " + f + ")", nFinT: (x, f) => x + " has not appeared in this account since " + f + ". You may now pay it with your credit card", nDevC: (x, i) => "Your " + x.toLowerCase() + " was refunded (" + i + " €)", otroC: " (another contract)",
       eEstable: "Stable", eVaria: "Varies a lot", totalSec: (x, suf) => "Total: " + x + " €" + suf,
-      cada: { semanal: "every week", mensual: "every month", bimestral: "every 2 months", trimestral: "every 3 months", semestral: "every 6 months", anual: "every year" },
+      cada: { semanal: "every week", cuatrisemanal: "every 4 weeks", mensual: "every month", bimestral: "every 2 months", trimestral: "every 3 months", semestral: "every 6 months", anual: "every year" },
       head: (n, m) => n
         ? "This is what you pay each year in " + n + (n === 1 ? " repeating charge." : " repeating charges.") + (m ? (m === 1 ? " 1 more is not added in because we have only seen it a few times." : " " + m + " more are not added in because we have only seen them a few times.") : "")
         : m ? (m === 1 ? "This is what you would pay each year if 1 charge we have only seen a few times repeats." : "This is what you would pay each year if " + m + " charges we have only seen a few times repeat.") : "We have not seen any repeating charges.",

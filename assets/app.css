@@ -1098,5 +1098,9 @@ main:has(#dCalc:not([hidden])) :is(#como-funciona,.indep,.faq),main:has(#dRev:no
 @media (min-width:761px){.home-dog{height:180px}}
 .ext-dog{width:auto;max-width:100%;height:100px}
 @media (min-width:761px){.ext-dog{height:126px}}
+.home-ok li.home-es{display:inline-flex;align-items:center;gap:6px}
+.home-ok li.home-es::before{content:none}
+.flag-es{flex:none;width:18px;height:12px;border-radius:2px}
+.ext-sub{margin:-8px 0 0;font:600 16px/1.4 var(--f-text);color:var(--ink-2);text-align:center;white-space:nowrap}
 
 /* rs-tam */.rs-hero{max-width:760px;margin-inline:auto}.rs-img{max-width:560px;margin-inline:auto}
