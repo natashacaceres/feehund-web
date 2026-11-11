@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="en" data-title-fijo><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>We cancel it for you · Feehund</title>
+<meta name="robots" content="noindex">
+<link rel="canonical" href="https://feehund.com/en/cancel/send/">
+<link rel="alternate" hreflang="es-ES" href="https://feehund.com/baja/enviar/">
+<link rel="alternate" hreflang="ca-ES" href="https://feehund.com/ca/baixa/enviar/">
+<link rel="alternate" hreflang="en-ES" href="https://feehund.com/en/cancel/send/">
+<link rel="icon" href="../../../assets/brand/favicon.ico?v=202611110314" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="../../../assets/brand/favicon-32.png?v=202611110314">
+<link rel="apple-touch-icon" sizes="180x180" href="../../../assets/brand/apple-touch-icon.png?v=202611110314">
+<link rel="manifest" href="../../../manifest.webmanifest">
+<meta name="theme-color" content="#0E5E6F">
+<link rel="preload" href="../../../assets/fonts/fraunces-800.woff" as="font" type="font/woff" crossorigin>
+<link rel="preload" href="../../../assets/fonts/atkinson-next-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="../../../assets/app.css?v=202611110314">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="hdr">
+  <div class="wrap">
+    <a class="brand tb-wm" href="../../../en/" data-marca>Feehund</a>
+    <div class="hdr-r">
+      <details class="langdd">
+      <summary aria-label="Language: English">EN<span class="langdd-i" aria-hidden="true"></span></summary>
+      <ul><li><a href="../../../baja/enviar/" hreflang="es" lang="es">Español</a></li><li><a href="../../../ca/baixa/enviar/" hreflang="ca" lang="ca">Català</a></li><li><a href="../../../en/cancel/send/" hreflang="en" lang="en" aria-current="page">English</a></li></ul>
+    </details>
+    </div>
+  </div>
+</header>
+
+<main id="main" class="baja tb" data-vista="flujo" data-api="empresa" data-empresa="basic-fit" data-baja="certificada" data-aviso="permanencia" data-pide-dni="true">
+<div class="wrap baja-in tb-in">
+  <div class="tb-top tb-prog">
+    <button type="button" class="tb-back" id="tbBack" data-salida="../../../en/statement/">← Back</button>
+    <p class="tb-cnt" id="tbCnt" data-fmt="{n} of 4" aria-live="polite">1 of 4</p>
+  </div>
+  <div class="tb-bar tb-prog" id="tbBar" role="progressbar" aria-label="Progress" aria-valuemin="1" aria-valuemax="4" aria-valuenow="1"><span></span></div>
+  <p class="tb-emp">Cancelling <strong data-t="empresa">Basic-Fit</strong></p>
+
+  <section class="tb-paso" id="tbNo" hidden aria-labelledby="tbNoH">
+    <h2 id="tbNoH">This company only allows cancelling on its website.</h2>
+    <p>Here are the steps.</p>
+    <ol class="baja-pasos" data-api="pasos-online"><li><span class="baja-num" aria-hidden="true">1</span><p>[VERIFICAR]</p></li><li><span class="baja-num" aria-hidden="true">2</span><p>[VERIFICAR]</p></li><li><span class="baja-num" aria-hidden="true">3</span><p>[VERIFICAR]</p></li></ol>
+    <a class="btn tb-sec" href="../../../en/statement/">Back to your results</a>
+  </section>
+
+  <section class="tb-paso" data-paso="1" aria-labelledby="tbH1">
+    <h2 id="tbH1">When do you want it to end?</h2>
+    <div class="tb-aviso" id="tbAvPerm" data-aviso="permanencia">
+      <p><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.5 2.5 20h19L12 3.5Z"/><path d="M12 10v4.5"/><circle cx="12" cy="17.2" r=".6"/></svg><span>If you cancel today, <span data-t="empresa"></span> may charge you the minimum-term penalty. We recommend sending it on <span data-t="fecha-envio"></span>.</span></p>
+      <button type="button" class="btn tb-sec" id="tbProgramar"><span>Schedule for <span data-t="fecha-envio"></span></span></button>
+      <button type="button" class="tb-link" id="tbYa">Send now anyway</button>
+    </div>
+    <div class="tb-aviso tb-aviso--info" id="tbAvPre" data-aviso="preaviso" hidden>
+      <p><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg><span><span data-t="empresa"></span> asks for <span data-t="dias"></span> days' notice. We send it today so it arrives in time.</span></p>
+    </div>
+    <fieldset class="tb-ops">
+      <legend class="sr">When do you want it to end?</legend>
+      <label class="tb-op"><input type="radio" name="cuando" value="ya"><span class="tb-op-t"><strong>As soon as possible</strong></span></label>
+      <label class="tb-op"><input type="radio" name="cuando" value="fin"><span class="tb-op-t"><strong>When my minimum term ends</strong></span>
+        <span class="tb-op-x tb-f" id="tbFechaBox" hidden><span class="tb-nota">Minimum term end date</span><input type="date" id="tbFecha" aria-label="Minimum term end date"></span></label>
+      <label class="tb-op"><input type="radio" name="cuando" value="ren"><span class="tb-op-t"><strong>Before it renews</strong></span></label>
+    </fieldset>
+    <label class="tb-chk tb-chk--box" id="tbPen" hidden><input type="checkbox" id="tbPenChk" required><span>I understand there may be a penalty.</span></label>
+    <p class="tb-err" id="tbE1" role="alert" hidden>Choose an option.</p>
+    <p class="tb-err" id="tbE1f" role="alert" hidden>Enter the date.</p>
+    <p class="tb-err" id="tbE1p" role="alert" hidden>Tick the box to send it now.</p>
+    <div class="tb-acc"><button type="button" class="btn tb-btn" id="tbN1">Continue</button></div>
+  </section>
+
+  <section class="tb-paso" data-paso="2" aria-labelledby="tbH2" hidden>
+    <h2 id="tbH2">Your details</h2>
+    <div class="tb-f"><label for="tbNombre">Full name</label><input id="tbNombre" autocomplete="name" required><p class="tb-err" id="tbNombreE" hidden>Enter your full name.</p></div>
+    <div class="tb-f"><label for="tbCorreo">Email you use for your <span data-t="empresa"></span> account</label><input id="tbCorreo" type="email" autocomplete="email" inputmode="email" required><p class="tb-err" id="tbCorreoE" hidden>Check the email address.</p></div>
+    <div class="tb-f"><label for="tbCliente">Customer number or linked phone <span>(optional)</span></label><input id="tbCliente" autocomplete="off"></div>
+    <div class="tb-f" id="tbDniBox" data-pide-dni="true"><label for="tbDni">DNI or NIE</label><input id="tbDni" autocomplete="off" autocapitalize="characters"><p class="tb-nota"><span data-t="empresa"></span> asks for it to identify you.</p><p class="tb-err" id="tbDniE" hidden>Check the DNI or NIE.</p></div>
+    <div class="tb-carta">
+      <div class="tb-carta-h"><h3>Your letter</h3><button type="button" class="tb-link" id="tbEditar" data-editar="Edit" data-listo="Done">Edit</button></div>
+      <pre id="tbCartaTxt" data-api="carta"></pre>
+      <div class="tb-f"><textarea id="tbCartaEd" aria-label="Your letter" hidden></textarea></div>
+    </div>
+    <p class="tb-priv"><svg class="tb-ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="10.5" width="14" height="10" rx="1.5"/><path d="M8 10.5V7.5a4 4 0 0 1 8 0v3"/></svg><span>To send your cancellation, your name and contract details go to the certified mail service. Your statement never leaves your phone.</span></p>
+    <div class="tb-acc"><button type="button" class="btn tb-btn" id="tbN2" data-api="datos-guardar">Continue</button></div>
+  </section>
+
+  <section class="tb-paso" data-paso="3" aria-labelledby="tbH3" hidden>
+    <h2 id="tbH3">Sign your letter</h2>
+    <p>We have sent a code to <strong data-t="correo"></strong>.</p>
+    <div class="tb-otp" id="tbOtp" role="group" aria-label="6-digit code"><input type="text" inputmode="numeric" maxlength="1" pattern="[0-9]*" autocomplete="one-time-code" aria-label="Digit 1 / 6"><input type="text" inputmode="numeric" maxlength="1" pattern="[0-9]*" autocomplete="off" aria-label="Digit 2 / 6"><input type="text" inputmode="numeric" maxlength="1" pattern="[0-9]*" autocomplete="off" aria-label="Digit 3 / 6"><input type="text" inputmode="numeric" maxlength="1" pattern="[0-9]*" autocomplete="off" aria-label="Digit 4 / 6"><input type="text" inputmode="numeric" maxlength="1" pattern="[0-9]*" autocomplete="off" aria-label="Digit 5 / 6"><input type="text" inputmode="numeric" maxlength="1" pattern="[0-9]*" autocomplete="off" aria-label="Digit 6 / 6"></div>
+    <p class="tb-err" id="tbE3c" role="alert" hidden>That code is not right. Check the latest email or ask for a new one.</p>
+    <button type="button" class="tb-link" id="tbReenviar" data-api="firma-reenviar">Resend code</button>
+    <p class="tb-ok" id="tbReenvMsg" role="status" hidden></p>
+    <!-- [REVISIÓN LEGAL] texto de autorización -->
+    <label class="tb-chk tb-chk--box" data-revision="legal"><input type="checkbox" id="tbAut" required><span>I authorise Feehund to send this letter on my behalf to <span data-t="empresa"></span>.</span></label>
+    <p class="tb-err" id="tbE3a" role="alert" hidden>Tick the box to sign.</p>
+    <div class="tb-acc"><button type="button" class="btn tb-btn" id="tbN3" data-api="firma-verificar">Sign and continue</button></div>
+  </section>
+
+  <section class="tb-paso" data-paso="4" aria-labelledby="tbH4" hidden>
+    <h2 id="tbH4">Choose and pay</h2>
+    <fieldset class="tb-ops">
+      <legend class="sr">Choose and pay</legend>
+      <label class="tb-op"><input type="radio" name="pack" value="1"><span class="tb-op-t"><strong>1 cancellation · <span class="tb-precio">4,99 €</span></strong></span></label>
+      <label class="tb-op"><input type="radio" name="pack" value="3"><span class="tb-op-t"><strong>3 cancellations · <span class="tb-precio">9,99 €</span></strong><span>Use the other two whenever you want with the same link.</span></span></label>
+    </fieldset>
+    <ul class="tb-lista"><li>Letter sent by certified mail</li><li>PDF certificate in your inbox</li><li>If it does not arrive, we refund you</li><li>If they charge you again, second letter free</li></ul>
+    <!-- [REVISIÓN LEGAL] renuncia al desistimiento -->
+    <label class="tb-chk tb-chk--box" data-revision="legal"><input type="checkbox" id="tbDes" required><span>I ask for it to be sent now and understand that, because of this, I lose my right of withdrawal. <a href="../../../condiciones/" target="_blank">See terms</a></span></label>
+    <p class="tb-err" id="tbE4d" role="alert" hidden>Tick the box to continue.</p>
+    <div class="tb-errbox" id="tbE4p" role="alert" tabindex="-1" hidden><p class="tb-err">The payment did not go through. You have not been charged.</p><p>Try again or use another card.</p></div>
+    <div class="tb-acc">
+      <button type="button" class="btn tb-pay" id="tbPay" data-api="pago" data-modo="enviar" data-estado="../status/">Pay and send · 4,99 €</button>
+      <div class="tb-fino"><p>VAT included. One-off payment, no subscription.</p><p>Feehund has no connection with <span data-t="empresa"></span>.</p></div>
+    </div>
+  </section>
+</div>
+</main>
+<footer class="ftr"><div class="wrap ftr-in">
+  <ul class="ftr-links">
+    <li><a href="../../../baja/"><span data-l="es">Dar de baja</span><span data-l="ca">Donar de baixa</span><span data-l="en">Cancel</span></a></li>
+    <li><a href="../../../blog/">La Letra Pequeña</a></li>
+    <li><a href="../../../metodologia/"><span data-l="es">Cómo se calcula</span><span data-l="ca">Com es calcula</span><span data-l="en">How it is calculated</span></a></li>
+    <li><a href="../../../contacto/"><span data-l="es">Contacto</span><span data-l="ca">Contacte</span><span data-l="en">Contact</span></a></li>
+  </ul>
+  <ul class="ftr-legal">
+    <li><a href="../../../aviso-legal/"><span data-l="es">Aviso legal</span><span data-l="ca">Avís legal</span><span data-l="en">Legal notice</span></a></li>
+    <li><a href="../../../privacidad/"><span data-l="es">Privacidad</span><span data-l="ca">Privacitat</span><span data-l="en">Privacy</span></a></li>
+    <li><a href="../../../cookies/"><span data-l="es">Cookies</span><span data-l="ca">Galetes</span><span data-l="en">Cookies</span></a></li>
+    <li><a href="../../../condiciones/"><span data-l="es">Condiciones</span><span data-l="ca">Condicions</span><span data-l="en">Terms</span></a></li>
+    <li>© 2026 <span data-marca>Feehund</span></li>
+  </ul>
+</div></footer>
+<script src="../../../assets/te-damos-de-baja.js?v=20261111"></script>
+<script src="../../../assets/app.js?v=202611110314"></script>
+</body></html>

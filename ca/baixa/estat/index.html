@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="ca" data-title-fijo><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Estat de la teva baixa · Feehund</title>
+<meta name="robots" content="noindex">
+<link rel="canonical" href="https://feehund.com/ca/baixa/estat/">
+<link rel="alternate" hreflang="es-ES" href="https://feehund.com/baja/estado/">
+<link rel="alternate" hreflang="ca-ES" href="https://feehund.com/ca/baixa/estat/">
+<link rel="alternate" hreflang="en-ES" href="https://feehund.com/en/cancel/status/">
+<link rel="icon" href="../../../assets/brand/favicon.ico?v=202611110314" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="../../../assets/brand/favicon-32.png?v=202611110314">
+<link rel="apple-touch-icon" sizes="180x180" href="../../../assets/brand/apple-touch-icon.png?v=202611110314">
+<link rel="manifest" href="../../../manifest.webmanifest">
+<meta name="theme-color" content="#0E5E6F">
+<link rel="preload" href="../../../assets/fonts/fraunces-800.woff" as="font" type="font/woff" crossorigin>
+<link rel="preload" href="../../../assets/fonts/atkinson-next-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="../../../assets/app.css?v=202611110314">
+</head>
+<body>
+<a class="skip" href="#main">Anar al contingut</a>
+<header class="hdr">
+  <div class="wrap">
+    <a class="brand" href="../../../ca/"><img src="../../../assets/brand/feehund-logo-h64.png?v=202611110314" srcset="../../../assets/brand/feehund-logo-h64.png?v=202611110314 1x, ../../../assets/brand/feehund-logo-h128.png?v=202611110314 2x" alt="Feehund" data-marca width="211" height="64"></a>
+    <div class="hdr-r">
+      <details class="langdd">
+      <summary aria-label="Idioma: Català">CA<span class="langdd-i" aria-hidden="true"></span></summary>
+      <ul><li><a href="../../../baja/estado/" hreflang="es" lang="es">Español</a></li><li><a href="../../../ca/baixa/estat/" hreflang="ca" lang="ca" aria-current="page">Català</a></li><li><a href="../../../en/cancel/status/" hreflang="en" lang="en">English</a></li></ul>
+    </details>
+    </div>
+  </div>
+</header>
+
+<main id="main" class="baja tb" data-vista="estado" data-api="baja-estado" data-empresa="basic-fit">
+<div class="wrap baja-in tb-in">
+  <p class="tb-emp">Baixa de <strong data-t="empresa">Basic-Fit</strong></p>
+  <section class="tb-est" data-estado="programada" hidden>
+    <span class="tb-est-i" role="img" aria-label="Programada"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15.5" rx="2"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg></span>
+    <div class="tb-est-m"><h1>Programada per al <span data-t="fecha-prog"></span></h1><p>Aquell dia l'enviem amb certificat i t'avisem per correu.</p></div>
+  </section>
+  <section class="tb-est" data-estado="enviada">
+    <span class="tb-est-i" role="img" aria-label="Enviada"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 3 10 14"/><path d="M21 3 14.5 21l-4.5-7-7-4.5L21 3Z"/></svg></span>
+    <div class="tb-est-m"><h1>Enviada el <span data-t="fecha-env"></span></h1><p>Va amb certificat. Quan arribi, t'avisem per correu.</p><a class="btn tb-sec" href="#" data-api="certificado-pdf">Descarregar certificat (PDF)</a></div>
+  </section>
+  <section class="tb-est" data-estado="entregada" hidden>
+    <span class="tb-est-i" role="img" aria-label="Lliurada"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span>
+    <div class="tb-est-m"><h1>Lliurada</h1><p><span data-t="empresa"></span> la va rebre el <span data-t="fecha-ent"></span>.</p><a class="btn tb-sec" href="#" data-api="certificado-pdf">Descarregar certificat (PDF)</a></div>
+  </section>
+  <section class="tb-est" data-estado="devuelta" hidden>
+    <span class="tb-est-i" role="img" aria-label="No lliurada"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.5 6.5l11 11M17.5 6.5l-11 11"/></svg></span>
+    <div class="tb-est-m"><h1>No s'ha pogut lliurar. T'hem retornat els diners.</h1><p>El reemborsament va a la mateixa targeta amb què vas pagar.</p></div>
+  </section>
+  <section class="tb-blk" aria-labelledby="tbRH">
+    <h2 id="tbRH">T'han tornat a cobrar?</h2>
+    <p>Puja el teu proper extracte i ho comprovem.</p>
+    <a class="btn tb-sec" href="../../../ca/extracte/" data-api="recobro-comprobar">Pujar el meu extracte</a>
+    <div class="tb-aviso tb-aviso--info" id="tbRecobro" data-api="recobro-detectado" hidden>
+      <p><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.5 2.5 20h19L12 3.5Z"/><path d="M12 10v4.5"/><circle cx="12" cy="17.2" r=".6"/></svg><span><strong>Hi ha un cobrament de <span data-t="empresa"></span> després de la data de baixa.</strong> T'enviem una segona carta gratis, citant el certificat.</span></p>
+      <details class="tb-guia"><summary>Com retornar el rebut des del teu banc</summary><ol><li>Obre l'app o el web del teu banc i busca el rebut de <span data-t="empresa"></span>.</li><li>Prem «Retornar rebut». Si no hi surt, demana-ho a la teva oficina.</li><li>En els rebuts domiciliats tens 8 setmanes des del càrrec.</li><li>Guarda el certificat de la baixa per si l'empresa reclama.</li></ol></details>
+    </div>
+  </section>
+  <section class="tb-blk" id="tbPackQ" data-api="pack-restantes" hidden aria-labelledby="tbQH">
+    <h2 id="tbQH">Et queden <span data-t="quedan">2</span> baixes</h2>
+    <a class="btn tb-btn" href="../enviar/?pack=usar" data-api="pack-usar">Fer-ne servir una</a>
+  </section>
+</div>
+</main>
+<footer class="ftr"><div class="wrap ftr-in">
+  <ul class="ftr-links">
+    <li><a href="../../../baja/"><span data-l="es">Dar de baja</span><span data-l="ca">Donar de baixa</span><span data-l="en">Cancel</span></a></li>
+    <li><a href="../../../blog/">La Letra Pequeña</a></li>
+    <li><a href="../../../metodologia/"><span data-l="es">Cómo se calcula</span><span data-l="ca">Com es calcula</span><span data-l="en">How it is calculated</span></a></li>
+    <li><a href="../../../contacto/"><span data-l="es">Contacto</span><span data-l="ca">Contacte</span><span data-l="en">Contact</span></a></li>
+  </ul>
+  <ul class="ftr-legal">
+    <li><a href="../../../aviso-legal/"><span data-l="es">Aviso legal</span><span data-l="ca">Avís legal</span><span data-l="en">Legal notice</span></a></li>
+    <li><a href="../../../privacidad/"><span data-l="es">Privacidad</span><span data-l="ca">Privacitat</span><span data-l="en">Privacy</span></a></li>
+    <li><a href="../../../cookies/"><span data-l="es">Cookies</span><span data-l="ca">Galetes</span><span data-l="en">Cookies</span></a></li>
+    <li><a href="../../../condiciones/"><span data-l="es">Condiciones</span><span data-l="ca">Condicions</span><span data-l="en">Terms</span></a></li>
+    <li>© 2026 <span data-marca>Feehund</span></li>
+  </ul>
+</div></footer>
+<script src="../../../assets/te-damos-de-baja.js?v=20261111"></script>
+<script src="../../../assets/app.js?v=202611110314"></script>
+</body></html>
