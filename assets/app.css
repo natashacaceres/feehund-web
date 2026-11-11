@@ -1462,3 +1462,8 @@ details.opc summary:hover{background:var(--brand-tint);border-radius:11px}
 
 /* ===== 5 · «Funciona en modo avión» bajo la línea de privacidad (comprobado en Chrome Android y Safari iOS emulados) ===== */
 .drop-avion{margin:-2px 0 0;font-size:16px;line-height:1.35;color:var(--ink-2);text-align:center}
+
+/* ===== 6 · Compartir pegado a la cifra, como botón visible ===== */
+.res-share{display:flex;width:auto;min-width:0;margin:var(--s-3) auto 0;padding:0 22px;min-height:48px;border:1.5px solid var(--brand);border-radius:12px;background:transparent;color:var(--brand);font:800 16px/1.2 var(--f-text)}
+.res-share:hover{background:var(--brand-tint);color:var(--brand)}
+.ext-res .res-share{margin:var(--s-2) 0 0}
