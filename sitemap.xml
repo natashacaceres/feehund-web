@@ -1,20 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
-  <url><loc>https://feehund.com/es/</loc><lastmod>2026-10-30</lastmod>
-    <xhtml:link rel="alternate" hreflang="es-ES" href="https://feehund.com/es/"/>
-    <xhtml:link rel="alternate" hreflang="ca-ES" href="https://feehund.com/es/ca/"/>
-    <xhtml:link rel="alternate" hreflang="en-ES" href="https://feehund.com/es/en/"/>
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://feehund.com/es/"/></url>
-  <url><loc>https://feehund.com/es/ca/</loc><lastmod>2026-10-30</lastmod>
-    <xhtml:link rel="alternate" hreflang="es-ES" href="https://feehund.com/es/"/>
-    <xhtml:link rel="alternate" hreflang="ca-ES" href="https://feehund.com/es/ca/"/>
-    <xhtml:link rel="alternate" hreflang="en-ES" href="https://feehund.com/es/en/"/>
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://feehund.com/es/"/></url>
-  <url><loc>https://feehund.com/es/en/</loc><lastmod>2026-10-30</lastmod>
-    <xhtml:link rel="alternate" hreflang="es-ES" href="https://feehund.com/es/"/>
-    <xhtml:link rel="alternate" hreflang="ca-ES" href="https://feehund.com/es/ca/"/>
-    <xhtml:link rel="alternate" hreflang="en-ES" href="https://feehund.com/es/en/"/>
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://feehund.com/es/"/></url>
   <url><loc>https://feehund.com/blog/</loc><lastmod>2026-11-11</lastmod></url>
   <url><loc>https://feehund.com/blog/comparativas-datafonos/</loc><lastmod>2026-10-30</lastmod></url>
   <url><loc>https://feehund.com/blog/resumen-datafono/</loc><lastmod>2026-11-04</lastmod></url>
@@ -207,4 +192,50 @@
   <url><loc>https://feehund.com/baja/crunchyroll/</loc><lastmod>2026-11-11</lastmod></url>
   <url><loc>https://feehund.com/baja/edarling/</loc><lastmod>2026-11-11</lastmod></url>
   <url><loc>https://feehund.com/baja/el-pais/</loc><lastmod>2026-11-11</lastmod></url>
+  <url><loc>https://feehund.com/</loc><lastmod>2026-11-11</lastmod>
+    <xhtml:link rel="alternate" hreflang="es-ES" href="https://feehund.com/"/>
+    <xhtml:link rel="alternate" hreflang="ca-ES" href="https://feehund.com/ca/"/>
+    <xhtml:link rel="alternate" hreflang="en-ES" href="https://feehund.com/en/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://feehund.com/"/></url>
+  <url><loc>https://feehund.com/ca/</loc><lastmod>2026-11-11</lastmod>
+    <xhtml:link rel="alternate" hreflang="es-ES" href="https://feehund.com/"/>
+    <xhtml:link rel="alternate" hreflang="ca-ES" href="https://feehund.com/ca/"/>
+    <xhtml:link rel="alternate" hreflang="en-ES" href="https://feehund.com/en/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://feehund.com/"/></url>
+  <url><loc>https://feehund.com/en/</loc><lastmod>2026-11-11</lastmod>
+    <xhtml:link rel="alternate" hreflang="es-ES" href="https://feehund.com/"/>
+    <xhtml:link rel="alternate" hreflang="ca-ES" href="https://feehund.com/ca/"/>
+    <xhtml:link rel="alternate" hreflang="en-ES" href="https://feehund.com/en/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://feehund.com/"/></url>
+  <url><loc>https://feehund.com/extracto/</loc><lastmod>2026-11-11</lastmod>
+    <xhtml:link rel="alternate" hreflang="es-ES" href="https://feehund.com/extracto/"/>
+    <xhtml:link rel="alternate" hreflang="ca-ES" href="https://feehund.com/ca/extracte/"/>
+    <xhtml:link rel="alternate" hreflang="en-ES" href="https://feehund.com/en/statement/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://feehund.com/extracto/"/></url>
+  <url><loc>https://feehund.com/ca/extracte/</loc><lastmod>2026-11-11</lastmod>
+    <xhtml:link rel="alternate" hreflang="es-ES" href="https://feehund.com/extracto/"/>
+    <xhtml:link rel="alternate" hreflang="ca-ES" href="https://feehund.com/ca/extracte/"/>
+    <xhtml:link rel="alternate" hreflang="en-ES" href="https://feehund.com/en/statement/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://feehund.com/extracto/"/></url>
+  <url><loc>https://feehund.com/en/statement/</loc><lastmod>2026-11-11</lastmod>
+    <xhtml:link rel="alternate" hreflang="es-ES" href="https://feehund.com/extracto/"/>
+    <xhtml:link rel="alternate" hreflang="ca-ES" href="https://feehund.com/ca/extracte/"/>
+    <xhtml:link rel="alternate" hreflang="en-ES" href="https://feehund.com/en/statement/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://feehund.com/extracto/"/></url>
+  <url><loc>https://feehund.com/datafono/</loc><lastmod>2026-11-11</lastmod>
+    <xhtml:link rel="alternate" hreflang="es-ES" href="https://feehund.com/datafono/"/>
+    <xhtml:link rel="alternate" hreflang="ca-ES" href="https://feehund.com/ca/datafon/"/>
+    <xhtml:link rel="alternate" hreflang="en-ES" href="https://feehund.com/en/card-machine/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://feehund.com/datafono/"/></url>
+  <url><loc>https://feehund.com/ca/datafon/</loc><lastmod>2026-11-11</lastmod>
+    <xhtml:link rel="alternate" hreflang="es-ES" href="https://feehund.com/datafono/"/>
+    <xhtml:link rel="alternate" hreflang="ca-ES" href="https://feehund.com/ca/datafon/"/>
+    <xhtml:link rel="alternate" hreflang="en-ES" href="https://feehund.com/en/card-machine/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://feehund.com/datafono/"/></url>
+  <url><loc>https://feehund.com/en/card-machine/</loc><lastmod>2026-11-11</lastmod>
+    <xhtml:link rel="alternate" hreflang="es-ES" href="https://feehund.com/datafono/"/>
+    <xhtml:link rel="alternate" hreflang="ca-ES" href="https://feehund.com/ca/datafon/"/>
+    <xhtml:link rel="alternate" hreflang="en-ES" href="https://feehund.com/en/card-machine/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://feehund.com/datafono/"/></url>
+  <url><loc>https://feehund.com/metodologia/</loc><lastmod>2026-11-11</lastmod></url>
 </urlset>
