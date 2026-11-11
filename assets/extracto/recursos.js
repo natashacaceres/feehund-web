@@ -5,15 +5,15 @@
 //   ACTUALIZAR_RECURSOS=1 node --test tests/unit/worker-montaje.test.mjs
 // La versión es una huella de todos los archivos de las listas: cambia en cuanto cambia cualquiera de ellos.
 globalThis.RECURSOS_EXTRACTO = {
-  version: '849c91edf372',
+  version: '9f16a3d0acd3',
   // Página, fuentes, motor, núcleo, lectores y textos: se guardan al instalar.
   PAGINA: [
     '/extracto/',
     '/extracto/dev/',
-    '/assets/app.css?v=202611112306',
+    '/assets/app.css?v=202611112317',
     '/assets/app.js?v=202611111722',
     '/assets/atras.js?v=202611111845',
-    '/assets/bancos-guia.js?v=202611120115',
+    '/assets/bancos-guia.js?v=202611121000',
     '/assets/brand/apple-touch-icon.png?v=202611111722',
     '/assets/brand/favicon-16.png?v=202611111722',
     '/assets/brand/favicon-192.png?v=202611111722',

@@ -1369,3 +1369,15 @@ details.opc[open] summary::after{transform:rotate(90deg)}
 .bk-otro{justify-self:start;min-height:44px;padding:0;border:0;background:none;color:var(--brand);font:800 16px/1.2 var(--f-text);text-decoration:underline;text-underline-offset:3px;cursor:pointer}
 .bk-ol{list-style:decimal}
 .bk-l[hidden]{display:none}
+/* Buscador de bancos como desplegable: la lista cae debajo, del mismo ancho, una fila por banco */
+.bk{position:relative}
+.bk-q{padding-right:44px;background:#fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%230E5E6F' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E") right 14px center/20px no-repeat}
+.bk-lista{display:block;flex-wrap:nowrap;margin:-6px 0 0;padding:4px 0;max-height:300px;overflow-y:auto;border:1.5px solid var(--field);border-radius:12px;background:#fff;box-shadow:0 6px 18px rgba(20,33,61,.10)}
+.bk-lista li{margin:0}
+.bk-lista li + li{border-top:1px solid var(--line)}
+.bk-b{display:flex;align-items:center;width:100%;min-height:48px;padding:10px 14px;border:0;border-radius:0;background:transparent;color:var(--ink);font:600 16px/1.3 var(--f-text);text-align:left}
+.bk-b:hover,.bk-b:focus-visible{background:var(--brand-tint);outline:none}
+.bk-nada{padding:12px 14px}
+/* Al abrir «¿Cómo lo descargo…?» el recuadro no se tiñe entero al pasar el ratón: solo la fila del título */
+details.opc:hover{background:transparent}
+details.opc summary:hover{background:var(--brand-tint);border-radius:11px}

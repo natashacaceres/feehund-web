@@ -20,15 +20,21 @@
   function pintarLista() {
     const t = plano(q.value.trim());
     lista.textContent = "";
+    q.setAttribute("aria-expanded", "true");
     const vis = bancos.filter((b) => !t || plano(b.n + " " + b.id.replace(/_/g, " ")).indexOf(t) >= 0);
     for (const b of vis) {
       const li = el("li"), btn = el("button", "bk-b", b.n);
-      btn.type = "button"; btn.addEventListener("click", () => elegir(b));
+      btn.type = "button"; btn.setAttribute("role", "option");
+      // mousedown: elige antes de que el buscador pierda el foco y cierre la lista
+      btn.addEventListener("mousedown", (e) => e.preventDefault());
+      btn.addEventListener("click", () => elegir(b));
       li.appendChild(btn); lista.appendChild(li);
     }
     if (!vis.length) lista.appendChild(el("li", "bk-nada", TX.nada));
     lista.hidden = false; pasos.hidden = true;
   }
+
+  function cerrar() { if (!q.hidden) { lista.hidden = true; q.setAttribute("aria-expanded", "false"); } }
 
   function elegir(b) {
     try { localStorage.setItem("feehund-banco", b.id); } catch (e) {}
@@ -50,16 +56,22 @@
     if (alguno) pasos.appendChild(el("p", "bk-rev", TX.rev(b.n, fecha(b.revisado))));
     else pasos.appendChild(el("p", "bk-x", TX.sin(b.n)));
     const otro = el("button", "bk-otro", TX.otro); otro.type = "button";
-    otro.addEventListener("click", () => { q.value = ""; q.hidden = false; if (etiqueta) etiqueta.hidden = false; pintarLista(); q.focus(); });
+    otro.addEventListener("click", () => { q.value = ""; q.hidden = false; if (etiqueta) etiqueta.hidden = false; pasos.hidden = true; q.focus(); pintarLista(); });
     pasos.appendChild(otro);
-    lista.hidden = true; q.hidden = true; if (etiqueta) etiqueta.hidden = true; pasos.hidden = false;
+    lista.hidden = true; q.setAttribute("aria-expanded", "false"); q.hidden = true; if (etiqueta) etiqueta.hidden = true; pasos.hidden = false;
   }
 
   fetch(raiz + "data/bancos-descarga.json", { cache: "no-cache" }).then((r) => r.ok ? r.json() : []).then((d) => {
     bancos = d || []; if (!bancos.length) { caja.hidden = true; return; }
+    q.setAttribute("role", "combobox"); q.setAttribute("aria-controls", "xBkLista"); q.setAttribute("aria-expanded", "false");
+    lista.setAttribute("role", "listbox");
     q.addEventListener("input", pintarLista);
+    q.addEventListener("focus", pintarLista);
+    q.addEventListener("click", pintarLista);
+    q.addEventListener("keydown", (e) => { if (e.key === "Escape") cerrar(); if (e.key === "Enter") { e.preventDefault(); const p = lista.querySelector(".bk-b"); if (p) p.click(); } });
+    q.addEventListener("blur", () => setTimeout(cerrar, 150));
     let guardado = null; try { guardado = localStorage.getItem("feehund-banco"); } catch (e) {}
     const b = bancos.find((x) => x.id === guardado);
-    if (b) elegir(b); else pintarLista();
+    if (b) elegir(b); else cerrar();
   }).catch(() => { caja.hidden = true; });
 })();
