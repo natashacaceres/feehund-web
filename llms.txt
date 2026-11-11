@@ -1,0 +1,22 @@
+# Feehund
+
+> Feehund es una web española independiente que ayuda a ver qué se paga de más. Para particulares, lee el extracto del banco en el propio dispositivo, sin subirlo, y muestra suscripciones, recibos que se repiten, cobros duplicados y subidas de precio. Para comercios y autónomos, compara lo que se paga por el datáfono con 30 tarifas de 25 bancos y empresas de pago.
+
+Feehund no es un banco ni un comparador que cobre por contratar. El extracto no sale del móvil o del ordenador de la persona.
+
+## Particulares
+
+- [Mi banco: qué se repite en tu cuenta](https://feehund.com/extracto/): lector del extracto del banco (PDF, Excel, CSV o foto) que funciona en el navegador sin subir datos.
+- [Dar de baja](https://feehund.com/baja/): cómo darse de baja de 186 empresas en España (telefonía, streaming, gimnasios, seguros, alarmas, apps y más), con los pasos, el plazo de aviso, la permanencia y la fecha de revisión. Cada ficha se comprueba con la web oficial de la empresa.
+
+## Comercios y autónomos
+
+- [Mi datáfono](https://feehund.com/datafono/): calculadora independiente de las comisiones del datáfono (TPV) por cada cobro con tarjeta.
+- [Cómo se calcula](https://feehund.com/metodologia/): método y fuentes de las tarifas.
+
+## La Letra Pequeña (blog)
+
+- [¿Qué suscripciones pago sin saberlo?](https://feehund.com/blog/suscripciones-olvidadas/): cómo encontrarlas en el extracto y darse de baja antes de enero.
+- [Me han subido el seguro, ¿puedo devolver el recibo?](https://feehund.com/blog/devolver-recibo-seguro/): plazos para no renovar un seguro en España.
+- [Cómo leer el resumen mensual de tu datáfono](https://feehund.com/blog/resumen-datafono/): los seis datos del resumen, uno a uno.
+- [Cómo saber si una comparativa de datáfonos es fiable](https://feehund.com/blog/comparativas-datafonos/): qué mirar antes de fiarse de un comparador.
