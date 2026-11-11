@@ -289,6 +289,33 @@
   $("dDemo").addEventListener("click", () => { contrasenas = {}; ejemplo().then(analyze, () => msg($("dErr"), TX.bad)); });
   $("dHand").addEventListener("click", (e) => { e.preventDefault(); irACalculadora(""); });
   $("dForm").addEventListener("submit", (e) => { e.preventDefault(); confirmar().catch(() => {}); });
+  // «Te damos de baja» en el resultado de la calculadora: solo cuando dice que compensa cambiar (app.js enseña #pay),
+  // con el banco o la empresa que la persona ha elegido en la calculadora
+  const rBaja = $("rBaja"), pay = $("pay");
+  if (rBaja && pay) {
+    const ENVIAR = ROOT + { es: "baja/enviar/", ca: "ca/baixa/enviar/", en: "en/cancel/send/" }[LANG];
+    const prov = $("rBajaProv"), porDefecto = prov ? prov.textContent.trim() : "";
+    // el que está marcado en la calculadora; si son «mis precios», el que ha leído el lector en el resumen
+    const proveedor = () => {
+      const pv = document.querySelector('#pProvChips .chip[aria-pressed="true"]');
+      const leido = actual && actual.campos && actual.campos.proveedor && actual.campos.proveedor.valor ? (actual.campos.proveedor.nombre || "") : "";
+      if (!pv || pv.dataset.v === "CONTRATO") return leido;
+      if (pv.dataset.v === "OTRO") { const s = $("pProv"); return s && s.selectedIndex > 0 ? s.options[s.selectedIndex].text.trim() : leido; }
+      const sp = pv.querySelector('[data-l="' + LANG + '"]');
+      return (sp || pv).textContent.trim();
+    };
+    const slug = (x) => x.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+    const ponerBaja = () => {
+      rBaja.hidden = pay.hidden;
+      if (pay.hidden) return;
+      const n = proveedor();
+      if (prov) prov.textContent = " " + (n || porDefecto) + " ";
+      const a = $("rBajaA");
+      if (a) a.href = ENVIAR + (n ? "?empresa=" + encodeURIComponent(slug(n)) + "&nombre=" + encodeURIComponent(n) : "");
+    };
+    new MutationObserver(ponerBaja).observe(pay, { attributes: true, attributeFilter: ["hidden"] });
+    ponerBaja();
+  }
   $("dAgain").addEventListener("click", (e) => {
     e.preventDefault();
     actual = null; contrasenas = {}; if (bandeja) bandeja.vaciar();

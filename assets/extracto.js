@@ -29,7 +29,8 @@
       entre: (a, b, c) => "Entre " + a + " y " + b + " € " + c, fijo: (x, c) => x + " € " + c, pagado: (x) => x + " € pagados", sinCargo: (n) => (n === 1 ? "1 mes sin cargo" : n + " meses sin cargo"),
       veces: (n) => (n === 1 ? "Cobrada 1 vez" : "Cobrada " + n + " veces"), de: (a, b, c) => "De " + a + " a " + b + " € " + c, repetido: (f) => "Repetido el " + f,
       devol: (n, f) => (n === 1 ? "Una devolución, el " + f : n + " devoluciones, la última el " + f), ultimo: (f, x, c) => "Último cargo el " + f + " · " + x + " € " + c,
-      tarjeta: "Puede que ahora lo pagues con la tarjeta de crédito.", darBaja: "Dar de baja", priv: "Se lee en tu dispositivo. No se sube.",
+      tarjeta: "Puede que ahora lo pagues con la tarjeta de crédito.", darBaja: "Dar de baja", darme: "Darme de baja",
+      aDuplicado: ["Pagas dos servicios para lo mismo", (a, b) => a + " y " + b + " hacen lo mismo. Puedes quedarte con uno."], priv: "Se lee en tu dispositivo. No se sube.",
       none: "No ha encontrado cobros que se repitan. Prueba con más meses.", bad: "No se ha podido leer. Prueba con Excel o CSV.", mapeo: "No reconocemos las columnas de este archivo. Prueba a descargarlo en Excel o CSV.",
       dl: "Imagen descargada.", ics: "Archivo de avisos descargado.", sinIcs: "No hay cobros para avisar.", share: (x) => x + " €/año en cobros que se repiten · feehund.com", lista: "Cobros que se repiten" },
     ca: { datafono: "Això és el resum del teu datàfon, no l'extracte del teu compte. Es llegeix a El meu datàfon.", irDatafono: "Anar a El meu datàfon", year: "€/any", menos: " menys/any",
@@ -54,7 +55,8 @@
       entre: (a, b, c) => "Entre " + a + " i " + b + " € " + c, fijo: (x, c) => x + " € " + c, pagado: (x) => x + " € pagats", sinCargo: (n) => (n === 1 ? "1 mes sense càrrec" : n + " mesos sense càrrec"),
       veces: (n) => (n === 1 ? "Cobrada 1 vegada" : "Cobrada " + n + " vegades"), de: (a, b, c) => "De " + a + " a " + b + " € " + c, repetido: (f) => "Repetit el " + f,
       devol: (n, f) => (n === 1 ? "Una devolució, el " + f : n + " devolucions, l'última el " + f), ultimo: (f, x, c) => "Últim càrrec el " + f + " · " + x + " € " + c,
-      tarjeta: "Potser ara el pagues amb la targeta de crèdit.", darBaja: "Donar de baixa", priv: "Es llegeix al teu dispositiu. No es puja.",
+      tarjeta: "Potser ara el pagues amb la targeta de crèdit.", darBaja: "Donar de baixa", darme: "Donar-me de baixa",
+      aDuplicado: ["Pagues dos serveis per al mateix", (a, b) => a + " i " + b + " fan el mateix. Pots quedar-te amb un."], priv: "Es llegeix al teu dispositiu. No es puja.",
       none: "No ha trobat cobraments que es repeteixin. Prova amb més mesos.", bad: "No s'ha pogut llegir. Prova amb Excel o CSV.", mapeo: "No reconeixem les columnes d'aquest fitxer. Prova de descarregar-lo en Excel o CSV.",
       dl: "Imatge descarregada.", ics: "Fitxer d'avisos descarregat.", sinIcs: "No hi ha cobraments per avisar.", share: (x) => x + " €/any en cobraments que es repeteixen · feehund.com", lista: "Cobraments que es repeteixen" },
     en: { datafono: "This is your card machine summary, not your bank statement. It goes in My card machine.", irDatafono: "Go to My card machine", year: "€/year", menos: " less/year",
@@ -79,7 +81,8 @@
       entre: (a, b, c) => "Between " + a + " and " + b + " € " + c, fijo: (x, c) => x + " € " + c, pagado: (x) => x + " € paid", sinCargo: (n) => (n === 1 ? "1 month with no charge" : n + " months with no charge"),
       veces: (n) => (n === 1 ? "Charged once" : "Charged " + n + " times"), de: (a, b, c) => "From " + a + " to " + b + " € " + c, repetido: (f) => "Repeated on " + f,
       devol: (n, f) => (n === 1 ? "One refund, on " + f : n + " refunds, the last on " + f), ultimo: (f, x, c) => "Last charge on " + f + " · " + x + " € " + c,
-      tarjeta: "You may now be paying it with your credit card.", darBaja: "Cancel", priv: "It's read on your device. Nothing is uploaded.",
+      tarjeta: "You may now be paying it with your credit card.", darBaja: "Cancel", darme: "Cancel it for me",
+      aDuplicado: ["Two services for the same thing", (a, b) => a + " and " + b + " do the same. You could keep just one."], priv: "It's read on your device. Nothing is uploaded.",
       none: "No recurring charges found. Try with more months.", bad: "The file could not be read. Try Excel or CSV.", mapeo: "We do not recognise the columns in this file. Try downloading it as Excel or CSV.",
       dl: "Image downloaded.", ics: "Reminder file downloaded.", sinIcs: "There are no charges to remind you about.", share: (x) => "€" + x + "/year in recurring charges · feehund.com", lista: "Recurring charges" },
   }[LANG];
@@ -179,7 +182,7 @@
   const cada = (c) => TX.cada[c.periodicidad] || "";
   const el = (tag, clase, texto) => { const x = document.createElement(tag); if (clase) x.className = clase; if (texto !== undefined) x.textContent = texto; return x; };
   const extras = [];
-  function limpiar() { while (extras.length) extras.pop().remove(); ["xList", "xAlertas", "xNoticias", "xTodo"].forEach((id) => { if ($(id)) $(id).textContent = ""; }); }
+  function limpiar() { while (extras.length) extras.pop().remove(); ["xList", "xAlertas", "xNoticias", "xTodo", "xPreguntas"].forEach((id) => { if ($(id)) $(id).textContent = ""; }); }
 
   // Una fila: nombre con etiquetas, una línea debajo (y otra si hace falta), enlace de baja y la cifra a la derecha
   function fila(nombre, tags, lineas, cifra, sufijo, baja) {
@@ -192,6 +195,15 @@
     if (cifra !== null && cifra !== undefined) { const y = el("p", "ext-y", cifra); if (sufijo) y.appendChild(el("span", "", sufijo)); li.appendChild(y); }
     return li;
   }
+
+  // «Te damos de baja» (/baja/enviar/): se ofrece en lo que se puede dejar (suscripciones, cuotas, seguros, teléfono…),
+  // no en la luz, el agua, los impuestos ni las comisiones del banco. Lleva la empresa puesta.
+  const ENVIAR = ROOT + { es: "baja/enviar/", ca: "ca/baixa/enviar/", en: "en/cancel/send/" }[LANG];
+  const SIN_BAJA = ["energia", "agua", "impuestos", "gastos_fijos", "pasarelas", "comisiones", "tarjetas"];
+  // categorías en las que dos servicios a la vez suelen sobrar
+  const PARA_LO_MISMO = ["streaming", "musica", "gimnasios", "nube_apps", "ia", "prensa", "citas", "videojuegos", "alarmas", "idiomas"];
+  const seDaDeBaja = (c) => Boolean(c && c.tipo === "comercio" && c.comercio_id && c.periodicidad !== "puntual" && SIN_BAJA.indexOf(c.categoria) < 0);
+  const enviarBaja = (c) => ENVIAR + "?empresa=" + encodeURIComponent(String(c.comercio_id).replace(/_/g, "-")) + "&nombre=" + encodeURIComponent(c.nombre);
 
   function enlaceBaja(c) {
     const pag = BAJAS[c.comercio_id || c.id] || (c.categoria === "gimnasios" ? "gimnasio" : null);
@@ -308,12 +320,17 @@
     svg.setAttribute("viewBox", "0 0 24 24"); svg.setAttribute("aria-hidden", "true"); path.setAttribute("d", ICONOS[tipo]);
     svg.appendChild(path); span.appendChild(svg); vieja.replaceWith(span);
   }
-  function alerta(tipo, titulo, detalle, cifra, accion, enlace) {
+  function alerta(tipo, titulo, detalle, cifra, accion, enlace, baja) {
     const a = plantilla("tAlerta");
     a.dataset.tipo = tipo; icono(a, tipo);
     poner(a, "titulo", titulo); poner(a, "detalle", detalle); poner(a, "cifra", cifra || "");
-    const ac = a.querySelector('[data-c="accion"]');
-    if (ac) { if (accion) { ac.textContent = accion + " →"; if (enlace) ac.href = enlace; else ac.replaceWith(el("p", ac.className, accion)); } else ac.remove(); }
+    // «Darme de baja» va en su propio botón (data-c="accion-baja"); si la plantilla no lo trae, en el de la acción
+    const ab = a.querySelector('[data-c="accion-baja"]');
+    let ac = a.querySelector('[data-c="accion"]');
+    if (baja && enlace && ab) { ab.textContent = accion; ab.href = enlace; ab.hidden = false; if (ac) ac.remove(); ac = null; }
+    else if (ab) ab.remove();
+    if (ac) { if (accion) { ac.textContent = accion + (baja ? "" : " →"); if (enlace) ac.href = enlace; else ac.replaceWith(el("p", ac.className, accion)); } else ac.remove(); }
+    if (ac && baja && enlace) ac.classList.add("al-a--baja");
     return a;
   }
   const media = (xs) => xs.reduce((t, x) => t + x, 0) / xs.length;
@@ -345,7 +362,7 @@
     }
     for (const c of deGrupo("subidas")) {
       const s1 = c.subida || {}, anual = (c.subida_mensual || 0) * 12;
-      avisos.push({ tipo: "subida", corto: TX.deA(c.nombre, e2(s1.antes), e2(s1.ahora)), euros: anual, nodo: alerta("subida", TX.aSubida[0], TX.aSubida[1](c.nombre, e2(s1.antes), e2(s1.ahora), cada(c), pct((s1.ahora - s1.antes) / s1.antes)), "+" + e2(anual) + " " + TX.year, TX.aSubida[2], enlaceBaja(c)) });
+      avisos.push({ tipo: "subida", corto: TX.deA(c.nombre, e2(s1.antes), e2(s1.ahora)), euros: anual, nodo: alerta("subida", TX.aSubida[0], TX.aSubida[1](c.nombre, e2(s1.antes), e2(s1.ahora), cada(c), pct((s1.ahora - s1.antes) / s1.antes)), "+" + e2(anual) + " " + TX.year, ...(seDaDeBaja(c) ? [TX.darme, enviarBaja(c), true] : [TX.aSubida[2], enlaceBaja(c)])) });
     }
     const vistosR = {};
     for (const c of cobros.concat(r.terminados || [])) {
@@ -358,7 +375,7 @@
         const otros = movs.filter((x) => x !== m).map((x) => Math.abs(x.importe)), med = media(otros), v = Math.abs(m.importe);
         if (v > med * (1 + RECIBO_ALTO) && (!peor || v - med > peor.dif)) peor = { m, v, med, dif: v - med };
       }
-      if (peor) avisos.push({ tipo: "recibo", corto: nombreR + ", " + e2(peor.v) + " € " + TX.el + " " + fecha(peor.m.fecha), euros: peor.dif, nodo: alerta("recibo", TX.aRecibo[0], TX.aRecibo[1](nombreR, e2(peor.v), fecha(peor.m.fecha), pct(peor.dif / peor.med), e2(peor.med)), "+" + e2(peor.dif) + " €", TX.aRecibo[2]) });
+      if (peor) avisos.push({ tipo: "recibo", corto: nombreR + ", " + e2(peor.v) + " € " + TX.el + " " + fecha(peor.m.fecha), euros: peor.dif, nodo: alerta("recibo", TX.aRecibo[0], TX.aRecibo[1](nombreR, e2(peor.v), fecha(peor.m.fecha), pct(peor.dif / peor.med), e2(peor.med)), "+" + e2(peor.dif) + " €", ...(seDaDeBaja(c) ? [TX.darme, enviarBaja(c), true] : [TX.aRecibo[2]])) });
     }
     const comisiones = deGrupo("comisiones");
     for (const c of comisiones.filter((x) => (x.etiquetas || []).indexOf("reclamable") >= 0 && (x.etiquetas || []).indexOf("devuelto") < 0)) {
@@ -369,6 +386,20 @@
       const suma = pagadas.reduce((t, x) => t + (x.coste_anual || x.importe || 0), 0);
       const lista = pagadas.map((x) => x.nombre.toLowerCase() + " (" + e2(x.coste_anual || x.importe) + " €)").join(", ");
       avisos.push({ tipo: "comision", corto: TX.enExtracto(e2(suma)), euros: suma, nodo: alerta("comision", TX.aComision[0], TX.aComision[1](lista), e2(suma) + " €", TX.aComision[2]) });
+    }
+    // dos o más servicios para lo mismo (dos plataformas, dos gimnasios…): se propone dejar el que menos se usa, el más barato
+    const porCategoria = {};
+    for (const c of seguros.filter((x) => seDaDeBaja(x) && PARA_LO_MISMO.indexOf(x.categoria) >= 0)) {
+      const lista = porCategoria[c.categoria] = porCategoria[c.categoria] || [];
+      if (!lista.some((y) => y.comercio_id === c.comercio_id)) lista.push(c);
+    }
+    for (const k in porCategoria) {
+      const l = porCategoria[k].slice().sort((a, b) => (b.coste_anual || 0) - (a.coste_anual || 0));
+      if (l.length < 2) continue;
+      const quitar = l[l.length - 1];
+      // se ve como un cobro doble, pero no cuenta en «¿Te cobran algo dos veces?»: no es un error del comercio
+      avisos.push({ tipo: "duplicado", corto: l[0].nombre + " · " + quitar.nombre, euros: quitar.coste_anual || 0,
+        nodo: alerta("doble", TX.aDuplicado[0], TX.aDuplicado[1](l[0].nombre, quitar.nombre), e2(quitar.coste_anual || 0) + " " + TX.year, TX.darme, enviarBaja(quitar), true) });
     }
     avisos.sort((a, b) => b.euros - a.euros);
     const tarjeta = ((r.lectura && r.lectura.avisos) || []).find((a) => a.codigo === "cobros_tarjeta_credito");
@@ -431,11 +462,15 @@
         const e = poner(f, "estado", texto); if (e) e.dataset.estado = estado;
         poner(f, "detalle", lineaPrecio(c).filter(Boolean).join(" · "));
         poner(f, "cifra", e2(c.coste_anual || 0) + " " + (c.periodicidad === "puntual" ? "€" : TX.year));
+        const b = f.querySelector('[data-c="baja"]');
+        if (b) { if (seDaDeBaja(c)) { b.href = enviarBaja(c); b.textContent = TX.darBaja; b.hidden = false; } else b.remove(); }
         filas.appendChild(f);
       }
       $("xTodo").appendChild(sec);
     }
     mostrar($("xTodo"), $("xTodo").querySelectorAll('[data-c="nombre"]').length);
+    const pack = $("xPack");
+    if (pack) pack.hidden = !cobros.some(seDaDeBaja);
   }
 
   // Cada bloque va dentro de un botón (<details>) o de una sección: se oculta si está vacío y su contador dice cuántos hay
