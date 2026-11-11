@@ -1381,3 +1381,4 @@ details.opc[open] summary::after{transform:rotate(90deg)}
 /* Al abrir «¿Cómo lo descargo…?» el recuadro no se tiñe entero al pasar el ratón: solo la fila del título */
 details.opc:hover{background:transparent}
 details.opc summary:hover{background:var(--brand-tint);border-radius:11px}
+.bk-nota{margin:0;padding:12px 14px;border-radius:12px;background:var(--brand-tint);font-size:16px;line-height:1.5;color:var(--ink)}

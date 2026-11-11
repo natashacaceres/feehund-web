@@ -53,7 +53,9 @@
       if (c.meses) extra.push(TX.meses(c.meses));
       if (extra.length) pasos.appendChild(el("p", "bk-x", extra.join(" ")));
     }
-    if (alguno) pasos.appendChild(el("p", "bk-rev", TX.rev(b.n, fecha(b.revisado))));
+    // Lo que el banco no permite o su límite importante (comprobado en su fuente oficial)
+    if (b.nota) pasos.appendChild(el("p", "bk-nota", b.nota));
+    if (alguno || b.nota) pasos.appendChild(el("p", "bk-rev", TX.rev(b.n, fecha(b.revisado))));
     else pasos.appendChild(el("p", "bk-x", TX.sin(b.n)));
     const otro = el("button", "bk-otro", TX.otro); otro.type = "button";
     otro.addEventListener("click", () => { q.value = ""; q.hidden = false; if (etiqueta) etiqueta.hidden = false; pasos.hidden = true; q.focus(); pintarLista(); });
