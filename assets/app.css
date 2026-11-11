@@ -1430,3 +1430,23 @@ details.opc summary:hover{background:var(--brand-tint);border-radius:11px}
   .cubo--main .cubo-s,.cubo--sec .cubo-s{align-self:start}
   .cubo--main .cubo-go,.cubo--sec .cubo-go{grid-row:1 / 3;grid-column:3;margin:0}
 }
+
+/* ===== 3 · Tarjetas planas: crema algo más oscuro (el de la zona del archivo), sin blanco, sin sombra y sin borde gris ===== */
+:root{--tarjeta:#F3E6CC;--tarjeta-h:#EEDDBA}
+.cubo.cubo--main,.cubo.cubo--main:hover{background:var(--tarjeta);border:0;box-shadow:none}
+.cubo.cubo--main:hover{background:var(--tarjeta-h)}
+.cubo.cubo--sec,.cubo.cubo--sec:hover{box-shadow:none}
+/* Resultado de /extracto/ */
+.al,.al[data-tipo]{background:var(--tarjeta);border:0;box-shadow:none}
+.res-todo,.res-sec,.res-sec-filas{background:var(--tarjeta);border:0;box-shadow:none}
+.res-sec + .res-sec{border-top:0}
+.res-paso .res-secs{gap:var(--s-3)}
+.res-sec{border-radius:16px;overflow:hidden}
+.res-sec-h{background:var(--tarjeta-h)}
+.fi + .fi{border-top:0}
+/* Resultado de /datafono/ (revisa tus cifras, recibo, pago e informe) */
+.dl-campos,.recibo,.calc .pay,.calc .informe{background:var(--tarjeta);border:0;box-shadow:none}
+/* los avisos venían sin fondo y separados por líneas grises: ahora cada uno es una tarjeta plana */
+.res-paso .res-alertas .al{background:var(--tarjeta)!important;border:0;border-radius:16px;padding:var(--s-4)}
+.res-paso .res-alertas .al + .al{border-top:0}
+.dl-dd{background:var(--tarjeta);border:0}
