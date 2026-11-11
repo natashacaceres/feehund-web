@@ -339,7 +339,9 @@
     tarjeta: "M3 6h18v12H3zM3 10h18",
   };
   function plantilla(id) { return $(id).content.firstElementChild.cloneNode(true); }
-  function poner(raiz, campo, texto) { const x = raiz.querySelector('[data-c="' + campo + '"]'); if (x) x.textContent = texto; return x; }
+  // el número y su «€» o «%» no se separan nunca al saltar de línea
+  const pegado = (t) => typeof t === "string" ? t.replace(/(\d) (€|%)/g, "$1\u00a0$2") : t;
+  function poner(raiz, campo, texto) { const x = raiz.querySelector('[data-c="' + campo + '"]'); if (x) x.textContent = pegado(texto); return x; }
   function icono(raiz, tipo) {
     // La plantilla trae el icono de un tipo; los demás se dibujan aquí con la misma clase
     if (raiz.querySelector(".al-i--" + tipo)) return;
