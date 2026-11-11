@@ -21,3 +21,6 @@
 .bj-logo{flex:0 0 32px;width:32px;height:32px;border-radius:8px;object-fit:contain;background:#fff}
 .bj-logo--letra{display:grid;place-items:center;background:var(--brand-tint,#E3EEF0);color:var(--brand,#0E5E6F);font:800 15px/1 var(--f-text,system-ui)}
 .bj-nada{font-weight:600}
+
+/* Nota pequeña cuando «Te damos de baja» no sirve con esa empresa */
+.baja-nocompat { font-size: .9375rem; line-height: 1.45; color: #5E6470; margin: -.25rem auto 1.25rem; max-width: 34rem; text-align: center; }

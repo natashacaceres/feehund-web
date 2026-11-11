@@ -154,6 +154,7 @@
       return;
     }
     actual = r;
+    await envioP;
     render(r, cobros); show("res");
     const h = $("xResH"); if (h) h.focus({ preventScroll: true });
   }
@@ -202,8 +203,17 @@
   const SIN_BAJA = ["energia", "agua", "impuestos", "gastos_fijos", "pasarelas", "comisiones", "tarjetas"];
   // categorías en las que dos servicios a la vez suelen sobrar
   const PARA_LO_MISMO = ["streaming", "musica", "gimnasios", "nube_apps", "ia", "prensa", "citas", "videojuegos", "alarmas", "idiomas"];
-  const seDaDeBaja = (c) => Boolean(c && c.tipo === "comercio" && c.comercio_id && c.periodicidad !== "puntual" && SIN_BAJA.indexOf(c.categoria) < 0);
-  const enviarBaja = (c) => ENVIAR + "?empresa=" + encodeURIComponent(String(c.comercio_id).replace(/_/g, "-")) + "&nombre=" + encodeURIComponent(c.nombre);
+  // Qué empresas tienen página de baja (p) y cuáles aceptan nuestro envío por correo certificado (e).
+  // Sale de las fichas de investigacion/bajas (indice_web.py). Si no está en la lista, no se ofrece nada.
+  let ENVIO = {};
+  const envioP = fetch(ROOT + "data/bajas-envio.json", { cache: "no-cache" }).then((r) => (r.ok ? r.json() : {})).then((d) => { ENVIO = d || {}; }).catch(() => {});
+  const fichaBaja = (c) => (c && c.comercio_id && ENVIO[c.comercio_id]) || null;
+  const seDaDeBaja = (c) => Boolean(c && c.tipo === "comercio" && c.comercio_id && c.periodicidad !== "puntual" && SIN_BAJA.indexOf(c.categoria) < 0 && fichaBaja(c));
+  const compatible = (c) => Boolean(seDaDeBaja(c) && fichaBaja(c).e);
+  // compatible: «Te damos de baja»; si no, la página con los pasos para hacerlo uno mismo (solo en español por ahora)
+  const enviarBaja = (c) => compatible(c)
+    ? ENVIAR + "?empresa=" + encodeURIComponent(String(c.comercio_id).replace(/_/g, "-")) + "&nombre=" + encodeURIComponent(c.nombre)
+    : ROOT + "baja/" + fichaBaja(c).p + "/";
 
   function enlaceBaja(c) {
     const pag = BAJAS[c.comercio_id || c.id] || (c.categoria === "gimnasios" ? "gimnasio" : null);
@@ -470,7 +480,7 @@
     }
     mostrar($("xTodo"), $("xTodo").querySelectorAll('[data-c="nombre"]').length);
     const pack = $("xPack");
-    if (pack) pack.hidden = !cobros.some(seDaDeBaja);
+    if (pack) pack.hidden = !cobros.some(compatible);
   }
 
   // Cada bloque va dentro de un botón (<details>) o de una sección: se oculta si está vacío y su contador dice cuántos hay
