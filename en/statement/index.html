@@ -31,7 +31,7 @@
 <meta name="twitter:image" content="https://feehund.com/assets/brand/og-image.png?v=202611111722">
 <link rel="preload" href="../../assets/fonts/fraunces-800.woff" as="font" type="font/woff" crossorigin>
 <link rel="preload" href="../../assets/fonts/atkinson-next-400.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="../../assets/app.css?v=20261111234857">
+<link rel="stylesheet" href="../../assets/app.css?v=20261111235115">
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "WebApplication", "name": "What repeats in your account?", "url": "https://feehund.com/en/statement/", "description": "Drop your bank statement and see which subscriptions and fees repeat in your account. It's read on your device and nothing is uploaded.", "inLanguage": "en", "applicationCategory": "FinanceApplication", "operatingSystem": "Web", "isAccessibleForFree": true, "offers": {"@type": "Offer", "price": "0", "priceCurrency": "EUR"}, "publisher": {"@type": "Organization", "name": "Feehund", "url": "https://feehund.com/"}}</script>
 </head>
 <body>
@@ -57,12 +57,14 @@
       <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 15.5V4M7.5 8.5 12 4l4.5 4.5"/><path d="M4.5 14.5v3.5a2 2 0 0 0 2 2h11a2 2 0 0 0 2-2v-3.5"/></svg>
       <p class="drop-t"><span class="x-desk">Drop your statement</span><span class="x-mov">Choose your statement</span></p>
       <p class="drop-s">PDF, Excel or CSV from your bank in Spain</p>
+      <div class="bk bk--zona" id="xBk"><label class="bk-l" for="xBkQ">Find your bank</label><input id="xBkQ" class="bk-q" type="search" autocomplete="off" placeholder="CaixaBank, Santander, ING…"><ul class="bk-lista" id="xBkLista"></ul><p class="bk-general" id="xBkGeneral" hidden>In your bank's app or website, look for Transactions › Download or Export. Choose Excel or CSV if you can; if not, PDF. 3 months or more is best.</p></div>
       <button type="button" class="btn btn--gold" id="xPick"><span class="x-desk">Choose file</span><span class="x-mov">Choose statement</span></button>
       <p class="drop-priv"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="10.5" width="14" height="10" rx="1.5"/><path d="M8 10.5V7.5a4 4 0 0 1 8 0v3"/></svg><span>Read on your device. Never uploaded.</span></p>
+      <div class="bk-pasos bk-pasos--zona" id="xBkPasos" hidden></div>
       <input type="file" id="xFile" class="sr" accept=".csv,.txt,.xls,.xlsx,.ods,.pdf,text/csv,application/pdf,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" tabindex="-1" aria-hidden="true">
     </div>
     <p class="ext-err" id="xErr" role="alert" hidden></p>
-    <div class="ext-opc"><details class="opc opc-how"><summary><svg class="opc-i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.6 9.3a2.5 2.5 0 0 1 4.8.9c0 1.7-2.4 2.2-2.4 3.6"/><path d="M12 17h.01"/></svg><span>How do I download it from my bank?</span></summary><div class="opc-in"><p>In your bank's app or website, look for Transactions › Download or Export. Choose Excel or CSV if you can; if not, PDF. 3 months or more is best.</p><div class="bk" id="xBk"><label class="bk-l" for="xBkQ">Find your bank</label><input id="xBkQ" class="bk-q" type="search" autocomplete="off" placeholder="CaixaBank, Santander, ING…"><ul class="bk-lista" id="xBkLista"></ul><div class="bk-pasos" id="xBkPasos" hidden></div></div></div></details><button type="button" class="opc" id="xDemo"><svg class="opc-i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M10 8.5v7l5.5-3.5z"/></svg><span>Try an example</span></button></div>
+    <div class="ext-opc"><button type="button" class="opc" id="xDemo"><svg class="opc-i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M10 8.5v7l5.5-3.5z"/></svg><span>Try an example</span></button></div>
   </section>
   <section class="ext-s ext-load" id="xLoad" hidden aria-live="polite">
     <img src="../../assets/img/tiqui-olfatea.webp?v=202611111722" alt="" aria-hidden="true" width="320" height="320" class="ext-sniff" decoding="async">
@@ -106,8 +108,8 @@
     <li>© 2026 <span data-marca>Feehund</span></li>
   </ul>
 </div></footer>
-<script src="../../assets/extracto.js?v=20261111234857" data-root="../../"></script>
-<script src="../../assets/app.js?v=20261111234857"></script>
-<script src="../../assets/atras.js?v=20261111234857" defer></script>
-<script src="../../assets/bancos-guia.js?v=20261111234857" data-root="../../" defer></script>
+<script src="../../assets/extracto.js?v=20261111235115" data-root="../../"></script>
+<script src="../../assets/app.js?v=20261111235115"></script>
+<script src="../../assets/atras.js?v=20261111235115" defer></script>
+<script src="../../assets/bancos-guia.js?v=20261111235115" data-root="../../" defer></script>
 </body></html>

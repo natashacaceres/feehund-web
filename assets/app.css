@@ -1450,3 +1450,12 @@ details.opc summary:hover{background:var(--brand-tint);border-radius:11px}
 .res-paso .res-alertas .al{background:var(--tarjeta)!important;border:0;border-radius:16px;padding:var(--s-4)}
 .res-paso .res-alertas .al + .al{border-top:0}
 .dl-dd{background:var(--tarjeta);border:0}
+
+/* ===== 4 · La guía del banco dentro de la zona del archivo, encima de «Elegir extracto» ===== */
+.drop .bk--zona{width:100%;max-width:420px;margin:var(--s-3) auto 0;text-align:left}
+.drop .bk--zona .bk-l{text-align:left}
+.drop .bk--zona .bk-pasos{padding:4px 0}
+.drop .bk--zona + .btn{margin-top:var(--s-3)}
+.bk-general[hidden]{display:none}
+.drop .bk-pasos--zona{width:100%;max-width:420px;margin:var(--s-3) auto 0;padding:0;text-align:left}
+.drop .bk--zona + .btn{margin-top:var(--s-3)}
