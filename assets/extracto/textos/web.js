@@ -162,4 +162,9 @@ export default {
     ca: '{cifra} €/any',
     en: '€{cifra} a year',
   },
+  compartir_linea: {
+    es: 'en cobros que se repiten',
+    ca: 'en cobraments que es repeteixen',
+    en: 'in repeating charges',
+  },
 };
