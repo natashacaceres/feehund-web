@@ -1467,3 +1467,12 @@ details.opc summary:hover{background:var(--brand-tint);border-radius:11px}
 .res-share{display:flex;width:auto;min-width:0;margin:var(--s-3) auto 0;padding:0 22px;min-height:48px;border:1.5px solid var(--brand);border-radius:12px;background:transparent;color:var(--brand);font:800 16px/1.2 var(--f-text)}
 .res-share:hover{background:var(--brand-tint);color:var(--brand)}
 .ext-res .res-share{margin:var(--s-2) 0 0}
+
+/* ===== 8 · «Todo lo que pagas» plegado: cada categoría enseña su nombre y su total; se abre al tocarla ===== */
+.res-sec-h{position:relative;align-items:center;padding-right:48px}
+.res-sec-h::-webkit-details-marker{display:none}
+.res-sec-h::after{content:"";position:absolute;right:16px;top:50%;width:20px;height:20px;margin-top:-10px;background:var(--ico-chev) center/20px no-repeat;transition:transform .18s}
+.res-sec[open] > .res-sec-h::after{transform:rotate(180deg)}
+.res-sec-t{font-size:18px}
+.res-sec-tot{font-size:16px}
+.res-sec:not([open]) > .res-sec-h{background:var(--tarjeta)}
