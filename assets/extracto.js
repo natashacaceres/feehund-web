@@ -365,6 +365,19 @@
   const media = (xs) => xs.reduce((t, x) => t + x, 0) / xs.length;
   const pct = (x) => Math.round(x * 100);
 
+  // Único movimiento del resultado: el total sube de 0 a la cifra en 0,8 s (con «reducir movimiento», aparece directamente)
+  function subirCifra(nodo, total) {
+    if (!(total > 0) || matchMedia("(prefers-reduced-motion: reduce)").matches || typeof requestAnimationFrame !== "function") return;
+    const dur = 800, t0 = performance.now(), fin = e0(total) + " €";
+    const paso = (t) => {
+      const k = Math.min(1, (t - t0) / dur), suave = 1 - Math.pow(1 - k, 3);
+      nodo.textContent = k < 1 ? e0(total * suave) + " €" : fin;
+      if (k < 1) requestAnimationFrame(paso);
+    };
+    nodo.textContent = e0(0) + " €";
+    requestAnimationFrame(paso);
+  }
+
   function renderAccion(r, cobros) {
     limpiar();
     const seguros = cobros.filter((c) => c.estado === "seguro");
@@ -372,9 +385,16 @@
     // Cabecera: «Pagas 3.532 € al año en suscripciones y domiciliaciones»
     const cuenta = $("xCount"), sr = $("xTotal");
     cuenta.textContent = "";
-    if (total > 0) { cuenta.append(TX.pagas[0]); cuenta.appendChild(el("strong", "", e0(total) + " €")); cuenta.append(TX.pagas[1]); }
+    if (total > 0) {
+      // la cifra sube de 0 al total en 0,8 s, una sola vez; para el lector de pantalla, la frase completa y fija (#xTotal, aria-live)
+      const vista = el("span"); vista.setAttribute("aria-hidden", "true");
+      const cifra = el("strong", "", e0(total) + " €");
+      vista.append(TX.pagas[0]); vista.appendChild(cifra); vista.append(TX.pagas[1]);
+      cuenta.appendChild(vista);
+      subirCifra(cifra, total);
+    }
     else cuenta.append(TX.nada);
-    if (sr) { sr.textContent = ""; cuenta.appendChild(sr); }
+    if (sr) { sr.textContent = total > 0 ? TX.pagas[0] + e0(total) + " €" + TX.pagas[1] : ""; sr.setAttribute("aria-live", "polite"); cuenta.appendChild(sr); }
 
     const porId = {};
     (r.cobros || []).concat(r.terminados || []).forEach((c) => { porId[c.id] = c; });
