@@ -4,6 +4,14 @@
 (function () {
   "use strict";
   const ROOT = (document.currentScript && document.currentScript.dataset.root) || "../";
+  // Contador anónimo (cambio 13). APAGADO: con activo:false no sale ninguna petición. Solo envía el nombre del evento
+  // («abre», «resultado», «comparte»), sin cookies, sin identificadores y sin nada del extracto.
+  // Se enciende poniendo activo:true, después de crear la base de datos y su enlace en Cloudflare (ver functions/api/contador.js).
+  const CONTADOR = { activo: false, ruta: "/api/contador" };
+  function contar(evento) {
+    if (!CONTADOR.activo || !window.fetch) return;
+    try { fetch(CONTADOR.ruta, { method: "POST", body: evento, headers: { "content-type": "text/plain" }, credentials: "omit", cache: "no-store", keepalive: true, referrerPolicy: "no-referrer" }).catch(() => {}); } catch (e) {}
+  }
   const $ = (id) => document.getElementById(id);
   const LANG = ["es", "ca", "en"].indexOf(document.documentElement.lang) >= 0 ? document.documentElement.lang : "es";
   const TX = {
@@ -122,7 +130,7 @@
   const scr = { up: $("xUp"), load: $("xLoad"), res: $("xRes") };
   const cargando = scr.load && scr.load.querySelector("p");
   const textoCarga = cargando ? cargando.textContent : "";
-  let actual = null, entradaActual = null, contrasenas = {};
+  let actual = null, entradaActual = null, contrasenas = {}, propio = false;
 
   function show(which) { for (const k in scr) scr[k].hidden = k !== which; scrollTo({ top: 0, behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" }); }
   function msg(el, t) { el.textContent = t; el.hidden = !t; }
@@ -162,6 +170,8 @@
     actual = r;
     await envioP;
     render(r, cobros); show("res");
+    propio = !(entrada && entrada.deEjemplo);
+    if (propio) contar("resultado");
     // Etiqueta «Ejemplo» (#xEjemplo, de Design): solo cuando lo leído es el extracto inventado de ejemplo
     const ej = $("xEjemplo"); if (ej) ej.hidden = !(entrada && entrada.deEjemplo);
     const h = $("xResH"); if (h) h.focus({ preventScroll: true });
@@ -550,8 +560,9 @@
     const blob = await m.generarImagenCompartir(total, { idioma: LANG });
     if (!blob) return;
     const file = new File([blob], "feehund.png", { type: "image/png" });
-    if (navigator.canShare && navigator.canShare({ files: [file] })) { try { await navigator.share({ files: [file], text: TX.share(e0(total)) }); return; } catch (e) { if (e && e.name === "AbortError") return; } }
+    if (navigator.canShare && navigator.canShare({ files: [file] })) { try { await navigator.share({ files: [file], text: TX.share(e0(total)) }); if (propio) contar("comparte"); return; } catch (e) { if (e && e.name === "AbortError") return; } }
     download(blob, "feehund.png"); msg($("xMsg"), TX.dl);
+    if (propio) contar("comparte");
   }
 
   async function ics() {
@@ -599,9 +610,10 @@
   });
   $("xDemo").addEventListener("click", () => { contrasenas = {}; ejemplo().then((f) => { f.deEjemplo = true; return analyze(f); }, () => msg($("xErr"), TX.bad)); });
   $("xShare").addEventListener("click", () => share().catch(() => {}));
+  contar("abre");
   const btnIcs = $("xIcs"); if (btnIcs) btnIcs.addEventListener("click", () => ics().catch(() => {}));
   $("xAgain").addEventListener("click", () => {
-    actual = null; entradaActual = null; contrasenas = {};
+    actual = null; entradaActual = null; contrasenas = {}; propio = false;
     limpiar(); msg($("xMsg"), ""); if (bandeja) bandeja.vaciar();
     motor().then((m) => m.olvidar()).catch(() => {});
     show("up");
