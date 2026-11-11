@@ -35,6 +35,13 @@
     lista.hidden = false;
   }
 
+  // buscador vacío (la X o borrar a mano): se olvida el banco elegido y se cierran sus pasos
+  function vaciar() {
+    if (q.value !== "" || q.hidden) return;
+    delete q.dataset.elegido; pasos.hidden = true; pasos.textContent = "";
+    try { localStorage.removeItem("feehund-banco"); } catch (e) {}
+  }
+
   function cerrar() { if (!q.hidden) { lista.hidden = true; q.setAttribute("aria-expanded", "false"); } }
 
   function elegir(b) {
@@ -70,7 +77,8 @@
     bancos = d || []; if (!bancos.length) { caja.hidden = true; return; }
     q.setAttribute("role", "combobox"); q.setAttribute("aria-controls", "xBkLista"); q.setAttribute("aria-expanded", "false");
     lista.setAttribute("role", "listbox");
-    q.addEventListener("input", pintarLista);
+    q.addEventListener("input", () => { vaciar(); pintarLista(); });
+    q.addEventListener("search", vaciar);
     q.addEventListener("focus", () => { if (q.dataset.elegido && q.value === q.dataset.elegido) q.select(); pintarLista(); });
     q.addEventListener("click", pintarLista);
     q.addEventListener("keydown", (e) => { if (e.key === "Escape") cerrar(); if (e.key === "Enter") { e.preventDefault(); const p = lista.querySelector(".bk-b"); if (p) p.click(); } });
