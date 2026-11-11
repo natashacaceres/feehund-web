@@ -11,6 +11,8 @@
       si: "Sí", no: "No", el: "el", yMas: (n) => " y " + n + " más", deA: (x, a, b) => x + ", de " + a + " a " + b + " €", enExtracto: (x) => x + " € en este extracto",
       preguntas: [["doble", "¿Te cobran algo dos veces?"], ["subida", "¿Te han subido algún precio?"], ["recibo", "¿Algún recibo ha venido más alto de lo normal?"], ["comision", "¿Pagas comisiones al banco?"]],
       pagas: ["Pagas ", " al año en suscripciones y domiciliaciones"], nada: "No hemos visto cobros que se repitan.",
+      temas: { doble: "cobros dobles", subida: "subidas de precio", recibo: "recibos más altos de lo normal", comision: "comisiones del banco" },
+      bien: (l) => "Todo en orden en " + l + ".", yy: " y ",
       avisosN: (n) => (n === 0 ? "Todo en orden. No vemos nada raro." : n === 1 ? "Revisa este aviso" : "Revisa estos " + n + " avisos"),
       aDoble: ["Te cobraron dos veces", (x, i, f) => x + " te cobró " + i + " € dos veces el " + f, "Pide al comercio que te lo devuelva"],
       aSubida: ["Te subieron el precio", (x, a, b, c, p) => x + " pasó de " + a + " a " + b + " € " + c + " (+" + p + " %)", "Dar de baja"],
@@ -37,6 +39,8 @@
       si: "Sí", no: "No", el: "el", yMas: (n) => " i " + n + " més", deA: (x, a, b) => x + ", de " + a + " a " + b + " €", enExtracto: (x) => x + " € en aquest extracte",
       preguntas: [["doble", "Et cobren alguna cosa dues vegades?"], ["subida", "T'han pujat algun preu?"], ["recibo", "Algun rebut ha vingut més alt del normal?"], ["comision", "Pagues comissions al banc?"]],
       pagas: ["Pagues ", " l'any en subscripcions i domiciliacions"], nada: "No hem vist cobraments que es repeteixin.",
+      temas: { doble: "cobraments dobles", subida: "pujades de preu", recibo: "rebuts més alts del normal", comision: "comissions del banc" },
+      bien: (l) => "Tot en ordre en " + l + ".", yy: " i ",
       avisosN: (n) => (n === 0 ? "Tot en ordre. No veiem res d'estrany." : n === 1 ? "Revisa aquest avís" : "Revisa aquests " + n + " avisos"),
       aDoble: ["T'han cobrat dues vegades", (x, i, f) => x + " t'ha cobrat " + i + " € dues vegades el " + f, "Demana al comerç que te'l retorni"],
       aSubida: ["T'han pujat el preu", (x, a, b, c, p) => x + " ha passat de " + a + " a " + b + " € " + c + " (+" + p + " %)", "Donar de baixa"],
@@ -63,6 +67,8 @@
       si: "Yes", no: "No", el: "on", yMas: (n) => " and " + n + " more", deA: (x, a, b) => x + ", from " + a + " to " + b + " €", enExtracto: (x) => x + " € in this statement",
       preguntas: [["doble", "Are you charged twice for anything?"], ["subida", "Has any price gone up?"], ["recibo", "Has any bill come in higher than usual?"], ["comision", "Do you pay bank fees?"]],
       pagas: ["You pay ", " a year in subscriptions and direct debits"], nada: "We have not seen any repeating charges.",
+      temas: { doble: "double charges", subida: "price rises", recibo: "bills higher than usual", comision: "bank fees" },
+      bien: (l) => "All in order on " + l + ".", yy: " and ",
       avisosN: (n) => (n === 0 ? "All in order. We see nothing unusual." : n === 1 ? "Check this alert" : "Check these " + n + " alerts"),
       aDoble: ["You were charged twice", (x, i, f) => x + " charged you " + i + " € twice on " + f, "Ask the company for a refund"],
       aSubida: ["Your price went up", (x, a, b, c, p) => x + " went from " + a + " to " + b + " € " + c + " (+" + p + " %)", "Cancel"],
@@ -435,6 +441,15 @@
     if ($("xAvisosN")) $("xAvisosN").textContent = TX.avisosN(avisos.length);
     mostrar($("xAlertas"), avisos.length);
 
+    // ---- Diseño por pasos: lo que está bien, en una sola línea (#xBien) ----
+    const bien = $("xBien");
+    if (bien) {
+      const ok = TX.preguntas.map(([tipo]) => tipo).filter((tipo) => !avisos.some((a) => a.tipo === tipo)).map((tipo) => TX.temas[tipo]);
+      const lista = ok.length > 1 ? ok.slice(0, -1).join(", ") + TX.yy + ok[ok.length - 1] : ok[0] || "";
+      bien.textContent = lista ? TX.bien(lista) : ""; bien.hidden = !lista;
+      const paso = bien.closest(".res-paso"); if (paso) paso.hidden = !(avisos.length || lista);
+    }
+
     // ---- Las grandes preguntas: Sí o No, y una línea solo si es Sí ----
     if ($("xPreguntas") && $("tPregunta")) {
       for (const [tipo, pregunta] of TX.preguntas) {
@@ -499,7 +514,7 @@
   // Cada bloque va dentro de un botón (<details>) o de una sección: se oculta si está vacío y su contador dice cuántos hay
   function mostrar(cont, n) {
     if (!cont) return;
-    const caja = cont.closest("details") || cont.closest("section");
+    const caja = cont.closest("details") || cont.closest(".res-paso") || cont.closest("section");
     if (caja) { caja.hidden = !n; const c = caja.querySelector("[data-n]"); if (c) c.textContent = n ? String(n) : ""; if (caja.tagName === "DETAILS") caja.open = false; }
   }
 

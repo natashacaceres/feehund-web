@@ -1335,3 +1335,37 @@ details.opc[open] summary::after{transform:rotate(90deg)}
 .pg-atras-w{position:sticky;top:var(--hdr);z-index:45;height:52px;padding-top:0;pointer-events:none}
 .pg-atras-w .wrap{display:flex;align-items:center;height:100%}
 .pg-atras{pointer-events:auto;background:var(--bg);border-radius:50%;box-shadow:0 1px 4px rgba(20,33,61,.12)}
+/* ===== Resultado de Mi banco por pasos: todo a la vista, numerado y en orden ===== */
+.res-pasos{list-style:none;margin:var(--s-6) 0 0;padding:0;display:grid;gap:var(--s-7);counter-reset:paso;width:100%;text-align:left}
+.res-paso{counter-increment:paso}
+.res-paso[hidden]{display:none}
+.res-h{display:flex;align-items:center;gap:12px;margin:0 0 var(--s-4);font:800 24px/1.2 var(--f-head);color:var(--ink)}
+.res-h::before{content:counter(paso);display:inline-flex;align-items:center;justify-content:center;flex:none;width:36px;height:36px;border-radius:50%;background:var(--brand);color:#fff;font:800 18px/1 var(--f-text)}
+.res-bien{display:flex;gap:10px;align-items:flex-start;margin:0 0 var(--s-4);padding:14px 16px;border-radius:12px;background:var(--brand-tint);font-size:16px;line-height:1.45;color:var(--ink)}
+.res-bien::before{content:"✓";font-weight:800;color:var(--brand)}
+.res-paso .res-alertas,.res-paso .res-secs{display:grid;gap:var(--s-3)}
+.res-paso .res-noticias{display:grid;gap:var(--s-2);margin:0;padding:0;list-style:none}
+@media (min-width:768px){.res-h{font-size:28px}}
+/* Buscador «¿Cómo lo descargo de mi banco?» */
+.opc-in > p{margin:0 0 var(--s-4)}
+.bk{display:grid;gap:var(--s-3)}
+.bk[hidden]{display:none}
+.bk-l{font:800 16px/1.3 var(--f-text);color:var(--ink)}
+.bk-q{width:100%;min-height:48px;padding:10px 14px;border:1.5px solid var(--field);border-radius:12px;background:#fff;font:400 16px/1.3 var(--f-text);color:var(--ink)}
+.bk-q:focus{outline:2px solid var(--brand);outline-offset:2px}
+.bk-q[hidden]{display:none}
+.bk-lista{display:flex;flex-wrap:wrap;gap:8px;margin:0;padding:0;list-style:none}
+.bk-lista[hidden]{display:none}
+.bk-b{min-height:44px;padding:8px 14px;border:1.5px solid var(--brand);border-radius:999px;background:transparent;color:var(--brand);font:700 15px/1.2 var(--f-text);cursor:pointer}
+.bk-b:hover{background:var(--brand-tint)}
+.bk-nada{font-size:16px;color:var(--ink-2)}
+.bk-pasos{display:grid;gap:var(--s-2)}
+.bk-pasos[hidden]{display:none}
+.bk-h{font:800 22px/1.2 var(--f-head);color:var(--ink);margin:0}
+.bk-c{font:800 16px/1.3 var(--f-text);color:var(--brand);margin:var(--s-2) 0 0}
+.bk-ol{margin:0;padding-left:1.3em;display:grid;gap:6px;font-size:16px;line-height:1.5;color:var(--ink)}
+.bk-ol li::marker{font-weight:800;color:var(--brand)}
+.bk-x,.bk-rev{margin:0;font-size:15px;line-height:1.45;color:var(--ink-2)}
+.bk-otro{justify-self:start;min-height:44px;padding:0;border:0;background:none;color:var(--brand);font:800 16px/1.2 var(--f-text);text-decoration:underline;text-underline-offset:3px;cursor:pointer}
+.bk-ol{list-style:decimal}
+.bk-l[hidden]{display:none}

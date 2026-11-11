@@ -5,14 +5,15 @@
 //   ACTUALIZAR_RECURSOS=1 node --test tests/unit/worker-montaje.test.mjs
 // La versión es una huella de todos los archivos de las listas: cambia en cuanto cambia cualquiera de ellos.
 globalThis.RECURSOS_EXTRACTO = {
-  version: '2c4451d9ee53',
+  version: '849c91edf372',
   // Página, fuentes, motor, núcleo, lectores y textos: se guardan al instalar.
   PAGINA: [
     '/extracto/',
     '/extracto/dev/',
-    '/assets/app.css?v=202611111815',
+    '/assets/app.css?v=202611112306',
     '/assets/app.js?v=202611111722',
     '/assets/atras.js?v=202611111845',
+    '/assets/bancos-guia.js?v=202611120115',
     '/assets/brand/apple-touch-icon.png?v=202611111722',
     '/assets/brand/favicon-16.png?v=202611111722',
     '/assets/brand/favicon-192.png?v=202611111722',
@@ -20,7 +21,7 @@ globalThis.RECURSOS_EXTRACTO = {
     '/assets/brand/favicon-512.png?v=202611111722',
     '/assets/brand/favicon.ico?v=202611111722',
     '/assets/brand/feehund-logo-h64.png?v=202611111722',
-    '/assets/extracto.js?v=202611111802',
+    '/assets/extracto.js?v=202611112306',
     '/assets/extracto/bandeja.css',
     '/assets/extracto/bandeja.js',
     '/assets/extracto/datafono/confirmar.js',
@@ -83,6 +84,7 @@ globalThis.RECURSOS_EXTRACTO = {
   // Librerías para Excel, CSV, ZIP y PDF con texto, y los datos: también al instalar.
   LECTORES: [
     '/data/bajas-envio.json',
+    '/data/bancos-descarga.json',
     '/data/bancos.json',
     '/data/comercios.json',
     '/data/ejemplo-datafono.csv',

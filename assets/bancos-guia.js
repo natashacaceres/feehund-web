@@ -1,0 +1,65 @@
+/* «¿Cómo lo descargo de mi banco?»: buscador de bancos con los pasos comprobados de cada uno.
+   Datos: /data/bancos-descarga.json (lo genera investigacion/descargas/herramientas/comprobar.py; solo pasos cuyos
+   botones aparecen tal cual en la ayuda oficial del banco). Sin pasos comprobados, se remite a la guía general. */
+(function () {
+  "use strict";
+  const caja = document.getElementById("xBk"); if (!caja) return;
+  const L = ["es", "ca", "en"].indexOf(document.documentElement.lang) >= 0 ? document.documentElement.lang : "es";
+  const TX = {
+    es: { app: "En la app", web: "En la web", fmt: (f) => "Se descarga en " + f + ".", meses: (n) => n === 1 ? "Cada archivo es de un mes." : "Hasta " + n + " meses.", rev: (b, f) => "Comprobado el " + f + " con la ayuda oficial de " + b + ".", sin: (b) => "Todavía no tenemos comprobados los pasos de " + b + ". Sigue la guía general de arriba.", otro: "Cambiar de banco", nada: "No lo tenemos todavía. Sigue la guía general de arriba.", o: " o " },
+    ca: { app: "A l'app", web: "Al web", fmt: (f) => "Es descarrega en " + f + ".", meses: (n) => n === 1 ? "Cada fitxer és d'un mes." : "Fins a " + n + " mesos.", rev: (b, f) => "Comprovat el " + f + " amb l'ajuda oficial de " + b + ".", sin: (b) => "Encara no tenim comprovats els passos de " + b + ". Segueix la guia general de dalt.", otro: "Canviar de banc", nada: "Encara no el tenim. Segueix la guia general de dalt.", o: " o " },
+    en: { app: "In the app", web: "On the website", fmt: (f) => "Downloads as " + f + ".", meses: (n) => n === 1 ? "Each file covers one month." : "Up to " + n + " months.", rev: (b, f) => "Checked on " + f + " against " + b + "'s official help (steps in Spanish).", sin: (b) => "We have not checked the steps for " + b + " yet. Follow the general guide above.", otro: "Change bank", nada: "Not available yet. Follow the general guide above.", o: " or " },
+  }[L];
+  const etiqueta = caja.querySelector(".bk-l"), q = document.getElementById("xBkQ"), lista = document.getElementById("xBkLista"), pasos = document.getElementById("xBkPasos");
+  const raiz = (document.currentScript && document.currentScript.dataset.root) || "../";
+  const plano = (t) => t.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
+  const el = (tag, cls, txt) => { const x = document.createElement(tag); if (cls) x.className = cls; if (txt !== undefined) x.textContent = txt; return x; };
+  const fecha = (iso) => iso ? iso.slice(8, 10) + "/" + iso.slice(5, 7) + "/" + iso.slice(0, 4) : "";
+  let bancos = [];
+
+  function pintarLista() {
+    const t = plano(q.value.trim());
+    lista.textContent = "";
+    const vis = bancos.filter((b) => !t || plano(b.n + " " + b.id.replace(/_/g, " ")).indexOf(t) >= 0);
+    for (const b of vis) {
+      const li = el("li"), btn = el("button", "bk-b", b.n);
+      btn.type = "button"; btn.addEventListener("click", () => elegir(b));
+      li.appendChild(btn); lista.appendChild(li);
+    }
+    if (!vis.length) lista.appendChild(el("li", "bk-nada", TX.nada));
+    lista.hidden = false; pasos.hidden = true;
+  }
+
+  function elegir(b) {
+    try { localStorage.setItem("feehund-banco", b.id); } catch (e) {}
+    pasos.textContent = "";
+    pasos.appendChild(el("h3", "bk-h", b.n));
+    let alguno = false;
+    for (const canal of ["app", "web"]) {
+      const c = b[canal]; if (!c) continue;
+      alguno = true;
+      pasos.appendChild(el("h4", "bk-c", TX[canal]));
+      const ol = el("ol", "bk-ol");
+      for (const p of c.pasos) ol.appendChild(el("li", "", p));
+      pasos.appendChild(ol);
+      const extra = [];
+      if (c.formatos && c.formatos.length) extra.push(TX.fmt(c.formatos.join(TX.o)));
+      if (c.meses) extra.push(TX.meses(c.meses));
+      if (extra.length) pasos.appendChild(el("p", "bk-x", extra.join(" ")));
+    }
+    if (alguno) pasos.appendChild(el("p", "bk-rev", TX.rev(b.n, fecha(b.revisado))));
+    else pasos.appendChild(el("p", "bk-x", TX.sin(b.n)));
+    const otro = el("button", "bk-otro", TX.otro); otro.type = "button";
+    otro.addEventListener("click", () => { q.value = ""; q.hidden = false; if (etiqueta) etiqueta.hidden = false; pintarLista(); q.focus(); });
+    pasos.appendChild(otro);
+    lista.hidden = true; q.hidden = true; if (etiqueta) etiqueta.hidden = true; pasos.hidden = false;
+  }
+
+  fetch(raiz + "data/bancos-descarga.json", { cache: "no-cache" }).then((r) => r.ok ? r.json() : []).then((d) => {
+    bancos = d || []; if (!bancos.length) { caja.hidden = true; return; }
+    q.addEventListener("input", pintarLista);
+    let guardado = null; try { guardado = localStorage.getItem("feehund-banco"); } catch (e) {}
+    const b = bancos.find((x) => x.id === guardado);
+    if (b) elegir(b); else pintarLista();
+  }).catch(() => { caja.hidden = true; });
+})();

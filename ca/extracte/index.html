@@ -31,7 +31,7 @@
 <meta name="twitter:image" content="https://feehund.com/assets/brand/og-image.png?v=202611111722">
 <link rel="preload" href="../../assets/fonts/fraunces-800.woff" as="font" type="font/woff" crossorigin>
 <link rel="preload" href="../../assets/fonts/atkinson-next-400.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="../../assets/app.css?v=202611111815">
+<link rel="stylesheet" href="../../assets/app.css?v=202611112306">
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "WebApplication", "name": "Què es repeteix al teu compte?", "url": "https://feehund.com/ca/extracte/", "description": "Deixa anar el teu extracte i mira quines subscripcions i comissions es repeteixen al teu compte. Es llegeix al teu dispositiu i no es puja.", "inLanguage": "ca", "applicationCategory": "FinanceApplication", "operatingSystem": "Web", "isAccessibleForFree": true, "offers": {"@type": "Offer", "price": "0", "priceCurrency": "EUR"}, "publisher": {"@type": "Organization", "name": "Feehund", "url": "https://feehund.com/"}}</script>
 </head>
 <body>
@@ -62,7 +62,7 @@
       <input type="file" id="xFile" class="sr" accept=".csv,.txt,.xls,.xlsx,.ods,.pdf,text/csv,application/pdf,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" tabindex="-1" aria-hidden="true">
     </div>
     <p class="ext-err" id="xErr" role="alert" hidden></p>
-    <div class="ext-opc"><details class="opc opc-how"><summary><svg class="opc-i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.6 9.3a2.5 2.5 0 0 1 4.8.9c0 1.7-2.4 2.2-2.4 3.6"/><path d="M12 17h.01"/></svg><span>Com el descarrego del meu banc?</span></summary><p class="opc-in">A l'app o al web del teu banc, busca Moviments › Descarregar o Exportar. Tria Excel o CSV si pots; si no, PDF. Millor 3 mesos o més.</p></details><button type="button" class="opc" id="xDemo"><svg class="opc-i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M10 8.5v7l5.5-3.5z"/></svg><span>Provar amb un exemple</span></button></div>
+    <div class="ext-opc"><details class="opc opc-how"><summary><svg class="opc-i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.6 9.3a2.5 2.5 0 0 1 4.8.9c0 1.7-2.4 2.2-2.4 3.6"/><path d="M12 17h.01"/></svg><span>Com el descarrego del meu banc?</span></summary><div class="opc-in"><p>A l'app o al web del teu banc, busca Moviments › Descarregar o Exportar. Tria Excel o CSV si pots; si no, PDF. Millor 3 mesos o més.</p><div class="bk" id="xBk"><label class="bk-l" for="xBkQ">Busca el teu banc</label><input id="xBkQ" class="bk-q" type="search" autocomplete="off" placeholder="CaixaBank, Santander, ING…"><ul class="bk-lista" id="xBkLista"></ul><div class="bk-pasos" id="xBkPasos" hidden></div></div></div></details><button type="button" class="opc" id="xDemo"><svg class="opc-i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M10 8.5v7l5.5-3.5z"/></svg><span>Provar amb un exemple</span></button></div>
   </section>
   <section class="ext-s ext-load" id="xLoad" hidden aria-live="polite">
     <img src="../../assets/img/tiqui-olfatea.webp?v=202611111722" alt="" aria-hidden="true" width="320" height="320" class="ext-sniff" decoding="async">
@@ -72,13 +72,11 @@
     <p class="x-ejemplo" id="xEjemplo" hidden>Exemple</p>
     <h2 class="sr" id="xResH" tabindex="-1">El teu resultat</h2>
     <p class="res-count" id="xCount"><span class="sr" id="xTotal"></span></p>
-    <ul class="res-pq" id="xPreguntas"></ul>
-    <p class="res-nota" id="xNota" hidden></p>
-    <div class="res-btns">
-      <details class="res-dd"><summary><span>Què fer amb cada avís</span><span class="res-n" data-n></span></summary><div class="res-dd-in res-alertas" id="xAlertas"></div></details>
-      <details class="res-dd"><summary><span>Veure tot el que pagues</span><span class="res-n" data-n></span></summary><div class="res-dd-in res-secs" id="xTodo"></div></details>
-      <details class="res-dd"><summary><span>Bones notícies</span><span class="res-n" data-n></span></summary><ul class="res-dd-in res-noticias" id="xNoticias"></ul></details>
-    </div>
+    <ol class="res-pasos">
+      <li class="res-paso"><h2 class="res-h">El que has de revisar</h2><p class="res-bien" id="xBien" hidden></p><p class="res-nota" id="xNota" hidden></p><div class="res-alertas" id="xAlertas"></div></li>
+      <li class="res-paso"><h2 class="res-h">Tot el que pagues</h2><div class="res-secs" id="xTodo"></div></li>
+      <li class="res-paso"><h2 class="res-h">Bones notícies</h2><ul class="res-noticias" id="xNoticias"></ul></li>
+    </ol>
     <div class="ext-act"><div class="ext-links"><button type="button" class="link-alt" id="xShare">Compartir la meva xifra</button><button type="button" class="link-alt ext-again" id="xAgain">Provar amb un altre fitxer</button></div></div>
     <p class="ext-msg" id="xMsg" role="status" hidden></p>
     <a class="tb-franja" id="xPack" href="../baixa/" data-api="baja-pack" hidden><strong>En vols deixar algun?</strong><span>T'enviem la baixa amb certificat</span></a>
@@ -108,7 +106,8 @@
     <li>© 2026 <span data-marca>Feehund</span></li>
   </ul>
 </div></footer>
-<script src="../../assets/extracto.js?v=202611111802" data-root="../../"></script>
+<script src="../../assets/extracto.js?v=202611112306" data-root="../../"></script>
 <script src="../../assets/app.js?v=202611111722"></script>
 <script src="../../assets/atras.js?v=202611111845" defer></script>
+<script src="../../assets/bancos-guia.js?v=202611120115" data-root="../../" defer></script>
 </body></html>

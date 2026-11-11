@@ -8,6 +8,15 @@ const VIEJAS = {
   "/es/en": ["/en/", "/en/card-machine/"],
 };
 
+// Páginas de Design que nunca se rellenaron («[VERIFICAR]»): llevan a la guía comprobada en español
+// (las de catalán e inglés aún no existen) o, la del gimnasio genérico, a la sección de gimnasios de /baja/.
+const SIN_RELLENAR = {};
+for (const s of ["netflix", "spotify", "amazon-prime", "disney-plus"]) {
+  SIN_RELLENAR["/ca/baixa/" + s] = "/baja/" + s + "/";
+  SIN_RELLENAR["/en/cancel/" + s] = "/baja/" + s + "/";
+}
+for (const r of ["/baja/gimnasio", "/ca/baixa/gimnasio", "/en/cancel/gimnasio"]) SIN_RELLENAR[r] = "/baja/#bj-gimnasios";
+
 export async function onRequest(context) {
   const url = new URL(context.request.url);
   if (url.hostname === "www.feehund.com" || url.hostname === "feehund-web.pages.dev") {
@@ -16,6 +25,7 @@ export async function onRequest(context) {
     return Response.redirect(url.toString(), 301);
   }
   const ruta = url.pathname.replace(/\/(index\.html)?$/, "");
+  if (SIN_RELLENAR[ruta]) return Response.redirect(url.origin + SIN_RELLENAR[ruta], 301);
   const vieja = VIEJAS[ruta];
   if (vieja) {
     if (url.searchParams.has("pago")) {
