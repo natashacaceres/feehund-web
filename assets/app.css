@@ -1480,3 +1480,7 @@ details.opc summary:hover{background:var(--brand-tint);border-radius:11px}
 /* 10 · el naranja del perro solo para el dinero encontrado («Lo que tienes que revisar»); versión oscura que pasa AA sobre la tarjeta */
 :root{--naranja:#8E5D15}
 .res-alertas .al-c{color:var(--naranja)}
+
+/* 12 · «Recupera lo que cuesta cambiar en» se lee antes que su valor («Al instante») */
+.calc .facts .k:first-child{margin-top:0}
+.calc .facts .k + .v{margin-top:var(--s-1)}
