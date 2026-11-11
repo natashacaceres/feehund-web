@@ -180,8 +180,19 @@
     el.appendChild(a); el.hidden = false;
   }
 
-  // Fecha corta: 17/06
-  const fecha = (iso) => (iso ? iso.slice(8, 10) + "/" + iso.slice(5, 7) : "");
+  // Fecha en palabras: «13 de marzo» (es), «13 de març» / «13 d'abril» (ca), «13 March» (en)
+  const MESES = {
+    es: ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"],
+    ca: ["gener", "febrer", "març", "abril", "maig", "juny", "juliol", "agost", "setembre", "octubre", "novembre", "desembre"],
+    en: ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
+  }[LANG];
+  const fecha = (iso) => {
+    if (!iso) return "";
+    const d = String(+iso.slice(8, 10)), m = MESES[+iso.slice(5, 7) - 1];
+    if (LANG === "en") return d + " " + m;
+    if (LANG === "ca") return d + (/^[aeiou]/.test(m) ? " d'" : " de ") + m;
+    return d + " de " + m;
+  };
   const cada = (c) => TX.cada[c.periodicidad] || "";
   const el = (tag, clase, texto) => { const x = document.createElement(tag); if (clase) x.className = clase; if (texto !== undefined) x.textContent = texto; return x; };
   const extras = [];
@@ -551,7 +562,7 @@
   });
   $("xDemo").addEventListener("click", () => { contrasenas = {}; ejemplo().then((f) => { f.deEjemplo = true; return analyze(f); }, () => msg($("xErr"), TX.bad)); });
   $("xShare").addEventListener("click", () => share().catch(() => {}));
-  $("xIcs").addEventListener("click", () => ics().catch(() => {}));
+  const btnIcs = $("xIcs"); if (btnIcs) btnIcs.addEventListener("click", () => ics().catch(() => {}));
   $("xAgain").addEventListener("click", () => {
     actual = null; entradaActual = null; contrasenas = {};
     limpiar(); msg($("xMsg"), ""); if (bandeja) bandeja.vaciar();

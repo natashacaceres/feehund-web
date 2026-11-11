@@ -57,14 +57,14 @@
     <p class="ext-sub"><span data-l="es">Tarifas de bancos y fintech en España</span><span data-l="ca">Tarifes de bancs i fintech a Espanya</span><span data-l="en">Bank and fintech rates in Spain</span></p>
     <div class="drop" id="dDrop">
       <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 15.5V4M7.5 8.5 12 4l4.5 4.5"/><path d="M4.5 14.5v3.5a2 2 0 0 0 2 2h11a2 2 0 0 0 2-2v-3.5"/></svg>
-      <p class="drop-t">Deixa anar el resum del datàfon</p>
+      <p class="drop-t"><span class="x-desk">Deixa anar el resum del datàfon</span><span class="x-mov">Puja el resum del datàfon</span></p>
       <p class="drop-s">PDF, Excel, CSV o una foto del resum del mes</p>
-      <button type="button" class="btn btn--gold" id="dPick">Tria un arxiu</button>
+      <button type="button" class="btn btn--gold" id="dPick"><span class="x-desk">Tria un arxiu</span><span class="x-mov">Tria el resum</span></button>
+      <p class="drop-priv"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="10.5" width="14" height="10" rx="1.5"/><path d="M8 10.5V7.5a4 4 0 0 1 8 0v3"/></svg><span>Es llegeix al teu dispositiu. No es puja.</span></p>
       <input type="file" id="dFile" class="sr" multiple accept=".pdf,.xlsx,.xls,.ods,.csv,.tsv,.txt,.png,.jpg,.jpeg,.webp,.heic,.zip,application/pdf,text/csv,text/plain,image/*" tabindex="-1" aria-hidden="true">
     </div>
     <p class="ext-err" id="dErr" role="alert" hidden></p>
-    <div class="ext-links"><button type="button" class="link-alt ext-demo" id="dDemo">Prova amb un exemple</button><a class="link-alt dl-hand" id="dHand" href="#calcApp"><span data-l="es">Escribirlo a mano</span><span data-l="ca">Escriure-ho a mà</span><span data-l="en">Type it in</span></a></div>
-    <div class="ext-priv"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="10.5" width="14" height="10" rx="1.5"/><path d="M8 10.5V7.5a4 4 0 0 1 8 0v3"/></svg><p><span data-l="es">Se lee en tu dispositivo. No se sube.</span><span data-l="ca">Es llegeix al dispositiu. No es puja.</span><span data-l="en">Read on your device, never uploaded.</span></p></div>
+    <div class="ext-opc"><a class="opc" id="dHand" href="#calcApp"><svg class="opc-i" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M14 6l4 4"/></svg><span><span data-l="es">Escribirlo a mano</span><span data-l="ca">Escriure-ho a mà</span><span data-l="en">Type it in</span></span></a><button type="button" class="opc" id="dDemo"><svg class="opc-i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M10 8.5v7l5.5-3.5z"/></svg><span>Prova amb un exemple</span></button></div>
     <button type="button" class="link-alt ext-out" data-espera aria-haspopup="dialog"><span data-l="es">¿Cobras fuera de España?</span><span data-l="ca">Cobres fora d'Espanya?</span><span data-l="en">Outside Spain?</span></button>
   </section>
   <section class="ext-s ext-load" id="dLoad" hidden aria-live="polite">
