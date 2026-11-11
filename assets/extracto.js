@@ -156,6 +156,8 @@
     actual = r;
     await envioP;
     render(r, cobros); show("res");
+    // Etiqueta «Ejemplo» (#xEjemplo, de Design): solo cuando lo leído es el extracto inventado de ejemplo
+    const ej = $("xEjemplo"); if (ej) ej.hidden = !(entrada && entrada.deEjemplo);
     const h = $("xResH"); if (h) h.focus({ preventScroll: true });
   }
 
@@ -547,7 +549,7 @@
     const t = e.clipboardData && e.clipboardData.getData("text");
     if (t && t.split("\n").length > 2) anadir(t);
   });
-  $("xDemo").addEventListener("click", () => { contrasenas = {}; ejemplo().then(analyze, () => msg($("xErr"), TX.bad)); });
+  $("xDemo").addEventListener("click", () => { contrasenas = {}; ejemplo().then((f) => { f.deEjemplo = true; return analyze(f); }, () => msg($("xErr"), TX.bad)); });
   $("xShare").addEventListener("click", () => share().catch(() => {}));
   $("xIcs").addEventListener("click", () => ics().catch(() => {}));
   $("xAgain").addEventListener("click", () => {

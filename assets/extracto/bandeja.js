@@ -47,7 +47,8 @@ export function crearBandeja({ zona, boton, idioma = 'es', alLeer }) {
   const t = TX[idioma] || TX.es, fuera = FUERA[idioma] || FUERA.es;
   const doc = zona.ownerDocument;
   const el = (tag, clase, texto) => { const x = doc.createElement(tag); if (clase) x.className = clase; if (texto !== undefined) x.textContent = texto; return x; };
-  const textoBoton = boton ? boton.textContent : '';
+  // Se guarda el HTML del botón, no solo el texto: Design pone un texto para ordenador y otro para móvil (.x-desk / .x-mov)
+  const htmlBoton = boton ? boton.innerHTML : '';
   const nf = new Intl.NumberFormat(idioma === 'en' ? 'en-GB' : 'es-ES', { maximumFractionDigits: 1 });
   const peso = (b) => (b < 1024 * 1024 ? Math.max(1, Math.round(b / 1024)) + ' KB' : nf.format(b / 1024 / 1024) + ' MB');
 
@@ -72,7 +73,7 @@ export function crearBandeja({ zona, boton, idioma = 'es', alLeer }) {
     caja.hidden = !n && nota.hidden; // sin nada en la lista solo se ve el aviso, si lo hay
     leer.hidden = !n;
     zona.classList.toggle('bj-con', n > 0);
-    if (boton) { boton.textContent = n ? t.mas : textoBoton; boton.classList.toggle('btn--gold', !n); }
+    if (boton) { if (n) boton.textContent = t.mas; else boton.innerHTML = htmlBoton; boton.classList.toggle('btn--gold', !n); }
     const fotos = n > 0 && elementos.every((x) => x.archivo && esFoto(x.archivo));
     leer.textContent = n === 1 && !elementos[0].archivo ? t.leerTexto : t.leer(n, fotos);
   }
