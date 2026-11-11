@@ -1484,3 +1484,6 @@ details.opc summary:hover{background:var(--brand-tint);border-radius:11px}
 /* 12 · «Recupera lo que cuesta cambiar en» se lee antes que su valor («Al instante») */
 .calc .facts .k:first-child{margin-top:0}
 .calc .facts .k + .v{margin-top:var(--s-1)}
+
+/* 4c · foco visible al moverse con el teclado por la lista de bancos */
+.bk-lista .bk-b:focus-visible{outline:2px solid var(--brand);outline-offset:-3px;background:var(--tarjeta-h)}
