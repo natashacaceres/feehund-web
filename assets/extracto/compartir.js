@@ -91,3 +91,9 @@ export async function dibujarTicket({ cifra, linea, url = 'feehund.com/extracto'
   if (lienzo.convertToBlob) return lienzo.convertToBlob({ type: 'image/png' });
   return new Promise((ok, mal) => lienzo.toBlob((b) => (b ? ok(b) : mal(new Error('No se ha podido crear la imagen'))), 'image/png'));
 }
+
+/** El ticket del total al año: «2.196 €/año» (separador de miles también con cuatro cifras) y «en cobros que se repiten». */
+export function ticketDelTotal(n, idioma, t, formato) {
+  const cifra = new Intl.NumberFormat(idioma + (idioma === 'en' ? '-GB' : '-ES'), { maximumFractionDigits: 0, useGrouping: 'always' }).format(Math.round(n));
+  return dibujarTicket({ cifra: t.texto('compartir_total', idioma, { cifra }), linea: t.texto('compartir_linea', idioma), formato: formato === 'cuadrado' ? 'cuadrado' : 'historia' });
+}

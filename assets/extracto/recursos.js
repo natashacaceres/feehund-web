@@ -5,15 +5,15 @@
 //   ACTUALIZAR_RECURSOS=1 node --test tests/unit/worker-montaje.test.mjs
 // La versión es una huella de todos los archivos de las listas: cambia en cuanto cambia cualquiera de ellos.
 globalThis.RECURSOS_EXTRACTO = {
-  version: '5d7c536c4d1b',
+  version: '7c9a407ecc2a',
   // Página, fuentes, motor, núcleo, lectores y textos: se guardan al instalar.
   PAGINA: [
     '/extracto/',
     '/extracto/dev/',
-    '/assets/app.css?v=20261112002359',
-    '/assets/app.js?v=20261112002359',
-    '/assets/atras.js?v=20261112002359',
-    '/assets/bancos-guia.js?v=20261112002359',
+    '/assets/app.css?v=20261112003010',
+    '/assets/app.js?v=20261112003010',
+    '/assets/atras.js?v=20261112003010',
+    '/assets/bancos-guia.js?v=20261112003010',
     '/assets/brand/apple-touch-icon.png?v=202611111722',
     '/assets/brand/favicon-16.png?v=202611111722',
     '/assets/brand/favicon-192.png?v=202611111722',
@@ -22,7 +22,7 @@ globalThis.RECURSOS_EXTRACTO = {
     '/assets/brand/favicon.ico?v=202611111722',
     '/assets/brand/feehund-logo-h128.png?v=202611111722',
     '/assets/brand/feehund-logo-h64.png?v=202611111722',
-    '/assets/extracto.js?v=20261112002359',
+    '/assets/extracto.js?v=20261112003010',
     '/assets/extracto/bandeja.css',
     '/assets/extracto/bandeja.js',
     '/assets/extracto/compartir.js',

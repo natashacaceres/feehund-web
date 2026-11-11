@@ -88,8 +88,8 @@ export function generarICS(resultado, opciones = {}) {
 }
 
 /**
- * PNG estilo ticket con el total al año («2.196 €/año»), «en cobros que se repiten», el perro y feehund.com/extracto. Nada más.
- * opciones.formato: 'historia' (1080 × 1920, por defecto) o 'cuadrado' (1080 × 1080).
+ * PNG tipo ticket (compartir.js) con el total al año, el perro y feehund.com/extracto. Nada más.
+ * opciones.formato: 'historia' (1080 × 1920, por defecto) o 'cuadrado'.
  * @param {number|string} total euros al año, ≥ 0; null, vacío o lo que no sea un número → TypeError
  * @returns {Promise<Blob>}
  */
@@ -98,11 +98,8 @@ export async function generarImagenCompartir(total, opciones = {}) {
   // sin total no hay imagen: nunca un «0 €/año» falso; «1.234» tampoco se adivina
   const n = typeof total === 'number' ? total : /^\s*\d+(?:[.,]\d{1,2})?\s*$/.test(total) ? Number(total.trim().replace(',', '.')) : NaN;
   if (!Number.isFinite(n) || n < 0) throw new TypeError('El total tiene que ser un número de euros');
-  const [t, { dibujarTicket }] = await Promise.all([textos(), import('./compartir.js')]);
-  // separador de miles también en números de cuatro cifras («2.196», no «2196»)
-  const cifra = new Intl.NumberFormat(idioma + (idioma === 'en' ? '-GB' : '-ES'), { maximumFractionDigits: 0, useGrouping: 'always' }).format(Math.round(n));
-  const formato = opciones.formato === 'cuadrado' ? 'cuadrado' : 'historia';
-  return dibujarTicket({ cifra: t.texto('compartir_total', idioma, { cifra }), linea: t.texto('compartir_linea', idioma), formato });
+  const [t, c] = await Promise.all([textos(), import('./compartir.js')]);
+  return c.ticketDelTotal(n, idioma, t, opciones.formato);
 }
 
 // ---------- Sin conexión (service worker) ----------
