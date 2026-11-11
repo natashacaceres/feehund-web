@@ -3,11 +3,9 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Cómo dar de baja Netflix en España</title>
-<meta name="description" content="Cómo dar de baja Netflix en España en 3 pasos, con el precio de hoy y un modelo de baja para copiar.">
+<meta name="description" content="Dónde y cómo darte de baja de Netflix: canales, plazos, permanencia y qué necesitas. Revisado con la web de la empresa.">
 <link rel="canonical" href="https://feehund.com/baja/netflix/">
 <link rel="alternate" hreflang="es-ES" href="https://feehund.com/baja/netflix/">
-<link rel="alternate" hreflang="ca-ES" href="https://feehund.com/ca/baixa/netflix/">
-<link rel="alternate" hreflang="en-ES" href="https://feehund.com/en/cancel/netflix/">
 <link rel="alternate" hreflang="x-default" href="https://feehund.com/baja/netflix/">
 <link rel="icon" href="../../assets/brand/favicon.ico?v=202611110351" sizes="any">
 <link rel="icon" type="image/png" sizes="32x32" href="../../assets/brand/favicon-32.png?v=202611110351">
@@ -21,19 +19,20 @@
 <meta property="og:site_name" content="Feehund">
 <meta property="og:url" content="https://feehund.com/baja/netflix/">
 <meta property="og:title" content="Cómo dar de baja Netflix en España">
-<meta property="og:description" content="Cómo dar de baja Netflix en España en 3 pasos, con el precio de hoy y un modelo de baja para copiar.">
+<meta property="og:description" content="Dónde y cómo darte de baja de Netflix: canales, plazos, permanencia y qué necesitas. Revisado con la web de la empresa.">
 <meta property="og:image" content="https://feehund.com/assets/brand/og-image.png?v=202611110351">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Cómo dar de baja Netflix en España">
-<meta name="twitter:description" content="Cómo dar de baja Netflix en España en 3 pasos, con el precio de hoy y un modelo de baja para copiar.">
+<meta name="twitter:description" content="Dónde y cómo darte de baja de Netflix: canales, plazos, permanencia y qué necesitas. Revisado con la web de la empresa.">
 <meta name="twitter:image" content="https://feehund.com/assets/brand/og-image.png?v=202611110351">
 <link rel="preload" href="../../assets/fonts/fraunces-800.woff" as="font" type="font/woff" crossorigin>
 <link rel="preload" href="../../assets/fonts/atkinson-next-400.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="../../assets/app.css?v=202611110351">
+<link rel="stylesheet" href="../../assets/baja-empresa.css">
 </head>
-<body data-baja="netflix">
+<body>
 <a class="skip" href="#main"><span data-l="es">Ir al contenido</span><span data-l="ca">Anar al contingut</span><span data-l="en">Skip to content</span></a>
 <header class="hdr">
   <div class="wrap">
@@ -41,7 +40,7 @@
     <div class="hdr-r">
       <details class="langdd">
       <summary aria-label="Idioma: Español">ES<span class="langdd-i" aria-hidden="true"></span></summary>
-      <ul><li><a href="../../baja/netflix/" hreflang="es" lang="es" aria-current="page">Español</a></li><li><a href="../../ca/baixa/netflix/" hreflang="ca" lang="ca">Català</a></li><li><a href="../../en/cancel/netflix/" hreflang="en" lang="en">English</a></li></ul>
+      <ul><li><a href="../../baja/netflix/" hreflang="es" lang="es" aria-current="page">Español</a></li><li><a href="../../ca/baixa/" hreflang="ca" lang="ca">Català</a></li><li><a href="../../en/cancel/" hreflang="en" lang="en">English</a></li></ul>
     </details>
     </div>
   </div>
@@ -51,31 +50,14 @@
 <div class="wrap baja-in">
   <p class="art-back"><a href="../">← Dar de baja</a></p>
   <h1>Cómo dar de baja Netflix</h1>
-  <p class="baja-tag" id="bTag" hidden>Sin llamar</p>
-  <ol class="baja-pasos" id="bPasos" aria-label="Pasos"><li><span class="baja-num" aria-hidden="true">1</span><p>[VERIFICAR]</p></li><li><span class="baja-num" aria-hidden="true">2</span><p>[VERIFICAR]</p></li><li><span class="baja-num" aria-hidden="true">3</span><p>[VERIFICAR]</p></li></ol>
-  <section class="tb-oferta" data-baja="certificada" aria-labelledby="tbOfH">
-    <h2 id="tbOfH">¿Prefieres que la enviemos por ti?</h2>
-    <p>Carta lista y enviada con certificado. Si no llega, te devolvemos el dinero.</p>
-    <a class="btn tb-pay" href="../enviar/?empresa=netflix&amp;nombre=Netflix" data-api="baja-inicio" data-empresa="netflix">Enviar mi baja · 4,99 €</a>
-    <button type="button" class="btn tb-sec" data-api="carta-pdf" data-empresa="netflix">Descargar carta en PDF (gratis)</button>
-  </section>
-  <section class="baja-card" aria-labelledby="bCardH">
-    <h2 id="bCardH">¿No te lo ponen fácil?</h2>
-    <p>La ley les obliga a facilitar la baja.</p>
-    <p class="baja-small">Modelo orientativo.</p>
-    <button type="button" class="btn btn--gold" id="bCopy" data-servicio="Netflix">Copiar modelo de baja</button>
-    <p class="baja-msg" id="bMsg" role="status" hidden></p>
-    <pre class="baja-modelo" id="bModelo" hidden></pre>
-  </section>
-  <section class="baja-precio" aria-labelledby="bPrH">
-    <h2 id="bPrH">Precio hoy</h2>
-    <dl id="bPrecios"><div><dt>Con anuncios</dt><dd>8,99 €/mes</dd></div><div><dt>Estándar</dt><dd>14,99 €/mes</dd></div><div><dt>Premium</dt><dd>21,99 €/mes</dd></div></dl>
-    <p class="baja-rev">Revisado: <span id="bRev">[VERIFICAR]</span> · Fuente: <a id="bFuente" href="https://help.netflix.com/es-es/node/24926" target="_blank" rel="noopener">netflix.com</a></p>
-  </section>
+  <ol class="baja-pasos" aria-label="Pasos"><li><span class="baja-num" aria-hidden="true">1</span><p>Entra en netflix.com con tu cuenta y ve a Gestionar tu suscripción.</p></li><li><span class="baja-num" aria-hidden="true">2</span><p>Pulsa Cancelar y luego Completar cancelación.</p></li><li><span class="baja-num" aria-hidden="true">3</span><p>Te llega un correo de confirmación. Guárdalo.</p></li></ol>
+  <section class="baja-precio baja-info" aria-labelledby="bDatH"><h2 id="bDatH">Lo que tienes que saber</h2><dl><div><dt>Web o app de Netflix</dt><dd>Cuenta &gt; Gestionar tu suscripción &gt; Cancelar &gt; Completar cancelación.</dd></div><div><dt>Apple u otra empresa que te cobra</dt><dd>Si no ves el botón Cancelar en tu cuenta, te cobra otra empresa (Apple, tu operador u otra). Cancela allí. En la sección Suscripción de tu cuenta verás el enlace o las instrucciones.</dd></div><div><dt>Con cuánto avisar</dt><dd>Cancela antes de la próxima fecha de cobro. Sigues viendo Netflix hasta el final del periodo ya pagado y no te vuelven a cobrar.</dd></div><div><dt>Permanencia</dt><dd>No hay permanencia. La suscripción se renueva sola cada periodo hasta que la canceles. No devuelven dinero por periodos a medias.</dd></div><div><dt>Equipos</dt><dd>No hay equipos que devolver.</dd></div><div><dt>Tu prueba</dt><dd>El correo de confirmación que Netflix envía al correo de la cuenta.</dd></div><div><dt>Qué necesitas</dt><dd>Entrar en tu cuenta de Netflix.</dd></div></dl><p class="baja-rev">Revisado: 11/11/2026 · Fuente: <a href="https://help.netflix.com/es-es/node/407" target="_blank" rel="noopener">help.netflix.com</a></p></section>
+  <section class="baja-card" aria-labelledby="bOjoH"><h2 id="bOjoH">Ten en cuenta</h2><ul class="baja-ojo"><li>Cerrar sesión o borrar la app no cancela la suscripción.</li><li>Si alguien vuelve a entrar en la cuenta puede reactivarla sin querer. Cambia la contraseña y cierra sesión en todos los dispositivos.</li><li>Puedes pausar un mes en vez de cancelar, salvo en el plan Básico y con domiciliación bancaria o tarjeta regalo.</li><li>Si tienes Netflix dentro de un paquete de tu operador, la baja se hace con el operador.</li></ul></section>
+  <section class="baja-card" aria-labelledby="bCardH"><h2 id="bCardH">¿No te lo ponen fácil?</h2><p>La ley les obliga a facilitar la baja.</p><p class="baja-small">Modelo orientativo.</p><button type="button" class="btn btn--gold" id="bCopy" data-servicio="Netflix">Copiar modelo de baja</button><p class="baja-msg" id="bMsg" role="status" hidden></p><pre class="baja-modelo" id="bModelo" hidden></pre></section>
   <a class="baja-cta" href="../../extracto/"><strong>¿Qué más se repite en tu cuenta?</strong><span>Suelta tu extracto →</span></a>
 </div>
 </main>
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"HowTo","name":"Cómo dar de baja Netflix en España","inLanguage":"es","step":[{"@type":"HowToStep","position":1,"text":"[VERIFICAR]"},{"@type":"HowToStep","position":2,"text":"[VERIFICAR]"},{"@type":"HowToStep","position":3,"text":"[VERIFICAR]"}]}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "HowTo", "name": "Cómo dar de baja Netflix en España", "inLanguage": "es", "step": [{"@type": "HowToStep", "position": 1, "text": "Entra en netflix.com con tu cuenta y ve a Gestionar tu suscripción."}, {"@type": "HowToStep", "position": 2, "text": "Pulsa Cancelar y luego Completar cancelación."}, {"@type": "HowToStep", "position": 3, "text": "Te llega un correo de confirmación. Guárdalo."}]}</script>
 
 <footer class="ftr"><div class="wrap ftr-in">
   <ul class="ftr-links">
