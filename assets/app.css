@@ -1459,3 +1459,6 @@ details.opc summary:hover{background:var(--brand-tint);border-radius:11px}
 .bk-general[hidden]{display:none}
 .drop .bk-pasos--zona{width:100%;max-width:420px;margin:var(--s-3) auto 0;padding:0;text-align:left}
 .drop .bk--zona + .btn{margin-top:var(--s-3)}
+
+/* ===== 5 · «Funciona en modo avión» bajo la línea de privacidad (comprobado en Chrome Android y Safari iOS emulados) ===== */
+.drop-avion{margin:-2px 0 0;font-size:16px;line-height:1.35;color:var(--ink-2);text-align:center}
