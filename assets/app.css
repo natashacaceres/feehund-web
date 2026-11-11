@@ -1312,3 +1312,26 @@ details.opc[open] summary::after{transform:rotate(90deg)}
   .ftr-links,.ftr-legal{display:flex;flex-wrap:wrap;justify-content:center;column-gap:22px;row-gap:0}
   .ftr-links li + li::before,.ftr-legal li + li::before{content:none}
 }
+/* Flecha «Volver» en la cabecera (la enseña assets/atras.js; no sale en la portada) */
+.hdr-atras{display:inline-flex;align-items:center;justify-content:center;flex:none;width:44px;height:44px;margin-left:-10px;padding:0;border:0;border-radius:12px;background:none;color:var(--ink);cursor:pointer}
+.hdr-atras[hidden]{display:none}
+.hdr-atras:hover{background:var(--brand-tint)}
+.hdr-atras svg{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.hdr-atras + .brand{margin-left:calc(-1 * var(--s-5) + 2px)}
+/* Línea de independencia en el pie de todas las páginas */
+.ftr-indep{width:100%;margin:0 0 var(--s-2);font-size:15px;line-height:1.45;color:var(--ink-2);text-align:center}
+/* Cómo se calcula: Cómo funciona y las preguntas, con el mismo aire que el resto del texto */
+.doc .sec.como,.doc .faq{padding:var(--s-6) 0 0;background:none}
+.doc .faq-in{padding:0}
+.doc .met-fuera{margin-top:var(--s-5)}
+/* La flecha «Volver» va debajo de la cabecera, al principio de la página: la cabecera no cambia nunca */
+.pg-atras-w{padding-top:var(--s-3)}
+.pg-atras{display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;margin-left:-10px;padding:0;border:0;border-radius:12px;background:none;color:var(--ink);cursor:pointer}
+.pg-atras[hidden]{display:none}
+.pg-atras:hover{background:var(--brand-tint)}
+.pg-atras svg{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.pg-atras-w:has(.pg-atras[hidden]){display:none}
+/* Flecha «Volver»: una fila fija justo debajo de la cabecera, en la misma posición en todas las páginas y estados */
+.pg-atras-w{position:sticky;top:var(--hdr);z-index:45;height:52px;padding-top:0;pointer-events:none}
+.pg-atras-w .wrap{display:flex;align-items:center;height:100%}
+.pg-atras{pointer-events:auto;background:var(--bg);border-radius:50%;box-shadow:0 1px 4px rgba(20,33,61,.12)}

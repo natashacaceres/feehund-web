@@ -237,11 +237,13 @@
     const calc = $("calcApp"), form = $("calc");
     if (!calc) return;
     mostrarCalculadora();
+    // Con la calculadora delante, la pantalla de subir el resumen sobra: menos scroll. La flecha «Volver» la recupera.
+    const up = $("dUp"); if (up) up.hidden = true;
     const q = form && Array.prototype.find.call(form.querySelectorAll(".q"), (x) => !x.hidden);
     const h = q && q.querySelector("h2");
     if (h) h.focus({ preventScroll: true });
-    // un salto, sin animación: la calculadora mueve el foco al pulsar sus botones y cortaría un desplazamiento suave
-    (form || calc).scrollIntoView({ block: "start" });
+    // un salto, sin animación, al principio de la página: la calculadora mueve el foco al pulsar sus botones
+    scrollTo(0, 0);
     const vivo = $("dListo");
     if (vivo) vivo.textContent = aviso || "";
   }
