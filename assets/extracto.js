@@ -239,10 +239,10 @@
   const fichaBaja = (c) => (c && c.comercio_id && ENVIO[c.comercio_id]) || null;
   const seDaDeBaja = (c) => Boolean(c && c.tipo === "comercio" && c.comercio_id && c.periodicidad !== "puntual" && SIN_BAJA.indexOf(c.categoria) < 0 && fichaBaja(c));
   const compatible = (c) => Boolean(seDaDeBaja(c) && fichaBaja(c).e);
-  // compatible: «Te damos de baja»; si no, la página con los pasos para hacerlo uno mismo (solo en español por ahora)
+  // compatible: «Te damos de baja»; si no, la página con los pasos para hacerlo uno mismo, en el idioma de la página
   const enviarBaja = (c) => compatible(c)
     ? ENVIAR + "?empresa=" + encodeURIComponent(String(c.comercio_id).replace(/_/g, "-")) + "&nombre=" + encodeURIComponent(c.nombre)
-    : ROOT + "baja/" + fichaBaja(c).p + "/";
+    : ROOT + (LANG === "es" ? "" : LANG + "/") + BAJA_DIR + "/" + fichaBaja(c).p + "/";
 
   function enlaceBaja(c) {
     const pag = BAJAS[c.comercio_id || c.id] || (c.categoria === "gimnasios" ? "gimnasio" : null);

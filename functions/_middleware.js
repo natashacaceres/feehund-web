@@ -8,14 +8,13 @@ const VIEJAS = {
   "/es/en": ["/en/", "/en/card-machine/"],
 };
 
-// Páginas de Design que nunca se rellenaron («[VERIFICAR]»): llevan a la guía comprobada en español
-// (las de catalán e inglés aún no existen) o, la del gimnasio genérico, a la sección de gimnasios de /baja/.
-const SIN_RELLENAR = {};
-for (const s of ["netflix", "spotify", "amazon-prime", "disney-plus"]) {
-  SIN_RELLENAR["/ca/baixa/" + s] = "/baja/" + s + "/";
-  SIN_RELLENAR["/en/cancel/" + s] = "/baja/" + s + "/";
-}
-for (const r of ["/baja/gimnasio", "/ca/baixa/gimnasio", "/en/cancel/gimnasio"]) SIN_RELLENAR[r] = "/baja/#bj-gimnasios";
+// La página genérica del gimnasio de Design nunca se rellenó («[VERIFICAR]»): lleva a la sección de gimnasios de
+// la lista de bajas, en el mismo idioma.
+const SIN_RELLENAR = {
+  "/baja/gimnasio": "/baja/#bj-gimnasios",
+  "/ca/baixa/gimnasio": "/ca/baixa/#bj-gimnasios",
+  "/en/cancel/gimnasio": "/en/cancel/#bj-gimnasios",
+};
 
 export async function onRequest(context) {
   const url = new URL(context.request.url);
