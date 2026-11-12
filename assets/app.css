@@ -1487,3 +1487,8 @@ details.opc summary:hover{background:var(--brand-tint);border-radius:11px}
 
 /* 4c · foco visible al moverse con el teclado por la lista de bancos */
 .bk-lista .bk-b:focus-visible{outline:2px solid var(--brand);outline-offset:-3px;background:var(--tarjeta-h)}
+
+/* Guías de baja: logo oficial de la empresa encima del título */
+.baja-logo{display:block;width:64px;height:64px;margin:0 auto var(--s-3,12px);border-radius:16px}
+/* la rejilla de .baja-in separa 24 px: el logo se pega más al título */
+.baja-in > .baja-logo{margin:var(--s-2,8px) auto -12px}
