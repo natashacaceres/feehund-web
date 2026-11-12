@@ -16,6 +16,28 @@
   const el = (tag, cls, txt) => { const x = document.createElement(tag); if (cls) x.className = cls; if (txt !== undefined) x.textContent = txt; return x; };
   const fecha = (iso) => iso ? iso.slice(8, 10) + "/" + iso.slice(5, 7) + "/" + iso.slice(0, 4) : "";
   let bancos = [];
+  // logo oficial del banco (bajado de su web, en assets/logos/bancos/); sin logo, la inicial
+  const letra = (b, cls) => { const x = el("span", cls + " bk-ico--letra", b.n.charAt(0).toUpperCase()); x.setAttribute("aria-hidden", "true"); return x; };
+  const icono = (b, cls) => {
+    if (!b.logo) return letra(b, cls);
+    const i = el("img", cls); i.alt = ""; i.width = 28; i.height = 28; i.decoding = "async";
+    i.addEventListener("error", () => i.replaceWith(letra(b, cls)), { once: true }); // sin conexión o sin el archivo: la inicial
+    i.src = raiz + "assets/logos/bancos/" + b.id + ".png";
+    return i;
+  };
+  // el logo del banco elegido, dentro del buscador a la izquierda del nombre (una imagen encima del campo, sin estilos
+  // en línea: la CSP no los deja en Safari)
+  let logoQ = null;
+  const logoEnBuscador = (b) => {
+    if (!logoQ) {
+      const envoltorio = el("span", "bk-q-w"); q.parentNode.insertBefore(envoltorio, q); envoltorio.appendChild(q);
+      logoQ = el("img", "bk-q-logo"); logoQ.alt = ""; logoQ.width = 26; logoQ.height = 26; logoQ.hidden = true; envoltorio.appendChild(logoQ);
+      logoQ.addEventListener("error", () => { logoQ.hidden = true; q.classList.remove("bk-q--logo"); });
+    }
+    const con = Boolean(b && b.logo);
+    if (con) logoQ.src = raiz + "assets/logos/bancos/" + b.id + ".png";
+    logoQ.hidden = !con; q.classList.toggle("bk-q--logo", con);
+  };
 
   function pintarLista() {
     // si el buscador aún muestra el banco elegido, se enseña la lista entera para poder cambiarlo
@@ -24,7 +46,8 @@
     q.setAttribute("aria-expanded", "true");
     const vis = bancos.filter((b) => !t || plano(b.n + " " + b.id.replace(/_/g, " ")).indexOf(t) >= 0);
     for (const b of vis) {
-      const li = el("li"), btn = el("button", "bk-b", b.n);
+      const li = el("li"), btn = el("button", "bk-b");
+      btn.appendChild(icono(b, "bk-ico")); btn.appendChild(el("span", "", b.n));
       btn.type = "button"; btn.setAttribute("role", "option");
       // mousedown: elige antes de que el buscador pierda el foco y cierre la lista
       btn.addEventListener("mousedown", (e) => e.preventDefault());
@@ -38,7 +61,7 @@
   // buscador vacío (la X o borrar a mano): se olvida el banco elegido y se cierran sus pasos
   function vaciar() {
     if (q.value !== "" || q.hidden) return;
-    delete q.dataset.elegido; pasos.hidden = true; pasos.textContent = "";
+    delete q.dataset.elegido; pasos.hidden = true; pasos.textContent = ""; logoEnBuscador(null);
     try { localStorage.removeItem("feehund-banco"); } catch (e) {}
   }
 
@@ -47,7 +70,7 @@
   function elegir(b) {
     try { localStorage.setItem("feehund-banco", b.id); } catch (e) {}
     pasos.textContent = "";
-    pasos.appendChild(el("h3", "bk-h", b.n));
+    const h = el("h3", "bk-h"); h.appendChild(icono(b, "bk-ico")); h.appendChild(el("span", "", b.n)); pasos.appendChild(h);
     let alguno = false;
     for (const canal of ["app", "web"]) {
       const c = b[canal]; if (!c) continue;
@@ -66,18 +89,20 @@
     if (alguno || b.nota) pasos.appendChild(el("p", "bk-rev", TX.rev(b.n, fecha(b.revisado))));
     else { pasos.appendChild(el("p", "bk-x", TX.sin(b.n))); if (general) pasos.appendChild(el("p", "bk-x", general.textContent)); }
     const otro = el("button", "bk-otro", TX.otro); otro.type = "button";
-    otro.addEventListener("click", () => { q.value = ""; q.hidden = false; if (etiqueta) etiqueta.hidden = false; pasos.hidden = true; q.focus(); pintarLista(); });
+    otro.addEventListener("click", () => { q.value = ""; delete q.dataset.elegido; logoEnBuscador(null); q.hidden = false; if (etiqueta) etiqueta.hidden = false; pasos.hidden = true; q.focus(); pintarLista(); });
     pasos.appendChild(otro);
     // el banco elegido se queda escrito en el buscador; el botón «Elegir extracto» sigue justo debajo y los pasos, después
-    q.value = b.n; q.dataset.elegido = b.n;
+    q.value = b.n; q.dataset.elegido = b.n; logoEnBuscador(b);
     lista.hidden = true; q.setAttribute("aria-expanded", "false"); pasos.hidden = false;
   }
 
-  fetch(raiz + "data/bancos-descarga.json", { cache: "no-cache" }).then((r) => r.ok ? r.json() : []).then((d) => {
+  // se pide desde el <head> (preload) para que el buscador esté listo nada más abrir la página
+  fetch(raiz + "data/bancos-descarga.json").then((r) => r.ok ? r.json() : []).then((d) => {
     bancos = d || []; if (!bancos.length) { caja.hidden = true; return; }
     q.setAttribute("role", "combobox"); q.setAttribute("aria-controls", "xBkLista"); q.setAttribute("aria-expanded", "false");
     lista.setAttribute("role", "listbox");
-    q.addEventListener("input", () => { vaciar(); pintarLista(); });
+    // al escribir otro nombre, el logo del banco elegido se quita (vuelve si se deja el nombre como estaba)
+    q.addEventListener("input", () => { vaciar(); if (q.value !== q.dataset.elegido) logoEnBuscador(null); else logoEnBuscador(bancos.find((x) => x.n === q.value)); pintarLista(); });
     q.addEventListener("search", vaciar);
     q.addEventListener("focus", () => { if (q.dataset.elegido && q.value === q.dataset.elegido) q.select(); pintarLista(); });
     q.addEventListener("click", pintarLista);

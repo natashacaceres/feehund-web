@@ -1492,3 +1492,13 @@ details.opc summary:hover{background:var(--brand-tint);border-radius:11px}
 .baja-logo{display:block;width:64px;height:64px;margin:0 auto var(--s-3,12px);border-radius:16px}
 /* la rejilla de .baja-in separa 24 px: el logo se pega más al título */
 .baja-in > .baja-logo{margin:var(--s-2,8px) auto -12px}
+
+/* Buscador de bancos: logo oficial de cada banco en la lista, en el banco elegido y en sus pasos */
+.bk-b{gap:12px}
+.bk-ico{flex:0 0 28px;width:28px;height:28px;border-radius:7px;object-fit:contain;background:#fff}
+.bk-ico--letra{display:inline-grid;place-items:center;background:var(--brand-tint);color:var(--brand);font:800 15px/1 var(--f-text)}
+.bk-h{display:flex;align-items:center;gap:10px}
+.bk-q-w{position:relative;display:block}
+.bk-q-logo{position:absolute;left:12px;top:50%;width:26px;height:26px;margin-top:-13px;border-radius:7px;object-fit:contain;background:#fff;pointer-events:none}
+.bk-q-logo[hidden]{display:none}
+.bk-q.bk-q--logo{padding-left:50px}

@@ -31,7 +31,8 @@
 <meta name="twitter:image" content="https://feehund.com/assets/brand/og-image.png?v=202611111722">
 <link rel="preload" href="../../assets/fonts/fraunces-800.woff" as="font" type="font/woff" crossorigin>
 <link rel="preload" href="../../assets/fonts/atkinson-next-400.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="../../assets/app.css?v=20261112133512">
+<link rel="stylesheet" href="../../assets/app.css?v=20261112135142">
+<link rel="preload" href="../../data/bancos-descarga.json" as="fetch" crossorigin>
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "WebApplication", "name": "Què es repeteix al teu compte?", "url": "https://feehund.com/ca/extracte/", "description": "Deixa anar el teu extracte i mira quines subscripcions i comissions es repeteixen al teu compte. Es llegeix al teu dispositiu i no es puja.", "inLanguage": "ca", "applicationCategory": "FinanceApplication", "operatingSystem": "Web", "isAccessibleForFree": true, "offers": {"@type": "Offer", "price": "0", "priceCurrency": "EUR"}, "publisher": {"@type": "Organization", "name": "Feehund", "url": "https://feehund.com/"}}</script>
 </head>
 <body>
@@ -48,7 +49,7 @@
   </div>
 </header>
 
-<div class="pg-atras-w"><div class="wrap"><button type="button" class="pg-atras" data-atras hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></button></div></div>
+<div class="pg-atras-w"><div class="wrap"><button type="button" class="pg-atras" data-atras aria-label="Tornar" title="Tornar"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></button></div></div>
 <main id="main" class="ext">
 <div class="wrap ext-in">
   <section class="ext-s" id="xUp">
@@ -57,7 +58,7 @@
       <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 15.5V4M7.5 8.5 12 4l4.5 4.5"/><path d="M4.5 14.5v3.5a2 2 0 0 0 2 2h11a2 2 0 0 0 2-2v-3.5"/></svg>
       <p class="drop-t"><span class="x-desk">Deixa anar el teu extracte</span><span class="x-mov">Tria el teu extracte</span></p>
       <p class="drop-s">PDF, Excel o CSV del teu banc a Espanya</p>
-      <div class="bk bk--zona" id="xBk"><label class="bk-l" for="xBkQ">Busca el teu banc</label><input id="xBkQ" class="bk-q" type="search" autocomplete="off" placeholder="CaixaBank, Santander, ING…"><ul class="bk-lista" id="xBkLista"></ul><p class="bk-general" id="xBkGeneral" hidden>A l'app o al web del teu banc, busca Moviments › Descarregar o Exportar. Tria Excel o CSV si pots; si no, PDF. Millor 3 mesos o més.</p></div>
+      <div class="bk bk--zona" id="xBk"><label class="bk-l" for="xBkQ">Busca el teu banc</label><input id="xBkQ" class="bk-q" type="search" autocomplete="off" placeholder="CaixaBank, Santander, ING…"><ul class="bk-lista" id="xBkLista" hidden></ul><p class="bk-general" id="xBkGeneral" hidden>A l'app o al web del teu banc, busca Moviments › Descarregar o Exportar. Tria Excel o CSV si pots; si no, PDF. Millor 3 mesos o més.</p></div>
       <button type="button" class="btn btn--gold" id="xPick"><span class="x-desk">Triar fitxer</span><span class="x-mov">Triar extracte</span></button>
       <p class="drop-priv"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="10.5" width="14" height="10" rx="1.5"/><path d="M8 10.5V7.5a4 4 0 0 1 8 0v3"/></svg><span>Es llegeix al teu dispositiu. No es puja.</span></p>
       <p class="drop-avion">Funciona en mode avió.</p>
@@ -110,8 +111,8 @@
     <li>© 2026 <span data-marca>Feehund</span></li>
   </ul>
 </div></footer>
-<script src="../../assets/extracto.js?v=20261112133512" data-root="../../"></script>
-<script src="../../assets/app.js?v=20261112133512"></script>
-<script src="../../assets/atras.js?v=20261112133512" defer></script>
-<script src="../../assets/bancos-guia.js?v=20261112133512" data-root="../../" defer></script>
+<script src="../../assets/extracto.js?v=20261112135142" data-root="../../"></script>
+<script src="../../assets/app.js?v=20261112135142"></script>
+<script src="../../assets/atras.js?v=20261112135142" defer></script>
+<script src="../../assets/bancos-guia.js?v=20261112135142" data-root="../../" defer></script>
 </body></html>
