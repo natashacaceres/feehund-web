@@ -1505,3 +1505,12 @@ details.opc summary:hover{background:var(--brand-tint);border-radius:11px}
 
 /* Blog: los enlaces a fuentes dentro del texto se distinguen también sin color (subrayados) */
 main.art2 p a[href^="http"],main.art2 li a[href^="http"]{text-decoration:underline;text-underline-offset:3px;text-decoration-thickness:1px}
+
+/* Cabecera: «Dar de baja» a la izquierda del selector de idioma, con la misma letra que «ES» */
+.hdr-baja{display:inline-flex;align-items:center;min-height:44px;padding:0 8px;border-radius:var(--r);font:700 16px/1 var(--f-text);color:var(--ink);text-decoration:none;white-space:nowrap}
+.hdr-baja:hover,.hdr-baja[aria-current="page"]{color:var(--brand)}
+.hdr-baja:focus-visible{outline:2px solid var(--brand);outline-offset:2px}
+/* el logo nunca se aplasta para hacer sitio a «Dar de baja»; en móviles estrechos se juntan un poco y, en los muy estrechos, el logo es algo más bajo */
+.hdr .brand{flex-shrink:0}
+@media (max-width:400px){.hdr .wrap{gap:12px}.hdr-baja{padding:0 6px}.hdr-r{gap:4px}}
+@media (max-width:360px){.hdr .brand img{height:30px}}
