@@ -1502,3 +1502,6 @@ details.opc summary:hover{background:var(--brand-tint);border-radius:11px}
 .bk-q-logo{position:absolute;left:12px;top:50%;width:26px;height:26px;margin-top:-13px;border-radius:7px;object-fit:contain;background:#fff;pointer-events:none}
 .bk-q-logo[hidden]{display:none}
 .bk-q.bk-q--logo{padding-left:50px}
+
+/* Blog: los enlaces a fuentes dentro del texto se distinguen también sin color (subrayados) */
+main.art2 p a[href^="http"],main.art2 li a[href^="http"]{text-decoration:underline;text-underline-offset:3px;text-decoration-thickness:1px}
