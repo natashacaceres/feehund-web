@@ -135,14 +135,35 @@
   function show(which) { for (const k in scr) scr[k].hidden = k !== which; document.body.classList.toggle("con-barra", which === "res" && Boolean($("xBarra"))); scrollTo({ top: 0, behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" }); }
   function msg(el, t) { el.textContent = t; el.hidden = !t; }
 
+  // Barra de la espera bajo Tiqui: avanza con lo que va contando el motor (leyendo, página 3 de 10, saldo, cobros) y, entre
+  // aviso y aviso, poco a poco, para que nunca parezca parada. Llega al 100 % justo antes de enseñar el resultado.
+  const barraCarga = (() => {
+    const caja = $("xProg"), lleno = $("xProgL");
+    let v = 0, techo = 0, paso = 0.03, reloj = null;
+    const pintar = () => { if (!caja) return; lleno.style.transform = "scaleX(" + (v / 100).toFixed(3) + ")"; caja.setAttribute("aria-valuenow", String(Math.round(v))); };
+    const subir = (t, ritmo) => { if (t > techo) techo = Math.min(97, t); if (ritmo) paso = ritmo; };
+    return {
+      empezar() { if (!caja) return; clearInterval(reloj); v = 0; techo = 30; paso = 0.03; pintar(); reloj = setInterval(() => { v = Math.min(techo, v + Math.max(0.04, (techo - v) * paso)); pintar(); }, 120); },
+      fase(p) {
+        if (!p) return;
+        if (typeof p.progreso === "number") subir(20 + 55 * Math.max(0, Math.min(1, p.progreso)));
+        else if (p.pagina && p.total) subir(20 + 55 * Math.min(1, p.pagina / p.total));
+        else subir({ leyendo: 40, foto: 35, preparando_fotos: 30, saldo: 82, cobros: 92 }[p.fase] || 0);
+      },
+      ia() { subir(97, 0.006); }, // la lectura con IA tarda más: sigue avanzando, despacio
+      async fin() { if (!caja) return; clearInterval(reloj); v = 100; pintar(); await new Promise((ok) => setTimeout(ok, 250)); },
+      parar() { clearInterval(reloj); },
+    };
+  })();
+
   async function analyze(entrada) {
     entradaActual = entrada;
-    msg($("xErr"), ""); msg($("xMsg"), ""); show("load");
+    msg($("xErr"), ""); msg($("xMsg"), ""); show("load"); barraCarga.empezar();
     const t0 = Date.now();
     let r = null, error = null;
     try {
       const m = await motor();
-      r = await m.analizar(entrada, { idioma: LANG, contrasenas, onProgreso: (p) => { if (cargando && p && p.texto) cargando.textContent = p.texto; } });
+      r = await m.analizar(entrada, { idioma: LANG, contrasenas, onProgreso: (p) => { barraCarga.fase(p); if (cargando && p && p.texto) cargando.textContent = p.texto; } });
       // PDF con contraseña: se pide aquí mismo y se vuelve a leer
       while (r && r.necesita_contrasena && r.necesita_contrasena.length) {
         let pedida = false;
@@ -151,16 +172,18 @@
           if (clave) { contrasenas[p.archivo] = clave; pedida = true; }
         }
         if (!pedida) break;
-        r = await m.analizar(entrada, { idioma: LANG, contrasenas, onProgreso: (p) => { if (cargando && p && p.texto) cargando.textContent = p.texto; } });
+        r = await m.analizar(entrada, { idioma: LANG, contrasenas, onProgreso: (p) => { barraCarga.fase(p); if (cargando && p && p.texto) cargando.textContent = p.texto; } });
       }
       // Si el dispositivo no lo ha leído entero (filas sin leer, saldo que no cuadra, foto), lo lee Claude
       if (r && lecturaDudosa(r) && paraIA(entrada).length) {
+        barraCarga.ia();
         const r2 = await leerConIA(entrada, m).catch((e) => { console.error("Feehund: lectura con IA", e); return null; });
         if (r2 && mejorLectura(r2, r)) r = r2;
       }
     } catch (e) { error = e; }
     await new Promise((ok) => setTimeout(ok, Math.max(0, 900 - (Date.now() - t0))));
     if (cargando) cargando.textContent = textoCarga;
+    barraCarga.parar();
     if (error || !r) { show("up"); msg($("xErr"), (error && error.message) || TX.bad); return; }
     if (bandeja) bandeja.marcar(r.errores);
     const cobros = (r.cobros || []).filter((c) => c.estado === "seguro" || c.estado === "posible");
@@ -174,6 +197,7 @@
     }
     actual = r;
     await envioP;
+    await barraCarga.fin();
     render(r, cobros); show("res");
     const bShare = $("xShare"); if (bShare) bShare.hidden = !personalidad();
     propio = !(entrada && entrada.deEjemplo);
@@ -495,6 +519,12 @@
     if ($("xBuenaT")) { $("xBuenaT").textContent = T3.devolvieron(eur(sumaDev)); $("xBuenaN").textContent = T3.devoluciones(nDev); }
     else $("xBuena").textContent = T3.devolvieron(eur(sumaDev));
     $("xBuenas").hidden = !(sumaDev > 0);
+    // al tocar la fila, las devoluciones salen justo debajo (las mismas filas que en el detalle)
+    const listaDev = $("xBuenaLista");
+    if (listaDev) {
+      listaDev.textContent = ""; listaDev.hidden = true; $("xBuena").setAttribute("aria-expanded", "false");
+      Array.prototype.slice.call($("xNoticias").children, 0, devuelto.length).forEach((li) => listaDev.appendChild(li.cloneNode(true)));
+    }
     // «¿Otro banco o tarjeta?»: no sale si arriba ya está la acción de añadir el extracto de la tarjeta
     if ($("xOtro")) $("xOtro").hidden = acciones.some((a) => a.anadir);
 
@@ -987,7 +1017,11 @@
     const det = $("xDetalle"), abrir = det.hidden;
     if (abrir) abrirDetalle(null); else { det.hidden = true; $("xVerDetalle").textContent = T3.verDetalle; $("xVerDetalle").setAttribute("aria-expanded", "false"); }
   });
-  if ($("xBuena")) $("xBuena").addEventListener("click", () => abrirDetalle($("xNoticias")));
+  if ($("xBuena")) $("xBuena").addEventListener("click", () => {
+    const lista = $("xBuenaLista");
+    if (!lista || !lista.children.length) { abrirDetalle($("xNoticias")); return; }
+    lista.hidden = !lista.hidden; $("xBuena").setAttribute("aria-expanded", String(!lista.hidden));
+  });
   if ($("xMasExtractos")) $("xMasExtractos").addEventListener("click", anadirTarjeta);
   contar("abre");
   const btnIcs = $("xIcs"); if (btnIcs) btnIcs.addEventListener("click", () => ics().catch(() => {}));

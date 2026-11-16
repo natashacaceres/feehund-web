@@ -31,7 +31,7 @@
 <meta name="twitter:image" content="https://feehund.com/assets/brand/og-image.png?v=202611111722">
 <link rel="preload" href="../assets/fonts/fraunces-800.woff" as="font" type="font/woff" crossorigin>
 <link rel="preload" href="../assets/fonts/atkinson-next-400.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="../assets/app.css?v=20261116164127">
+<link rel="stylesheet" href="../assets/app.css?v=20261116164919">
 <link rel="preload" href="../data/bancos-descarga.json" as="fetch" crossorigin>
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "WebApplication", "name": "¿Qué se repite en tu cuenta?", "url": "https://feehund.com/extracto/", "description": "Suelta tu extracto y mira qué suscripciones y comisiones se repiten en tu cuenta. Se lee en tu dispositivo y no se guarda.", "inLanguage": "es", "applicationCategory": "FinanceApplication", "operatingSystem": "Web", "isAccessibleForFree": true, "offers": {"@type": "Offer", "price": "0", "priceCurrency": "EUR"}, "publisher": {"@type": "Organization", "name": "Feehund", "url": "https://feehund.com/"}}</script>
 </head>
@@ -71,6 +71,7 @@
   </section>
   <section class="ext-s ext-load" id="xLoad" hidden aria-live="polite">
     <img src="../assets/img/tiqui-olfatea.webp?v=202611111722" alt="" aria-hidden="true" width="320" height="320" class="ext-sniff" decoding="async">
+    <div class="ext-prog" id="xProg" role="progressbar" aria-label="Leyendo tu extracto" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span id="xProgL"></span></div>
     <p>Olfateando…</p>
   </section>
   <section class="ext-s ext-res" id="xRes" hidden>
@@ -86,7 +87,7 @@
     <p class="r3-escapo" id="xEscapo" data-ok="no"></p>
     <section class="r3-blq" id="xHacer" aria-labelledby="xHacerH"><h2 class="r3-h" id="xHacerH">Qué hacer ahora</h2><ul class="r3-acciones" id="xAcciones"></ul><button type="button" class="r3-mas" id="xMas" aria-expanded="false" hidden></button></section>
     <section class="r3-blq" id="xVa" aria-labelledby="xVaH"><h2 class="r3-h" id="xVaH">En qué se te va</h2><ul class="r3-barras" id="xBarras"></ul></section>
-    <section class="r3-blq" id="xBuenas" aria-labelledby="xBuenasH"><h2 class="r3-h" id="xBuenasH">Buenas noticias</h2><button type="button" class="r3-buena" id="xBuena"><span class="r3-buena-i" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span><span class="r3-buena-m"><span class="r3-buena-t" id="xBuenaT"></span><span class="r3-buena-n" id="xBuenaN"></span></span><svg class="r3-buena-f" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg></button></section>
+    <section class="r3-blq" id="xBuenas" aria-labelledby="xBuenasH"><h2 class="r3-h" id="xBuenasH">Buenas noticias</h2><button type="button" class="r3-buena" id="xBuena" aria-expanded="false" aria-controls="xBuenaLista"><span class="r3-buena-i" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span><span class="r3-buena-m"><span class="r3-buena-t" id="xBuenaT"></span><span class="r3-buena-n" id="xBuenaN"></span></span><svg class="r3-buena-f" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg></button><ul class="r3-buena-lista" id="xBuenaLista" hidden></ul></section>
     <button type="button" class="r3-link r3-ver" id="xVerDetalle" aria-expanded="false" aria-controls="xDetalle">Ver todo el detalle</button>
     <div class="r3-detalle" id="xDetalle" hidden>
     <p class="res-count" id="xCount" hidden></p>
@@ -129,7 +130,7 @@
     <li>© 2026 <span data-marca>Feehund</span></li>
   </ul>
 </div></footer>
-<script src="../assets/extracto.js?v=20261116164127" data-root="../"></script>
+<script src="../assets/extracto.js?v=20261116164919" data-root="../"></script>
 <script src="../assets/app.js?v=20261113141239"></script>
 <script src="../assets/atras.js?v=20261113141239" defer></script>
 <script src="../assets/bancos-guia.js?v=20261116140713" data-root="../" defer></script>
