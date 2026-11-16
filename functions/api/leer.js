@@ -86,7 +86,8 @@ export async function onRequestPost({ request, env }) {
       stream: true,
       fallbacks: 'default',
       system: INSTRUCCIONES,
-      output_config: { format: { type: 'json_schema', schema: ESQUEMA } },
+      // Copiar no exige razonar: con poco esfuerzo tarda y cuesta mucho menos; el saldo comprueba después cada fila
+      output_config: { effort: 'low', format: { type: 'json_schema', schema: ESQUEMA } },
       messages: [{ role: 'user', content: [contenido, { type: 'text', text: 'Transcribe todos los movimientos de este extracto.' }] }],
     }),
   });
