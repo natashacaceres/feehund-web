@@ -413,6 +413,8 @@
   // La tarjeta se dibuja una vez al salir el resultado, en este dispositivo y sin guardarse; compartir usa la misma
   async function vistaTarjeta() {
     blobTarjeta = null; if (urlTarjeta) { URL.revokeObjectURL(urlTarjeta); urlTarjeta = null; }
+    const r0 = actual;
+    if (r0 && !(r0.personalidad && r0.personalidad.ganadora)) { personalidad(); personalidadEnPagina(r0).then(() => { if (actual === r0 && r0.personalidad) vistaTarjeta(); }); }
     const p = personalidad(), caja = $("xTarjeta"), barra = $("xBarra"), img = $("xTarjetaImg"), mini = $("xBarraImg");
     if (!p) { if (caja) caja.hidden = true; if (barra) barra.hidden = true; return; }
     // el botón y la barra salen ya, con el resultado; la imagen llega después (si no llega, compartir la dibuja al pulsar)
@@ -783,7 +785,30 @@
 
   // Compartir: la tarjeta de la personalidad que da el análisis (assets/extracto/tarjeta.js). Nunca la lista ni los nombres.
   // Se dibuja solo al pulsar y no se guarda. Sin personalidad, no hay botón.
-  function personalidad() { const p = actual && actual.personalidad && actual.personalidad.ganadora; return p && p.id ? p : null; }
+  // Siempre hay personalidad: la del análisis; si no llega, la calcula la página; y si tampoco, el comodín
+  function personalidad() {
+    const p = actual && actual.personalidad && actual.personalidad.ganadora;
+    if (p && p.id) return p;
+    if (!actual) return null;
+    if (!actual._comodin) {
+      const movs = (actual.lectura && actual.lectura.movimientos) || [], per = (actual.lectura && actual.lectura.periodo) || {};
+      actual._comodin = { id: "agente_secreto", dato: { n: movs.length, m: per.dias || 0, unidad: "movimientos_en_dias" }, comodin: true };
+    }
+    return actual._comodin;
+  }
+  // Si el análisis llegó sin personalidad (lector viejo o fallo), se calcula aquí con los mismos movimientos
+  async function personalidadEnPagina(r) {
+    if (!r || (r.personalidad && r.personalidad.ganadora)) return;
+    try {
+      const [mp, dic] = await Promise.all([
+        import(new URL(ROOT + "assets/extracto/nucleo/personalidades.js", location.href).href),
+        fetch(ROOT + "data/comercios.json").then((x) => x.json()),
+      ]);
+      const movs = ((r.lectura && r.lectura.movimientos) || []).filter((m) => !m.divisa || m.divisa === "EUR");
+      const g = mp.calcularPersonalidades(movs, dic).ganadora;
+      if (g && g.id && actual === r) { r.personalidad = { ganadora: g }; delete r._comodin; }
+    } catch (e) { console.error("Feehund: personalidad en la página", e); }
+  }
   async function share() {
     const p = personalidad();
     if (!p) return;
