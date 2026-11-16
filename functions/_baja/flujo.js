@@ -8,7 +8,7 @@
 //   «lleida» (fase 2): se envía solo desde hola@feehund.com con copia a Lleida.net y el certificado se trae por su API.
 // Precio: data/te-damos-de-baja.json (lo escribe envio_web.py, el único sitio del precio).
 
-import DATOS from '../../data/te-damos-de-baja.json' with { type: 'json' };
+import DATOS from '../../data/te-damos-de-baja.js';
 import { calcularEnvio, carta, cartaRecobro, fechaLarga, hoyEspana, sumarDias, validarDatos, MAX_BAJAS, total, euros, esFecha } from '../../assets/te-damos-de-baja/carta.js';
 import { aleatorio, codigo6, referencia, hmac, sha256, igual, firmarId, leerToken, b64, deB64 } from './cripto.js';
 import { leer, borrar, listar, guardarBaja, guardarCompra, guardar, limitar, exportar } from './almacen.js';
