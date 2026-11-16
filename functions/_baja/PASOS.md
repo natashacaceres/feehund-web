@@ -14,7 +14,8 @@ ese mismo día. La persona cree que es automático: ve y recibe lo mismo que cua
 3. API Keys › Create › permiso «Sending access» › copia la clave (`re_…`). Va en el paso 3.
 
 ## 2. Stripe (cuenta «Calculadora datáfono»)
-El producto y el webhook los crea la otra sesión de Claude. Tú solo:
+El producto (`prod_VdmVGkorJMQg6T`) y el webhook ya están creados; el webhook está apagado hasta publicar y se enciende
+ese día. Tú solo:
 1. Developers › API keys › **Create restricted key**, nombre «Feehund bajas», con estos permisos y nada más:
    Checkout Sessions **Write**, Refunds **Write**, Products **Read**, PaymentIntents **Read**. Copia la clave (`rk_live_…`).
 2. Developers › Webhooks › el de `https://feehund.com/api/baja/stripe` › **Signing secret** › Reveal › copia (`whsec_…`).
@@ -26,7 +27,7 @@ El producto y el webhook los crea la otra sesión de Claude. Tú solo:
    - tipo **Secret**: `STRIPE_SECRET_KEY` (la `rk_live_…`), `STRIPE_WEBHOOK_SECRET` (la `whsec_…`), `RESEND_API_KEY` (la `re_…`).
    - tipo **Secret**, tres claves al azar: `TOKEN_SECRET`, `DATA_KEY` y `TAREA_SECRET`. Para cada una, abre Terminal,
      pega `openssl rand -base64 32`, pulsa Enter y copia lo que sale. **Guarda `DATA_KEY` en tu gestor de contraseñas.**
-   - tipo **Text**: `STRIPE_PRODUCT_BAJA` = el `prod_…` que te dé la otra sesión; `AVISOS_CORREO` = el correo donde
+   - tipo **Text**: `STRIPE_PRODUCT_BAJA` = `prod_VdmVGkorJMQg6T`; `AVISOS_CORREO` = el correo donde
      quieres los avisos urgentes (el que mires en el móvil).
 4. Deployments › el último › **Retry deployment**, para que las coja.
 

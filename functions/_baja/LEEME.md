@@ -16,6 +16,8 @@ Escribe `data/te-damos-de-baja.json` (empresas, dirección de bajas sacada de la
 - Mi banco (`data/bajas-envio.json`, campo `e`, con la misma regla);
 - la página de envío y el cobro: Stripe recibe el importe en cada pago (`price_data` sobre el producto
   `STRIPE_PRODUCT_BAJA`); en Stripe no hay precios fijos que cambiar.
+  La misma cuenta de Stripe cobra el informe del datáfono: el aviso solo actúa si `metadata.servicio` es
+  `te-damos-de-baja` y a todo lo demás contesta 200 sin tocar nada (`webhook.test.mjs`).
 
 Si en la revisión mensual una ficha cambia, el botón aparece o desaparece solo al regenerar. Los cambios se apuntan en
 `investigacion/bajas/envio-cambios.json` (qué empresas ganan o pierden el botón, y cuáles aceptarían envío pero aún no
@@ -79,7 +81,7 @@ Si falta alguna, la página dice «Este servicio aún no está abierto» y enlaz
 ## Probar en local
 
 ```bash
-node --test pruebas/te-damos-de-baja/carta.test.mjs pruebas/te-damos-de-baja/coherencia.test.mjs pruebas/te-damos-de-baja/modos.test.mjs
+node --test pruebas/te-damos-de-baja/carta.test.mjs pruebas/te-damos-de-baja/coherencia.test.mjs pruebas/te-damos-de-baja/modos.test.mjs pruebas/te-damos-de-baja/webhook.test.mjs
 # en Chrome: .dev.vars con claves de prueba apuntando al simulador (STRIPE_API, RESEND_API, LLEIDA_API) y PRUEBAS=1
 node pruebas/te-damos-de-baja/simulador.mjs            # buzón en http://localhost:8791/correo
 npx wrangler pages dev . --port 8788 --kv FEEHUND_KV   # con el almacén local vacío
