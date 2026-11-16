@@ -11,7 +11,8 @@
   Cache-Control: no-cache
 
 # Lector de extractos: la página solo puede cargar y pedir archivos de esta misma web.
-# connect-src 'self' impide enviar el extracto a cualquier otro sitio.
+# connect-src 'self' impide enviar el extracto a cualquier otro sitio. Solo /api/leer (esta web) lo pasa a Claude
+# cuando el dispositivo no ha podido leerlo entero, sin guardarlo.
 # 'wasm-unsafe-eval' deja usar WebAssembly (PDF, fotos, HEIC) sin permitir eval de JavaScript.
 # blob: en worker-src e img-src porque el lector de fotos y la imagen para compartir se crean en el propio navegador.
 # Las cuatro últimas directivas cierran plugins, cambios de base, envíos de formularios fuera y que nos metan en un marco.

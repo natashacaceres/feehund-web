@@ -59,6 +59,13 @@
 </ul>
 <h2>La calculadora</h2>
 <p>Els imports i les respostes es processen al navegador de l'usuari i no s'envien ni es desen en cap servidor.</p>
+<h2>El meu banc (lector de l'extracte)</h2>
+<p>L'extracte es llegeix al navegador de l'usuari. Si el navegador no el pot llegir sencer, per exemple un PDF amb un format que no reconeix o una foto, el fitxer s'envia xifrat a Anthropic, que amb la seva intel·ligència artificial Claude n'extreu els moviments i els retorna. El titular no desa el fitxer ni els moviments a cap servidor.</p>
+<ul class="list">
+<li><strong>Finalitat:</strong> llegir els moviments de l'extracte per mostrar el resultat que demana l'usuari.</li>
+<li><strong>Base jurídica:</strong> prestació del servei que l'usuari sol·licita en triar el seu extracte.</li>
+<li><strong>Conservació:</strong> el titular no conserva res. Anthropic tracta la petició segons les seves condicions de l'API.</li>
+</ul>
 <h2>Compra de l'informe</h2>
 <p>El pagament el gestiona Stripe, que tracta les dades de la targeta; el titular no hi té accés. El titular rep el nom, el correu, l'adreça de facturació i, si es facilita, el NIF o el nom de l'empresa.</p>
 <ul class="list">
@@ -84,6 +91,7 @@
 <ul class="list">
 <li><strong>Cloudflare:</strong> allotjament.</li>
 <li><strong>Stripe:</strong> pagaments.</li>
+<li><strong>Anthropic:</strong> lectura amb intel·ligència artificial dels extractes que el navegador no pot llegir.</li>
 <li><strong>FormSubmit:</strong> enviament de formularis.</li>
 </ul>
 <p>Alguns poden tractar dades fora de l'Espai Econòmic Europeu amb les garanties previstes al RGPD, com les clàusules contractuals tipus. No es cedeixen dades a tercers excepte per obligació legal.</p>
