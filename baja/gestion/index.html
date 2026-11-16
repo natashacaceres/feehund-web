@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="es" data-title-fijo><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Gestión de bajas · Feehund</title>
+<meta name="robots" content="noindex">
+<link rel="icon" href="../../assets/brand/favicon.ico?v=202611111722" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="../../assets/brand/favicon-32.png?v=202611111722">
+<link rel="apple-touch-icon" sizes="180x180" href="../../assets/brand/apple-touch-icon.png?v=202611111722">
+<link rel="manifest" href="../../manifest.webmanifest">
+<meta name="theme-color" content="#0E5E6F">
+<link rel="preload" href="../../assets/fonts/fraunces-800.woff" as="font" type="font/woff" crossorigin>
+<link rel="preload" href="../../assets/fonts/atkinson-next-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="../../assets/app.css?v=20261113141239">
+<link rel="stylesheet" href="../../assets/te-damos-de-baja/estilo.css?v=20261116">
+</head>
+<body>
+<a class="skip" href="#main">Ir al contenido</a>
+<header class="hdr">
+  <div class="wrap">
+    <a class="brand" href="../../"><img src="../../assets/brand/feehund-logo-h64.png?v=202611111722" srcset="../../assets/brand/feehund-logo-h64.png?v=202611111722 1x, ../../assets/brand/feehund-logo-h128.png?v=202611111722 2x" alt="Feehund" data-marca width="211" height="64"></a>
+    <div class="hdr-r">
+      <a class="hdr-baja" href="../../baja/">Dar de baja</a>
+    </div>
+  </div>
+</header>
+
+<main id="main" class="baja tb ge">
+<div class="wrap baja-in tb-in">
+  <p class="tb-nota" id="geCarga">Cargando…</p>
+  <section id="geOk" hidden>
+    <h1 id="geTit"></h1>
+    <p class="tb-ok" id="geEstado" role="status"></p>
+    <section class="tb-blk"><h2>Qué poner en Lleida.net</h2>
+      <dl>
+        <dt>Para</dt><dd><span id="gePara"></span> <button type="button" class="tb-link" data-copiar="gePara">Copiar</button></dd>
+        <dt>Asunto</dt><dd><span id="geAsunto"></span> <button type="button" class="tb-link" data-copiar="geAsunto">Copiar</button></dd>
+        <dt>Envío</dt><dd id="geEnvio"></dd>
+        <dt>Persona</dt><dd id="gePersona"></dd>
+      </dl>
+      <div class="ge-fila"><a class="btn tb-sec" id="geCarta" target="_blank">Carta en PDF</a><a class="btn tb-sec" id="geDni" target="_blank" hidden>Foto del DNI</a><a class="btn tb-sec" id="geRec" target="_blank" hidden>Segunda carta en PDF</a></div>
+      <h3>Texto <button type="button" class="tb-link" data-copiar="geTexto">Copiar</button></h3>
+      <pre id="geTexto"></pre>
+    </section>
+    <section class="tb-blk" id="geAcciones" hidden><h2>Cuando esté enviada</h2>
+      <div class="tb-f"><label for="geCert">Certificado de Lleida.net (PDF)</label><input type="file" id="geCert" accept="application/pdf"></div>
+      <div class="tb-acc"><button type="button" class="btn tb-btn" id="geHecho">Hecho: mandarle el justificante</button></div>
+      <button type="button" class="tb-link" id="geDevolver">No se pudo entregar: devolverle el dinero</button>
+    </section>
+    <p id="geMsg" role="status" hidden></p>
+  </section>
+</div>
+</main>
+<footer class="ftr"><div class="wrap ftr-in">
+  <p class="ftr-indep"><span data-l="es">Ningún banco ni empresa de pago paga por aparecer en Feehund.</span><span data-l="ca">Cap banc ni empresa de pagament paga per aparèixer a Feehund.</span><span data-l="en">No bank or payment company pays to appear on Feehund.</span></p>
+  <ul class="ftr-links">
+    <li><a href="../../baja/"><span data-l="es">Dar de baja</span><span data-l="ca">Donar de baixa</span><span data-l="en">Cancel</span></a></li>
+    <li><a href="../../blog/">La Letra Pequeña</a></li>
+    <li><a href="../../metodologia/"><span data-l="es">Cómo se calcula</span><span data-l="ca">Com es calcula</span><span data-l="en">How it is calculated</span></a></li>
+    <li><a href="../../contacto/"><span data-l="es">Contacto</span><span data-l="ca">Contacte</span><span data-l="en">Contact</span></a></li>
+  </ul>
+  <ul class="ftr-legal">
+    <li><a href="../../aviso-legal/"><span data-l="es">Aviso legal</span><span data-l="ca">Avís legal</span><span data-l="en">Legal notice</span></a></li>
+    <li><a href="../../privacidad/"><span data-l="es">Privacidad</span><span data-l="ca">Privacitat</span><span data-l="en">Privacy</span></a></li>
+    <li><a href="../../cookies/"><span data-l="es">Cookies</span><span data-l="ca">Galetes</span><span data-l="en">Cookies</span></a></li>
+    <li><a href="../../condiciones/"><span data-l="es">Condiciones</span><span data-l="ca">Condicions</span><span data-l="en">Terms</span></a></li>
+    <li>© 2026 <span data-marca>Feehund</span></li>
+  </ul>
+</div></footer>
+<script src="../../assets/te-damos-de-baja/gestion.js?v=20261116"></script>
+<script src="../../assets/app.js?v=20261113141239"></script>
+<script src="../../assets/atras.js?v=20261113141239" defer></script>
+</body></html>

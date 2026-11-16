@@ -16,8 +16,9 @@ test('31 empresas, cada una con su correo de la ficha y una regla completa', () 
   }
 });
 
-test('precios: 3,99 € y 1,99 € por cada baja más', () => {
-  assert.deepEqual([1, 2, 3, 5].map(total), [399, 598, 797, 1195]);
+test('precio: sale de data/te-damos-de-baja.json (3,99 € y 2,99 € por cada baja más)', () => {
+  assert.deepEqual(DATOS.precio, { primera: 399, extra: 299 });
+  assert.deepEqual([1, 2, 3, 5].map((n) => total(n, DATOS.precio)), [399, 698, 997, 1595]);
 });
 
 test('días hábiles: fines de semana, festivos nacionales y Viernes Santo', () => {

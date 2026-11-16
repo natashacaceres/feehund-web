@@ -49,10 +49,10 @@ http.createServer(async (req, res) => {
     if (ruta === '/v1/checkout/sessions' && req.method === 'POST') {
       if (!/^Bearer sk_test_/.test(req.headers.authorization || '')) return jsonR(res, 401, { error: { type: 'invalid_request_error', code: 'api_key_invalid' } });
       const f = deFormulario(cuerpo), id = 'cs_test_' + crypto.randomBytes(10).toString('hex');
-      const precios = { [process.env.STRIPE_PRICE_BAJA1 || 'price_baja1_prueba']: 399, [process.env.STRIPE_PRICE_BAJA_EXTRA || 'price_extra_prueba']: 199 };
+      // Como Stripe: importe en cada línea (price_data) sobre un producto que tiene que existir
       const items = Object.values(f.line_items || {});
-      const total = items.reduce((a, it) => a + (precios[it.price] ?? NaN) * Number(it.quantity), 0);
-      if (!Number.isFinite(total)) return jsonR(res, 400, { error: { type: 'invalid_request_error', code: 'resource_missing' } });
+      if (!items.length || items.some((it) => it.price_data?.product !== (process.env.STRIPE_PRODUCT_BAJA || 'prod_prueba') || it.price_data?.currency !== 'eur')) return jsonR(res, 400, { error: { type: 'invalid_request_error', code: 'resource_missing' } });
+      const total = items.reduce((a, it) => a + Number(it.price_data.unit_amount) * Number(it.quantity), 0);
       const s = { id, object: 'checkout.session', url: `http://localhost:${PUERTO}/pagar/${id}`, amount_total: total, currency: 'eur', client_reference_id: f.client_reference_id, customer_email: f.customer_email, metadata: f.metadata, payment_status: 'unpaid', status: 'open', success_url: f.success_url, cancel_url: f.cancel_url, payment_intent: null, custom_text: f.custom_text, items };
       sesiones.set(id, s); return jsonR(res, 200, s);
     }
@@ -77,7 +77,7 @@ http.createServer(async (req, res) => {
       return res.end(`<!doctype html><meta name="viewport" content="width=device-width"><title>Pago de prueba</title>
 <body style="font:16px system-ui;max-width:420px;margin:40px auto;padding:0 16px;background:#f6f8fa">
 <p style="background:#ffe7b8;padding:8px 12px;border-radius:8px">Simulador de Stripe · modo prueba · no se cobra nada</p>
-<h1 style="font-size:22px">Feehund</h1><p>${s.items.map((i) => `${i.quantity} × ${esc(i.price)}`).join('<br>')}</p>
+<h1 style="font-size:22px">Feehund</h1><p>${s.items.map((i) => `${i.quantity} × Te damos de baja · ${(i.price_data.unit_amount / 100).toFixed(2).replace('.', ',')} €`).join('<br>')}</p>
 <p style="font-size:28px;font-weight:700">${(s.amount_total / 100).toFixed(2).replace('.', ',')} €</p>
 <p>${esc(s.customer_email)}</p><p style="font-size:13px;color:#555">${esc(s.custom_text?.submit?.message)}</p>
 <form method="post"><p>Tarjeta 4242 4242 4242 4242 · 12/34 · 123</p><button style="width:100%;padding:14px;font-size:17px;background:#0E5E6F;color:#fff;border:0;border-radius:8px" id="pagar">Pagar</button></form>

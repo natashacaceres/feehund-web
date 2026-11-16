@@ -9,6 +9,7 @@ workers_dev = true
 [vars]
 URL_WEB = "https://feehund.com"
 
-# Cada día a las 7:00 UTC (8:00 en invierno y 9:00 en verano, hora de España)
+# Cada hora: envía las programadas del día, recuerda las que siguen sin enviar (una vez al día), trae los justificantes
+# (envío automático), devuelve lo que no llega y borra lo que toca. Todo es idempotente: repetirlo no duplica nada.
 [triggers]
-crons = ["0 7 * * *"]
+crons = ["0 * * * *"]

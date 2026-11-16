@@ -29,10 +29,15 @@ async function stripe(env, metodo, ruta, cuerpo, idem) {
   return j;
 }
 
-/** Página de pago de Stripe. unidades: 1 a 5 bajas (la primera a STRIPE_PRICE_BAJA1, las demás a STRIPE_PRICE_BAJA_EXTRA). */
-export function crearPago(env, { compra, unidades, correo, idioma, vuelta, cancelar, textos }) {
-  const items = [{ price: env.STRIPE_PRICE_BAJA1, quantity: 1 }];
-  if (unidades > 1) items.push({ price: env.STRIPE_PRICE_BAJA_EXTRA, quantity: unidades - 1 });
+/**
+ * Página de pago de Stripe (Checkout). El importe sale de data/te-damos-de-baja.json (precio: {primera, extra}) y se
+ * manda en cada pago sobre un único producto (STRIPE_PRODUCT_BAJA): cambiar el precio no obliga a tocar Stripe.
+ * unidades: 1 a 5 bajas (la primera a precio.primera, las demás a precio.extra).
+ */
+export function crearPago(env, { compra, unidades, precio, correo, idioma, vuelta, cancelar, textos }) {
+  const linea = (importe, cantidad) => ({ quantity: cantidad, price_data: { currency: 'eur', unit_amount: importe, product: env.STRIPE_PRODUCT_BAJA } });
+  const items = [linea(precio.primera, 1)];
+  if (unidades > 1) items.push(linea(precio.extra, unidades - 1));
   return stripe(env, 'POST', '/v1/checkout/sessions', {
     mode: 'payment',
     line_items: Object.fromEntries(items.map((x, i) => [i, x])),
@@ -42,8 +47,8 @@ export function crearPago(env, { compra, unidades, correo, idioma, vuelta, cance
     success_url: vuelta,
     cancel_url: cancelar,
     expires_at: Math.floor(Date.now() / 1000) + 3600, // una hora
-    metadata: { compra, servicio: 'te-damos-de-baja' },
-    payment_intent_data: { metadata: { compra, servicio: 'te-damos-de-baja' }, description: textos.descripcion },
+    metadata: { compra, servicio: 'te-damos-de-baja', unidades },
+    payment_intent_data: { metadata: { compra, servicio: 'te-damos-de-baja' }, description: textos.descripcion, statement_descriptor_suffix: 'FEEHUND BAJA' },
     // [REVISIÓN LEGAL] la renuncia al desistimiento se acepta en nuestra página; Stripe la recuerda junto al botón
     custom_text: { submit: { message: textos.renuncia } },
   }, 'pago-' + compra);

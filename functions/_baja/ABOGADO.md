@@ -3,9 +3,11 @@
 Los textos marcados **[REVISIÓN LEGAL]** están en la web como borrador. Nada se cobra hasta su visto bueno.
 
 ## Qué hace el servicio, en una frase
-La persona rellena sus datos, firma con un código que le llega al correo y paga 3,99 € (1,99 € cada baja más). Feehund
-envía su carta de baja desde hola@feehund.com a la dirección de bajas de la empresa, con copia a Lleida.net (que
-certifica el envío y la entrega) y con «responder a» la persona. Si no llega, se devuelve el dinero. Si la empresa
+La persona rellena sus datos, firma con un código que le llega al correo y paga 3,99 € (2,99 € cada baja más). Su carta
+de baja se envía ese mismo día por correo electrónico certificado de Lleida.net a la dirección de bajas de la empresa.
+**Fase 1 (al principio):** la envía a mano la titular desde su cuenta de Lleida.net con los datos que le llegan en un
+correo urgente. **Fase 2:** sale sola desde hola@feehund.com con copia a Lleida.net y «responder a» la persona.
+La persona ve y recibe exactamente lo mismo en las dos fases. Si no llega, se devuelve el dinero. Si la empresa
 vuelve a cobrar, segunda carta gratis (una por compra). Los datos se borran a los 30 días de la entrega.
 
 ## 1. Mandato: enviar bajas en nombre de otra persona
@@ -37,8 +39,8 @@ vuelve a cobrar, segunda carta gratis (una por compra). Los datos se borran a lo
   un mes de antelación.
 - «Motivo de la baja: decisión personal.» (Orange, Amena, Jazztel y Simyo piden motivo.)
 - Petición de no hacer más cargos, anular la domiciliación y confirmar por escrito.
-- Frase sobre Feehund: «Envío esta carta a través de Feehund, que la remite en mi nombre y con mi autorización. Las
-  respuestas llegan directamente a mi correo.»
+- Frase sobre Feehund: «Envío esta carta a través de Feehund, que la remite en mi nombre y con mi autorización.»
+  (Las respuestas: la carta pide que confirmen la baja por escrito al correo de la persona.)
 - Firma: «Firmado electrónicamente el [fecha, hora] con un código de verificación enviado a [correo]. Referencia FH-…»
 - Segunda carta (reclamación del cobro posterior), mismo formato.
 - Remitente visible: «"Nombre Apellidos (vía Feehund)" <hola@feehund.com>». ¿Problema?
@@ -63,7 +65,15 @@ fuero, resolución de litigios en línea.
   de esos 30 días (seguros anuales, por ejemplo), ya no tenemos los datos. ¿60 o 90 días son razonables?
 - Registro de actividades de tratamiento; ¿hace falta evaluación de impacto?
 
-## 6. Fiscal y otros
+## 6. Fase 1: envío a mano
+- Los datos de la persona y la carta llegan al **buzón de correo de la titular** (correo urgente) y se envían desde **su
+  cuenta personal de Lleida.net**. ¿Cómo se cuenta en privacidad (texto nuevo: «el equipo de Feehund recibe tu carta y
+  tus datos por correo… y los borra de ese correo cuando está enviada»)? ¿Hace falta algo más con su proveedor de correo?
+- La foto del DNI no va en el correo: se descarga de la página de gestión, protegida con un enlace firmado.
+- La web promete «la enviamos **hoy**». ¿Algún riesgo si un día no se puede (enfermedad, vacaciones)?
+- La titular **no es autónoma ni empresa** (solo NIF): ¿puede cobrar este servicio así? (también con el gestor)
+
+## 7. Fiscal y otros
 - Factura: Stripe no la emite; Verifactu; IVA 21 % incluido; epígrafe del IAE para este servicio.
 - ¿Algún registro o autorización para gestionar trámites en nombre de consumidores?
 - Seguro de responsabilidad civil profesional, por si una carta se envía mal.

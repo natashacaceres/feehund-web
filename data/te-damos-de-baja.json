@@ -1,5 +1,9 @@
 {
  "version": "2026-11-11",
+ "precio": {
+  "primera": 399,
+  "extra": 299
+ },
  "empresas": {
   "adamo": {
    "id": "adamo",

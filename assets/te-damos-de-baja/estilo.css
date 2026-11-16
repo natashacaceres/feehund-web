@@ -13,3 +13,27 @@
 .tb .tb-est-m .tb-link{display:block;width:max-content;margin:var(--s-4) auto 0}
 .tb #tbRecobro .tb-f{margin-top:var(--s-3)}
 .tb .tb-blk + .tb-blk{margin-top:var(--s-6)}
+/* Página de gracias: confirmación oficial, tranquila, con check verde grande */
+.gr .gr-ok{display:flex;flex-direction:column;align-items:center;text-align:center;gap:var(--s-3);padding-top:var(--s-5)}
+.gr .gr-check{width:112px;height:112px;animation:gr-pop .45s cubic-bezier(.2,1.4,.4,1) both}
+.gr .gr-check svg{width:100%;height:100%}
+.gr .gr-check circle{fill:#1F8A4C}
+.gr .gr-check path{fill:none;stroke:#FFFFFF;stroke-width:5.5;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:64;stroke-dashoffset:64;animation:gr-trazo .35s .25s ease-out forwards}
+.gr h1:focus{outline:none}
+.gr h1{margin:var(--s-3) 0 0;font-size:clamp(28px,7vw,40px);line-height:1.15}
+.gr .gr-ok p{margin:0;max-width:34ch;font-size:18px;line-height:1.5}
+.gr .gr-1{font-size:20px}
+.gr .gr-altura{font-weight:700;color:var(--brand)}
+.gr .gr-tiqui{margin:var(--s-4) 0 0}
+.gr .gr-tiqui img{width:160px;height:auto}
+.gr .gr-tiqui figcaption{font-size:14px;color:var(--ink-2)}
+.gr .tb-acc{width:100%;max-width:420px}
+@keyframes gr-pop{from{transform:scale(.4);opacity:0}to{transform:scale(1);opacity:1}}
+@keyframes gr-trazo{to{stroke-dashoffset:0}}
+@media (prefers-reduced-motion:reduce){.gr .gr-check,.gr .gr-check path{animation:none;stroke-dashoffset:0}}
+/* Página de gestión (equipo) */
+.ge pre{white-space:pre-wrap;background:#FFFFFF;border:1px solid var(--line);border-radius:var(--r);padding:var(--s-4);font:14px/1.5 ui-monospace,Menlo,monospace}
+.ge dl{display:grid;grid-template-columns:max-content 1fr;gap:var(--s-2) var(--s-4);margin:0}
+.ge dt{font-weight:700}.ge dd{margin:0;overflow-wrap:anywhere}
+.ge .ge-fila{display:flex;flex-wrap:wrap;gap:var(--s-3);align-items:center}
+.ge .tb-blk{margin-top:var(--s-5)}

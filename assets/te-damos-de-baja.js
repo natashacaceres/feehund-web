@@ -31,7 +31,7 @@ const T = {
     perdido: "Esta baja ya no existe o el enlace no es correcto. Si han pasado más de 30 días desde la entrega, ya borramos los datos.",
     prog: (f) => f, quedan: (n) => n === 1 ? "Te queda 1 baja pagada" : `Te quedan ${n} bajas pagadas`,
     devuelto: (x) => `Te devolvemos ${x}. Tarda de 5 a 10 días en verse en tu tarjeta.`, borrado: "Hemos borrado tus datos.",
-    borrarProg: "Cancelar el envío y borrar mis datos", borrarEl: (f) => `Borramos tus datos solos el ${f}.`, esperaBorrar: "Podrás borrarlos en cuanto sepamos si la carta ha llegado (uno o dos días).",
+    borrarProg: "Cancelar el envío y borrar mis datos", borrarEl: (f) => `Borramos tus datos solos el ${f}.`, esperaBorrar: "Podrás borrarlos cuando tengas el justificante.",
     nadaRecobro: (e) => `No vemos cobros de ${e} después de la baja en ese extracto.`, recobroVisto: (f, x) => `Vemos un cobro de ${x} el ${f}.`,
     leyendo: "Leyendo tu extracto en tu dispositivo…", noLeido: "No hemos podido leer ese archivo. Escríbelo a mano.",
     confirmarBorrar: "¿Seguro? No se puede deshacer.",
@@ -54,7 +54,7 @@ const T = {
     perdido: "Aquesta baixa ja no existeix o l'enllaç no és correcte. Si han passat més de 30 dies des del lliurament, ja hem esborrat les dades.",
     prog: (f) => f, quedan: (n) => n === 1 ? "Et queda 1 baixa pagada" : `Et queden ${n} baixes pagades`,
     devuelto: (x) => `Et retornem ${x}. Triga de 5 a 10 dies a veure's a la targeta.`, borrado: "Hem esborrat les teves dades.",
-    borrarProg: "Cancel·lar l'enviament i esborrar les meves dades", borrarEl: (f) => `Esborrem les teves dades soles el ${f}.`, esperaBorrar: "Les podràs esborrar quan sapiguem si la carta ha arribat (un o dos dies).",
+    borrarProg: "Cancel·lar l'enviament i esborrar les meves dades", borrarEl: (f) => `Esborrem les teves dades soles el ${f}.`, esperaBorrar: "Les podràs esborrar quan tinguis el justificant.",
     nadaRecobro: (e) => `No veiem cobraments de ${e} després de la baixa en aquest extracte.`, recobroVisto: (f, x) => `Veiem un cobrament de ${x} el ${f}.`,
     leyendo: "Llegint el teu extracte al teu dispositiu…", noLeido: "No hem pogut llegir aquest fitxer. Escriu-ho a mà.",
     confirmarBorrar: "Segur? No es pot desfer.",
@@ -77,7 +77,7 @@ const T = {
     perdido: "This cancellation no longer exists or the link is wrong. If more than 30 days have passed since delivery, we have already deleted the details.",
     prog: (f) => f, quedan: (n) => n === 1 ? "You have 1 paid cancellation left" : `You have ${n} paid cancellations left`,
     devuelto: (x) => `We are refunding ${x}. It takes 5 to 10 days to show on your card.`, borrado: "We have deleted your details.",
-    borrarProg: "Cancel sending and delete my details", borrarEl: (f) => `We delete your details automatically on ${f}.`, esperaBorrar: "You can delete them as soon as we know the letter has arrived (a day or two).",
+    borrarProg: "Cancel sending and delete my details", borrarEl: (f) => `We delete your details automatically on ${f}.`, esperaBorrar: "You can delete them once you have the proof of sending.",
     nadaRecobro: (e) => `We see no ${e} charges after the cancellation in that statement.`, recobroVisto: (f, x) => `We see a charge of ${x} on ${f}.`,
     leyendo: "Reading your statement on your device…", noLeido: "We could not read that file. Type it in instead.",
     confirmarBorrar: "Are you sure? It cannot be undone.",
@@ -232,13 +232,13 @@ async function flujo() {
   for (let n = 1; n <= Math.min(3, MAX_BAJAS); n++) {
     const l = document.createElement("label"); l.className = "tb-op";
     l.innerHTML = '<input type="radio" name="pack"><span class="tb-op-t"><strong></strong></span>';
-    l.querySelector("input").value = String(n); l.querySelector("input").checked = n === 1; l.querySelector("strong").textContent = T.pack(n, euros(total(n), LANG));
+    l.querySelector("input").value = String(n); l.querySelector("input").checked = n === 1; l.querySelector("strong").textContent = T.pack(n, euros(total(n, E.precio), LANG));
     packs.appendChild(l);
   }
-  $("tbPackNota").textContent = T.packNota(euros(total(2) - total(1), LANG));
+  $("tbPackNota").textContent = T.packNota(euros(E.precio.extra, LANG));
   if (lote) { packs.hidden = true; $("tbPackNota").hidden = true; $("tbLote").hidden = false; }
   const unidades = () => Number((document.querySelector('input[name="pack"]:checked') || {}).value || 1);
-  const payLabel = () => { const r = calcularEnvio(E, eleccion(), hoy), prog = Boolean(r.ok && r.programada); $("tbPay").textContent = lote ? T.usar(prog) : T.pay(prog, euros(total(unidades()), LANG)); };
+  const payLabel = () => { const r = calcularEnvio(E, eleccion(), hoy), prog = Boolean(r.ok && r.programada); $("tbPay").textContent = lote ? T.usar(prog) : T.pay(prog, euros(total(unidades(), E.precio), LANG)); };
   packs.addEventListener("change", payLabel);
   $("tbDes").addEventListener("change", () => err("tbE4d", false));
   $("tbPay").addEventListener("click", async () => {
@@ -281,8 +281,8 @@ async function estado() {
   fill("empresa", S.nombre);
   ver(S.estado === "borrador" || S.estado === "firmada" ? "pago" : S.estado);
   fill("fecha-prog", fd(S.envio));
-  if (S.enviadaEn) fill("fecha-env", new Date(S.enviadaEn).toLocaleString({ es: "es-ES", ca: "ca-ES", en: "en-GB" }[LANG], { day: "numeric", month: "long", year: "numeric", hour: "2-digit", minute: "2-digit", timeZone: "Europe/Madrid" }));
-  if (S.entregadaEn) fill("fecha-ent", fd(S.entregadaEn.slice(0, 10)));
+  if (S.enviadaEn) fill("fecha-env", fd(new Intl.DateTimeFormat("sv-SE", { timeZone: "Europe/Madrid" }).format(new Date(S.enviadaEn))));
+  fill("correo", S.correo);
   document.querySelectorAll('[data-api="certificado-pdf"]').forEach((a) => { a.href = API + "certificado.pdf?p=" + encodeURIComponent(p); a.hidden = !S.certificado; });
   document.querySelectorAll('[data-api="carta-pdf"]').forEach((a) => { a.href = API + "carta.pdf?p=" + encodeURIComponent(p); });
   $("tbTarde").hidden = !S.tarde;
@@ -334,8 +334,8 @@ async function estado() {
   // Tus datos
   const b = $("tbBorrar");
   if (S.estado === "programada") b.textContent = T.borrarProg;
-  $("tbBorrarNota").textContent = S.estado === "enviada" ? T.esperaBorrar : S.borrarEl ? T.borrarEl(fd(S.borrarEl)) : "";
-  b.hidden = S.estado === "enviada";
+  $("tbBorrarNota").textContent = S.estado === "en_marcha" ? T.esperaBorrar : S.borrarEl ? T.borrarEl(fd(S.borrarEl)) : "";
+  b.hidden = S.estado === "en_marcha";
   b.addEventListener("click", async () => {
     if (!confirm(T.confirmarBorrar)) return;
     try { const r = await api("borrar", { p }); $("tbBorrarNota").textContent = T.borrado + (r.devuelto ? " " + T.devuelto(euros(r.devuelto, LANG)) : ""); b.hidden = true; document.querySelectorAll(".tb-est, #tbRecBox, #tbLoteBox").forEach((el) => { el.hidden = true; }); }
@@ -343,5 +343,26 @@ async function estado() {
   });
 }
 
+/* ============ GRACIAS (después de pagar) ============ */
+// Solo confirma si hay un pago válido; si no, lleva a la lista de bajas. Igual con el envío a mano y con el automático.
+async function gracias() {
+  const p = Q.get("p"), fuera = () => location.replace(GUIA);
+  if (!p) return fuera();
+  let S = null;
+  for (let i = 0; i < 8; i++) { // el aviso de Stripe puede tardar unos segundos
+    try { S = await api("estado?p=" + encodeURIComponent(p)); } catch { return fuera(); }
+    if (S.estado !== "pago") break;
+    await new Promise((r) => setTimeout(r, 2000));
+  }
+  if (!S || ["en_marcha", "programada", "hecha"].indexOf(S.estado) < 0) return fuera();
+  fill("empresa", S.nombre); fill("correo", S.correo); fill("fecha-prog", fd(S.envio));
+  document.querySelectorAll("[data-cuando]").forEach((el) => { el.hidden = el.dataset.cuando !== (S.estado === "programada" ? "prog" : "hoy"); });
+  if (S.lote && S.lote.quedan > 0) { $("grLote").hidden = false; fill("quedan", T.quedan(S.lote.quedan)); }
+  $("grEstado").href = { es: "/baja/estado/", ca: "/ca/baixa/estat/", en: "/en/cancel/status/" }[LANG] + "?p=" + encodeURIComponent(p);
+  $("grCarga").hidden = true; $("grOk").hidden = false;
+  $("grH").setAttribute("tabindex", "-1"); $("grH").focus({ preventScroll: true });
+}
+
 if (main && main.dataset.vista === "flujo") flujo();
 if (main && main.dataset.vista === "estado") estado();
+if (main && main.dataset.vista === "gracias") gracias();

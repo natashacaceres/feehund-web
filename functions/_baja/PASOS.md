@@ -1,56 +1,58 @@
-# «Te damos de baja» · lo que tienes que hacer tú
+# «Te damos de baja» · lo que tienes que hacer tú (fase 1: envío a mano)
 
-Todo lo demás está hecho y probado en local. Puedes ir en este orden; cuando acabes cada paso, me pasas lo que pone
-«me pasas» y yo lo coloco.
+Sin pagar nada antes de tener clientes. Cuando alguien paga, te llega un correo URGENTE y la envías tú por Lleida.net
+ese mismo día. La persona cree que es automático: ve y recibe lo mismo que cuando lo sea.
 
-## 1. Lleida.net (el certificado)
-1. Date de alta en Lleida.net, servicio **Correo electrónico certificado (Mailcert)**. Compra el pack más pequeño
-   (desde 25 €; cada envío cuesta 1 € + IVA).
-2. En su panel, añade **hola@feehund.com** como remitente autorizado (lista blanca) y elige que el certificado se haga
-   cuando pongamos su dirección en copia (**modo SENT_CC**). Si no lo encuentras, pídeselo a su soporte con esas palabras.
-3. Pide el **usuario y la clave de la API**. → *me pasas* que ya los tienes (los pegas tú en Cloudflare, paso 4).
+## 0. Antes de cobrar de verdad
+- Habla con tu **gestor**: cobrar este servicio sin ser autónoma ni empresa.
+- **Abogado**: la lista está en `functions/_baja/ABOGADO.md`.
 
-## 2. Resend (el que envía los correos)
-1. Cuenta en resend.com. Añade el dominio **feehund.com**: te da 3 registros; ponlos en Cloudflare › DNS (o dime y lo
-   hago contigo). Espera a que salga «Verified».
-2. Crea una **API key** de envío. Comprueba que **hola@feehund.com** recibe correo (es el remitente).
+## 1. Resend (envía los correos de la web; gratis hasta 3.000 al mes)
+1. Crea la cuenta en resend.com › Domains › Add domain › `feehund.com`.
+2. Te da 3 registros DNS: cópialos en Cloudflare › feehund.com › DNS › Add record (o dime y lo hacemos juntas).
+   Espera a que Resend diga «Verified».
+3. API Keys › Create › permiso «Sending access» › copia la clave (`re_…`). Va en el paso 3.
 
-## 3. Stripe (el cobro)
-En la cuenta de Feehund, **primero en modo de prueba** y luego igual en real:
-1. Producto «Te damos de baja» con **dos precios de pago único**: **3,99 €** y **1,99 €**. Copia los dos códigos
-   `price_…`.
-2. Desarrolladores › Webhooks › añadir: dirección `https://feehund.com/api/baja/stripe`, eventos
-   `checkout.session.completed` y `checkout.session.async_payment_succeeded`. Copia el secreto `whsec_…`.
+## 2. Stripe (cuenta «Calculadora datáfono»)
+El producto y el webhook los crea la otra sesión de Claude. Tú solo:
+1. Developers › API keys › **Create restricted key**, nombre «Feehund bajas», con estos permisos y nada más:
+   Checkout Sessions **Write**, Refunds **Write**, Products **Read**, PaymentIntents **Read**. Copia la clave (`rk_live_…`).
+2. Developers › Webhooks › el de `https://feehund.com/api/baja/stripe` › **Signing secret** › Reveal › copia (`whsec_…`).
 
-## 4. Cloudflare (las claves)
-1. Workers & Pages › KV › crear un espacio llamado `feehund-baja`.
-2. Proyecto **feehund-web** › Settings › Bindings › añadir KV: nombre `FEEHUND_KV`, espacio `feehund-baja`
-   (en **Preview** y en **Production**).
-3. Settings › Variables and secrets, **primero solo en Preview** (pruebas), todas como «Secret»:
-   - `STRIPE_SECRET_KEY` (la `sk_test_…`), `STRIPE_WEBHOOK_SECRET`, `STRIPE_PRICE_BAJA1` (3,99), `STRIPE_PRICE_BAJA_EXTRA` (1,99)
-   - `RESEND_API_KEY`, `LLEIDA_USER`, `LLEIDA_API_KEY`
-   - `TOKEN_SECRET`, `DATA_KEY` y `TAREA_SECRET`: tres claves al azar. Para hacerlas, abre Terminal y pega esto tres
-     veces (una por clave): `openssl rand -base64 32`
-   - `ENVIO_PRUEBA`: **tu propio correo**. Así, en las pruebas, ninguna carta llega a una empresa de verdad.
-4. **Guarda `DATA_KEY` en un sitio seguro** (gestor de contraseñas): sin ella no se pueden leer los datos guardados.
+## 3. Cloudflare
+1. Storage & Databases › KV › Create: nombre `feehund-baja`.
+2. Workers & Pages › **feehund-web** › Settings › Bindings › Add › KV namespace: nombre `FEEHUND_KV`, espacio `feehund-baja`.
+3. Settings › Variables and secrets › Add, en **Production**:
+   - tipo **Secret**: `STRIPE_SECRET_KEY` (la `rk_live_…`), `STRIPE_WEBHOOK_SECRET` (la `whsec_…`), `RESEND_API_KEY` (la `re_…`).
+   - tipo **Secret**, tres claves al azar: `TOKEN_SECRET`, `DATA_KEY` y `TAREA_SECRET`. Para cada una, abre Terminal,
+     pega `openssl rand -base64 32`, pulsa Enter y copia lo que sale. **Guarda `DATA_KEY` en tu gestor de contraseñas.**
+   - tipo **Text**: `STRIPE_PRODUCT_BAJA` = el `prod_…` que te dé la otra sesión; `AVISOS_CORREO` = el correo donde
+     quieres los avisos urgentes (el que mires en el móvil).
+4. Deployments › el último › **Retry deployment**, para que las coja.
 
-## 5. La tarea diaria
-Con las claves puestas, lo publico yo: el Worker `feehund-baja-tarea` (necesitarás iniciar sesión en Cloudflare una vez
-cuando te lo pida) con la misma `TAREA_SECRET`.
+## 4. La tarea de cada hora (recordatorios, programadas y borrado a los 30 días)
+Workers & Pages › Create › Worker › nombre `feehund-baja-tarea` › Deploy › Edit code: borra lo que hay, pega el
+contenido de `workers/baja-tarea/index.js` (te lo paso) › Deploy. Después, en ese Worker:
+- Settings › Variables and secrets: Secret `TAREA_SECRET` (la misma del paso 3) y Text `URL_WEB` = `https://feehund.com`.
+- Settings › Trigger events › Add › Cron: `0 * * * *` (cada hora).
 
-## 6. Prueba de verdad (vista previa)
-Con todo puesto en Preview, hacemos juntas una baja de prueba con la tarjeta de prueba de Stripe: la carta te llega a ti
-(por `ENVIO_PRUEBA`), con copia real a Lleida (1 €), y comprobamos que llega el certificado.
+## 5. Lleida.net
+Cuando llegue el primer cliente: alta en Lleida.net (acepta personas físicas) y compra el **pack de bienvenida de 9,99 €**
+(10 envíos). Si quieres poder enviar desde tu correo con copia a `correo@certificado.lleida.net`, pídeles que den de
+alta tu dirección como remitente.
 
-## 7. Abogado
-Contrata la revisión. La lista con todo lo que tiene que mirar está en `functions/_baja/ABOGADO.md`.
+## Cuando llegue un correo URGENTE
+1. Abre Lleida.net › Correo electrónico certificado › nuevo envío.
+2. **Para**, **Asunto** y **Texto**: cópialos del correo urgente (el asunto lleva la referencia FH-…, déjalo igual).
+3. Adjunta la carta en PDF (va en el correo). Si la empresa pide copia del DNI, descárgala en el enlace de gestión.
+4. Envía. Cuando Lleida te mande el certificado en PDF, abre el enlace de gestión del correo, súbelo y pulsa
+   **«Hecho»**: a la persona le llega su justificante.
+5. Si no se puede entregar: en esa misma página, **«No se pudo entregar»**. Se le devuelve el dinero y se le avisa.
+6. Borra el correo urgente: lleva datos personales.
+Si una baja sigue sin «Hecho», al día siguiente te llega un RECORDATORIO.
 
-## 8. Encender
-Con el sí del abogado y tu sí: pongo las mismas variables en **Production** (con las claves reales de Stripe y sin
-`ENVIO_PRUEBA`), publico, enciendo «Darme de baja» en Mi banco (`ENVIO_ACTIVO = true`) y vuelvo a poner el bloque
-«¿Prefieres que la enviemos por ti?» en las guías de las 31 empresas, con 3,99 €.
-
-## Decisiones que te tocan a ti
-- **Borrar a los 30 días** hace que la segunda carta gratis solo se pueda pedir en esos 30 días. ¿Lo subimos a 60 o 90?
-- He añadido la **foto del DNI** (opcional) porque 17 de las 31 empresas piden copia. ¿Te parece bien?
-- **Firma dibujada**: opcional. **AutoFirma**: no está hecho (lo dejaste para el final).
+## Decisiones que te tocan
+- **Borrar a los 30 días** limita la segunda carta gratis a esos 30 días. ¿60 o 90?
+- **Foto del DNI** (opcional): 17 de las 31 empresas piden copia.
+- La página y los correos dicen «la enviamos **hoy**». Si alguien paga a las 23:50, la tienes que enviar esa noche o
+  muy temprano. Si prefieres «en el día» o «en 24 horas», se cambia en un sitio.

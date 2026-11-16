@@ -1,4 +1,4 @@
-// Worker «feehund-baja-tarea»: una vez al día llama a la tarea de «Te damos de baja» de la web
+// Worker «feehund-baja-tarea»: cada hora llama a la tarea de «Te damos de baja» de la web
 // (envía las cartas programadas para hoy, mira si han llegado, trae los certificados de Lleida.net, devuelve el dinero
 // de las que no llegan y borra los datos a los 30 días). Toda la lógica y las claves están en la web (Pages):
 // este Worker solo guarda TAREA_SECRET, la misma que en la web.

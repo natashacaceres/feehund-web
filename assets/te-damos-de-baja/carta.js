@@ -3,9 +3,10 @@
 // Fechas siempre como 'AAAA-MM-DD' en hora de España.
 // [REVISIÓN LEGAL] Los textos de la carta (CARTA) los tiene que revisar el abogado antes de cobrar.
 
-export const PRECIO = { primera: 399, extra: 199 }; // céntimos, IVA incluido
-export const MAX_BAJAS = 5;                          // bajas en una misma compra
-export const total = (n) => PRECIO.primera + PRECIO.extra * (Math.max(1, n) - 1);
+// El precio NO está aquí: sale de data/te-damos-de-baja.json (lo escribe envio_web.py del motor, el único sitio del precio).
+export const MAX_BAJAS = 5; // bajas en una misma compra
+/** Total en céntimos de n bajas. precio: { primera, extra } de data/te-damos-de-baja.json */
+export const total = (n, precio) => precio.primera + precio.extra * (Math.max(1, n) - 1);
 export const euros = (c, idioma = 'es') => (c / 100).toLocaleString(idioma === 'en' ? 'en-GB' : idioma + '-ES', { minimumFractionDigits: 2 }) + ' €';
 
 /* ---------- fechas ---------- */
@@ -95,7 +96,7 @@ const CARTA = {
     motivo: 'Motivo de la baja: decisión personal.',
     cargos: (c) => `Pido que a partir de esa fecha no se me haga ningún cargo más, que se anule la domiciliación de los recibos y que me confirméis la baja por escrito en ${c}.`,
     adjunto: 'Adjunto copia de mi documento de identidad.',
-    feehund: 'Envío esta carta a través de Feehund, que la remite en mi nombre y con mi autorización. Las respuestas llegan directamente a mi correo.',
+    feehund: 'Envío esta carta a través de Feehund, que la remite en mi nombre y con mi autorización.',
     saludo: 'Atentamente,',
     firma: (f, c, r) => `Firmado electrónicamente el ${f} con un código de verificación enviado a ${c}. Referencia ${r}.`,
     sinFirma: '[Se firma en el paso siguiente]',
@@ -111,7 +112,7 @@ const CARTA = {
     motivo: 'Motiu de la baixa: decisió personal.',
     cargos: (c) => `Demano que a partir d'aquesta data no se'm faci cap més càrrec, que s'anul·li la domiciliació dels rebuts i que em confirmeu la baixa per escrit a ${c}.`,
     adjunto: 'Adjunto còpia del meu document d\'identitat.',
-    feehund: 'Envio aquesta carta a través de Feehund, que la tramet en nom meu i amb la meva autorització. Les respostes arriben directament al meu correu.',
+    feehund: 'Envio aquesta carta a través de Feehund, que la tramet en nom meu i amb la meva autorització.',
     saludo: 'Atentament,',
     firma: (f, c, r) => `Signat electrònicament el ${f} amb un codi de verificació enviat a ${c}. Referència ${r}.`,
     sinFirma: '[Se signa al pas següent]',
@@ -127,7 +128,7 @@ const CARTA = {
     motivo: 'Reason for cancelling: personal decision.',
     cargos: (c) => `Please make no further charges from that date, cancel any direct debit or automatic payment, and confirm the cancellation in writing to ${c}.`,
     adjunto: 'A copy of my identity document is attached.',
-    feehund: 'I am sending this letter through Feehund, which forwards it on my behalf and with my authorisation. Replies come straight to my email.',
+    feehund: 'I am sending this letter through Feehund, which forwards it on my behalf and with my authorisation.',
     saludo: 'Yours faithfully,',
     firma: (f, c, r) => `Signed electronically on ${f} with a verification code sent to ${c}. Reference ${r}.`,
     sinFirma: '[Signed in the next step]',
