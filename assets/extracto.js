@@ -348,7 +348,12 @@
   const SUSCRIPCIONES = ["streaming", "musica", "nube_apps", "ia", "prensa", "gimnasios", "citas", "videojuegos", "idiomas", "reparto", "suscripciones", "club_descuentos", "bienestar"];
   const MESES_FRIO = [11, 12, 1, 2, 3];
   // logo oficial de la empresa: el de su guía de baja (assets/logos/<página>.png); si no hay guía, ninguno
-  const logoDe = (c) => { const f = fichaBaja(c); return f && f.p ? ROOT + "assets/logos/" + f.p + ".png" : null; };
+  // y si no tiene guía, el de su nombre (assets/logos/<id con guiones>.png); si no existe, la imagen se quita sola
+  const logoDe = (c) => {
+    const f = fichaBaja(c);
+    if (f && f.p) return ROOT + "assets/logos/" + f.p + ".png";
+    return c && c.comercio_id ? ROOT + "assets/logos/" + String(c.comercio_id).replace(/_/g, "-") + ".png" : null;
+  };
   const eur = (x) => (Math.abs(x) >= 1 ? e0(x) : e2(x)) + " €";
   let blobTarjeta = null, urlTarjeta = null;
 
