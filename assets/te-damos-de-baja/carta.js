@@ -54,7 +54,8 @@ export function ultimoDiaAviso(aviso, objetivo) {
  * que acabe; ren = fecha de la próxima renovación o vencimiento).
  * Devuelve { ok, error?, envio, objetivo, programada, tarde }: tarde = aunque se envíe hoy, llega con menos aviso del
  * que pide la empresa (puede acabar un periodo más tarde).
- * Margen: un día hábil más (o dos naturales) por si la empresa tarda en leer el correo o hay un festivo local.
+ * Margen: un día hábil más (o dos naturales) por si la empresa tarda en leer el correo o hay un festivo local, y un
+ * día más por las 24 horas que nos damos para enviarla.
  */
 export function calcularEnvio(empresa, eleccion, hoy = hoyEspana()) {
   const cuando = eleccion?.cuando;
@@ -65,8 +66,11 @@ export function calcularEnvio(empresa, eleccion, hoy = hoyEspana()) {
   if (objetivo > sumarMeses(hoy, 18)) return { ok: false, error: 'lejos' };
   const limite = ultimoDiaAviso(empresa.aviso, objetivo);
   const conMargen = empresa.aviso?.habiles ? restarHabiles(limite, 1) : sumarDias(limite, -2);
-  const envio = conMargen > hoy ? conMargen : hoy;
-  return { ok: true, envio, objetivo, programada: envio > hoy, tarde: limite < hoy };
+  // Prometemos enviarla en 24 horas: la programada se adelanta un día más para que, aunque salga al final de su día,
+  // llegue a tiempo. Si ya no cabe, sale en las próximas 24 horas, y es «tarde» si así llegaría después del límite.
+  const envio = sumarDias(conMargen, -1);
+  if (envio > hoy) return { ok: true, envio, objetivo, programada: true, tarde: false };
+  return { ok: true, envio: hoy, objetivo, programada: false, tarde: limite < sumarDias(hoy, 1) };
 }
 
 /* ---------- textos ---------- */

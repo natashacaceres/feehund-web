@@ -4,7 +4,7 @@ Los textos marcados **[REVISIÓN LEGAL]** están en la web como borrador. Nada s
 
 ## Qué hace el servicio, en una frase
 La persona rellena sus datos, firma con un código que le llega al correo y paga 3,99 € (2,99 € cada baja más). Su carta
-de baja se envía ese mismo día por correo electrónico certificado de Lleida.net a la dirección de bajas de la empresa.
+de baja se envía en las 24 horas siguientes por correo electrónico certificado de Lleida.net a la dirección de bajas de la empresa.
 **Fase 1 (al principio):** la envía a mano la titular desde su cuenta de Lleida.net con los datos que le llegan en un
 correo urgente. **Fase 2:** sale sola desde hola@feehund.com con copia a Lleida.net y «responder a» la persona.
 La persona ve y recibe exactamente lo mismo en las dos fases. Si no llega, se devuelve el dinero. Si la empresa
@@ -70,7 +70,8 @@ fuero, resolución de litigios en línea.
   cuenta personal de Lleida.net**. ¿Cómo se cuenta en privacidad (texto nuevo: «el equipo de Feehund recibe tu carta y
   tus datos por correo… y los borra de ese correo cuando está enviada»)? ¿Hace falta algo más con su proveedor de correo?
 - La foto del DNI no va en el correo: se descarga de la página de gestión, protegida con un enlace firmado.
-- La web promete «la enviamos **hoy**». ¿Algún riesgo si un día no se puede (enfermedad, vacaciones)?
+- La web promete «la enviamos **en 24 horas**» (o «el <fecha>» si está programada). ¿Algún riesgo si un día no se puede
+  (enfermedad, vacaciones)?
 - La titular **no es autónoma ni empresa** (solo NIF): ¿puede cobrar este servicio así? (también con el gestor)
 
 ## 7. Fiscal y otros

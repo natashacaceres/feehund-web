@@ -52,7 +52,7 @@ async function firmarYSeguir(page, { dibujar = true } = {}) {
 /** Lo que pasa por detrás tras pagar: a mano (correo urgente + página de gestión) o solo (tarea). Devuelve el correo urgente. */
 async function enviarPorDetras(page, empresa, { fotos = false } = {}) {
   if (MODO === 'lleida') { await tarea(); return null; }
-  const urg = await correoA(EQUIPO, new RegExp(`^(URGENTE|RECORDATORIO) · Enviar hoy la baja de ${empresa}`));
+  const urg = await correoA(EQUIPO, new RegExp(`^(URGENTE|RECORDATORIO) · Enviar la baja de ${empresa} antes del `));
   const g = await page.context().newPage();
   await g.goto(enlaceGestion(urg.text)); await g.waitForSelector('#geOk:visible');
   if (fotos) await foto(g, 'gestion-equipo');
@@ -101,15 +101,15 @@ await foto(page, 'stripe-simulado');
 await page.click('#pagar');
 await page.waitForURL(/\/baja\/gracias\/\?p=/);
 await page.waitForSelector('#grOk:visible', { timeout: 30000 });
-assert.match(await page.textContent('#grOk'), /Gracias por ser parte de Feehund[\s\S]*Ya estamos gestionando tu baja de O2[\s\S]*La enviamos hoy[\s\S]*Trataremos de estar a la altura/);
+assert.match(await page.textContent('#grOk'), /Gracias por ser parte de Feehund[\s\S]*Ya estamos gestionando tu baja de O2[\s\S]*La enviamos en las próximas 24 horas[\s\S]*Trataremos de estar a la altura/);
 assert.ok((await page.textContent('#grOk')).includes(PERSONA.correo));
 assert.match(await page.textContent('#grLote'), /Te quedan 2 bajas pagadas/);
 await espera(900); await foto(page, 'gracias');
 const pToken = new URL(page.url()).searchParams.get('p');
 const urlEstado1 = WEB + '/baja/estado/?p=' + pToken;
-const recibido = await correoA(PERSONA.correo, /^Recibido: enviamos hoy tu baja de O2$/);
+const recibido = await correoA(PERSONA.correo, /^Recibido: enviamos tu baja de O2 en 24 horas$/);
 assert.ok(recibido.adjuntos.some((a) => a.startsWith('solicitud-de-baja')));
-ok('página de gracias y correo «Recibido: enviamos hoy…» con la carta');
+ok('página de gracias y correo «Recibido: enviamos tu baja… en 24 horas» con la carta');
 await page.goto(urlEstado1);
 await page.waitForSelector('.tb-est[data-estado="en_marcha"]:visible');
 await foto(page, 'estado-en-marcha');
@@ -142,8 +142,8 @@ await page.fill('#tbRecFecha', dia(0)); await page.fill('#tbRecImp', '12,50');
 await foto(page, 'recobro');
 await page.click('#tbRecEnviar');
 await page.waitForSelector('#tbRecOk:visible');
-await correoA(PERSONA.correo, /^Recibido: enviamos hoy una segunda carta a O2$/);
-if (MODO === 'manual') { const u = await correoA(EQUIPO, /^URGENTE · Enviar hoy la segunda carta/); assert.ok(u.adjuntos.some((a) => a.startsWith('justificante-')) && /12,50 €/.test(u.text)); }
+await correoA(PERSONA.correo, /^Recibido: enviamos una segunda carta a O2 en 24 horas$/);
+if (MODO === 'manual') { const u = await correoA(EQUIPO, /^URGENTE · Enviar la segunda carta a O2 antes del /); assert.ok(u.adjuntos.some((a) => a.startsWith('justificante-')) && /12,50 €/.test(u.text)); }
 const otra = await page.evaluate(async (p) => (await fetch('/api/baja/recobro', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ p, fecha: new Date().toISOString().slice(0, 10), importe: 3 }) })).status, pToken);
 assert.equal(otra, 400);
 ok('segunda carta con el justificante; la tercera se rechaza');
@@ -172,7 +172,7 @@ await correoA(PERSONA.correo, /^Recibido: enviamos tu baja de Basic-Fit el /);
 const envioBasic = (await (await page.request.get(WEB + '/api/baja/estado?p=' + pBasic)).json()).envio;
 let t = await tarea(); assert.equal(t.enviadas + t.avisos, 0, 'no sale antes de tiempo');
 t = await tarea(envioBasic); assert.equal(t.enviadas + t.avisos, 1, JSON.stringify(t));
-if (MODO === 'manual') await correoA(EQUIPO, /^URGENTE · Enviar hoy la baja de Basic-Fit/);
+if (MODO === 'manual') { const u = await correoA(EQUIPO, /^URGENTE · Enviar la baja de Basic-Fit antes del .+\(todo el día\)/); assert.match(u.text, /le hemos dicho que sale el /); }
 t = await tarea(envioBasic); assert.equal(t.avisos, 0, 'el mismo día no se repite el aviso');
 await enviarPorDetras(page, 'Basic-Fit');
 await correoA(PERSONA.correo, /^Tu baja de Basic-Fit ya está enviada/);
@@ -217,7 +217,7 @@ assert.match(await page.textContent('#grOk'), /Thank you for being part of Feehu
 await espera(900); await foto(page, 'en-thanks');
 const pEn = new URL(page.url()).searchParams.get('p');
 if (MODO === 'manual') {
-  const u = await correoA(EQUIPO, /^URGENTE · Enviar hoy la baja de Privilegios/);
+  const u = await correoA(EQUIPO, /^URGENTE · Enviar la baja de Privilegios en Compras antes del /);
   const g = await ctx.newPage(); await g.goto(enlaceGestion(u.text));
   await g.waitForSelector('#geOk:visible'); g.once('dialog', (d) => d.accept()); await g.click('#geDevolver'); await g.waitForSelector('#geMsg.tb-ok'); await g.close();
 } else await tarea();

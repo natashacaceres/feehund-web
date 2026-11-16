@@ -29,14 +29,17 @@ test('días hábiles: fines de semana, festivos nacionales y Viernes Santo', () 
   assert.equal(sumarMeses('2027-03-31', -1), '2027-02-28');
 });
 
-test('fecha de envío: telecos 2 días hábiles + 1 de margen; seguros un mes + 2 días', () => {
+test('fecha de envío: telecos 2 días hábiles + 1 de margen; seguros un mes + 2 días; y 1 día más por las 24 horas', () => {
   const hoy = '2026-11-16';
-  assert.deepEqual(calcularEnvio(E.orange, { cuando: 'fin', fecha: '2026-12-15' }, hoy), { ok: true, envio: '2026-12-10', objetivo: '2026-12-15', programada: true, tarde: false });
-  assert.deepEqual(calcularEnvio(E.dkv, { cuando: 'ren', fecha: '2027-03-01' }, hoy), { ok: true, envio: '2027-01-30', objetivo: '2027-03-01', programada: true, tarde: false });
+  assert.deepEqual(calcularEnvio(E.orange, { cuando: 'fin', fecha: '2026-12-15' }, hoy), { ok: true, envio: '2026-12-09', objetivo: '2026-12-15', programada: true, tarde: false });
+  assert.deepEqual(calcularEnvio(E.dkv, { cuando: 'ren', fecha: '2027-03-01' }, hoy), { ok: true, envio: '2027-01-29', objetivo: '2027-03-01', programada: true, tarde: false });
   // Ya no da tiempo: se envía hoy y se avisa
   assert.deepEqual(calcularEnvio(E.zoom, { cuando: 'ren', fecha: '2026-12-01' }, hoy), { ok: true, envio: hoy, objetivo: '2026-12-01', programada: false, tarde: true });
   assert.equal(calcularEnvio(E.dkv, { cuando: 'ya' }, hoy).error, 'cuando'); // un seguro solo se puede parar en la renovación
   assert.equal(calcularEnvio(E.orange, { cuando: 'fin', fecha: hoy }, hoy).error, 'fecha');
+  // Justo en el borde: con 24 horas aún llega (no es tarde) / ya no llega (tarde)
+  assert.deepEqual(calcularEnvio(E.orange, { cuando: 'fin', fecha: '2026-11-19' }, hoy), { ok: true, envio: hoy, objetivo: '2026-11-19', programada: false, tarde: false });
+  assert.deepEqual(calcularEnvio(E.orange, { cuando: 'fin', fecha: '2026-11-18' }, hoy), { ok: true, envio: hoy, objetivo: '2026-11-18', programada: false, tarde: true });
 });
 
 test('carta: seguro con oposición a la prórroga; telecos con el plazo legal; inglés para Zoom', () => {

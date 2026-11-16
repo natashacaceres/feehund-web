@@ -32,6 +32,9 @@ const MAX_ENVIOS_CODIGO = 4, MAX_INTENTOS = 5, MIN_CODIGO = 15;
 
 export class Fallo extends Error { constructor(codigo, estado = 400) { super(codigo); this.codigo = codigo; this.estado = estado; } }
 const ahoraISO = () => new Date().toISOString();
+// Plazo para enviarla a mano: 24 horas desde el pago, o el día programado entero
+const plazo = (b) => b.programada ? fechaLarga(b.envio, 'es') + ' (todo el día)'
+  : new Intl.DateTimeFormat('es-ES', { timeZone: 'Europe/Madrid', day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit' }).format(new Date(Date.parse(b.pagadaEn) + 864e5));
 const horaEspana = (d = new Date()) => new Intl.DateTimeFormat('es-ES', { timeZone: 'Europe/Madrid', hour: '2-digit', minute: '2-digit' }).format(d);
 export const base = (env, url) => env.URL_WEB || new URL(url).origin;
 const tokenBaja = (env, b) => firmarId(env, 'baja', b.id);
@@ -187,7 +190,7 @@ async function pagada(env, origen, b) {
   const adj = await leer(env, 'adj', b.id); // copia del DNI y firma: duran lo que dure la baja
   if (adj) await guardar(env, 'adj', b.id, adj, { ttlDias: 400 });
   const programada = b.envio > hoyEspana();
-  b.estado = programada ? 'programada' : 'pagada';
+  b.estado = programada ? 'programada' : 'pagada'; b.programada = programada;
   await guardarBaja(env, b);
   // La confirmación a la persona: la misma en los dos modos
   const e = empresaDe(b.empresa), M = msj(b.idioma), url = await urlEstado(env, origen, b);
@@ -206,7 +209,7 @@ async function despachar(env, origen, b, recordatorio = false, hoy = hoyEspana()
 async function avisoUrgente(env, origen, b, recordatorio) {
   if (!env.AVISOS_CORREO) throw new Fallo('sin_avisos', 503);
   const e = empresaDe(b.empresa), c = laCarta(b);
-  const [asunto, texto] = urgente.baja({ e, b, c, recordatorio, gestion: await urlGestion(env, origen, b), lleidaCc: LLEIDA_CC });
+  const [asunto, texto] = urgente.baja({ e, b, c, recordatorio, gestion: await urlGestion(env, origen, b), lleidaCc: LLEIDA_CC, limite: plazo(b), programada: b.programada });
   await enviarCorreo(env, { para: env.AVISOS_CORREO, asunto, texto, idem: `urgente-${b.id}-${b.avisadaEn}`, adjuntos: [{ nombre: archivoCarta(c, b), bytes: await pdfDe(env, b, c), tipo: 'application/pdf' }] });
 }
 
@@ -374,7 +377,7 @@ export async function recobro(env, req, token, cuerpo) {
       asunto: r.asunto, texto: r.cuerpo.join('\n'), adjuntos, idem: `recobro-${b.id}`,
     });
   } else {
-    const [asunto, texto] = urgente.recobro({ e, b, r, gestion: await urlGestion(env, origen, b), lleidaCc: LLEIDA_CC });
+    const [asunto, texto] = urgente.recobro({ e, b, r, gestion: await urlGestion(env, origen, b), lleidaCc: LLEIDA_CC, limite: plazo({ pagadaEn: b.recobroEn }) });
     await enviarCorreo(env, { para: env.AVISOS_CORREO, asunto, texto, idem: `urgente-recobro-${b.id}`, adjuntos });
   }
   const [asunto, texto] = msj(b.idioma).recobro(e.nombre, await urlEstado(env, origen, b));

@@ -1,6 +1,6 @@
 // Correos. Texto plano, cortos, firmados «Feehund».
 // MENSAJES: a la persona, en el idioma en que usó la página. Redacción definitiva: la MISMA con el envío a mano (fase 1)
-// y con el automático (fase 2). Nunca «al instante»: «hoy».
+// y con el automático (fase 2). Promesa: «en 24 horas» (las programadas, «el <fecha>»). Nunca «hoy» ni «al instante».
 // urgente: al equipo (AVISOS_CORREO), en castellano, con todo lo necesario para enviar la carta a mano en 2 minutos.
 
 const FIN = '\n\nFeehund · feehund.com';
@@ -19,11 +19,11 @@ const RENUNCIA = {
 export const MENSAJES = {
   es: {
     codigo: (c, e) => [`Tu código para firmar la baja de ${e}: ${c}`, `Tu código para firmar la carta de baja de ${e} es:\n\n${c}\n\nCaduca en 15 minutos.` + PIE.es],
-    recibido: (e, url) => [`Recibido: enviamos hoy tu baja de ${e}`, `Gracias. Hemos recibido tu pago y ya estamos gestionando tu baja.\n\nEnviamos hoy tu carta a ${e} por correo electrónico certificado y te mandamos el justificante a este correo. Te adjuntamos la carta firmada.\n\nCómo va: ${url}` + RENUNCIA.es + FIN],
+    recibido: (e, url) => [`Recibido: enviamos tu baja de ${e} en 24 horas`, `Gracias. Hemos recibido tu pago y ya estamos gestionando tu baja.\n\nEnviamos tu carta a ${e} por correo electrónico certificado en las próximas 24 horas y te mandamos el justificante a este correo. Te adjuntamos la carta firmada.\n\nCómo va: ${url}` + RENUNCIA.es + FIN],
     programada: (e, f, url) => [`Recibido: enviamos tu baja de ${e} el ${f}`, `Gracias. Hemos recibido tu pago y tu baja ya está programada.\n\nEnviamos tu carta a ${e} el ${f} por correo electrónico certificado y ese día te mandamos el justificante a este correo. Hasta entonces puedes cancelarla y te devolvemos el dinero. Te adjuntamos la carta firmada.\n\nCómo va: ${url}` + RENUNCIA.es + FIN],
     justificante: (e, f, url) => [`Tu baja de ${e} ya está enviada: aquí tienes el justificante`, `Enviamos tu carta de baja a ${e} el ${f} por correo electrónico certificado. Te adjuntamos el justificante de Lleida.net y tu carta: guárdalos, son la prueba de que la pediste y de cuándo.\n\nSi ${e} te contesta, la respuesta te llega a este correo.\nSi te vuelven a cobrar después de la baja, te enviamos una segunda carta gratis: ${url}` + FIN],
     devuelta: (e, imp) => [`No hemos podido entregar tu baja a ${e}: te devolvemos ${imp}`, `El correo de ${e} no ha aceptado tu carta. Te devolvemos ${imp} a la misma tarjeta; tarda de 5 a 10 días en verse.\n\nPuedes darte de baja por los otros caminos de nuestra guía gratis.` + FIN],
-    recobro: (e, url) => [`Recibido: enviamos hoy una segunda carta a ${e}`, `Enviamos hoy a ${e} una segunda carta, gratis, reclamando el cobro posterior a tu baja y citando el justificante. Te la adjuntamos.\n\nCómo va: ${url}` + FIN],
+    recobro: (e, url) => [`Recibido: enviamos una segunda carta a ${e} en 24 horas`, `En las próximas 24 horas enviamos a ${e} una segunda carta, gratis, reclamando el cobro posterior a tu baja y citando el justificante. Te la adjuntamos.\n\nCómo va: ${url}` + FIN],
     cancelada: (e, imp) => [`Envío a ${e} cancelado`, `Has cancelado el envío de tu baja a ${e} y hemos borrado tus datos. Te devolvemos ${imp} a la misma tarjeta.` + FIN],
     restantes: (n, imp) => [`Te devolvemos ${imp}`, `Te devolvemos ${imp} por ${n === 1 ? 'la baja que no has usado' : `las ${n} bajas que no has usado`}. Tarda de 5 a 10 días en verse en tu tarjeta.` + FIN],
     descripcion: (n) => n === 1 ? 'Te damos de baja · 1 baja con certificado' : `Te damos de baja · ${n} bajas con certificado`,
@@ -31,11 +31,11 @@ export const MENSAJES = {
   },
   ca: {
     codigo: (c, e) => [`El teu codi per signar la baixa de ${e}: ${c}`, `El teu codi per signar la carta de baixa de ${e} és:\n\n${c}\n\nCaduca d'aquí a 15 minuts.` + PIE.ca],
-    recibido: (e, url) => [`Rebut: enviem avui la teva baixa de ${e}`, `Gràcies. Hem rebut el teu pagament i ja estem gestionant la teva baixa.\n\nEnviem avui la teva carta a ${e} per correu electrònic certificat i t'enviem el justificant a aquest correu. T'adjuntem la carta signada.\n\nCom va: ${url}` + RENUNCIA.ca + FIN],
+    recibido: (e, url) => [`Rebut: enviem la teva baixa de ${e} en 24 hores`, `Gràcies. Hem rebut el teu pagament i ja estem gestionant la teva baixa.\n\nEnviem la teva carta a ${e} per correu electrònic certificat en les properes 24 hores i t'enviem el justificant a aquest correu. T'adjuntem la carta signada.\n\nCom va: ${url}` + RENUNCIA.ca + FIN],
     programada: (e, f, url) => [`Rebut: enviem la teva baixa de ${e} el ${f}`, `Gràcies. Hem rebut el teu pagament i la teva baixa ja està programada.\n\nEnviem la teva carta a ${e} el ${f} per correu electrònic certificat i aquell dia t'enviem el justificant a aquest correu. Fins llavors la pots cancel·lar i et retornem els diners. T'adjuntem la carta signada.\n\nCom va: ${url}` + RENUNCIA.ca + FIN],
     justificante: (e, f, url) => [`La teva baixa de ${e} ja està enviada: aquí tens el justificant`, `Vam enviar la teva carta de baixa a ${e} el ${f} per correu electrònic certificat. T'adjuntem el justificant de Lleida.net i la teva carta: guarda'ls, són la prova que la vas demanar i de quan.\n\nSi ${e} et contesta, la resposta t'arriba a aquest correu.\nSi et tornen a cobrar després de la baixa, t'enviem una segona carta gratis: ${url}` + FIN],
     devuelta: (e, imp) => [`No hem pogut lliurar la teva baixa a ${e}: et retornem ${imp}`, `El correu de ${e} no ha acceptat la teva carta. Et retornem ${imp} a la mateixa targeta; triga de 5 a 10 dies a veure's.\n\nPots donar-te de baixa pels altres camins de la nostra guia gratis.` + FIN],
-    recobro: (e, url) => [`Rebut: enviem avui una segona carta a ${e}`, `Enviem avui a ${e} una segona carta, gratis, reclamant el cobrament posterior a la teva baixa i citant el justificant. Te l'adjuntem.\n\nCom va: ${url}` + FIN],
+    recobro: (e, url) => [`Rebut: enviem una segona carta a ${e} en 24 hores`, `En les properes 24 hores enviem a ${e} una segona carta, gratis, reclamant el cobrament posterior a la teva baixa i citant el justificant. Te l'adjuntem.\n\nCom va: ${url}` + FIN],
     cancelada: (e, imp) => [`Enviament a ${e} cancel·lat`, `Has cancel·lat l'enviament de la teva baixa a ${e} i hem esborrat les teves dades. Et retornem ${imp} a la mateixa targeta.` + FIN],
     restantes: (n, imp) => [`Et retornem ${imp}`, `Et retornem ${imp} per ${n === 1 ? 'la baixa que no has fet servir' : `les ${n} baixes que no has fet servir`}. Triga de 5 a 10 dies a veure's a la targeta.` + FIN],
     descripcion: (n) => n === 1 ? 'Et donem de baixa · 1 baixa amb certificat' : `Et donem de baixa · ${n} baixes amb certificat`,
@@ -43,11 +43,11 @@ export const MENSAJES = {
   },
   en: {
     codigo: (c, e) => [`Your code to sign your ${e} cancellation: ${c}`, `Your code to sign your cancellation letter to ${e} is:\n\n${c}\n\nIt expires in 15 minutes.` + PIE.en],
-    recibido: (e, url) => [`Received: we send your ${e} cancellation today`, `Thank you. We have received your payment and are already handling your cancellation.\n\nWe send your letter to ${e} today by certified email and email you the proof of sending. Your signed letter is attached.\n\nHow it is going: ${url}` + RENUNCIA.en + FIN],
+    recibido: (e, url) => [`Received: we send your ${e} cancellation within 24 hours`, `Thank you. We have received your payment and are already handling your cancellation.\n\nWe send your letter to ${e} by certified email within the next 24 hours and email you the proof of sending. Your signed letter is attached.\n\nHow it is going: ${url}` + RENUNCIA.en + FIN],
     programada: (e, f, url) => [`Received: we send your ${e} cancellation on ${f}`, `Thank you. We have received your payment and your cancellation is scheduled.\n\nWe send your letter to ${e} on ${f} by certified email and that day we email you the proof of sending. Until then you can cancel it and we refund you. Your signed letter is attached.\n\nHow it is going: ${url}` + RENUNCIA.en + FIN],
     justificante: (e, f, url) => [`Your ${e} cancellation has been sent: here is your proof`, `We sent your cancellation letter to ${e} on ${f} by certified email. The Lleida.net proof of sending and your letter are attached: keep them, they prove you asked and when.\n\nIf ${e} replies, the reply comes to this email.\nIf they charge you again after the cancellation, we send a second letter for free: ${url}` + FIN],
     devuelta: (e, imp) => [`We could not deliver your cancellation to ${e}: refunding ${imp}`, `${e}'s email did not accept your letter. We are refunding ${imp} to the same card; it takes 5 to 10 days to show.\n\nYou can still cancel the other ways in our free guide.` + FIN],
-    recobro: (e, url) => [`Received: we send a second letter to ${e} today`, `We send ${e} a second letter today, for free, disputing the charge after your cancellation and quoting the proof of sending. It is attached.\n\nHow it is going: ${url}` + FIN],
+    recobro: (e, url) => [`Received: we send a second letter to ${e} within 24 hours`, `Within the next 24 hours we send ${e} a second letter, for free, disputing the charge after your cancellation and quoting the proof of sending. It is attached.\n\nHow it is going: ${url}` + FIN],
     cancelada: (e, imp) => [`Sending to ${e} cancelled`, `You cancelled sending your letter to ${e} and we have deleted your details. We are refunding ${imp} to the same card.` + FIN],
     restantes: (n, imp) => [`Refunding ${imp}`, `We are refunding ${imp} for ${n === 1 ? 'the cancellation you did not use' : `the ${n} cancellations you did not use`}. It takes 5 to 10 days to show on your card.` + FIN],
     descripcion: (n) => n === 1 ? 'We cancel it for you · 1 certified cancellation' : `We cancel it for you · ${n} certified cancellations`,
@@ -61,9 +61,9 @@ const fecha = (iso) => new Date(iso + 'T12:00:00Z').toLocaleDateString('es-ES', 
 const datosPersona = (b) => [`- Nombre: ${b.datos.nombre}`, `- Correo: ${b.datos.correo}`, b.datos.dni ? `- DNI/NIE: ${b.datos.dni}` : '', b.datos.dato ? `- Dato del contrato: ${b.datos.dato}` : ''].filter(Boolean).join('\n');
 
 export const urgente = {
-  baja: ({ e, b, c, recordatorio, gestion, lleidaCc }) => [
-    `${recordatorio ? 'RECORDATORIO' : 'URGENTE'} · Enviar hoy la baja de ${e.nombre} · ${b.ref}`,
-    [`${recordatorio ? 'Esta baja sigue sin enviar.' : 'Nueva baja pagada.'} Hay que enviarla HOY por correo certificado de Lleida.net (la persona ya tiene el aviso de que sale hoy).`,
+  baja: ({ e, b, c, recordatorio, gestion, lleidaCc, limite, programada }) => [
+    `${recordatorio ? 'RECORDATORIO' : 'URGENTE'} · Enviar la baja de ${e.nombre} antes del ${limite} · ${b.ref}`,
+    [`${recordatorio ? 'Esta baja sigue sin enviar.' : 'Nueva baja pagada.'} Hay que enviarla por correo certificado de Lleida.net como muy tarde el ${limite} (a la persona le hemos dicho ${programada ? `que sale el ${fecha(b.envio)}` : 'que sale en 24 horas'}).`,
       '',
       'Cómo (2 minutos):',
       `1. Lleida.net › Correo electrónico certificado › nuevo envío (o desde tu correo, con copia a ${lleidaCc}).`,
@@ -87,9 +87,9 @@ export const urgente = {
       'Cuando esté enviada, borra este correo: lleva datos personales.',
     ].join('\n'),
   ],
-  recobro: ({ e, b, r, gestion, lleidaCc }) => [
-    `URGENTE · Enviar hoy la segunda carta (reclamación) a ${e.nombre} · ${b.ref}`,
-    [`La persona dice que ${e.nombre} le ha vuelto a cobrar después de la baja. Hay que enviar HOY la segunda carta (gratis) por correo certificado de Lleida.net.`,
+  recobro: ({ e, b, r, gestion, lleidaCc, limite }) => [
+    `URGENTE · Enviar la segunda carta a ${e.nombre} antes del ${limite} · ${b.ref}`,
+    [`La persona dice que ${e.nombre} le ha vuelto a cobrar después de la baja. Hay que enviar la segunda carta (gratis) por correo certificado de Lleida.net como muy tarde el ${limite} (le hemos dicho que sale en 24 horas).`,
       '',
       `1. Para: ${e.correo} (con copia a ${lleidaCc} si lo envías desde tu correo)`,
       `2. Asunto: ${r.asunto}`,

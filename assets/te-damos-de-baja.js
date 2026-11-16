@@ -15,7 +15,7 @@ const EXTRACTO = { es: "/extracto/", ca: "/ca/extracte/", en: "/en/statement/" }
 const T = {
   es: {
     aviso: (a) => a.habiles ? `${a.habiles} días hábiles` : a.meses ? (a.meses === 1 ? "un mes" : `${a.meses} meses`) : a.dias === 1 ? "24 horas" : `${a.dias} días`,
-    calc: (f, e) => `La enviamos el ${f}, con el aviso que pide ${e}. Te avisamos ese día.`, calcHoy: "La enviamos hoy, en cuanto pagues.",
+    calc: (f, e) => `La enviamos el ${f}, con el aviso que pide ${e}. Te avisamos ese día.`, calcHoy: "La enviamos en las 24 horas siguientes al pago.",
     fecha: { fin: "Fecha de fin de la permanencia", ren: "Fecha de la próxima renovación o vencimiento" },
     lejos: "Elige una fecha de los próximos 18 meses.", pasada: "Elige una fecha a partir de mañana.",
     idiomaCarta: { es: "La carta va en castellano, el idioma de la empresa.", ca: "La carta va en catalán, el idioma de la empresa.", en: "La carta va en inglés, el idioma de la empresa." },
@@ -38,7 +38,7 @@ const T = {
   },
   ca: {
     aviso: (a) => a.habiles ? `${a.habiles} dies hàbils` : a.meses ? (a.meses === 1 ? "un mes" : `${a.meses} mesos`) : a.dias === 1 ? "24 hores" : `${a.dias} dies`,
-    calc: (f, e) => `L'enviem el ${f}, amb l'avís que demana ${e}. T'avisem aquell dia.`, calcHoy: "L'enviem avui, tan bon punt paguis.",
+    calc: (f, e) => `L'enviem el ${f}, amb l'avís que demana ${e}. T'avisem aquell dia.`, calcHoy: "L'enviem en les 24 hores següents al pagament.",
     fecha: { fin: "Data de fi de la permanència", ren: "Data de la propera renovació o venciment" },
     lejos: "Tria una data dels propers 18 mesos.", pasada: "Tria una data a partir de demà.",
     idiomaCarta: { es: "La carta va en castellà, l'idioma de l'empresa.", ca: "La carta va en català, l'idioma de l'empresa.", en: "La carta va en anglès, l'idioma de l'empresa." },
@@ -61,7 +61,7 @@ const T = {
   },
   en: {
     aviso: (a) => a.habiles ? `${a.habiles} working days'` : a.meses ? (a.meses === 1 ? "one month's" : `${a.meses} months'`) : a.dias === 1 ? "24 hours'" : `${a.dias} days'`,
-    calc: (f, e) => `We send it on ${f}, with the notice ${e} asks for. We will let you know that day.`, calcHoy: "We send it today, as soon as you pay.",
+    calc: (f, e) => `We send it on ${f}, with the notice ${e} asks for. We will let you know that day.`, calcHoy: "We send it within 24 hours of payment.",
     fecha: { fin: "Minimum term end date", ren: "Next renewal or expiry date" },
     lejos: "Choose a date within the next 18 months.", pasada: "Choose a date from tomorrow on.",
     idiomaCarta: { es: "The letter is in Spanish, the company's language.", ca: "The letter is in Catalan, the company's language.", en: "The letter is in English, the company's language." },

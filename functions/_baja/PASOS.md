@@ -1,7 +1,7 @@
 # «Te damos de baja» · lo que tienes que hacer tú (fase 1: envío a mano)
 
 Sin pagar nada antes de tener clientes. Cuando alguien paga, te llega un correo URGENTE y la envías tú por Lleida.net
-ese mismo día. La persona cree que es automático: ve y recibe lo mismo que cuando lo sea.
+en las 24 horas siguientes (el asunto dice hasta cuándo). Si la baja estaba programada, ese día entero. La persona cree que es automático: ve y recibe lo mismo que cuando lo sea.
 
 ## 0. Antes de cobrar de verdad
 - Habla con tu **gestor**: cobrar este servicio sin ser autónoma ni empresa.
@@ -51,9 +51,9 @@ alta tu dirección como remitente.
 5. Si no se puede entregar: en esa misma página, **«No se pudo entregar»**. Se le devuelve el dinero y se le avisa.
 6. Borra el correo urgente: lleva datos personales.
 Si una baja sigue sin «Hecho», al día siguiente te llega un RECORDATORIO.
+La persona tiene la promesa de «en 24 horas» (o «el <fecha>» si la programó); las fechas programadas ya dejan ese día
+de margen para que llegue a tiempo.
 
 ## Decisiones que te tocan
 - **Borrar a los 30 días** limita la segunda carta gratis a esos 30 días. ¿60 o 90?
 - **Foto del DNI** (opcional): 17 de las 31 empresas piden copia.
-- La página y los correos dicen «la enviamos **hoy**». Si alguien paga a las 23:50, la tienes que enviar esa noche o
-  muy temprano. Si prefieres «en el día» o «en 24 horas», se cambia en un sitio.

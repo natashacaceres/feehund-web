@@ -48,7 +48,8 @@ async function recorrido(modo, correo) {
   await vista(); // al volver de Stripe (página de gracias / estado)
   if (modo === 'manual') {
     const urgente = (await correos()).filter((c) => c.to.includes('equipo@example.com')).pop();
-    assert.match(urgente.subject, /^URGENTE · Enviar hoy la baja de O2 · FH-/);
+    assert.match(urgente.subject, /^URGENTE · Enviar la baja de O2 antes del .+ · FH-/);
+    assert.match(urgente.text, /le hemos dicho que sale en 24 horas/);
     assert.match(urgente.text, /Para: bajas@o2online\.es/); // la dirección de la ficha
     const g = await firmarId(env, 'gestion', r.p.split('.')[0]);
     assert.equal((await F.gestion(env, g)).para, 'bajas@o2online.es');
@@ -73,12 +74,12 @@ test('envío a mano y automático: la persona recibe los mismos correos y ve lo 
   // y lo que se ve es lo que se espera
   assert.deepEqual(a.suyos.map((c) => c.asunto), [
     'Tu código para firmar la baja de O2: CODIGO',
-    'Recibido: enviamos hoy tu baja de O2',
+    'Recibido: enviamos tu baja de O2 en 24 horas',
     'Tu baja de O2 ya está enviada: aquí tienes el justificante',
-    'Recibido: enviamos hoy una segunda carta a O2',
+    'Recibido: enviamos una segunda carta a O2 en 24 horas',
   ]);
   assert.deepEqual(a.vistas.map((v) => v.estado), ['en_marcha', 'hecha', 'hecha']);
   assert.equal(a.vistas[0].quedan, 1);
   assert.deepEqual(a.suyos[2].adjuntos, ['justificante-FH-REF.pdf', 'solicitud-de-baja-del-contrato-FH-REF.pdf']);
-  for (const c of a.suyos) assert.doesNotMatch(c.texto + c.asunto, /al instante|inmediat/i);
+  for (const c of a.suyos) assert.doesNotMatch(c.texto + c.asunto, /al instante|inmediat|\bhoy\b/i); // la promesa es «en 24 horas»
 });
