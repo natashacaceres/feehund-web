@@ -433,6 +433,7 @@ function probarFecha(L, i, cx) {
     const s = unirTexto(P, i, j);
     // con decimales de punto, «12.03» es un importe y no el 12 de marzo
     if (len === 1 && cx.decimal === '.' && /^\d{1,2}\.\d{2}$/.test(s)) return null;
+    if (len === 1 && cx.unDecimal && /^\d+\.\d$/.test(s)) return null; // «10.5» es un importe, no el 10 de mayo
     let p = parseFechaParcial(s, { orden: cx.orden, hoy: cx.hoy });
     let corregido = false;
     if (!p && ocr) {
@@ -510,6 +511,7 @@ function probarImporte(L, i, cx) {
       let valor = null;
       if (pareceImporte(t)) valor = parseImporte(t);
       else if (cx.decimal === '.' && /^[-+(]?\d{1,2}\.\d{2}\)?-?$/.test(t)) valor = parseImporte(t);
+      else if (cx.unDecimal && /^[-+]?\d+\.\d$/.test(t)) valor = parseImporte(t);
       if (valor === null) continue;
       return { tipo: 'importe', i0: i, i1: j, valor, texto: t, signo: signoExplicito(t), divisa: divisaDe(t), corregido, conf: confMin(P, i, j) };
     }
@@ -1673,8 +1675,11 @@ export function reconstruir(paginas, ctx = {}) {
     if (/^\d{1,2}[-/.]\d{1,2}(?:[-/.]\d{2,4})?$/.test(w.t)) fechasNum.push(w.t);
     else if (/^[-+(]?\d[\d.,]*\d[)-]?$/.test(w.t) && /[.,]/.test(w.t)) cifras.push(w.t);
   }
-  cx.orden = inferirOrden(fechasNum);
   cx.decimal = inferirDecimal(cifras);
+  // importes escritos como números de ordenador («-2.7», «500.0», «-1290.26»: punto decimal, uno o dos decimales,
+  // sin miles), como el PDF de Openbank: con 3 o más de un decimal y ninguno con coma, un decimal también es importe
+  cx.unDecimal = cx.decimal === '.' && cifras.filter((t) => /^[-+]?\d+\.\d$/.test(t)).length >= 3 && !cifras.some((t) => /,\d{1,2}$/.test(t));
+  cx.orden = inferirOrden(cx.unDecimal ? fechasNum.filter((t) => !/^\d+\.\d$/.test(t)) : fechasNum);
   cx.milesConSigno = cifras.some((t) => /\d[.,]\d{3}[.,]\d{2}\b/.test(t));
 
   // 2. campos y 3. clases
