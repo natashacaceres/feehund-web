@@ -309,6 +309,17 @@ export async function montarResultado(lecturas, deps) {
     }
   }
 
+  // 4 bis. Personalidad para la tarjeta de compartir (solo el id y sus números, sin importes ni nombres)
+  let personalidad = null;
+  if (leidas.length && eur.length && deps.diccionario && typeof nucleo.personalidades === 'function') {
+    try {
+      const r = nucleo.personalidades(eur, deps.diccionario, { casaPorLaVentana: Boolean(opciones.casaPorLaVentana) });
+      personalidad = { ganadora: r.ganadora };
+    } catch (e) {
+      deps.alFallar?.(e);
+    }
+  }
+
   // 5. Avisos, de lo general a lo concreto, sin repetir
   const avisos = [];
   if (leidas.length && combinada.aviso) avisos.push(conTexto(combinada.aviso, leidas.length === 1 ? leidas[0].archivo : null));
@@ -385,6 +396,7 @@ export async function montarResultado(lecturas, deps) {
     total_seguro: aImporte(det.total_seguro),
     total_posible: aImporte(det.total_posible),
     total_devuelto: aImporte(det.total_devuelto ?? null),
+    personalidad,
     necesita_mapeo: necesitaMapeo,
     necesita_contrasena: necesitaContrasena.length ? necesitaContrasena : null,
     necesita_confirmacion: fotos.length > 0 && !deps.confirmado,

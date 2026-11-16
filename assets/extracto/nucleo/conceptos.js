@@ -344,16 +344,20 @@ function clasificarSinCache(m, imp, dic) {
   const tarjeta = !recibo && (cc === '12' || tt.has('CARD') || algun(set, ['COMPRA', 'COMPRAS', 'TARJETA', 'TARJ', 'CARD', 'TPV', 'DATAFONO'])
     || /\d{4,6}[X*•·]{4,10}\d{2,4}|[X*•]{4}/.test(n));
   const mandato = recibo ? mandatoDe(n) : null;
+  // Señal de compra por internet: «WWW», «.COM» o «HTTP» en el concepto tal cual (para agrupar comercios se siguen quitando)
+  const online = /\bWWW\b|\.COM\b|\bHTTPS?\b/.test(n);
   const res = (tipo, clave, extra = {}) => ({
     clave, nombre: extra.nombre ?? null, comercio: extra.comercio ?? null, pasarela: extra.pasarela ?? null, tipo,
-    categoria: extra.categoria ?? extra.comercio?.categoria ?? null, recibo, tarjeta, mandato, concepto_limpio: limpio, ...(extra.motivo ? { motivo: extra.motivo } : {}),
+    categoria: extra.categoria ?? extra.comercio?.categoria ?? null, recibo, tarjeta, mandato, online: online || Boolean(extra.pasarela),
+    concepto_limpio: limpio, ...(extra.motivo ? { motivo: extra.motivo } : {}), ...(extra.sentido ? { sentido: extra.sentido } : {}),
   });
   const deId = (id) => dic.porId.get(id)?.comercio ?? null;
   const conComercio = (tipo, c, extra = {}) => res(tipo, c.id, { comercio: c, nombre: c.nombre, ...extra });
 
   if (!Number.isFinite(imp) || imp === 0) return res('excluido', 'excluido:importe_cero', { motivo: 'importe_cero' });
+  // Un Bizum es Bizum en los dos sentidos: el recibido no se cuenta como ingreso
+  if (set.has('BIZUM')) return res('bizum', 'bizum', { sentido: imp > 0 ? 'recibido' : 'enviado' });
   if (imp > 0) return res('ingreso', 'ingreso');
-  if (set.has('BIZUM')) return res('bizum', 'bizum');
   if (m.nota === 'traspaso' || m.nota === 'cambio_divisa' || tt.has('EXCHANGE')
     || algun(set, PALABRAS_TRASPASO) || FRASES_TRASPASO.some((f) => hayFrase(tokens, f))) return res('traspaso', 'traspaso');
 

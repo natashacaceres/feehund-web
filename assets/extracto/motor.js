@@ -88,18 +88,22 @@ export function generarICS(resultado, opciones = {}) {
 }
 
 /**
- * PNG tipo ticket (compartir.js) con el total al año, el perro y feehund.com/extracto. Nada más.
- * opciones.formato: 'historia' (1080 × 1920, por defecto) o 'cuadrado'.
- * @param {number|string} total euros al año, ≥ 0; null, vacío o lo que no sea un número → TypeError
+ * Tarjeta para compartir (tarjeta.js): PNG de 1080 × 1920 con la personalidad. Los textos salen de
+ * /data/personalidades.json; valores rellena {n} y {m}. Se dibuja en el dispositivo y no se guarda.
+ * @param {string} personalidadId
+ * @param {{n?, m?}} valores
+ * @param {{idioma?: 'es'|'ca'|'en', tema?: 'azul'|'crema'}} opciones
  * @returns {Promise<Blob>}
  */
-export async function generarImagenCompartir(total, opciones = {}) {
-  const idioma = idiomaDe(opciones.idioma);
-  // sin total no hay imagen: nunca un «0 €/año» falso; «1.234» tampoco se adivina
-  const n = typeof total === 'number' ? total : /^\s*\d+(?:[.,]\d{1,2})?\s*$/.test(total) ? Number(total.trim().replace(',', '.')) : NaN;
-  if (!Number.isFinite(n) || n < 0) throw new TypeError('El total tiene que ser un número de euros');
-  const [t, c] = await Promise.all([textos(), import('./compartir.js')]);
-  return c.ticketDelTotal(n, idioma, t, opciones.formato);
+export async function generarTarjeta(personalidadId, valores = {}, opciones = {}) {
+  const t = await import('./tarjeta.js');
+  return t.generarTarjeta(personalidadId, valores, { ...opciones, idioma: idiomaDe(opciones.idioma) });
+}
+
+/** Menú de compartir del móvil con la tarjeta; si no lo hay, la descarga («feehund-tarjeta.png»). */
+export async function compartirTarjeta(blob) {
+  const t = await import('./tarjeta.js');
+  return t.compartirTarjeta(blob);
 }
 
 // ---------- Sin conexión (service worker) ----------

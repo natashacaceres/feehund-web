@@ -72,9 +72,9 @@ async function atender(m) {
       lecturas = lecturasDesdeResultado(r, m.correcciones);
       extra = { confirmado: true, previos: { errores: r.errores, necesita_mapeo: r.necesita_mapeo, necesita_contrasena: r.necesita_contrasena } };
     }
-    const [piezasNucleo, detectarCargado, dicc] = await Promise.all([piezas, detectar, cargarDiccionario()]);
+    const [piezasNucleo, detectarCargado, dicc, personalidades] = await Promise.all([piezas, detectar, cargarDiccionario(), cargarPersonalidades()]);
     const resultado = await montarResultado(lecturas, {
-      opciones, diccionario: dicc, nucleo: { ...piezasNucleo, detectar: detectarCargado }, progreso, alFallar: (err) => console.error(err), ...extra,
+      opciones, diccionario: dicc, nucleo: { ...piezasNucleo, detectar: detectarCargado, personalidades }, progreso, alFallar: (err) => console.error(err), ...extra,
     });
     lecturas = null;
     self.postMessage({ id, tipo: 'resultado', resultado });
@@ -179,6 +179,19 @@ function cargarDetectar() {
     busqueda = p;
   }
   return busqueda;
+}
+
+/** personalidades.js. Si no llega, null: el análisis sale igual, sin personalidad (y sin botón de compartir). */
+let personalidadesCargadas = null;
+function cargarPersonalidades() {
+  if (!personalidadesCargadas) {
+    const p = import('./nucleo/personalidades.js').then((x) => x.calcularPersonalidades, () => {
+      if (personalidadesCargadas === p) personalidadesCargadas = null;
+      return null;
+    });
+    personalidadesCargadas = p;
+  }
+  return personalidadesCargadas;
 }
 
 /** data/comercios.json una sola vez. Si no llega, null: el resultado lo dice y no da totales. */

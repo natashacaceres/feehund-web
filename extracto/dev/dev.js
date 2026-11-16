@@ -8,7 +8,7 @@
 //   necesita_contrasena → otra vez analizar() con contrasenas {[archivo]: clave}
 //   necesita_mapeo → otra vez analizar() con mapeo {[archivo]: {fila_cabecera, columnas, hoja?}}
 //   necesita_confirmacion → confirmar(resultado, [{id, fecha?, concepto?, importe?, quitar?}])
-//   recalcular(resultado, idsDesmarcados) · generarICS(resultado, {desmarcados}) · generarImagenCompartir(total, {idioma})
+//   recalcular(resultado, idsDesmarcados) · generarICS(resultado, {desmarcados}) · generarTarjeta(personalidadId, {n, m}, {idioma, tema}) · compartirTarjeta(blob)
 //   registrarSinConexion() · onEstadoSinConexion(cb) · estadoSinConexion() · pedirOcrSinConexion() · olvidar()
 import * as motor from '/assets/extracto/motor.js';
 
@@ -137,8 +137,6 @@ const T = {
   ics: ['Descargar calendario (.ics)', 'Descarrega el calendari (.ics)', 'Download calendar (.ics)'],
   ics_vacio: ['No hay cobros que poner en el calendario.', 'No hi ha cobraments per posar al calendari.', 'There are no charges to put in the calendar.'],
   imagen: ['Imagen para compartir', 'Imatge per compartir', 'Image to share'],
-  img_alt: ['{total} al año en cobros que se repiten, con la mascota de feehund', "{total} l'any en cobraments que es repeteixen, amb la mascota de feehund", '{total} a year in repeating charges, with the feehund mascot'],
-  img_bajar: ['Descargar la imagen', 'Descarrega la imatge', 'Download the image'],
   compartir: ['Compartir', 'Comparteix', 'Share'],
   total_act: ['Total actualizado, {total} al año.', "Total actualitzat, {total} l'any.", 'Total updated, {total} a year.'],
   c_fecha: ['Fecha', 'Data', 'Date'],
@@ -560,14 +558,13 @@ async function bajarIcs() {
 
 async function imagen() {
   try {
-    const total = E.actual.total_seguro ?? 0;
-    const img = await motor.generarImagenCompartir(total, { idioma });
-    const url = img instanceof Blob ? guardarUrl(img) : String(img);
+    // la personalidad del análisis; mientras el análisis no la da, la de muestra de /data/personalidades.json
+    const p = E.actual?.personalidad?.ganadora ?? { id: 'agente_secreto', dato: { n: 412 } };
+    const img = await motor.generarTarjeta(p.id, p.dato || {}, { idioma });
+    const url = guardarUrl(img);
     const fig = $('vista');
-    const puedeCompartir = img instanceof Blob && navigator.canShare?.({ files: [new File([img], 'feehund.png', { type: img.type || 'image/png' })] });
-    fig.replaceChildren(h('img', { src: url, alt: t('img_alt', { total: enteros(total) }) }),
-      h('figcaption', { cls: 'acciones' }, h('a', { cls: 'enlace', href: url, download: 'feehund-extracto.png', text: t('img_bajar') }),
-        puedeCompartir ? h('button', { type: 'button', cls: 'boton', text: t('compartir'), onclick: () => navigator.share({ files: [new File([img], 'feehund.png', { type: img.type || 'image/png' })] }).catch(() => {}) }) : null));
+    fig.replaceChildren(h('img', { src: url, alt: t('imagen') }),
+      h('figcaption', { cls: 'acciones' }, h('button', { type: 'button', cls: 'boton', text: t('compartir'), onclick: () => motor.compartirTarjeta(img).catch(() => {}) })));
     fig.hidden = false;
   } catch (err) {
     console.error(err);

@@ -170,6 +170,7 @@
     actual = r;
     await envioP;
     render(r, cobros); show("res");
+    const bShare = $("xShare"); if (bShare) bShare.hidden = !personalidad();
     propio = !(entrada && entrada.deEjemplo);
     if (propio) contar("resultado");
     // Etiqueta «Ejemplo» (#xEjemplo, de Design): solo cuando lo leído es el extracto inventado de ejemplo
@@ -552,17 +553,17 @@
 
   function download(blob, name) { const u = URL.createObjectURL(blob), a = document.createElement("a"); a.href = u; a.download = name; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(u), 4000); }
 
-  // Compartir: solo la cifra, nunca la lista ni los nombres
+  // Compartir: la tarjeta de la personalidad que da el análisis (assets/extracto/tarjeta.js). Nunca la lista ni los nombres.
+  // Se dibuja solo al pulsar y no se guarda. Sin personalidad, no hay botón.
+  function personalidad() { const p = actual && actual.personalidad && actual.personalidad.ganadora; return p && p.id ? p : null; }
   async function share() {
-    if (!actual) return;
-    const total = (actual.cobros || []).some((c) => c.estado === "seguro") ? actual.total_seguro : actual.total_posible;
+    const p = personalidad();
+    if (!p) return;
     const m = await motor();
-    const blob = await m.generarImagenCompartir(total, { idioma: LANG });
-    if (!blob) return;
-    const file = new File([blob], "feehund.png", { type: "image/png" });
-    if (navigator.canShare && navigator.canShare({ files: [file] })) { try { await navigator.share({ files: [file], text: TX.share(e0(total)) }); if (propio) contar("comparte"); return; } catch (e) { if (e && e.name === "AbortError") return; } }
-    download(blob, "feehund.png"); msg($("xMsg"), TX.dl);
-    if (propio) contar("comparte");
+    const blob = await m.generarTarjeta(p.id, p.dato || {}, { idioma: LANG });
+    const como = await m.compartirTarjeta(blob);
+    if (como === "descargada") msg($("xMsg"), TX.dl);
+    if (como !== "cancelada" && propio) contar("comparte");
   }
 
   async function ics() {
