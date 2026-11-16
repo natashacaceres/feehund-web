@@ -1,0 +1,676 @@
+{
+ "version": "2026-11-11",
+ "empresas": {
+  "adamo": {
+   "id": "adamo",
+   "nombre": "Adamo",
+   "sector": "telecos",
+   "correo": "bajas@adamo.es",
+   "aviso": {
+    "habiles": 2
+   },
+   "cuenta": "fecha",
+   "opciones": [
+    "ya",
+    "fin"
+   ],
+   "permanencia": true,
+   "dato": "linea",
+   "dni": "si",
+   "motivo": false,
+   "tipo": "telecos",
+   "idioma": "es",
+   "aviso_extra": null,
+   "revisado": "2026-11-11"
+  },
+  "amena": {
+   "id": "amena",
+   "nombre": "Amena",
+   "sector": "telecos",
+   "correo": "particular.baja@es.orange.com",
+   "aviso": {
+    "habiles": 2
+   },
+   "cuenta": "fecha",
+   "opciones": [
+    "ya",
+    "fin"
+   ],
+   "permanencia": true,
+   "dato": "linea",
+   "dni": "copia",
+   "motivo": true,
+   "tipo": "telecos",
+   "idioma": "es",
+   "aviso_extra": null,
+   "revisado": "2026-11-11"
+  },
+  "ara": {
+   "id": "ara",
+   "nombre": "Ara",
+   "sector": "prensa",
+   "correo": "subscripcions@ara.cat",
+   "aviso": {
+    "meses": 1
+   },
+   "cuenta": "renovacion",
+   "opciones": [
+    "ya",
+    "ren"
+   ],
+   "permanencia": false,
+   "dato": "cuenta",
+   "dni": "no",
+   "motivo": false,
+   "tipo": "otro",
+   "idioma": "ca",
+   "aviso_extra": null,
+   "revisado": "2026-11-11"
+  },
+  "basic-fit": {
+   "id": "basic_fit",
+   "nombre": "Basic-Fit",
+   "sector": "gimnasios",
+   "correo": "servicioalcliente@basic-fit.es",
+   "aviso": {
+    "dias": 28
+   },
+   "cuenta": "fecha",
+   "opciones": [
+    "ya",
+    "fin"
+   ],
+   "permanencia": true,
+   "dato": "socio",
+   "dni": "no",
+   "motivo": false,
+   "tipo": "otro",
+   "idioma": "es",
+   "aviso_extra": null,
+   "revisado": "2026-11-11"
+  },
+  "cursor": {
+   "id": "cursor",
+   "nombre": "Cursor",
+   "sector": "ia",
+   "correo": "hi@cursor.com",
+   "aviso": {
+    "dias": 1
+   },
+   "cuenta": "renovacion",
+   "opciones": [
+    "ya",
+    "ren"
+   ],
+   "permanencia": false,
+   "dato": "cuenta",
+   "dni": "no",
+   "motivo": false,
+   "tipo": "otro",
+   "idioma": "en",
+   "aviso_extra": null,
+   "revisado": "2026-11-11"
+  },
+  "digi": {
+   "id": "digi",
+   "nombre": "Digi",
+   "sector": "telecos",
+   "correo": "atencionalcliente@digimobil.es",
+   "aviso": {
+    "habiles": 2
+   },
+   "cuenta": "fecha",
+   "opciones": [
+    "ya",
+    "fin"
+   ],
+   "permanencia": true,
+   "dato": "linea",
+   "dni": "copia",
+   "motivo": false,
+   "tipo": "telecos",
+   "idioma": "es",
+   "aviso_extra": null,
+   "revisado": "2026-11-11"
+  },
+  "dkv": {
+   "id": "dkv",
+   "nombre": "DKV",
+   "sector": "seguros",
+   "correo": "atencion.cliente@dkvseguros.es",
+   "aviso": {
+    "meses": 1
+   },
+   "cuenta": "renovacion",
+   "opciones": [
+    "ren"
+   ],
+   "permanencia": false,
+   "dato": "poliza",
+   "dni": "copia",
+   "motivo": false,
+   "tipo": "seguro",
+   "idioma": "es",
+   "aviso_extra": null,
+   "revisado": "2026-11-11"
+  },
+  "el-espanol": {
+   "id": "el_espanol",
+   "nombre": "El Español",
+   "sector": "prensa",
+   "correo": "suscriptor@elespanol.com",
+   "aviso": {
+    "dias": 7
+   },
+   "cuenta": "renovacion",
+   "opciones": [
+    "ya",
+    "ren"
+   ],
+   "permanencia": false,
+   "dato": "cuenta",
+   "dni": "no",
+   "motivo": false,
+   "tipo": "otro",
+   "idioma": "es",
+   "aviso_extra": null,
+   "revisado": "2026-11-11"
+  },
+  "fiatc": {
+   "id": "fiatc",
+   "nombre": "Fiatc",
+   "sector": "seguros",
+   "correo": "fiatc@fiatc.es",
+   "aviso": {
+    "meses": 1
+   },
+   "cuenta": "renovacion",
+   "opciones": [
+    "ren"
+   ],
+   "permanencia": false,
+   "dato": "poliza",
+   "dni": "copia",
+   "motivo": false,
+   "tipo": "seguro",
+   "idioma": "es",
+   "aviso_extra": null,
+   "revisado": "2026-11-11"
+  },
+  "finetwork": {
+   "id": "finetwork",
+   "nombre": "Finetwork",
+   "sector": "telecos",
+   "correo": "bajas@finetwork.com",
+   "aviso": {
+    "habiles": 2
+   },
+   "cuenta": "fecha",
+   "opciones": [
+    "ya",
+    "fin"
+   ],
+   "permanencia": true,
+   "dato": "linea",
+   "dni": "si",
+   "motivo": false,
+   "tipo": "telecos",
+   "idioma": "es",
+   "aviso_extra": "sms",
+   "revisado": "2026-11-11"
+  },
+  "hits-mobile": {
+   "id": "hits_mobile",
+   "nombre": "Hits Mobile",
+   "sector": "telecos",
+   "correo": "clientes@hitsmobile.es",
+   "aviso": {
+    "habiles": 2
+   },
+   "cuenta": "fecha",
+   "opciones": [
+    "ya",
+    "fin"
+   ],
+   "permanencia": true,
+   "dato": "linea",
+   "dni": "si",
+   "motivo": false,
+   "tipo": "telecos",
+   "idioma": "es",
+   "aviso_extra": null,
+   "revisado": "2026-11-11"
+  },
+  "jasper": {
+   "id": "jasper",
+   "nombre": "Jasper",
+   "sector": "ia",
+   "correo": "hey@jasper.ai",
+   "aviso": {
+    "meses": 1
+   },
+   "cuenta": "renovacion",
+   "opciones": [
+    "ya",
+    "ren"
+   ],
+   "permanencia": false,
+   "dato": "cuenta",
+   "dni": "no",
+   "motivo": false,
+   "tipo": "otro",
+   "idioma": "en",
+   "aviso_extra": null,
+   "revisado": "2026-11-11"
+  },
+  "jazztel": {
+   "id": "jazztel",
+   "nombre": "Jazztel",
+   "sector": "telecos",
+   "correo": "bajas.jazztel@es.orange.com",
+   "aviso": {
+    "habiles": 2
+   },
+   "cuenta": "fecha",
+   "opciones": [
+    "ya",
+    "fin"
+   ],
+   "permanencia": true,
+   "dato": "linea",
+   "dni": "copia",
+   "motivo": true,
+   "tipo": "telecos",
+   "idioma": "es",
+   "aviso_extra": null,
+   "revisado": "2026-11-11"
+  },
+  "la-voz-de-galicia": {
+   "id": "la_voz_de_galicia",
+   "nombre": "La Voz de Galicia",
+   "sector": "prensa",
+   "correo": "suscripciones@lavoz.es",
+   "aviso": {
+    "dias": 5
+   },
+   "cuenta": "renovacion",
+   "opciones": [
+    "ya",
+    "ren"
+   ],
+   "permanencia": false,
+   "dato": "cuenta",
+   "dni": "no",
+   "motivo": false,
+   "tipo": "otro",
+   "idioma": "es",
+   "aviso_extra": null,
+   "revisado": "2026-11-11"
+  },
+  "llamaya": {
+   "id": "llamaya",
+   "nombre": "Llamaya",
+   "sector": "telecos",
+   "correo": "clientes@llamaya.com",
+   "aviso": {
+    "habiles": 2
+   },
+   "cuenta": "fecha",
+   "opciones": [
+    "ya"
+   ],
+   "permanencia": false,
+   "dato": "linea",
+   "dni": "si",
+   "motivo": false,
+   "tipo": "telecos",
+   "idioma": "es",
+   "aviso_extra": null,
+   "revisado": "2026-11-11"
+  },
+  "movistar-prosegur": {
+   "id": "movistar_prosegur",
+   "nombre": "Movistar Prosegur Alarmas",
+   "sector": "alarmas",
+   "correo": "gestiondeclientes@movistarproseguralarmas.com",
+   "aviso": {
+    "dias": 30
+   },
+   "cuenta": "fecha",
+   "opciones": [
+    "ya",
+    "fin"
+   ],
+   "permanencia": true,
+   "dato": "instalacion",
+   "dni": "copia",
+   "motivo": false,
+   "tipo": "otro",
+   "idioma": "es",
+   "aviso_extra": null,
+   "revisado": "2026-11-11"
+  },
+  "o2": {
+   "id": "o2",
+   "nombre": "O2",
+   "sector": "telecos",
+   "correo": "bajas@o2online.es",
+   "aviso": {
+    "habiles": 2
+   },
+   "cuenta": "fecha",
+   "opciones": [
+    "ya"
+   ],
+   "permanencia": false,
+   "dato": "linea",
+   "dni": "copia",
+   "motivo": false,
+   "tipo": "telecos",
+   "idioma": "es",
+   "aviso_extra": null,
+   "revisado": "2026-11-11"
+  },
+  "ocaso": {
+   "id": "ocaso",
+   "nombre": "Ocaso",
+   "sector": "seguros",
+   "correo": "ocaso@ocaso.es",
+   "aviso": {
+    "meses": 1
+   },
+   "cuenta": "renovacion",
+   "opciones": [
+    "ren"
+   ],
+   "permanencia": false,
+   "dato": "poliza",
+   "dni": "copia",
+   "motivo": false,
+   "tipo": "seguro",
+   "idioma": "es",
+   "aviso_extra": null,
+   "revisado": "2026-11-11"
+  },
+  "orange": {
+   "id": "orange",
+   "nombre": "Orange",
+   "sector": "telecos",
+   "correo": "particular.baja@es.orange.com",
+   "aviso": {
+    "habiles": 2
+   },
+   "cuenta": "fecha",
+   "opciones": [
+    "ya",
+    "fin"
+   ],
+   "permanencia": true,
+   "dato": "linea",
+   "dni": "copia",
+   "motivo": true,
+   "tipo": "telecos",
+   "idioma": "es",
+   "aviso_extra": null,
+   "revisado": "2026-11-11"
+  },
+  "privicompras": {
+   "id": "privicompras",
+   "nombre": "Privilegios en Compras",
+   "sector": "club_descuentos",
+   "correo": "atencionalcliente@privilegiosencompras.es",
+   "aviso": {},
+   "cuenta": "fecha",
+   "opciones": [
+    "ya"
+   ],
+   "permanencia": false,
+   "dato": "tarjeta4",
+   "dni": "no",
+   "motivo": false,
+   "tipo": "otro",
+   "idioma": "es",
+   "aviso_extra": null,
+   "revisado": "2026-11-11"
+  },
+  "prosegur-alarms": {
+   "id": "prosegur_alarms",
+   "nombre": "Prosegur Alarms",
+   "sector": "alarmas",
+   "correo": "gestiondeclientes@movistarproseguralarmas.com",
+   "aviso": {
+    "dias": 30
+   },
+   "cuenta": "fecha",
+   "opciones": [
+    "ya",
+    "fin"
+   ],
+   "permanencia": true,
+   "dato": "instalacion",
+   "dni": "copia",
+   "motivo": false,
+   "tipo": "otro",
+   "idioma": "es",
+   "aviso_extra": null,
+   "revisado": "2026-11-11"
+  },
+  "r-cable": {
+   "id": "r_cable",
+   "nombre": "R",
+   "sector": "telecos",
+   "correo": "R-al-habla@mundo-R.net",
+   "aviso": {
+    "habiles": 2
+   },
+   "cuenta": "fecha",
+   "opciones": [
+    "ya",
+    "fin"
+   ],
+   "permanencia": true,
+   "dato": "linea",
+   "dni": "copia",
+   "motivo": false,
+   "tipo": "telecos",
+   "idioma": "es",
+   "aviso_extra": null,
+   "revisado": "2026-11-11"
+  },
+  "reale": {
+   "id": "reale",
+   "nombre": "Reale",
+   "sector": "seguros",
+   "correo": "incidencias.ret@reale.es",
+   "aviso": {
+    "meses": 1
+   },
+   "cuenta": "renovacion",
+   "opciones": [
+    "ren"
+   ],
+   "permanencia": false,
+   "dato": "poliza",
+   "dni": "copia",
+   "motivo": false,
+   "tipo": "seguro",
+   "idioma": "es",
+   "aviso_extra": null,
+   "revisado": "2026-11-11"
+  },
+  "regal": {
+   "id": "regal",
+   "nombre": "Regal",
+   "sector": "seguros",
+   "correo": "cliente@regal.es",
+   "aviso": {
+    "meses": 1
+   },
+   "cuenta": "renovacion",
+   "opciones": [
+    "ren"
+   ],
+   "permanencia": false,
+   "dato": "poliza",
+   "dni": "copia",
+   "motivo": false,
+   "tipo": "seguro",
+   "idioma": "es",
+   "aviso_extra": null,
+   "revisado": "2026-11-11"
+  },
+  "sector-alarm": {
+   "id": "sector_alarm",
+   "nombre": "Sector Alarm",
+   "sector": "alarmas",
+   "correo": "suscripciones@sectoralarm.es",
+   "aviso": {
+    "meses": 1
+   },
+   "cuenta": "fecha",
+   "opciones": [
+    "ya",
+    "fin"
+   ],
+   "permanencia": true,
+   "dato": "instalacion",
+   "dni": "copia",
+   "motivo": false,
+   "tipo": "otro",
+   "idioma": "es",
+   "aviso_extra": "formulario",
+   "revisado": "2026-11-11"
+  },
+  "securitas-direct": {
+   "id": "securitas_direct",
+   "nombre": "Verisure (Securitas Direct)",
+   "sector": "alarmas",
+   "correo": "verisure@verisure.es",
+   "aviso": {
+    "dias": 30
+   },
+   "cuenta": "fecha",
+   "opciones": [
+    "ya",
+    "fin"
+   ],
+   "permanencia": true,
+   "dato": "instalacion",
+   "dni": "copia",
+   "motivo": false,
+   "tipo": "otro",
+   "idioma": "es",
+   "aviso_extra": null,
+   "revisado": "2026-11-11"
+  },
+  "simyo": {
+   "id": "simyo",
+   "nombre": "Simyo",
+   "sector": "telecos",
+   "correo": "soporte@simyo.es",
+   "aviso": {
+    "habiles": 2
+   },
+   "cuenta": "fecha",
+   "opciones": [
+    "ya",
+    "fin"
+   ],
+   "permanencia": true,
+   "dato": "linea",
+   "dni": "copia",
+   "motivo": true,
+   "tipo": "telecos",
+   "idioma": "es",
+   "aviso_extra": null,
+   "revisado": "2026-11-11"
+  },
+  "surfshark": {
+   "id": "surfshark",
+   "nombre": "Surfshark",
+   "sector": "nube_apps",
+   "correo": "support@surfshark.com",
+   "aviso": {
+    "dias": 1
+   },
+   "cuenta": "renovacion",
+   "opciones": [
+    "ya",
+    "ren"
+   ],
+   "permanencia": false,
+   "dato": "cuenta",
+   "dni": "no",
+   "motivo": false,
+   "tipo": "otro",
+   "idioma": "en",
+   "aviso_extra": null,
+   "revisado": "2026-11-11"
+  },
+  "tuenti": {
+   "id": "tuenti",
+   "nombre": "Tuenti",
+   "sector": "telecos",
+   "correo": "bajas@o2online.es",
+   "aviso": {
+    "habiles": 2
+   },
+   "cuenta": "fecha",
+   "opciones": [
+    "ya"
+   ],
+   "permanencia": false,
+   "dato": "linea",
+   "dni": "copia",
+   "motivo": false,
+   "tipo": "telecos",
+   "idioma": "es",
+   "aviso_extra": null,
+   "revisado": "2026-11-11"
+  },
+  "urban-sports-club": {
+   "id": "urban_sports_club",
+   "nombre": "Urban Sports Club",
+   "sector": "gimnasios",
+   "correo": "member-contact@urbansportsclub.com",
+   "aviso": {
+    "dias": 3
+   },
+   "cuenta": "renovacion",
+   "opciones": [
+    "ya",
+    "ren"
+   ],
+   "permanencia": false,
+   "dato": "cuenta",
+   "dni": "no",
+   "motivo": false,
+   "tipo": "otro",
+   "idioma": "es",
+   "aviso_extra": null,
+   "revisado": "2026-11-11"
+  },
+  "zoom": {
+   "id": "zoom",
+   "nombre": "Zoom",
+   "sector": "nube_apps",
+   "correo": "renewals@zoom.us",
+   "aviso": {
+    "dias": 30
+   },
+   "cuenta": "renovacion",
+   "opciones": [
+    "ya",
+    "ren"
+   ],
+   "permanencia": false,
+   "dato": "cuenta",
+   "dni": "no",
+   "motivo": false,
+   "tipo": "otro",
+   "idioma": "en",
+   "aviso_extra": null,
+   "revisado": "2026-11-11"
+  }
+ }
+}

@@ -1,0 +1,69 @@
+# «Te damos de baja» · lista para el abogado (antes de cobrar)
+
+Los textos marcados **[REVISIÓN LEGAL]** están en la web como borrador. Nada se cobra hasta su visto bueno.
+
+## Qué hace el servicio, en una frase
+La persona rellena sus datos, firma con un código que le llega al correo y paga 3,99 € (1,99 € cada baja más). Feehund
+envía su carta de baja desde hola@feehund.com a la dirección de bajas de la empresa, con copia a Lleida.net (que
+certifica el envío y la entrega) y con «responder a» la persona. Si no llega, se devuelve el dinero. Si la empresa
+vuelve a cobrar, segunda carta gratis (una por compra). Los datos se borran a los 30 días de la entrega.
+
+## 1. Mandato: enviar bajas en nombre de otra persona
+- Texto de la casilla (paso 3): «Autorizo a Feehund a enviar esta carta en mi nombre a [empresa] por correo electrónico
+  certificado, y confirmo que soy el titular del contrato.» ¿Basta como mandato (art. 1709 y ss. del Código Civil)?
+- La firma es una **firma electrónica simple** (Reglamento eIDAS art. 3.10; Ley 6/2020): código de un solo uso enviado
+  al correo + casilla, con hora, navegador, hash de la IP y huella (SHA-256) del texto firmado. Opcional: firma dibujada
+  en el PDF. ¿Es suficiente prueba? ¿Conviene ofrecer certificado digital (AutoFirma)?
+- **Suplantación**: solo comprobamos que la persona controla ese correo. ¿Qué responsabilidad tiene Feehund si alguien da
+  de baja el contrato de otro? ¿Hace falta algo más (p. ej., que el correo sea el de la cuenta en la empresa)?
+- Varias fichas dicen que la empresa **no aclara si acepta una baja enviada por un tercero** (Adamo, Ara, El Español,
+  Llamaya, Hits Mobile…). Finetwork pide además confirmar por SMS; Sector Alarm tiene formulario propio. ¿Se pueden
+  ofrecer igualmente, con el aviso que ya se muestra?
+
+## 2. Desistimiento
+- Casilla del paso 4: «Pido que la enviéis ya (o en la fecha programada) y entiendo que, una vez enviada, pierdo el
+  derecho de desistimiento.» Base pensada: **art. 103 a) TRLGDCU** (servicio ejecutado por completo con consentimiento
+  expreso previo). ¿Es la excepción correcta (y no la 103 m)?
+- Bajas **programadas**: se pueden cancelar y se devuelve el dinero hasta el día de envío. Bajas del **lote sin usar**: se
+  devuelven cuando la persona quiera y solas a los 180 días. ¿Correcto?
+- Confirmación en soporte duradero (art. 98.7): los correos «programada» y «enviada» recuerdan la renuncia y enlazan las
+  condiciones. Stripe también la muestra junto al botón de pago. ¿Suficiente?
+- Información precontractual (art. 97): precio con IVA, características, garantías, identidad del vendedor. ¿Falta algo?
+
+## 3. La carta (`assets/te-damos-de-baja/carta.js`, una hoja, es/ca/en según la empresa)
+- Frase de telecos: «Conforme a la normativa de protección de los usuarios de telecomunicaciones, la baja debe hacerse
+  efectiva en un plazo máximo de dos días hábiles…» ¿Citar norma concreta (RD 899/2009 art. 7, Ley 11/2022)?
+- Seguros: «Conforme al artículo 22 de la Ley 50/1980, de Contrato de Seguro, comunico mi oposición a la prórroga…» con
+  un mes de antelación.
+- «Motivo de la baja: decisión personal.» (Orange, Amena, Jazztel y Simyo piden motivo.)
+- Petición de no hacer más cargos, anular la domiciliación y confirmar por escrito.
+- Frase sobre Feehund: «Envío esta carta a través de Feehund, que la remite en mi nombre y con mi autorización. Las
+  respuestas llegan directamente a mi correo.»
+- Firma: «Firmado electrónicamente el [fecha, hora] con un código de verificación enviado a [correo]. Referencia FH-…»
+- Segunda carta (reclamación del cobro posterior), mismo formato.
+- Remitente visible: «"Nombre Apellidos (vía Feehund)" <hola@feehund.com>». ¿Problema?
+
+## 4. Condiciones del servicio
+Sección nueva «Te damos de baja» en /condiciones/ (y ca/en): qué es, precio, autorización, cuándo se envía,
+desistimiento, garantías (reembolso si no se entrega; segunda carta), alcance (no garantizamos que la empresa tramite la
+baja ni evitamos penalizaciones). Revisar: limitación de responsabilidad, identidad del vendedor (autónoma), ley y
+fuero, resolución de litigios en línea.
+
+## 5. Protección de datos (RGPD)
+- Datos nuevos: nombre, correo, dato del contrato, DNI/NIE, **foto del DNI** (17 de las 31 empresas piden copia), firma
+  dibujada, carta, prueba de la firma. Sección nueva en /privacidad/ (y ca/en). ¿Base jurídica «ejecución del contrato»
+  vale también para la foto del DNI? ¿Minimización?
+- Encargados: **Resend** (correo, EE. UU.), **Lleida.net** (¿encargado o tercero de confianza responsable del
+  certificado?), **Stripe**, **Cloudflare** (KV, datos cifrados con AES-GCM). Contratos de encargo (DPA) y transferencias
+  fuera del EEE (cláusulas tipo / Data Privacy Framework).
+- **Lectura con IA de Mi banco**: si el móvil no puede leer el extracto, se envía a **Anthropic (fuera de la UE)** y no se
+  guarda. Ya está en /privacidad/ con «⚖ abogado». En «Te damos de baja» el extracto **no viaja** (la comprobación de un
+  cobro posterior se hace en el dispositivo).
+- **Plazo de borrado**: 30 días tras la entrega. Choca con la segunda carta gratis: si el cobro posterior llega después
+  de esos 30 días (seguros anuales, por ejemplo), ya no tenemos los datos. ¿60 o 90 días son razonables?
+- Registro de actividades de tratamiento; ¿hace falta evaluación de impacto?
+
+## 6. Fiscal y otros
+- Factura: Stripe no la emite; Verifactu; IVA 21 % incluido; epígrafe del IAE para este servicio.
+- ¿Algún registro o autorización para gestionar trámites en nombre de consumidores?
+- Seguro de responsabilidad civil profesional, por si una carta se envía mal.

@@ -1,0 +1,14 @@
+# Worker aparte de la web (Cloudflare Pages no tiene tareas programadas).
+# Publicar: npx wrangler deploy --config workers/baja-tarea/wrangler.toml
+# Clave: npx wrangler secret put TAREA_SECRET --config workers/baja-tarea/wrangler.toml  (la misma que en Pages)
+name = "feehund-baja-tarea"
+main = "index.js"
+compatibility_date = "2026-11-01"
+workers_dev = true
+
+[vars]
+URL_WEB = "https://feehund.com"
+
+# Cada día a las 7:00 UTC (8:00 en invierno y 9:00 en verano, hora de España)
+[triggers]
+crons = ["0 7 * * *"]

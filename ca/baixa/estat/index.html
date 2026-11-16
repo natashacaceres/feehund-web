@@ -17,6 +17,7 @@
 <link rel="preload" href="../../../assets/fonts/fraunces-800.woff" as="font" type="font/woff" crossorigin>
 <link rel="preload" href="../../../assets/fonts/atkinson-next-400.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="../../../assets/app.css?v=20261113141239">
+<link rel="stylesheet" href="../../../assets/te-damos-de-baja/estilo.css?v=20261116">
 </head>
 <body>
 <a class="skip" href="#main">Anar al contingut</a>
@@ -33,34 +34,64 @@
   </div>
 </header>
 
-<main id="main" class="baja tb" data-vista="estado" data-api="baja-estado" data-empresa="basic-fit">
-<div class="wrap pg-atras-w"><button type="button" class="pg-atras" data-atras aria-label="Tornar" title="Tornar"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></button></div>
+<main id="main" class="baja tb" data-vista="estado" data-api="baja-estado">
+<div class="wrap pg-atras-w"><button type="button" class="pg-atras" data-atras aria-label="Enrere" title="Enrere"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></button></div>
 <div class="wrap baja-in tb-in">
-  <p class="tb-emp">Baixa de <strong data-t="empresa">Basic-Fit</strong></p>
-  <section class="tb-est" data-estado="programada" hidden>
-    <span class="tb-est-i" role="img" aria-label="Programada"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15.5" rx="2"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg></span>
-    <div class="tb-est-m"><h1>Programada per al <span data-t="fecha-prog"></span></h1><p>Aquell dia l'enviem amb certificat i t'avisem per correu.</p></div>
+  <p class="tb-emp">Baixa de <strong data-t="empresa"></strong></p>
+  <section class="tb-est" data-estado="carga"><div class="tb-est-m"><p class="tb-nota">Carregant…</p></div></section>
+  <section class="tb-est" data-estado="pago" hidden>
+    <span class="tb-est-i" aria-hidden="true"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg></span>
+    <div class="tb-est-m"><h1>Comprovant el pagament…</h1><p>Triga uns segons.</p></div>
   </section>
-  <section class="tb-est" data-estado="enviada">
-    <span class="tb-est-i" role="img" aria-label="Enviada"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 3 10 14"/><path d="M21 3 14.5 21l-4.5-7-7-4.5L21 3Z"/></svg></span>
-    <div class="tb-est-m"><h1>Enviada el <span data-t="fecha-env"></span></h1><p>Va amb certificat. Quan arribi, t'avisem per correu.</p><a class="btn tb-sec" href="#" data-api="certificado-pdf">Descarregar certificat (PDF)</a></div>
+  <section class="tb-est" data-estado="programada" hidden>
+    <span class="tb-est-i" aria-hidden="true"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15.5" rx="2"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg></span>
+    <div class="tb-est-m"><h1>Programada per al <span data-t="fecha-prog"></span></h1><p>Aquell dia l'enviem amb certificat i t'avisem per correu.</p><a class="tb-link" href="#" data-api="carta-pdf" target="_blank">Veure la meva carta (PDF)</a></div>
+  </section>
+  <section class="tb-est" data-estado="enviada" hidden>
+    <span class="tb-est-i" aria-hidden="true"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 3 10 14"/><path d="M21 3 14.5 21l-4.5-7-7-4.5L21 3Z"/></svg></span>
+    <div class="tb-est-m"><h1>Enviada el <span data-t="fecha-env"></span></h1><p>Va amb certificat. Quan arribi, t'avisem per correu.</p><a class="btn tb-sec" href="#" data-api="certificado-pdf" hidden>Descarregar el certificat (PDF)</a><a class="tb-link" href="#" data-api="carta-pdf" target="_blank">Veure la meva carta (PDF)</a></div>
   </section>
   <section class="tb-est" data-estado="entregada" hidden>
-    <span class="tb-est-i" role="img" aria-label="Lliurada"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span>
-    <div class="tb-est-m"><h1>Lliurada</h1><p><span data-t="empresa"></span> la va rebre el <span data-t="fecha-ent"></span>.</p><a class="btn tb-sec" href="#" data-api="certificado-pdf">Descarregar certificat (PDF)</a></div>
+    <span class="tb-est-i" aria-hidden="true"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span>
+    <div class="tb-est-m"><h1>Lliurada</h1><p><span data-t="empresa"></span> la va rebre el <span data-t="fecha-ent"></span>.</p><a class="btn tb-sec" href="#" data-api="certificado-pdf" hidden>Descarregar el certificat (PDF)</a><a class="tb-link" href="#" data-api="carta-pdf" target="_blank">Veure la meva carta (PDF)</a></div>
   </section>
   <section class="tb-est" data-estado="devuelta" hidden>
-    <span class="tb-est-i" role="img" aria-label="No lliurada"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.5 6.5l11 11M17.5 6.5l-11 11"/></svg></span>
+    <span class="tb-est-i" aria-hidden="true"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.5 6.5l11 11M17.5 6.5l-11 11"/></svg></span>
     <div class="tb-est-m"><h1>No s'ha pogut lliurar. T'hem retornat els diners.</h1><p>El reemborsament va a la mateixa targeta amb què vas pagar.</p></div>
   </section>
-  <section class="tb-blk" aria-labelledby="tbRH">
+  <section class="tb-est" data-estado="error" id="tbPerdido" hidden><div class="tb-est-m"><h1>No trobem aquesta baixa</h1><p></p></div></section>
+  <div class="tb-aviso" id="tbTarde" hidden><p><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.5 2.5 20h19L12 3.5Z"/><path d="M12 10v4.5"/><circle cx="12" cy="17.2" r=".6"/></svg><span>Es va enviar amb menys avís del que demana <span data-t="empresa"></span>: potser la baixa arriba un període més tard.</span></p></div>
+
+  <section class="tb-blk" id="tbLoteBox" data-api="pack-restantes" hidden aria-labelledby="tbLoteH">
+    <h2 id="tbLoteH"></h2>
+    <p>Tria l'empresa i et portem a la seva carta.</p>
+    <div class="tb-f"><label for="tbLoteEmp">Empresa</label><select id="tbLoteEmp"></select></div>
+    <div class="tb-acc"><button type="button" class="btn tb-btn" id="tbLoteUsar" data-api="pack-usar">Fer-ne servir una</button></div>
+    <button type="button" class="tb-link" id="tbLoteDev">Retornar-me les que no faci servir</button>
+    <p class="tb-ok" id="tbLoteMsg" role="status" hidden></p>
+  </section>
+
+  <section class="tb-blk" id="tbRecBox" hidden aria-labelledby="tbRH">
     <h2 id="tbRH">T'han tornat a cobrar?</h2>
-    <p>Tria el teu proper extracte i ho comprovem.</p>
-    <a class="btn tb-sec" href="../../../ca/extracte/" data-api="recobro-comprobar">Triar el meu extracte</a>
+    <p>Tria el teu proper extracte i el comprovem al teu dispositiu: no en surt.</p>
+    <label class="btn tb-sec" id="tbRecElegir" data-api="recobro-comprobar">Triar el meu extracte<input type="file" id="tbRecArchivo" class="sr" multiple></label>
+    <button type="button" class="tb-link" id="tbRecMano">Escriure-ho a mà</button>
+    <p class="tb-nota" id="tbRecNada" role="status" hidden></p>
     <div class="tb-aviso tb-aviso--info" id="tbRecobro" data-api="recobro-detectado" hidden>
-      <p><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.5 2.5 20h19L12 3.5Z"/><path d="M12 10v4.5"/><circle cx="12" cy="17.2" r=".6"/></svg><span><strong>Hi ha un cobrament de <span data-t="empresa"></span> després de la data de baixa.</strong> T'enviem una segona carta gratis, citant el certificat.</span></p>
-      <details class="tb-guia"><summary>Com retornar el rebut des del teu banc</summary><ol><li>Obre l'app o el web del teu banc i busca el rebut de <span data-t="empresa"></span>.</li><li>Prem «Retornar rebut». Si no hi surt, demana-ho a la teva oficina.</li><li>En els rebuts domiciliats tens 8 setmanes des del càrrec.</li><li>Guarda el certificat de la baixa per si l'empresa reclama.</li></ol></details>
+      <p><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.5 2.5 20h19L12 3.5Z"/><path d="M12 10v4.5"/><circle cx="12" cy="17.2" r=".6"/></svg><span><span id="tbRecVisto" hidden></span> <strong>T'enviem una segona carta gratis</strong>, reclamant el cobrament i citant el certificat.</span></p>
+      <div class="tb-f"><label for="tbRecFecha">Data del cobrament</label><input type="date" id="tbRecFecha"></div>
+      <div class="tb-f"><label for="tbRecImp">Import (€)</label><input id="tbRecImp" inputmode="decimal" autocomplete="off"></div>
+      <p class="tb-err" id="tbRecE" role="alert" hidden>Indica la data i l'import.</p>
+      <div class="tb-acc"><button type="button" class="btn tb-btn" id="tbRecEnviar">Enviar la segona carta gratis</button></div>
+      <details class="tb-guia"><summary>Com retornar el rebut des del teu banc</summary><ol><li>Obre l'app o el web del teu banc i busca el rebut de <span data-t="empresa"></span>.</li><li>Prem «Retornar rebut». Si no apareix, demana-ho a la teva oficina.</li><li>En els rebuts domiciliats tens 8 setmanes des del càrrec.</li><li>Guarda el certificat de la baixa per si l'empresa reclama.</li></ol></details>
     </div>
+    <p class="tb-ok" id="tbRecOk" role="status" hidden>Segona carta enviada. Te l'hem enviat per correu.</p>
+  </section>
+
+  <section class="tb-blk" aria-labelledby="tbDH">
+    <h2 id="tbDH">Les teves dades</h2>
+    <p class="tb-nota" id="tbBorrarNota" role="status"></p>
+    <button type="button" class="tb-link" id="tbBorrar">Esborrar les meves dades ara</button>
   </section>
 </div>
 </main>
@@ -81,7 +112,7 @@
     <li>© 2026 <span data-marca>Feehund</span></li>
   </ul>
 </div></footer>
-<script src="../../../assets/te-damos-de-baja.js?v=20261111"></script>
+<script type="module" src="../../../assets/te-damos-de-baja.js?v=20261116"></script>
 <script src="../../../assets/app.js?v=20261113141239"></script>
 <script src="../../../assets/atras.js?v=20261113141239" defer></script>
 </body></html>

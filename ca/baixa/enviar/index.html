@@ -17,6 +17,7 @@
 <link rel="preload" href="../../../assets/fonts/fraunces-800.woff" as="font" type="font/woff" crossorigin>
 <link rel="preload" href="../../../assets/fonts/atkinson-next-400.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="../../../assets/app.css?v=20261113141239">
+<link rel="stylesheet" href="../../../assets/te-damos-de-baja/estilo.css?v=20261116">
 </head>
 <body>
 <a class="skip" href="#main">Anar al contingut</a>
@@ -33,40 +34,33 @@
   </div>
 </header>
 
-<main id="main" class="baja tb" data-vista="flujo" data-api="empresa" data-empresa="basic-fit" data-baja="certificada" data-aviso="permanencia" data-pide-dni="true">
+<main id="main" class="baja tb" data-vista="flujo" data-api="empresa">
 <div class="wrap baja-in tb-in">
   <div class="tb-top tb-prog">
     <button type="button" class="tb-back" id="tbBack" data-salida="../../../ca/extracte/">← Enrere</button>
     <p class="tb-cnt" id="tbCnt" data-fmt="{n} de 4" aria-live="polite">1 de 4</p>
   </div>
   <div class="tb-bar tb-prog" id="tbBar" role="progressbar" aria-label="Progrés" aria-valuemin="1" aria-valuemax="4" aria-valuenow="1"><span></span></div>
-  <p class="tb-emp">Baixa de <strong data-t="empresa">Basic-Fit</strong></p>
+  <p class="tb-emp">Baixa de <strong data-t="empresa"></strong></p>
 
-  <section class="tb-paso" id="tbNo" hidden aria-labelledby="tbNoH">
-    <h2 id="tbNoH">Aquesta empresa només permet la baixa al seu web.</h2>
-    <p>Aquí tens els passos.</p>
-    <ol class="baja-pasos" data-api="pasos-online"><li><span class="baja-num" aria-hidden="true">1</span><p>[VERIFICAR]</p></li><li><span class="baja-num" aria-hidden="true">2</span><p>[VERIFICAR]</p></li><li><span class="baja-num" aria-hidden="true">3</span><p>[VERIFICAR]</p></li></ol>
-    <a class="btn tb-sec" href="../../../ca/extracte/">Tornar al teu resultat</a>
-  </section>
+  <section class="tb-paso" id="tbCarga" aria-live="polite"><p class="tb-nota">Carregant…</p></section>
+  <section class="tb-paso" id="tbNo" hidden aria-labelledby="tbNoH"><h2 id="tbNoH">Aquesta empresa no accepta que li enviem la baixa.</h2><p>A la nostra guia gratis tens com fer-ho tu, pas a pas.</p><a class="btn tb-sec" id="tbGuia" href="../">Veure la guia gratis</a></section>
+  <section class="tb-paso" id="tbOff" hidden aria-labelledby="tbOffH"><h2 id="tbOffH">Aquest servei encara no està obert.</h2><p>Mentrestant, a la nostra guia gratis tens com donar-te de baixa tu, pas a pas.</p><a class="btn tb-sec" id="tbGuia2" href="../">Veure la guia gratis</a></section>
 
-  <section class="tb-paso" data-paso="1" aria-labelledby="tbH1">
+  <section class="tb-paso" data-paso="1" aria-labelledby="tbH1" hidden>
     <h2 id="tbH1">Quan vols que s'acabi?</h2>
-    <div class="tb-aviso" id="tbAvPerm" data-aviso="permanencia">
-      <p><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.5 2.5 20h19L12 3.5Z"/><path d="M12 10v4.5"/><circle cx="12" cy="17.2" r=".6"/></svg><span>Si et dones de baixa avui, <span data-t="empresa"></span> et pot cobrar la penalització de permanència. Et recomanem enviar-la el <span data-t="fecha-envio"></span>.</span></p>
-      <button type="button" class="btn tb-sec" id="tbProgramar"><span>Programar per al <span data-t="fecha-envio"></span></span></button>
-      <button type="button" class="tb-link" id="tbYa">Enviar-la ara igualment</button>
-    </div>
-    <div class="tb-aviso tb-aviso--info" id="tbAvPre" data-aviso="preaviso" hidden>
-      <p><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg><span><span data-t="empresa"></span> demana <span data-t="dias"></span> dies d'avís. L'enviem avui perquè arribi a temps.</span></p>
-    </div>
+    <div class="tb-aviso tb-aviso--info" id="tbAvPre" hidden><p><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg><span><span data-t="empresa"></span> demana <span data-t="aviso"></span> d'avís. Calculem el dia d'enviament perquè arribi a temps.</span></p></div>
     <fieldset class="tb-ops">
       <legend class="sr">Quan vols que s'acabi?</legend>
       <label class="tb-op"><input type="radio" name="cuando" value="ya"><span class="tb-op-t"><strong>Tan aviat com sigui possible</strong></span></label>
-      <label class="tb-op"><input type="radio" name="cuando" value="fin"><span class="tb-op-t"><strong>Quan acabi la meva permanència</strong></span>
-        <span class="tb-op-x tb-f" id="tbFechaBox" hidden><span class="tb-nota">Data de fi de la permanència</span><input type="date" id="tbFecha" aria-label="Data de fi de la permanència"></span></label>
+      <label class="tb-op"><input type="radio" name="cuando" value="fin"><span class="tb-op-t"><strong>Quan acabi la meva permanència</strong></span></label>
       <label class="tb-op"><input type="radio" name="cuando" value="ren"><span class="tb-op-t"><strong>Abans que es renovi</strong></span></label>
     </fieldset>
-    <label class="tb-chk tb-chk--box" id="tbPen" hidden><input type="checkbox" id="tbPenChk" required><span>Entenc que hi pot haver penalització.</span></label>
+    <div class="tb-f" id="tbFechaBox" hidden><label for="tbFecha"><span data-para="fin">Data de fi de la permanència</span><span data-para="ren" hidden>Data de la propera renovació o venciment</span></label><input type="date" id="tbFecha"></div>
+    <p class="tb-ok" id="tbCalc" role="status" hidden></p>
+    <div class="tb-aviso" id="tbTarde" hidden><p><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.5 2.5 20h19L12 3.5Z"/><path d="M12 10v4.5"/><circle cx="12" cy="17.2" r=".6"/></svg><span>Ja no hi ha temps d'avisar amb el termini que demana <span data-t="empresa"></span>. L'enviem avui, però potser la baixa arriba un període més tard.</span></p></div>
+    <div class="tb-aviso" id="tbAvPerm" hidden><p><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.5 2.5 20h19L12 3.5Z"/><path d="M12 10v4.5"/><circle cx="12" cy="17.2" r=".6"/></svg><span>Si encara tens permanència, donar-te de baixa ara et pot costar la penalització. Si saps quan acaba, tria «Quan acabi la meva permanència» i l'enviem a temps.</span></p></div>
+    <label class="tb-chk tb-chk--box" id="tbPen" hidden><input type="checkbox" id="tbPenChk"><span>Entenc que hi pot haver penalització.</span></label>
     <p class="tb-err" id="tbE1" role="alert" hidden>Tria una opció.</p>
     <p class="tb-err" id="tbE1f" role="alert" hidden>Indica la data.</p>
     <p class="tb-err" id="tbE1p" role="alert" hidden>Marca la casella per enviar-la ara.</p>
@@ -77,14 +71,17 @@
     <h2 id="tbH2">Les teves dades</h2>
     <div class="tb-f"><label for="tbNombre">Nom i cognoms</label><input id="tbNombre" autocomplete="name" required><p class="tb-err" id="tbNombreE" hidden>Escriu el teu nom i cognoms.</p></div>
     <div class="tb-f"><label for="tbCorreo">Correu amb què tens el compte a <span data-t="empresa"></span></label><input id="tbCorreo" type="email" autocomplete="email" inputmode="email" required><p class="tb-err" id="tbCorreoE" hidden>Revisa el correu.</p></div>
-    <div class="tb-f"><label for="tbCliente">Número de client o telèfon associat <span>(opcional)</span></label><input id="tbCliente" autocomplete="off"></div>
-    <div class="tb-f" id="tbDniBox" data-pide-dni="true"><label for="tbDni">DNI o NIE</label><input id="tbDni" autocomplete="off" autocapitalize="characters"><p class="tb-nota"><span data-t="empresa"></span> el demana per identificar-te.</p><p class="tb-err" id="tbDniE" hidden>Revisa el DNI o NIE.</p></div>
+    <div class="tb-f" id="tbDatoBox"><label for="tbDato"><span id="tbDatoL"></span><span id="tbDatoOpc"></span></label><input id="tbDato" autocomplete="off"><p class="tb-err" id="tbDatoE" hidden>Revisa aquesta dada.</p></div>
+    <div class="tb-f" id="tbDniBox" hidden><label for="tbDni">DNI o NIE</label><input id="tbDni" autocomplete="off" autocapitalize="characters"><p class="tb-nota"><span data-t="empresa"></span> el demana per identificar-te.</p><p class="tb-err" id="tbDniE" hidden>Revisa el DNI o NIE.</p></div>
+    <div class="tb-f" id="tbDniFotoBox" hidden><label for="tbDniFoto">Foto del teu DNI o NIE <span>(per davant)</span></label><input id="tbDniFoto" type="file" accept="image/*"><p class="tb-nota" id="tbDniFotoNota"></p><p class="tb-ok" id="tbDniFotoOk" role="status" hidden></p><p class="tb-err" id="tbDniFotoE" role="alert" hidden></p></div>
+    <div class="tb-aviso tb-aviso--info" id="tbExtra" hidden><p><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg><span></span></p></div>
     <div class="tb-carta">
-      <div class="tb-carta-h"><h3>La teva carta</h3><button type="button" class="tb-link" id="tbEditar" data-editar="Editar" data-listo="Fet">Editar</button></div>
+      <div class="tb-carta-h"><h3>La teva carta</h3></div>
+      <p class="tb-nota">Així la rebrà <span data-t="empresa"></span>. La signes al pas següent. <span id="tbCartaIdioma" hidden></span></p>
       <pre id="tbCartaTxt" data-api="carta"></pre>
-      <div class="tb-f"><textarea id="tbCartaEd" aria-label="La teva carta" hidden></textarea></div>
     </div>
-    <p class="tb-priv"><svg class="tb-ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="10.5" width="14" height="10" rx="1.5"/><path d="M8 10.5V7.5a4 4 0 0 1 8 0v3"/></svg><span>Per enviar la teva baixa, el teu nom i les dades del contracte s'envien al servei de correu certificat. El teu extracte no surt del teu mòbil.</span></p>
+    <p class="tb-priv"><svg class="tb-ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="10.5" width="14" height="10" rx="1.5"/><path d="M8 10.5V7.5a4 4 0 0 1 8 0v3"/></svg><span>Per enviar la teva baixa, les teves dades i la carta van a <span data-t="empresa"></span> i a Lleida.net, que certifica l'enviament. Les esborrem 30 dies després del lliurament. El teu extracte no surt del teu dispositiu.</span></p>
+    <p class="tb-err" id="tbE2" role="alert" hidden></p>
     <div class="tb-acc"><button type="button" class="btn tb-btn" id="tbN2" data-api="datos-guardar">Continuar</button></div>
   </section>
 
@@ -95,25 +92,26 @@
     <p class="tb-err" id="tbE3c" role="alert" hidden>Aquest codi no és correcte. Revisa l'últim correu o demana'n un altre.</p>
     <button type="button" class="tb-link" id="tbReenviar" data-api="firma-reenviar">Tornar a enviar el codi</button>
     <p class="tb-ok" id="tbReenvMsg" role="status" hidden></p>
-    <!-- [REVISIÓN LEGAL] texto de autorización -->
-    <label class="tb-chk tb-chk--box" data-revision="legal"><input type="checkbox" id="tbAut" required><span>Autoritzo Feehund a enviar aquesta carta en nom meu a <span data-t="empresa"></span>.</span></label>
+    <div class="tb-f tb-firma"><label for="tbFirma">La teva signatura (opcional)</label><p class="tb-nota">Si vols, dibuixa la teva signatura: va a la carta en PDF.</p><canvas id="tbFirma" width="600" height="180" aria-label="La teva signatura (opcional)"></canvas><button type="button" class="tb-link" id="tbFirmaBorrar">Esborrar</button></div>
+    <!-- [REVISIÓN LEGAL] mandato: autorización para enviar la carta en nombre de la persona -->
+    <label class="tb-chk tb-chk--box" data-revision="legal"><input type="checkbox" id="tbAut" required><span>Autoritzo Feehund a enviar aquesta carta en nom meu a <span data-t="empresa"></span> per correu electrònic certificat, i confirmo que sóc el titular del contracte.</span></label>
     <p class="tb-err" id="tbE3a" role="alert" hidden>Marca la casella per signar.</p>
+    <p class="tb-err" id="tbE3x" role="alert" hidden></p>
     <div class="tb-acc"><button type="button" class="btn tb-btn" id="tbN3" data-api="firma-verificar">Signar i continuar</button></div>
   </section>
 
   <section class="tb-paso" data-paso="4" aria-labelledby="tbH4" hidden>
     <h2 id="tbH4">Tria i paga</h2>
-    <fieldset class="tb-ops">
-      <legend class="sr">Tria i paga</legend>
-      <label class="tb-op"><input type="radio" name="pack" value="1" checked><span class="tb-op-t"><strong>1 baixa · <span class="tb-precio">4,99 €</span></strong></span></label>
-    </fieldset>
-    <ul class="tb-lista"><li>Carta enviada amb certificat</li><li>Certificat en PDF al teu correu</li><li>Si no arriba, et retornem els diners</li><li>Si et tornen a cobrar, segona carta gratis</li></ul>
-    <!-- [REVISIÓN LEGAL] renuncia al desistimiento -->
-    <label class="tb-chk tb-chk--box" data-revision="legal"><input type="checkbox" id="tbDes" required><span>Demano que s'enviï ara i entenc que, per això, perdo el dret de desistiment. <a href="../../../ca/condicions/" target="_blank">Veure condicions</a></span></label>
+    <fieldset class="tb-ops" id="tbPacks"><legend class="sr">Tria i paga</legend></fieldset>
+    <p class="tb-nota" id="tbPackNota"></p>
+    <p class="tb-ok" id="tbLote" data-api="pack-usar" hidden>Fas servir una de les baixes que ja vas pagar.</p>
+    <ul class="tb-lista"><li>Carta enviada amb certificat de Lleida.net</li><li>Certificat en PDF al teu correu</li><li>Si no arriba, et retornem els diners</li><li>Si et tornen a cobrar, segona carta gratis</li></ul>
+    <!-- [REVISIÓN LEGAL] renuncia al desistimiento (art. 103 a) TRLGDCU: servicio ejecutado por completo con consentimiento previo) -->
+    <label class="tb-chk tb-chk--box" data-revision="legal"><input type="checkbox" id="tbDes" required><span>Demano que l'envieu ara (o a la data programada) i entenc que, un cop enviada, perdo el dret de desistiment. <a href="../../../ca/condicions/#te-damos-de-baja" target="_blank">Veure condicions</a></span></label>
     <p class="tb-err" id="tbE4d" role="alert" hidden>Marca la casella per continuar.</p>
     <div class="tb-errbox" id="tbE4p" role="alert" tabindex="-1" hidden><p class="tb-err">El pagament no s'ha completat. No se t'ha cobrat res.</p><p>Torna-ho a provar o fes servir una altra targeta.</p></div>
     <div class="tb-acc">
-      <button type="button" class="btn tb-pay" id="tbPay" data-api="pago" data-modo="enviar" data-estado="../estat/">Pagar i enviar · 4,99 €</button>
+      <button type="button" class="btn tb-pay" id="tbPay" data-api="pago">Pagar i enviar · 3,99 €</button>
       <div class="tb-fino"><p>IVA inclòs. Pagament únic, sense subscripció.</p><p>Feehund no té relació amb <span data-t="empresa"></span>.</p></div>
     </div>
   </section>
@@ -136,6 +134,6 @@
     <li>© 2026 <span data-marca>Feehund</span></li>
   </ul>
 </div></footer>
-<script src="../../../assets/te-damos-de-baja.js?v=20261111"></script>
+<script type="module" src="../../../assets/te-damos-de-baja.js?v=20261116"></script>
 <script src="../../../assets/app.js?v=20261113141239"></script>
 </body></html>

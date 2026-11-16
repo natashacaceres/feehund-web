@@ -1,0 +1,15 @@
+/* «Te damos de baja»: lo poco que no está en app.css (firma dibujada, foto del DNI, lote, botones ocupados) */
+.tb .tb-firma canvas{display:block;width:100%;max-width:420px;height:auto;aspect-ratio:10/3;background:#FFFFFF;border:1px dashed var(--ink-2);border-radius:var(--r);touch-action:none;cursor:crosshair}
+.tb .tb-firma .tb-link{align-self:flex-start}
+.tb .tb-f input[type="file"]{min-height:0;padding:10px;border-style:dashed;font-size:15px}
+.tb .tb-f select{width:100%;min-height:48px;padding:10px 14px;background:#FFFFFF;border:1px solid var(--ink);border-radius:12px;font:400 17px/1.4 var(--f-text);color:var(--ink)}
+.tb .tb-f label span[data-t],.tb .tb-f label #tbDatoL,.tb .tb-f label [data-para]{font-weight:inherit;color:inherit;font-size:inherit}
+.tb .tb-f label #tbDatoOpc{font-weight:400;color:var(--ink-2)}
+.tb #tbCalc{margin-top:var(--s-3)}
+.tb .tb-nota #tbCartaIdioma{display:block;margin-top:var(--s-1)}
+.tb button[aria-busy="true"]{opacity:.6;cursor:progress}
+.tb label.btn{cursor:pointer;position:relative}
+.tb label.btn:focus-within{outline:2px solid var(--brand);outline-offset:2px}
+.tb .tb-est-m .tb-link{display:block;width:max-content;margin:var(--s-4) auto 0}
+.tb #tbRecobro .tb-f{margin-top:var(--s-3)}
+.tb .tb-blk + .tb-blk{margin-top:var(--s-6)}

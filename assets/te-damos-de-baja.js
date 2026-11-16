@@ -1,158 +1,347 @@
-/* «Te damos de baja»: solo interfaz. La lógica, los pagos y los envíos los programa el taller en los puntos marcados con data-api="…".
-   Datos de ejemplo para maquetar (EMP). Vista previa: ?empresa=basic-fit|vodafone|privilegios-en-compras|edreams-prime · ?paso=1-4 · ?error=codigo|pago
-   Estado: ?estado=programada|enviada|entregada|devuelta · ?recobro=1 · ?quedan=2. Nada se guarda en el navegador. */
-(function(){
-"use strict";
-const LANG = ["es","ca","en"].indexOf(document.documentElement.lang) >= 0 ? document.documentElement.lang : "es";
-const LOC = { es: "es-ES", ca: "ca-ES", en: "en-GB" }[LANG];
-const $ = id => document.getElementById(id);
+/* «Te damos de baja»: páginas /baja/enviar/ y /baja/estado/ (y ca/en). Habla con /api/baja/… (functions/_baja/LEEME.md).
+   La carta que se ve aquí sale del mismo módulo que la que se envía (te-damos-de-baja/carta.js).
+   Nada se guarda en el navegador: el enlace de estado (?p=…) llega también por correo. */
+import { carta, calcularEnvio, validarDatos, fechaLarga, hoyEspana, total, euros, DATO, datoObligatorio, MAX_BAJAS } from "./te-damos-de-baja/carta.js";
+
+const LANG = ["es", "ca", "en"].indexOf(document.documentElement.lang) >= 0 ? document.documentElement.lang : "es";
+const $ = (id) => document.getElementById(id);
 const Q = new URLSearchParams(location.search);
-const main = document.querySelector("main.tb"); if (!main) return;
-
-/* ---------- datos de ejemplo (el taller los sustituye por data-api="empresa") */
-const EMP = {
-  "basic-fit": { n: "Basic-Fit", baja: "certificada", aviso: "permanencia", fin: "2027-01-15", envio: "2027-01-02", dni: true },
-  "vodafone": { n: "Vodafone", baja: "certificada", aviso: "preaviso", dias: 2, dni: true },
-  "privilegios-en-compras": { n: "Privilegios en Compras", baja: "certificada", aviso: null, dni: false },
-  "edreams-prime": { n: "eDreams Prime", baja: "online", aviso: null, dni: false }
-};
-const slug = Q.get("empresa") || main.dataset.empresa || "basic-fit";
-const E = EMP[slug] || { n: Q.get("nombre") || slug, baja: "certificada", aviso: null, dni: false };
-main.dataset.empresa = slug; main.dataset.baja = E.baja; main.dataset.aviso = E.aviso || ""; main.dataset.pideDni = String(!!E.dni);
-
-const fd = (iso, hora) => { const d = new Date(iso + (iso.length === 10 ? "T12:00:00" : "")); if (isNaN(d)) return iso;
-  const s = d.toLocaleDateString(LOC, { day: "numeric", month: "long", year: "numeric" });
-  return hora ? s + ", " + d.toLocaleTimeString(LOC, { hour: "2-digit", minute: "2-digit" }) : s; };
-const fill = (k, v) => document.querySelectorAll('[data-t="' + k + '"]').forEach(el => { el.textContent = v; });
-fill("empresa", E.n);
-if (E.envio) fill("fecha-envio", fd(E.envio));
-if (E.dias) fill("dias", String(E.dias));
+const main = document.querySelector("main.tb");
+const API = "/api/baja/";
+const GUIA = { es: "/baja/", ca: "/ca/baixa/", en: "/en/cancel/" }[LANG];
+const ENVIAR = { es: "/baja/enviar/", ca: "/ca/baixa/enviar/", en: "/en/cancel/send/" }[LANG];
+const EXTRACTO = { es: "/extracto/", ca: "/ca/extracte/", en: "/en/statement/" }[LANG];
 
 const T = {
-  es: { de: (a, b) => a + " de " + b, pay: m => m ? "Pagar y programar" : "Pagar y enviar", prog: f => "Programada para el " + f, env: f => "Enviada el " + f,
-        ef: { ya: "lo antes posible", fin: f => "el " + f, ren: "antes de la próxima renovación" }, reenv: "Código reenviado.",
-        carta: (d, emp, ef, hoy) => [d.nombre || "[Nombre y apellidos]", d.correo || "[Correo]", d.cliente ? "N.º de cliente o teléfono: " + d.cliente : "", d.dni ? "DNI: " + d.dni : "", "", "A la atención de " + emp, "", "Asunto: Baja del contrato", "", "Solicito la baja de mi contrato con " + emp + " con efecto " + ef + ".", "", "Pido que no se me hagan más cargos a partir de esa fecha y que me confirméis la baja por escrito.", "", hoy, d.nombre || "[Nombre y apellidos]", "Firmado con código de verificación."] },
-  ca: { de: (a, b) => a + " de " + b, pay: m => m ? "Pagar i programar" : "Pagar i enviar", prog: f => "Programada per al " + f, env: f => "Enviada el " + f,
-        ef: { ya: "tan aviat com sigui possible", fin: f => "el " + f, ren: "abans de la propera renovació" }, reenv: "Codi reenviat.",
-        carta: (d, emp, ef, hoy) => [d.nombre || "[Nom i cognoms]", d.correo || "[Correu]", d.cliente ? "Núm. de client o telèfon: " + d.cliente : "", d.dni ? "DNI: " + d.dni : "", "", "A l'atenció de " + emp, "", "Assumpte: Baixa del contracte", "", "Sol·licito la baixa del meu contracte amb " + emp + " amb efecte " + ef + ".", "", "Demano que no se'm facin més càrrecs a partir d'aquesta data i que em confirmeu la baixa per escrit.", "", hoy, d.nombre || "[Nom i cognoms]", "Signat amb codi de verificació."] },
-  en: { de: (a, b) => a + " of " + b, pay: m => m ? "Pay and schedule" : "Pay and send", prog: f => "Scheduled for " + f, env: f => "Sent on " + f,
-        ef: { ya: "as soon as possible", fin: f => "on " + f, ren: "before the next renewal" }, reenv: "Code sent again.",
-        carta: (d, emp, ef, hoy) => [d.nombre || "[Full name]", d.correo || "[Email]", d.cliente ? "Customer number or phone: " + d.cliente : "", d.dni ? "DNI: " + d.dni : "", "", "For the attention of " + emp, "", "Subject: Contract cancellation", "", "I hereby request the cancellation of my contract with " + emp + ", effective " + ef + ".", "", "Please make no further charges from that date and confirm the cancellation in writing.", "", hoy, d.nombre || "[Full name]", "Signed with a verification code."] }
+  es: {
+    aviso: (a) => a.habiles ? `${a.habiles} días hábiles` : a.meses ? (a.meses === 1 ? "un mes" : `${a.meses} meses`) : a.dias === 1 ? "24 horas" : `${a.dias} días`,
+    calc: (f, e) => `La enviamos el ${f}, con el aviso que pide ${e}. Te avisamos ese día.`, calcHoy: "La enviamos hoy, en cuanto pagues.",
+    fecha: { fin: "Fecha de fin de la permanencia", ren: "Fecha de la próxima renovación o vencimiento" },
+    lejos: "Elige una fecha de los próximos 18 meses.", pasada: "Elige una fecha a partir de mañana.",
+    idiomaCarta: { es: "La carta va en castellano, el idioma de la empresa.", ca: "La carta va en catalán, el idioma de la empresa.", en: "La carta va en inglés, el idioma de la empresa." },
+    sms: (e) => `${e} te mandará un SMS para confirmar la baja: ábrelo y confírmala.`,
+    formulario: (e) => `${e} tiene su propio formulario. Enviamos tu carta con todos los datos que pide; si aun así te lo piden, te escribirán a ti.`,
+    dniCopia: (e) => `${e} pide copia del DNI. Si no la adjuntas, puede que te la pidan por correo.`,
+    fotoOk: "Foto lista.", fotoMal: "No hemos podido leer esa foto. Prueba con otra (JPG o PNG).",
+    opcional: "(opcional)", pay: (p, x) => `${p ? "Pagar y programar" : "Pagar y enviar"} · ${x}`, usar: (p) => p ? "Programar mi baja" : "Enviar mi baja",
+    pack: (n, x) => n === 1 ? `1 baja · ${x}` : `${n} bajas · ${x}`, packNota: (x) => `La segunda y las siguientes, ${x} cada una. Las que no uses te las devolvemos.`,
+    reenv: "Código reenviado.", sinCodigos: "Ya te hemos enviado varios códigos. Revisa el correo no deseado o empieza de nuevo.",
+    caducado: "El código ha caducado. Pide otro.", intentos: "Demasiados intentos. Vuelve a empezar.",
+    servicio: "Ahora mismo no podemos hacerlo. Prueba en unos minutos.", limite: "Has hecho muchos intentos hoy. Prueba mañana.",
+    perdido: "Esta baja ya no existe o el enlace no es correcto. Si han pasado más de 30 días desde la entrega, ya borramos los datos.",
+    prog: (f) => f, quedan: (n) => n === 1 ? "Te queda 1 baja pagada" : `Te quedan ${n} bajas pagadas`,
+    devuelto: (x) => `Te devolvemos ${x}. Tarda de 5 a 10 días en verse en tu tarjeta.`, borrado: "Hemos borrado tus datos.",
+    borrarProg: "Cancelar el envío y borrar mis datos", borrarEl: (f) => `Borramos tus datos solos el ${f}.`, esperaBorrar: "Podrás borrarlos en cuanto sepamos si la carta ha llegado (uno o dos días).",
+    nadaRecobro: (e) => `No vemos cobros de ${e} después de la baja en ese extracto.`, recobroVisto: (f, x) => `Vemos un cobro de ${x} el ${f}.`,
+    leyendo: "Leyendo tu extracto en tu dispositivo…", noLeido: "No hemos podido leer ese archivo. Escríbelo a mano.",
+    confirmarBorrar: "¿Seguro? No se puede deshacer.",
+  },
+  ca: {
+    aviso: (a) => a.habiles ? `${a.habiles} dies hàbils` : a.meses ? (a.meses === 1 ? "un mes" : `${a.meses} mesos`) : a.dias === 1 ? "24 hores" : `${a.dias} dies`,
+    calc: (f, e) => `L'enviem el ${f}, amb l'avís que demana ${e}. T'avisem aquell dia.`, calcHoy: "L'enviem avui, tan bon punt paguis.",
+    fecha: { fin: "Data de fi de la permanència", ren: "Data de la propera renovació o venciment" },
+    lejos: "Tria una data dels propers 18 mesos.", pasada: "Tria una data a partir de demà.",
+    idiomaCarta: { es: "La carta va en castellà, l'idioma de l'empresa.", ca: "La carta va en català, l'idioma de l'empresa.", en: "La carta va en anglès, l'idioma de l'empresa." },
+    sms: (e) => `${e} t'enviarà un SMS per confirmar la baixa: obre'l i confirma-la.`,
+    formulario: (e) => `${e} té el seu propi formulari. Enviem la teva carta amb totes les dades que demana; si tot i així te'l demanen, t'escriuran a tu.`,
+    dniCopia: (e) => `${e} demana còpia del DNI. Si no l'adjuntes, potser te la demanen per correu.`,
+    fotoOk: "Foto a punt.", fotoMal: "No hem pogut llegir aquesta foto. Prova amb una altra (JPG o PNG).",
+    opcional: "(opcional)", pay: (p, x) => `${p ? "Pagar i programar" : "Pagar i enviar"} · ${x}`, usar: (p) => p ? "Programar la meva baixa" : "Enviar la meva baixa",
+    pack: (n, x) => n === 1 ? `1 baixa · ${x}` : `${n} baixes · ${x}`, packNota: (x) => `La segona i les següents, ${x} cadascuna. Les que no facis servir te les retornem.`,
+    reenv: "Codi reenviat.", sinCodigos: "Ja t'hem enviat diversos codis. Revisa el correu brossa o torna a començar.",
+    caducado: "El codi ha caducat. Demana'n un altre.", intentos: "Massa intents. Torna a començar.",
+    servicio: "Ara mateix no ho podem fer. Prova-ho d'aquí a uns minuts.", limite: "Avui has fet molts intents. Prova-ho demà.",
+    perdido: "Aquesta baixa ja no existeix o l'enllaç no és correcte. Si han passat més de 30 dies des del lliurament, ja hem esborrat les dades.",
+    prog: (f) => f, quedan: (n) => n === 1 ? "Et queda 1 baixa pagada" : `Et queden ${n} baixes pagades`,
+    devuelto: (x) => `Et retornem ${x}. Triga de 5 a 10 dies a veure's a la targeta.`, borrado: "Hem esborrat les teves dades.",
+    borrarProg: "Cancel·lar l'enviament i esborrar les meves dades", borrarEl: (f) => `Esborrem les teves dades soles el ${f}.`, esperaBorrar: "Les podràs esborrar quan sapiguem si la carta ha arribat (un o dos dies).",
+    nadaRecobro: (e) => `No veiem cobraments de ${e} després de la baixa en aquest extracte.`, recobroVisto: (f, x) => `Veiem un cobrament de ${x} el ${f}.`,
+    leyendo: "Llegint el teu extracte al teu dispositiu…", noLeido: "No hem pogut llegir aquest fitxer. Escriu-ho a mà.",
+    confirmarBorrar: "Segur? No es pot desfer.",
+  },
+  en: {
+    aviso: (a) => a.habiles ? `${a.habiles} working days'` : a.meses ? (a.meses === 1 ? "one month's" : `${a.meses} months'`) : a.dias === 1 ? "24 hours'" : `${a.dias} days'`,
+    calc: (f, e) => `We send it on ${f}, with the notice ${e} asks for. We will let you know that day.`, calcHoy: "We send it today, as soon as you pay.",
+    fecha: { fin: "Minimum term end date", ren: "Next renewal or expiry date" },
+    lejos: "Choose a date within the next 18 months.", pasada: "Choose a date from tomorrow on.",
+    idiomaCarta: { es: "The letter is in Spanish, the company's language.", ca: "The letter is in Catalan, the company's language.", en: "The letter is in English, the company's language." },
+    sms: (e) => `${e} will text you to confirm the cancellation: open it and confirm.`,
+    formulario: (e) => `${e} has its own form. We send your letter with everything it asks for; if they still ask for the form, they will write to you.`,
+    dniCopia: (e) => `${e} asks for a copy of your ID. If you do not attach it, they may ask you for it by email.`,
+    fotoOk: "Photo ready.", fotoMal: "We could not read that photo. Try another one (JPG or PNG).",
+    opcional: "(optional)", pay: (p, x) => `${p ? "Pay and schedule" : "Pay and send"} · ${x}`, usar: (p) => p ? "Schedule my cancellation" : "Send my cancellation",
+    pack: (n, x) => n === 1 ? `1 cancellation · ${x}` : `${n} cancellations · ${x}`, packNota: (x) => `The second and the rest, ${x} each. We refund the ones you do not use.`,
+    reenv: "Code sent again.", sinCodigos: "We have already sent you several codes. Check your spam folder or start again.",
+    caducado: "The code has expired. Ask for a new one.", intentos: "Too many attempts. Start again.",
+    servicio: "We cannot do it right now. Try again in a few minutes.", limite: "You have tried many times today. Try tomorrow.",
+    perdido: "This cancellation no longer exists or the link is wrong. If more than 30 days have passed since delivery, we have already deleted the details.",
+    prog: (f) => f, quedan: (n) => n === 1 ? "You have 1 paid cancellation left" : `You have ${n} paid cancellations left`,
+    devuelto: (x) => `We are refunding ${x}. It takes 5 to 10 days to show on your card.`, borrado: "We have deleted your details.",
+    borrarProg: "Cancel sending and delete my details", borrarEl: (f) => `We delete your details automatically on ${f}.`, esperaBorrar: "You can delete them as soon as we know the letter has arrived (a day or two).",
+    nadaRecobro: (e) => `We see no ${e} charges after the cancellation in that statement.`, recobroVisto: (f, x) => `We see a charge of ${x} on ${f}.`,
+    leyendo: "Reading your statement on your device…", noLeido: "We could not read that file. Type it in instead.",
+    confirmarBorrar: "Are you sure? It cannot be undone.",
+  },
 }[LANG];
 
-/* ============ FLUJO ============ */
-if (main.dataset.vista === "flujo") {
-  const pasos = [...document.querySelectorAll(".tb-paso[data-paso]")];
-  const no = $("tbNo"), back = $("tbBack"), cnt = $("tbCnt"), bar = $("tbBar");
-  let paso = 1;
-  const pack = Q.get("pack") === "3" ? "3" : "1";
+const fd = (iso) => fechaLarga(iso, LANG);
+const fill = (k, v) => document.querySelectorAll('[data-t="' + k + '"]').forEach((el) => { el.textContent = v; });
+const err = (id, on, texto) => { const e = $(id); if (!e) return on; if (texto) e.textContent = texto; e.hidden = !on; return on; };
+async function api(ruta, cuerpo) {
+  const r = await fetch(API + ruta, cuerpo ? { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(cuerpo) } : {});
+  const j = await r.json().catch(() => ({ error: "servicio" }));
+  if (!r.ok) throw Object.assign(new Error(j.error || "servicio"), { codigo: j.error || "servicio", estado: r.status });
+  return j;
+}
+const espera = (btn, on) => { if (!btn) return; btn.disabled = on; btn.setAttribute("aria-busy", on ? "true" : "false"); };
 
-  if (E.baja === "online") {
-    pasos.forEach(p => { p.hidden = true; }); no.hidden = false;
-    document.querySelectorAll(".tb-prog").forEach(el => { el.hidden = true; });
-    return;
-  }
-  const show = n => {
-    paso = n; pasos.forEach(p => { p.hidden = Number(p.dataset.paso) !== n; });
+// Foto → JPEG reducido (lado mayor 1600 px). Devuelve «data:image/jpeg;base64,…»
+async function aJpeg(archivo, lado = 1600) {
+  const bmp = await createImageBitmap(archivo);
+  const k = Math.min(1, lado / Math.max(bmp.width, bmp.height));
+  const c = document.createElement("canvas"); c.width = Math.round(bmp.width * k); c.height = Math.round(bmp.height * k);
+  const g = c.getContext("2d"); g.fillStyle = "#fff"; g.fillRect(0, 0, c.width, c.height); g.drawImage(bmp, 0, 0, c.width, c.height);
+  return c.toDataURL("image/jpeg", 0.82);
+}
+
+/* ============ FLUJO (/baja/enviar/) ============ */
+async function flujo() {
+  const slug = (Q.get("empresa") || "").toLowerCase().replace(/_/g, "-");
+  const pasos = [...document.querySelectorAll(".tb-paso[data-paso]")];
+  const back = $("tbBack"), cnt = $("tbCnt"), bar = $("tbBar");
+  const guia = GUIA + (slug ? slug + "/" : "");
+  ["tbGuia", "tbGuia2"].forEach((id) => { if ($(id)) $(id).href = guia; });
+  const solo = (id) => { pasos.forEach((p) => { p.hidden = true; }); ["tbCarga", "tbNo", "tbOff"].forEach((x) => { if ($(x)) $(x).hidden = x !== id; }); document.querySelectorAll(".tb-prog").forEach((el) => { el.hidden = Boolean(id); }); };
+
+  let E;
+  try { E = await api("empresa?id=" + encodeURIComponent(slug)); } catch (e) { fill("empresa", Q.get("nombre") || ""); solo("tbNo"); return; }
+  fill("empresa", E.nombre);
+  if (!E.activo) { solo("tbOff"); return; }
+  solo(null); $("tbCarga").hidden = true;
+
+  let paso = 1, token = Q.get("p") || null, lote = Q.get("compra") || null, firmada = false, editado = false;
+  const show = (n) => {
+    paso = n; pasos.forEach((p) => { p.hidden = Number(p.dataset.paso) !== n; });
     cnt.textContent = cnt.dataset.fmt.replace("{n}", n);
     bar.setAttribute("aria-valuenow", n); bar.firstElementChild.style.width = (n * 25) + "%";
     const h = pasos[n - 1].querySelector("h2"); if (h) { h.setAttribute("tabindex", "-1"); h.focus({ preventScroll: true }); }
     window.scrollTo(0, 0);
-    if (n === 2) carta(); if (n === 3) fill("correo", $("tbCorreo").value.trim() || "—"); if (n === 4) payLabel();
+    if (n === 2) pintarCarta(); if (n === 3) fill("correo", $("tbCorreo").value.trim() || "—"); if (n === 4) payLabel();
   };
-  back.addEventListener("click", () => { if (paso > 1) show(paso - 1); else if (history.length > 1) history.back(); else location.href = back.dataset.salida; });
-  const err = (id, on) => { const e = $(id); if (e) e.hidden = !on; return on; };
+  back.addEventListener("click", () => { if (paso > 1 && !(paso === 4 && firmada)) show(paso === 4 ? 2 : paso - 1); else if (history.length > 1) history.back(); else location.href = back.dataset.salida; });
 
   /* Paso 1 · Cuándo */
-  const avP = $("tbAvPerm"), avA = $("tbAvPre"), pen = $("tbPen"), fecha = $("tbFecha");
-  avP.hidden = E.aviso !== "permanencia"; avA.hidden = E.aviso !== "preaviso";
-  if (E.fin) fecha.value = E.fin;
+  const fecha = $("tbFecha"), hoy = E.hoy || hoyEspana();
+  fecha.min = hoy;
+  document.querySelectorAll('input[name="cuando"]').forEach((r) => { r.closest(".tb-op").hidden = E.opciones.indexOf(r.value) < 0; });
+  if (E.opciones.length === 1) document.querySelector('input[name="cuando"][value="' + E.opciones[0] + '"]').checked = true;
+  $("tbAvPre").hidden = !E.aviso || !Object.keys(E.aviso).length; fill("aviso", E.aviso ? T.aviso(E.aviso) : "");
   const cuando = () => (document.querySelector('input[name="cuando"]:checked') || {}).value || "";
-  const sync1 = () => { const c = cuando(); $("tbFechaBox").hidden = c !== "fin"; pen.hidden = !(c === "ya" && E.aviso === "permanencia" && pen.dataset.abierto === "1"); };
-  document.querySelectorAll('input[name="cuando"]').forEach(r => r.addEventListener("change", () => { if (r.value === "ya" && E.aviso === "permanencia") pen.dataset.abierto = "1"; sync1(); err("tbE1", false); }));
-  $("tbProgramar").addEventListener("click", () => { document.querySelector('input[name="cuando"][value="fin"]').checked = true; fecha.value = E.envio || E.fin || ""; main.dataset.programada = E.envio || ""; sync1(); show(2); });
-  $("tbYa").addEventListener("click", () => { document.querySelector('input[name="cuando"][value="ya"]').checked = true; pen.dataset.abierto = "1"; sync1(); $("tbPenChk").focus(); });
+  const eleccion = () => ({ cuando: cuando(), fecha: fecha.value || undefined });
+  const sync1 = () => {
+    const c = cuando(), conFecha = c === "fin" || c === "ren";
+    $("tbFechaBox").hidden = !conFecha;
+    document.querySelectorAll("#tbFechaBox [data-para]").forEach((el) => { el.hidden = el.dataset.para !== c; });
+    $("tbAvPerm").hidden = !(c === "ya" && E.permanencia); $("tbPen").hidden = $("tbAvPerm").hidden;
+    const r = c ? calcularEnvio(E, eleccion(), hoy) : null;
+    $("tbCalc").hidden = !(r && r.ok); $("tbTarde").hidden = !(r && r.ok && r.tarde);
+    if (r && r.ok) $("tbCalc").textContent = r.programada ? T.calc(fd(r.envio), E.nombre) : T.calcHoy;
+    return r;
+  };
+  document.querySelectorAll('input[name="cuando"]').forEach((r) => r.addEventListener("change", () => { sync1(); err("tbE1", false); }));
+  fecha.addEventListener("input", () => { sync1(); err("tbE1f", false); });
+  $("tbPenChk").addEventListener("change", () => err("tbE1p", false));
   $("tbN1").addEventListener("click", () => {
     const c = cuando();
     if (err("tbE1", !c)) return;
-    if (err("tbE1f", c === "fin" && !fecha.value)) return;
-    if (c === "ya" && E.aviso === "permanencia") { pen.dataset.abierto = "1"; sync1(); if (err("tbE1p", !$("tbPenChk").checked)) return; }
+    const r = sync1();
+    if (!r.ok) { err("tbE1f", true, r.error === "lejos" ? T.lejos : fecha.value ? T.pasada : null); fecha.focus(); return; }
+    if (c === "ya" && E.permanencia && err("tbE1p", !$("tbPenChk").checked)) { $("tbPenChk").focus(); return; }
     show(2);
   });
-  $("tbPenChk").addEventListener("change", () => err("tbE1p", false));
 
   /* Paso 2 · Tus datos */
-  $("tbDniBox").hidden = !E.dni;
-  let editada = false;
-  const datos = () => ({ nombre: $("tbNombre").value.trim(), correo: $("tbCorreo").value.trim(), cliente: $("tbCliente").value.trim(), dni: E.dni ? $("tbDni").value.trim() : "" });
-  const efecto = () => { const c = cuando(); return c === "fin" && fecha.value ? T.ef.fin(fd(fecha.value)) : c === "ren" ? T.ef.ren : T.ef.ya; };
-  const carta = () => { if (editada) return; $("tbCartaTxt").textContent = T.carta(datos(), E.n, efecto(), fd(new Date().toISOString().slice(0, 10))).filter((l, i, a) => l !== "" || a[i - 1] !== "").join("\n"); };
-  ["tbNombre", "tbCorreo", "tbCliente", "tbDni"].forEach(id => $(id).addEventListener("input", () => { carta(); $(id).removeAttribute("aria-invalid"); err(id + "E", false); }));
-  $("tbEditar").addEventListener("click", () => {
-    const ta = $("tbCartaEd"), pre = $("tbCartaTxt"), b = $("tbEditar"), ed = ta.hidden;
-    if (ed) { ta.value = pre.textContent; ta.hidden = false; pre.hidden = true; b.textContent = b.dataset.listo; ta.focus(); }
-    else { pre.textContent = ta.value; ta.hidden = true; pre.hidden = false; b.textContent = b.dataset.editar; editada = true; }
+  $("tbDatoL").textContent = DATO[LANG][E.dato] + " "; $("tbDatoOpc").textContent = datoObligatorio(E) ? "" : T.opcional;
+  if (E.dato === "tarjeta4") { $("tbDato").inputMode = "numeric"; $("tbDato").maxLength = 4; }
+  $("tbDniBox").hidden = E.dni === "no"; $("tbDniFotoBox").hidden = E.dni !== "copia";
+  if (E.dni === "copia") $("tbDniFotoNota").textContent = T.dniCopia(E.nombre);
+  const extra = E.aviso_extra ? T[E.aviso_extra](E.nombre) : ""; $("tbExtra").hidden = !extra; if (extra) $("tbExtra").querySelector("span").textContent = extra;
+  $("tbCartaIdioma").hidden = E.idioma === LANG; $("tbCartaIdioma").textContent = T.idiomaCarta[E.idioma] || "";
+  let dniFoto = null;
+  $("tbDniFoto").addEventListener("change", async (ev) => {
+    const f = ev.target.files[0]; dniFoto = null; $("tbDniFotoOk").hidden = true; err("tbDniFotoE", false);
+    if (!f) return;
+    try { dniFoto = await aJpeg(f); $("tbDniFotoOk").textContent = T.fotoOk; $("tbDniFotoOk").hidden = false; pintarCarta(); }
+    catch { err("tbDniFotoE", true, T.fotoMal); }
   });
-  $("tbN2").addEventListener("click", () => {
-    const d = datos(), bad = [];
-    if (!d.nombre) bad.push("tbNombre");
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(d.correo)) bad.push("tbCorreo");
-    if (E.dni && !/^[0-9XYZxyz]\d{7}[A-Za-z]$/.test(d.dni.replace(/[\s-]/g, ""))) bad.push("tbDni");
-    ["tbNombre", "tbCorreo", "tbDni"].forEach(id => { const b = bad.indexOf(id) >= 0; err(id + "E", b); if (b) $(id).setAttribute("aria-invalid", "true"); else $(id).removeAttribute("aria-invalid"); });
-    if (bad.length) { $(bad[0]).focus(); return; }
-    if (!$("tbCartaEd").hidden) $("tbEditar").click();
-    show(3);
+  const datos = () => ({ nombre: $("tbNombre").value, correo: $("tbCorreo").value, dato: $("tbDato").value, dni: $("tbDni").value });
+  function pintarCarta() {
+    const v = validarDatos(E, datos());
+    const c = carta(E, { datos: { ...v.datos, nombre: v.datos.nombre, dni: v.datos.dni || $("tbDni").value.trim() }, eleccion: eleccion(), fecha: hoy, adjuntaDni: Boolean(dniFoto) });
+    $("tbCartaTxt").textContent = c.cuerpo.join("\n");
+  }
+  const CAMPOS = { nombre: "tbNombre", correo: "tbCorreo", dni: "tbDni", dato: "tbDato" };
+  Object.values(CAMPOS).forEach((id) => $(id).addEventListener("input", () => { pintarCarta(); $(id).removeAttribute("aria-invalid"); err(id + "E", false); editado = true; }));
+  const marcar = (malos) => { Object.entries(CAMPOS).forEach(([k, id]) => { const b = malos.indexOf(k) >= 0; err(id + "E", b); if (b) $(id).setAttribute("aria-invalid", "true"); else $(id).removeAttribute("aria-invalid"); }); };
+  $("tbN2").addEventListener("click", async () => {
+    err("tbE2", false);
+    const v = validarDatos(E, datos());
+    marcar(v.errores);
+    if (!v.ok) { $(CAMPOS[v.errores[0]]).focus(); return; }
+    if (token && !editado) { show(3); return; } // vuelve atrás sin cambiar nada: mismo código
+    espera($("tbN2"), true);
+    try {
+      const r = await api("pedido", { empresa: slug, idioma: LANG, eleccion: eleccion(), datos: v.datos, dniFoto, compra: lote || undefined });
+      token = r.p; editado = false; show(3);
+    } catch (e) {
+      if (e.codigo.indexOf("datos:") === 0) { const m = e.codigo.slice(6).split(","); marcar(m); $(CAMPOS[m[0]] || "tbNombre").focus(); }
+      else err("tbE2", true, T[e.codigo] || T.servicio);
+    } finally { espera($("tbN2"), false); }
   });
 
   /* Paso 3 · Firma */
   const otp = [...document.querySelectorAll("#tbOtp input")], otpBox = $("tbOtp");
   otp.forEach((inp, i) => {
     inp.addEventListener("input", () => { inp.value = inp.value.replace(/\D/g, "").slice(-1); otpBox.removeAttribute("aria-invalid"); err("tbE3c", false); if (inp.value && otp[i + 1]) otp[i + 1].focus(); });
-    inp.addEventListener("keydown", e => { if (e.key === "Backspace" && !inp.value && otp[i - 1]) otp[i - 1].focus(); });
-    inp.addEventListener("paste", e => { const t = ((e.clipboardData || window.clipboardData).getData("text") || "").replace(/\D/g, "").slice(0, 6); if (!t) return; e.preventDefault(); otp.forEach((o, k) => { o.value = t[k] || ""; }); (otp[Math.min(t.length, 5)]).focus(); });
+    inp.addEventListener("keydown", (e) => { if (e.key === "Backspace" && !inp.value && otp[i - 1]) otp[i - 1].focus(); });
+    inp.addEventListener("paste", (e) => { const t = ((e.clipboardData || window.clipboardData).getData("text") || "").replace(/\D/g, "").slice(0, 6); if (!t) return; e.preventDefault(); otp.forEach((o, k) => { o.value = t[k] || ""; }); otp[Math.min(t.length, 5)].focus(); });
   });
-  $("tbReenviar").addEventListener("click", () => { const m = $("tbReenvMsg"); m.textContent = T.reenv; m.hidden = false; });
+  $("tbReenviar").addEventListener("click", async () => {
+    const m = $("tbReenvMsg"); m.hidden = true;
+    try { await api("firma/reenviar", { p: token }); m.textContent = T.reenv; } catch (e) { m.textContent = e.codigo === "codigos" ? T.sinCodigos : T.servicio; }
+    m.hidden = false;
+  });
+  const firma = lienzo($("tbFirma"));
+  $("tbFirmaBorrar").addEventListener("click", () => firma.borrar());
   $("tbAut").addEventListener("change", () => err("tbE3a", false));
-  $("tbN3").addEventListener("click", () => {
-    const code = otp.map(o => o.value).join("");
-    const malo = code.length < 6 || Q.get("error") === "codigo" || code === "000000";
-    if (err("tbE3c", malo)) { otpBox.setAttribute("aria-invalid", "true"); otp[0].focus(); return; }
+  $("tbN3").addEventListener("click", async () => {
+    const code = otp.map((o) => o.value).join("");
+    if (err("tbE3c", code.length < 6)) { otpBox.setAttribute("aria-invalid", "true"); otp[0].focus(); return; }
     if (err("tbE3a", !$("tbAut").checked)) { $("tbAut").focus(); return; }
-    show(4);
+    espera($("tbN3"), true);
+    try { await api("firma", { p: token, codigo: code, autorizo: true, firma: firma.jpeg() }); firmada = true; show(4); }
+    catch (e) {
+      if (e.codigo === "codigo") { err("tbE3c", true); otpBox.setAttribute("aria-invalid", "true"); otp.forEach((o) => { o.value = ""; }); otp[0].focus(); }
+      else err("tbE3x", true, T[e.codigo] || T.servicio);
+    } finally { espera($("tbN3"), false); }
   });
 
   /* Paso 4 · Pago */
-  document.querySelector('input[name="pack"][value="' + pack + '"]').checked = true;
-  const payLabel = () => { const p = (document.querySelector('input[name="pack"]:checked') || {}).value === "3" ? "9,99 €" : "4,99 €";
-    const prog = cuando() === "fin" || cuando() === "ren";
-    $("tbPay").textContent = T.pay(prog) + " · " + p; $("tbPay").dataset.modo = prog ? "programar" : "enviar"; };
-  document.querySelectorAll('input[name="pack"]').forEach(r => r.addEventListener("change", payLabel));
+  const packs = $("tbPacks");
+  packs.innerHTML = "";
+  for (let n = 1; n <= Math.min(3, MAX_BAJAS); n++) {
+    const l = document.createElement("label"); l.className = "tb-op";
+    l.innerHTML = '<input type="radio" name="pack"><span class="tb-op-t"><strong></strong></span>';
+    l.querySelector("input").value = String(n); l.querySelector("input").checked = n === 1; l.querySelector("strong").textContent = T.pack(n, euros(total(n), LANG));
+    packs.appendChild(l);
+  }
+  $("tbPackNota").textContent = T.packNota(euros(total(2) - total(1), LANG));
+  if (lote) { packs.hidden = true; $("tbPackNota").hidden = true; $("tbLote").hidden = false; }
+  const unidades = () => Number((document.querySelector('input[name="pack"]:checked') || {}).value || 1);
+  const payLabel = () => { const r = calcularEnvio(E, eleccion(), hoy), prog = Boolean(r.ok && r.programada); $("tbPay").textContent = lote ? T.usar(prog) : T.pay(prog, euros(total(unidades()), LANG)); };
+  packs.addEventListener("change", payLabel);
   $("tbDes").addEventListener("change", () => err("tbE4d", false));
-  $("tbPay").addEventListener("click", () => {
+  $("tbPay").addEventListener("click", async () => {
     err("tbE4p", false);
     if (err("tbE4d", !$("tbDes").checked)) { $("tbDes").focus(); return; }
-    if (Q.get("error") === "pago") { err("tbE4p", true); $("tbE4p").focus(); return; }
-    const prog = $("tbPay").dataset.modo === "programar";
-    location.href = $("tbPay").dataset.estado + "?empresa=" + encodeURIComponent(slug) + "&estado=" + (prog ? "programada" : "enviada") + "&fecha=" + encodeURIComponent(prog && fecha.value ? fecha.value : "") + ((document.querySelector('input[name="pack"]:checked') || {}).value === "3" ? "&quedan=2" : "");
+    espera($("tbPay"), true);
+    try { const r = await api("pago", { p: token, unidades: unidades(), renuncia: true }); location.href = r.url; }
+    catch (e) { err("tbE4p", true); $("tbE4p").focus(); espera($("tbPay"), false); }
   });
 
   sync1();
-  const p0 = Math.min(4, Math.max(1, parseInt(Q.get("paso"), 10) || 1));
-  if (p0 > 1 && E.aviso === "permanencia") document.querySelector('input[name="cuando"][value="fin"]').checked = true;
-  if (Q.get("error") === "codigo" && p0 === 3) { otp.forEach(o => { o.value = "4"; }); }
-  show(p0); if (p0 === 1) window.scrollTo(0, 0);
+  // Vuelve de Stripe sin pagar: la carta ya está firmada, se queda en el pago
+  if (token && Q.get("pago") === "no") { firmada = true; show(4); err("tbE4p", true); return; }
+  show(1);
 }
 
-/* ============ ESTADO ============ */
-if (main.dataset.vista === "estado") {
-  const st = ["programada", "enviada", "entregada", "devuelta"].indexOf(Q.get("estado")) >= 0 ? Q.get("estado") : "enviada";
-  document.querySelectorAll(".tb-est").forEach(el => { el.hidden = el.dataset.estado !== st; });
-  const f = Q.get("fecha") || E.envio || "2027-01-02";
-  fill("fecha-prog", fd(f));
-  fill("fecha-env", fd(new Date().toISOString().slice(0, 16), true));
-  fill("fecha-ent", fd(new Date(Date.now() + 2 * 864e5).toISOString().slice(0, 10)));
-  $("tbRecobro").hidden = Q.get("recobro") !== "1";
-  const q = parseInt(Q.get("quedan"), 10);
-  $("tbPackQ").hidden = !(q > 0); if (q > 0) fill("quedan", String(q));
+// Firma dibujada (opcional): ratón, dedo o lápiz. jpeg() → null si no se ha dibujado nada.
+function lienzo(c) {
+  const g = c.getContext("2d"); let tocado = false, abajo = false, ult = null;
+  const limpio = () => { g.fillStyle = "#fff"; g.fillRect(0, 0, c.width, c.height); g.strokeStyle = "#13212b"; g.lineWidth = 3.2; g.lineCap = g.lineJoin = "round"; };
+  limpio();
+  const pos = (e) => { const r = c.getBoundingClientRect(); return [(e.clientX - r.left) * (c.width / r.width), (e.clientY - r.top) * (c.height / r.height)]; };
+  c.addEventListener("pointerdown", (e) => { abajo = true; ult = pos(e); c.setPointerCapture(e.pointerId); e.preventDefault(); });
+  c.addEventListener("pointermove", (e) => { if (!abajo) return; const p = pos(e); g.beginPath(); g.moveTo(ult[0], ult[1]); g.lineTo(p[0], p[1]); g.stroke(); ult = p; tocado = true; });
+  ["pointerup", "pointercancel"].forEach((t) => c.addEventListener(t, () => { abajo = false; }));
+  return { borrar: () => { tocado = false; limpio(); }, jpeg: () => (tocado ? c.toDataURL("image/jpeg", 0.85) : null) };
 }
-})();
+
+/* ============ ESTADO (/baja/estado/) ============ */
+async function estado() {
+  const p = Q.get("p");
+  const ver = (st) => document.querySelectorAll(".tb-est").forEach((el) => { el.hidden = el.dataset.estado !== st; });
+  if (!p) { $("tbPerdido").querySelector("p").textContent = T.perdido; ver("error"); return; }
+  let S;
+  for (let i = 0; i < 8; i++) { // al volver de Stripe el pago puede tardar unos segundos en confirmarse
+    try { S = await api("estado?p=" + encodeURIComponent(p)); } catch (e) { $("tbPerdido").querySelector("p").textContent = e.estado === 404 ? T.perdido : T.servicio; ver("error"); return; }
+    if (S.estado !== "pago" && S.estado !== "firmada") break;
+    ver("pago"); await new Promise((r) => setTimeout(r, 2500));
+  }
+  fill("empresa", S.nombre);
+  ver(S.estado === "borrador" || S.estado === "firmada" ? "pago" : S.estado);
+  fill("fecha-prog", fd(S.envio));
+  if (S.enviadaEn) fill("fecha-env", new Date(S.enviadaEn).toLocaleString({ es: "es-ES", ca: "ca-ES", en: "en-GB" }[LANG], { day: "numeric", month: "long", year: "numeric", hour: "2-digit", minute: "2-digit", timeZone: "Europe/Madrid" }));
+  if (S.entregadaEn) fill("fecha-ent", fd(S.entregadaEn.slice(0, 10)));
+  document.querySelectorAll('[data-api="certificado-pdf"]').forEach((a) => { a.href = API + "certificado.pdf?p=" + encodeURIComponent(p); a.hidden = !S.certificado; });
+  document.querySelectorAll('[data-api="carta-pdf"]').forEach((a) => { a.href = API + "carta.pdf?p=" + encodeURIComponent(p); });
+  $("tbTarde").hidden = !S.tarde;
+
+  // Lote: las bajas que quedan
+  if (S.lote && S.lote.quedan > 0) {
+    $("tbLoteBox").hidden = false; $("tbLoteH").textContent = T.quedan(S.lote.quedan);
+    const sel = $("tbLoteEmp");
+    api("empresas").then((l) => { l.sort((a, b) => a.nombre.localeCompare(b.nombre)).forEach((e) => { const o = document.createElement("option"); o.value = e.slug; o.textContent = e.nombre; sel.appendChild(o); }); });
+    $("tbLoteUsar").addEventListener("click", () => { if (sel.value) location.href = ENVIAR + "?empresa=" + encodeURIComponent(sel.value) + "&compra=" + encodeURIComponent(S.lote.compra); });
+    $("tbLoteDev").addEventListener("click", async () => {
+      if (!confirm(T.confirmarBorrar)) return;
+      try { const r = await api("lote/devolver", { compra: S.lote.compra }); $("tbLoteMsg").textContent = T.devuelto(euros(r.devuelto, LANG)); $("tbLoteUsar").hidden = $("tbLoteDev").hidden = sel.hidden = true; }
+      catch { $("tbLoteMsg").textContent = T.servicio; }
+      $("tbLoteMsg").hidden = false;
+    });
+  }
+
+  // Segunda carta: el extracto se lee en el dispositivo (mismo motor que Mi banco) y no sale de él
+  $("tbRecBox").hidden = !(S.recobro || S.recobroHecho);
+  if (S.recobroHecho) { $("tbRecOk").hidden = false; $("tbRecElegir").hidden = $("tbRecMano").hidden = true; }
+  const desde = S.efecto && S.efecto.fecha && S.efecto.cuando === "fin" ? S.efecto.fecha : S.envio;
+  $("tbRecFecha").min = S.envio; $("tbRecFecha").max = hoyEspana();
+  const abrir = (f, x) => { $("tbRecobro").hidden = false; if (f) $("tbRecFecha").value = f; if (x) $("tbRecImp").value = String(x).replace(".", LANG === "en" ? "." : ","); $("tbRecVisto").hidden = !f; if (f) $("tbRecVisto").textContent = T.recobroVisto(fd(f), euros(Math.round(x * 100), LANG)); };
+  $("tbRecMano").addEventListener("click", () => abrir());
+  $("tbRecArchivo").addEventListener("change", async (ev) => {
+    const files = ev.target.files; if (!files.length) return;
+    const m = $("tbRecNada"); m.hidden = false; m.textContent = T.leyendo;
+    try {
+      const { analizar } = await import("/assets/extracto/motor.js");
+      const r = await analizar(files, { idioma: LANG });
+      const id = S.empresa.replace(/-/g, "_");
+      const series = [].concat(r.cobros || [], r.terminados || [], r.gastos_fijos || []).filter((c) => c.comercio_id === id && c.ultimo_cargo > desde);
+      if (!series.length) { m.textContent = T.nadaRecobro(S.nombre); return; }
+      const c = series.sort((a, b) => (a.ultimo_cargo < b.ultimo_cargo ? 1 : -1))[0];
+      m.hidden = true; abrir(c.ultimo_cargo, Math.abs(c.importe));
+    } catch { m.textContent = T.noLeido; }
+  });
+  $("tbRecEnviar").addEventListener("click", async () => {
+    err("tbRecE", false);
+    const f = $("tbRecFecha").value, x = $("tbRecImp").value.replace(/\s|€/g, "").replace(",", ".");
+    if (err("tbRecE", !f || !(Number(x) > 0))) return;
+    espera($("tbRecEnviar"), true);
+    try { await api("recobro", { p, fecha: f, importe: Number(x) }); $("tbRecobro").hidden = true; $("tbRecElegir").hidden = $("tbRecMano").hidden = true; $("tbRecOk").hidden = false; }
+    catch (e) { err("tbRecE", true, e.codigo === "recobro_usado" ? null : T.servicio); }
+    finally { espera($("tbRecEnviar"), false); }
+  });
+
+  // Tus datos
+  const b = $("tbBorrar");
+  if (S.estado === "programada") b.textContent = T.borrarProg;
+  $("tbBorrarNota").textContent = S.estado === "enviada" ? T.esperaBorrar : S.borrarEl ? T.borrarEl(fd(S.borrarEl)) : "";
+  b.hidden = S.estado === "enviada";
+  b.addEventListener("click", async () => {
+    if (!confirm(T.confirmarBorrar)) return;
+    try { const r = await api("borrar", { p }); $("tbBorrarNota").textContent = T.borrado + (r.devuelto ? " " + T.devuelto(euros(r.devuelto, LANG)) : ""); b.hidden = true; document.querySelectorAll(".tb-est, #tbRecBox, #tbLoteBox").forEach((el) => { el.hidden = true; }); }
+    catch { $("tbBorrarNota").textContent = T.servicio; }
+  });
+}
+
+if (main && main.dataset.vista === "flujo") flujo();
+if (main && main.dataset.vista === "estado") estado();

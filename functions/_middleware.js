@@ -23,6 +23,8 @@ export async function onRequest(context) {
     url.protocol = "https:";
     return Response.redirect(url.toString(), 301);
   }
+  // Código que vive en el repositorio pero no es de la web: el Worker de la tarea diaria y las pruebas
+  if (/^\/(workers|pruebas)(\/|$)/.test(url.pathname)) return new Response("Not found", { status: 404 });
   const ruta = url.pathname.replace(/\/(index\.html)?$/, "");
   if (SIN_RELLENAR[ruta]) return Response.redirect(url.origin + SIN_RELLENAR[ruta], 301);
   const vieja = VIEJAS[ruta];
