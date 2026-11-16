@@ -138,6 +138,11 @@ test('sin R2, la copia semanal llega por correo a AVISOS_CORREO (cifrada, una po
   const adjunto = await (await fetch(`${SIM}/adjunto/${encodeURIComponent(c.id)}/0`)).text();
   assert.equal(JSON.parse(adjunto).version, 1);
   assert.doesNotMatch(adjunto, /Ana Prueba|ana\.copia/);
+  // la consulta semanal a Brevo (clave viva y permiso de leer eventos): una vez por semana
+  assert.equal(t1.brevo, 200); assert.equal((await F.tarea(env, 'https://feehund.com')).brevo, null);
+  const mala = entorno('manual'); mala.BREVO_API_KEY = 'mala';
+  const t3 = await F.tarea(mala, 'https://feehund.com');
+  assert.ok(t3.errores.some((e) => e.startsWith('brevo')), JSON.stringify(t3));
   // sin R2 ni correo: no hace nada y no falla
   const sin = entorno('manual'); delete sin.AVISOS_CORREO;
   assert.equal((await F.tarea(sin, 'https://feehund.com')).copia, null);

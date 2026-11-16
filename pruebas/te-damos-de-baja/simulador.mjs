@@ -96,6 +96,7 @@ http.createServer(async (req, res) => {
       correos.push(c); console.log('correo →', c.to.join(', '), '·', c.subject); return jsonR(res, 201, { messageId: c.id });
     }
     if (ruta === '/v3/smtp/statistics/events' && req.method === 'GET') {
+      if (!/^xkeysib-/.test(req.headers['api-key'] || '')) return jsonR(res, 401, { code: 'unauthorized', message: 'Key not found' });
       const c = correos.find((x) => x.id === url.searchParams.get('messageId'));
       return jsonR(res, 200, { events: c ? [{ event: 'requests', email: c.to[0], messageId: c.id, date: c.en }, { event: c.last_event, email: c.to[0], messageId: c.id, date: c.en }] : [] });
     }

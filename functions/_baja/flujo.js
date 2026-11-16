@@ -12,7 +12,7 @@ import DATOS from '../../data/te-damos-de-baja.json' with { type: 'json' };
 import { calcularEnvio, carta, cartaRecobro, fechaLarga, hoyEspana, sumarDias, validarDatos, MAX_BAJAS, total, euros, esFecha } from '../../assets/te-damos-de-baja/carta.js';
 import { aleatorio, codigo6, referencia, hmac, sha256, igual, firmarId, leerToken, b64, deB64 } from './cripto.js';
 import { leer, borrar, listar, guardarBaja, guardarCompra, guardar, limitar, exportar } from './almacen.js';
-import { crearPago, leerPago, devolver, enviarCorreo, estadoCorreo, buscarCertificados, descargarCertificado, LLEIDA_CC } from './servicios.js';
+import { crearPago, leerPago, devolver, enviarCorreo, estadoCorreo, pulsoBrevo, buscarCertificados, descargarCertificado, LLEIDA_CC } from './servicios.js';
 import { cartaPdf } from './pdf.js';
 import { msj, urgente } from './mensajes.js';
 
@@ -451,7 +451,7 @@ async function devolverResto(env, c, motivo) {
 
 /* ---------- tarea diaria (la llama el Worker feehund-baja-tarea) ---------- */
 export async function tarea(env, origen, hoy = hoyEspana()) {
-  const hecho = { enviadas: 0, avisos: 0, revisadas: 0, archivadas: 0, restos: 0, copia: null, errores: [] };
+  const hecho = { enviadas: 0, avisos: 0, revisadas: 0, archivadas: 0, restos: 0, copia: null, brevo: null, errores: [] };
   const intentar = async (que, f) => { try { await f(); } catch (err) { hecho.errores.push(`${que}: ${err.codigo || err.message}`.slice(0, 120)); } };
   for (const { id, meta } of await listar(env, 'baja')) {
     if (meta.e === 'programada' && meta.env <= hoy) {
@@ -479,6 +479,16 @@ export async function tarea(env, origen, hoy = hoyEspana()) {
   }
   // Copia de seguridad semanal: en R2 si existe el enlace COPIAS; si no, por correo a AVISOS_CORREO. Sin ninguno, nada.
   if (env.COPIAS || (env.AVISOS_CORREO && env.BREVO_API_KEY)) await intentar('copia', async () => { hecho.copia = await copiaSemanal(env, hoy); });
+  // Una vez por semana, una consulta a Brevo: mantiene viva la clave (Brevo la desactiva tras 90 días sin uso) y avisa en
+  // el registro de la tarea («brevo: 401/403») si la clave no vale o no tiene permiso para leer eventos.
+  if (env.BREVO_API_KEY) await intentar('brevo', async () => {
+    const dia = new Date(hoy + 'T12:00:00Z').getUTCDay() || 7, marca = 'brevopulso:' + sumarDias(hoy, 1 - dia);
+    if (await env.FEEHUND_KV.get(marca)) return;
+    const estado = await pulsoBrevo(env);
+    hecho.brevo = estado;
+    if (estado !== 200) throw new Error('brevo ' + estado);
+    await env.FEEHUND_KV.put(marca, '1', { expirationTtl: 30 * 86400 });
+  });
   return hecho;
 }
 

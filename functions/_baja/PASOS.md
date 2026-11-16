@@ -17,8 +17,11 @@ en las 24 horas siguientes (el asunto dice hasta cuándo). Si la baja estaba pro
    `v=spf1 include:_spf.mx.cloudflare.net include:spf.brevo.com ~all`
    Si Brevo propone crear otro registro SPF, no lo crees: edita el que hay y deja esa línea.
 4. Espera a que Brevo diga que el dominio está autenticado.
-5. **SMTP & API** › **API keys** › **Generate a new API key**, nombre «feehund-web». Copia la clave (`xkeysib-…`).
-   Va en el paso 3 como `BREVO_API_KEY`.
+5. **SMTP & API** › **API keys** › **Generate a new API key**, nombre «feehund-web», con acceso restringido: solo
+   **Transactional email** en Read/write. Copia la clave (`xkeysib-…`). Va en el paso 3 como `BREVO_API_KEY`.
+   Brevo desactiva las claves que pasan 90 días sin uso: la tarea la usa cada semana (la copia semanal por correo y una
+   consulta pequeña a Brevo), así que no caduca aunque no haya ventas. Esa consulta lee los eventos de los correos, lo
+   mismo que hará la fase 2: si el permiso no alcanzara, el registro de la tarea diría `brevo 401` o `brevo 403`.
 
 ## 2. Stripe (cuenta «Calculadora datáfono»)
 El producto (`prod_VdmVGkorJMQg6T`) y el webhook ya están creados; el webhook está apagado hasta publicar y se enciende
@@ -49,6 +52,8 @@ Si algún día activas R2 (Cloudflare › R2, aceptar el plan): crea el bucket `
 ## 5. La tarea de cada hora (recordatorios, programadas, archivo a los 90 días y copias)
 La publico yo con `workers/baja-tarea/wrangler.toml` (cron cada hora) después de publicar la web, con la misma
 `TAREA_SECRET`. No tienes que hacer nada.
+Para ver que todo va: `npx wrangler tail feehund-baja-tarea`. A la hora en punto sale `tarea 200 {…}`; la primera de la
+semana lleva `"brevo":200` (clave viva y con permiso) y `"copia":{…}`.
 
 ## 6. Lleida.net
 Cuando llegue el primer cliente: alta en Lleida.net (acepta personas físicas) y compra el **pack de bienvenida de 9,99 €**

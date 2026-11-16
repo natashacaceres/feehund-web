@@ -114,6 +114,15 @@ export async function enviarCorreo(env, { de, para, cc, responderA, asunto, text
   if (marca) await env.FEEHUND_KV.put(marca, j.messageId, { expirationTtl: 30 * 86400 });
   return j.messageId;
 }
+/**
+ * Consulta barata (1 evento del último día) que hace la tarea una vez por semana: Brevo desactiva las claves que pasan
+ * 90 días sin uso, y así la clave sigue viva aunque no haya ventas. Usa el mismo endpoint que la fase 2 (eventos), así
+ * que también comprueba que el permiso «Transactional email» de la clave alcanza para leerlos. Devuelve el estado HTTP.
+ */
+export async function pulsoBrevo(env) {
+  const r = await fetch(brevoBase(env) + '/v3/smtp/statistics/events?limit=1&days=1', { headers: { 'api-key': env.BREVO_API_KEY, accept: 'application/json' } });
+  return r.status;
+}
 /** (fase 2) Cómo va un correo: 'delivered', 'bounced' (rebote, bloqueo, dirección no válida, error) o null si aún no se sabe. */
 export async function estadoCorreo(env, messageId) {
   const r = await fetch(brevoBase(env) + '/v3/smtp/statistics/events?messageId=' + encodeURIComponent(messageId) + '&days=90', { headers: { 'api-key': env.BREVO_API_KEY, accept: 'application/json' } });
