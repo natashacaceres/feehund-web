@@ -132,7 +132,7 @@
   const textoCarga = cargando ? cargando.textContent : "";
   let actual = null, entradaActual = null, contrasenas = {}, propio = false;
 
-  function show(which) { for (const k in scr) scr[k].hidden = k !== which; scrollTo({ top: 0, behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" }); }
+  function show(which) { for (const k in scr) scr[k].hidden = k !== which; document.body.classList.toggle("con-barra", which === "res" && Boolean($("xBarra"))); scrollTo({ top: 0, behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" }); }
   function msg(el, t) { el.textContent = t; el.hidden = !t; }
 
   async function analyze(entrada) {
@@ -213,6 +213,228 @@
   const cada = (c) => TX.cada[c.periodicidad] || "";
   const el = (tag, clase, texto) => { const x = document.createElement(tag); if (clase) x.className = clase; if (texto !== undefined) x.textContent = texto; return x; };
   const extras = [];
+
+  // ---------- Resultado en «tres respuestas» (rediseño del 16 nov 2026, opción A) ----------
+  // Orden fijo: la respuesta, qué hacer ahora, en qué se te va, buenas noticias, la tarjeta y los enlaces.
+  // El detalle de siempre (avisos, secciones y noticias) sigue debajo, en #xDetalle, y lo abren «Revisar», «Ver» y las barras.
+  const TRES = Boolean($("xHacer"));
+  const T3 = {
+    es: { meses: (n) => (n === 1 ? "1 mes leído" : n + " meses leídos"), calc: (n) => "al año, calculado con " + (n === 1 ? "1 mes" : n + " meses"),
+      fRevisar: "Lo he revisado todo. Te cuento solo lo importante.", fNada: "Nada que reclamar. Lo he mirado dos veces, por si acaso.", fPoco: "Me has dado poco, pero esto es lo que veo.",
+      escRecibo: (x, n) => x + " se te escaparon en " + n + (n === 1 ? " recibo más alto de lo normal" : " recibos más altos de lo normal"),
+      escDoble: (x, n) => x + " se te escaparon en " + (n === 1 ? "un posible cobro repetido" : n + " posibles cobros repetidos"),
+      escComision: (x) => x + " se te escaparon en comisiones del banco",
+      escVarios: (x, m) => x + " se te escaparon " + (m >= 12 ? "este año" : m <= 1 ? "este mes" : "en estos " + m + " meses"), escNada: "No se te escapa nada",
+      nada: "No hemos visto cobros que se repitan.", otros: "Otros", recibos: "Recibos que varían", devolvieron: (x) => "Te devolvieron " + x,
+      verMas: (n) => "Ver " + n + " más", verMenos: "Ver menos", verDetalle: "Ver todo el detalle", ocultarDetalle: "Ocultar el detalle",
+      revisar: "Revisar", anadir: "Añadir", ver: "Ver", darme: "Darme de baja", darBaja: "Dar de baja",
+      dobleT: (x) => x + ": posible cobro repetido", dobleL: (i, f) => i + " dos veces, el " + f,
+      tarjT: (n) => "Faltan " + n + " pagos con tarjeta", tarjT0: "Puede que pagues algo con tarjeta", tarjL: "Añade su extracto y lo verás todo",
+      reciboT: (x, d, m) => x + ": +" + d + " en " + m, reciboL: (p) => p + " % más que tu media", reciboAnio: (p) => p + " % más que hace un año", consumo: "Puede ser por consumo",
+      comT: (x) => "Comisiones del banco: " + x, comL: "Cobradas en este extracto", comLR: "Puedes pedir que te la devuelvan",
+      subT: (x, a) => x + ": " + a + " al año", subL: "Tu suscripción más cara" },
+    ca: { meses: (n) => (n === 1 ? "1 mes llegit" : n + " mesos llegits"), calc: (n) => "a l'any, calculat amb " + (n === 1 ? "1 mes" : n + " mesos"),
+      fRevisar: "Ho he revisat tot. T'explico només el que importa.", fNada: "Res a reclamar. Ho he mirat dues vegades, per si de cas.", fPoco: "M'has donat poc, però això és el que veig.",
+      escRecibo: (x, n) => x + " se t'han escapat en " + n + (n === 1 ? " rebut més alt del normal" : " rebuts més alts del normal"),
+      escDoble: (x, n) => x + " se t'han escapat en " + (n === 1 ? "un possible cobrament repetit" : n + " possibles cobraments repetits"),
+      escComision: (x) => x + " se t'han escapat en comissions del banc",
+      escVarios: (x, m) => x + " se t'han escapat " + (m >= 12 ? "aquest any" : m <= 1 ? "aquest mes" : "en aquests " + m + " mesos"), escNada: "No se t'escapa res",
+      nada: "No hem vist cobraments que es repeteixin.", otros: "Altres", recibos: "Rebuts que varien", devolvieron: (x) => "T'han retornat " + x,
+      verMas: (n) => "Veure'n " + n + " més", verMenos: "Veure'n menys", verDetalle: "Veure tot el detall", ocultarDetalle: "Amagar el detall",
+      revisar: "Revisar", anadir: "Afegir", ver: "Veure", darme: "Donar-me de baixa", darBaja: "Donar de baixa",
+      dobleT: (x) => x + ": possible cobrament repetit", dobleL: (i, f) => i + " dues vegades, el " + f,
+      tarjT: (n) => "Falten " + n + " pagaments amb targeta", tarjT0: "Potser pagues alguna cosa amb targeta", tarjL: "Afegeix-ne l'extracte i ho veuràs tot",
+      reciboT: (x, d, m) => x + ": +" + d + (/^[aeiou]/.test(m) ? " a l'" : " al ") + m, reciboL: (p) => p + " % més que la teva mitjana", reciboAnio: (p) => p + " % més que fa un any", consumo: "Pot ser pel consum",
+      comT: (x) => "Comissions del banc: " + x, comL: "Cobrades en aquest extracte", comLR: "Pots demanar que te la retornin",
+      subT: (x, a) => x + ": " + a + " l'any", subL: "La teva subscripció més cara" },
+    en: { meses: (n) => (n === 1 ? "1 month read" : n + " months read"), calc: (n) => "a year, worked out from " + (n === 1 ? "1 month" : n + " months"),
+      fRevisar: "I've checked everything. Here's only what matters.", fNada: "Nothing to claim. I checked twice, just in case.", fPoco: "You didn't give me much, but this is what I see.",
+      escRecibo: (x, n) => x + " slipped away on " + n + (n === 1 ? " bill higher than usual" : " bills higher than usual"),
+      escDoble: (x, n) => x + " slipped away on " + (n === 1 ? "a possible repeat charge" : n + " possible repeat charges"),
+      escComision: (x) => x + " slipped away on bank fees",
+      escVarios: (x, m) => x + " slipped away " + (m >= 12 ? "this year" : m <= 1 ? "this month" : "in these " + m + " months"), escNada: "Nothing is slipping away",
+      nada: "We have not seen any repeating charges.", otros: "Other", recibos: "Bills that vary", devolvieron: (x) => "You got " + x + " back",
+      verMas: (n) => "See " + n + " more", verMenos: "See less", verDetalle: "See all the detail", ocultarDetalle: "Hide the detail",
+      revisar: "Check", anadir: "Add", ver: "See", darme: "Cancel it for me", darBaja: "Cancel",
+      dobleT: (x) => x + ": possible repeat charge", dobleL: (i, f) => i + " twice, on " + f,
+      tarjT: (n) => n + " card payments missing", tarjT0: "You may pay some by card", tarjL: "Add its statement to see everything",
+      reciboT: (x, d, m) => x + ": +" + d + " in " + m, reciboL: (p) => p + " % above your average", reciboAnio: (p) => p + " % more than a year ago", consumo: "Could be down to usage",
+      comT: (x) => "Bank fees: " + x, comL: "Charged in this statement", comLR: "You can ask for it back",
+      subT: (x, a) => x + ": " + a + " a year", subL: "Your most expensive subscription" },
+  }[LANG];
+  // «Darme de baja» solo en suscripciones: nunca luz, agua, gas, teléfono ni seguros
+  const SUSCRIPCIONES = ["streaming", "musica", "nube_apps", "ia", "prensa", "gimnasios", "citas", "videojuegos", "idiomas", "reparto", "suscripciones", "club_descuentos", "bienestar"];
+  const MESES_FRIO = [11, 12, 1, 2, 3];
+  const eur = (x) => (Math.abs(x) >= 1 ? e0(x) : e2(x)) + " €";
+  const svgIcono = (d) => {
+    const ns = "http://www.w3.org/2000/svg", svg = document.createElementNS(ns, "svg"), path = document.createElementNS(ns, "path");
+    svg.setAttribute("viewBox", "0 0 24 24"); svg.setAttribute("aria-hidden", "true"); path.setAttribute("d", d); svg.appendChild(path); return svg;
+  };
+  let blobTarjeta = null, urlTarjeta = null;
+
+  // Abre el detalle de siempre y lleva la vista a lo que se ha tocado
+  function abrirDetalle(nodo) {
+    const det = $("xDetalle"); if (!det) return;
+    det.hidden = false;
+    const b = $("xVerDetalle"); if (b) { b.textContent = T3.ocultarDetalle; b.setAttribute("aria-expanded", "true"); }
+    let x = nodo && nodo.closest ? nodo : null;
+    for (let p = x; p; p = p.parentElement) { if (p.tagName === "DETAILS") p.open = true; if (p.hidden && p !== det && det.contains(p)) p.hidden = false; }
+    const destino = x || det;
+    const quieto = matchMedia("(prefers-reduced-motion: reduce)").matches;
+    destino.scrollIntoView({ behavior: quieto ? "auto" : "smooth", block: "center" });
+    if (x) { x.classList.remove("r3-foco"); void x.offsetWidth; x.classList.add("r3-foco"); }
+  }
+
+  function renderTres(r, cobros, d) {
+    const { avisos, porId } = d;
+    const per = (r.lectura && r.lectura.periodo) || {};
+    const dias = per.dias || 365, meses = Math.max(1, Math.round(per.meses || dias / 30.44));
+    const movsMes = (((r.lectura && r.lectura.movimientos) || []).length) / Math.max(1, dias / 30.44);
+
+    // ---- 3. En qué se te va: lo mismo que suma la cifra, en € al año (también las comisiones) ----
+    const haySeguros = cobros.some((c) => c.estado === "seguro");
+    const cuenta = (c) => c && (haySeguros ? c.estado === "seguro" : c.estado === "seguro" || c.estado === "posible");
+    const anualComision = (c) => (c.periodicidad === "puntual" ? (c.coste_anual || c.importe || 0) * 365 / dias : c.coste_anual || 0);
+    let barras = [];
+    for (const g of r.grupos || []) {
+      if (!(g.codigo.indexOf("sector_") === 0 || g.codigo === "recibos" || g.codigo === "comisiones")) continue;
+      const items = (g.ids || []).map((id) => porId[id]).filter(Boolean);
+      const v = g.codigo === "comisiones"
+        ? items.filter((c) => (c.etiquetas || []).indexOf("devuelto") < 0).reduce((t, c) => t + anualComision(c), 0)
+        : items.filter(cuenta).reduce((t, c) => t + (c.coste_anual || 0), 0);
+      const redondo = Math.round(v);
+      if (redondo > 0) barras.push({ codigo: g.codigo, titulo: g.codigo === "recibos" ? T3.recibos : g.titulo, v: redondo });
+    }
+    // como mucho 5 barras de mayor a menor; lo que sobra (y el grupo «otros» del motor) va en una sola «Otros», al final
+    const otrosMotor = barras.filter((b) => b.codigo === "sector_otros");
+    barras = barras.filter((b) => b.codigo !== "sector_otros").sort((a, b) => b.v - a.v);
+    let resto = otrosMotor;
+    if (barras.length + (otrosMotor.length ? 1 : 0) > 5) { resto = resto.concat(barras.slice(4)); barras = barras.slice(0, 4); }
+    if (resto.length) barras.push({ codigo: resto.length === 1 ? resto[0].codigo : "otros", titulo: T3.otros, v: resto.reduce((t, b) => t + b.v, 0) });
+    const total = barras.reduce((t, b) => t + b.v, 0); // la cifra principal es exactamente la suma de las barras
+
+    // ---- 2. Qué hacer ahora ----
+    const acciones = [];
+    let escapo = 0; const escTipos = {};
+    const sumarEsc = (tipo, x) => { escapo += x; escTipos[tipo] = (escTipos[tipo] || 0) + 1; };
+    for (const a of avisos.filter((x) => x.tipo === "doble" && x.c)) {
+      sumarEsc("doble", a.imp || 0);
+      acciones.push({ p: 1, euros: a.imp || 0, icono: "doble", t: T3.dobleT(a.c.nombre), l: T3.dobleL(eur(a.imp || 0), fecha(a.fechaD)), b: T3.revisar, nodo: a.nodo });
+    }
+    const tj = avisos.find((x) => x.tipo === "tarjeta");
+    if (tj) acciones.push({ p: 2, euros: 0, icono: "tarjeta", t: tj.datos && tj.datos.n ? T3.tarjT(tj.datos.n) : T3.tarjT0, l: T3.tarjL, b: T3.anadir, anadir: true, fija: true });
+    for (const a of avisos.filter((x) => x.tipo === "recibo" && x.c)) {
+      const { c, peor } = a, mes = +peor.m.fecha.slice(5, 7);
+      let linea = T3.reciboL(pct(peor.dif / peor.med)), cuentaEsc = true;
+      if (c.categoria === "energia" && MESES_FRIO.indexOf(mes) >= 0) {
+        // luz y gas en invierno: con el mismo mes del año anterior; si no lo hay, puede ser consumo
+        const antes = (c.movimientos || []).find((m) => m.importe < 0 && m.fecha.slice(5, 7) === peor.m.fecha.slice(5, 7) && +m.fecha.slice(0, 4) === +peor.m.fecha.slice(0, 4) - 1);
+        if (antes) {
+          const va = Math.abs(antes.importe);
+          if (!(peor.v > va * (1 + RECIBO_ALTO))) continue; // como el año pasado: no es para revisar
+          linea = T3.reciboAnio(pct(peor.v / va - 1));
+        } else { linea = T3.consumo; cuentaEsc = false; }
+      }
+      if (cuentaEsc) sumarEsc("recibo", peor.dif);
+      acciones.push({ p: 3, euros: peor.dif, icono: "recibo", t: T3.reciboT(a.nombreR, eur(peor.dif), MESES[mes - 1]), l: linea, b: T3.revisar, nodo: a.nodo });
+    }
+    const coms = avisos.filter((x) => x.tipo === "comision");
+    if (coms.length) {
+      const suma = coms.reduce((t, x) => t + (x.euros || 0), 0);
+      for (const x of coms) sumarEsc("comision", x.euros || 0);
+      escTipos.comision = 1;
+      acciones.push({ p: 4, euros: suma, icono: "comision", t: T3.comT(eur(suma)), l: coms.some((x) => x.reclamable) ? T3.comLR : T3.comL, b: T3.ver, nodo: coms[0].nodo });
+    }
+    const susc = cobros.filter((c) => c.estado === "seguro" && SUSCRIPCIONES.indexOf(c.categoria) >= 0 && seDaDeBaja(c)).sort((a, b) => (b.coste_anual || 0) - (a.coste_anual || 0))[0];
+    if (susc) acciones.push({ p: 5, euros: susc.coste_anual || 0, icono: "baja", t: T3.subT(susc.nombre, eur(susc.coste_anual || 0)), l: T3.subL, b: compatible(susc) ? T3.darme : T3.darBaja, enlace: enviarBaja(susc) });
+    acciones.sort((a, b) => a.p - b.p || b.euros - a.euros);
+    // sin el extracto de la tarjeta el análisis está incompleto: ese aviso siempre entra en los tres primeros
+    const iT = acciones.findIndex((a) => a.fija);
+    if (iT > 2) acciones.splice(2, 0, acciones.splice(iT, 1)[0]);
+
+    // ---- 1. La respuesta ----
+    $("xMeses").textContent = T3.meses(meses);
+    // «algo que revisar»: lo que se escapó o falta el extracto de la tarjeta (la suscripción más cara es solo una idea)
+    const frase = movsMes < 40 ? T3.fPoco : escapo > 0 || acciones.some((a) => a.p < 5) ? T3.fRevisar : T3.fNada;
+    $("xFrase").textContent = frase;
+    const cifra = $("xCifra");
+    if (total > 0) { cifra.textContent = eur(total); subirCifra(cifra, total); } else cifra.textContent = "0 €";
+    $("xCifraL").hidden = false;
+    const calc = $("xCalc"); calc.textContent = meses < 12 ? T3.calc(meses) : ""; calc.hidden = meses >= 12;
+    const sr = $("xTotal"); if (sr) sr.textContent = $("xCifraL").textContent + " " + eur(total) + (meses < 12 ? ", " + T3.calc(meses) : "");
+    const esc = $("xEscapo");
+    const tipos = Object.keys(escTipos);
+    esc.dataset.ok = escapo > 0 ? "no" : "si";
+    esc.textContent = escapo <= 0 ? T3.escNada
+      : tipos.length > 1 ? T3.escVarios(eur(escapo), meses)
+      : tipos[0] === "recibo" ? T3.escRecibo(eur(escapo), escTipos.recibo)
+      : tipos[0] === "doble" ? T3.escDoble(eur(escapo), escTipos.doble) : T3.escComision(eur(escapo));
+
+    // ---- 2. pintar las acciones: tres a la vista y el resto detrás de «Ver X más» ----
+    const ul = $("xAcciones"); ul.textContent = "";
+    acciones.forEach((a, i) => {
+      const li = el("li", "r3-ac" + (i >= 3 ? " r3-ac--mas" : "")), ic = el("span", "r3-ac-i r3-ac-i--" + a.icono);
+      ic.appendChild(svgIcono(a.icono === "baja" ? "M6 6l12 12M18 6L6 18" : ICONOS[a.icono]));
+      const m = el("div", "r3-ac-m"); m.appendChild(el("p", "r3-ac-t", pegado(a.t))); m.appendChild(el("p", "r3-ac-l", pegado(a.l)));
+      let btn;
+      if (a.enlace) { btn = el("a", "r3-btn", a.b); btn.href = a.enlace; }
+      else {
+        btn = el("button", "r3-btn", a.b); btn.type = "button";
+        btn.addEventListener("click", () => { if (a.anadir) anadirTarjeta(); else abrirDetalle(a.nodo); });
+      }
+      li.appendChild(ic); li.appendChild(m); li.appendChild(btn);
+      if (i >= 3) li.hidden = true;
+      ul.appendChild(li);
+    });
+    $("xHacer").hidden = !acciones.length;
+    const mas = $("xMas"); mas.hidden = acciones.length <= 3; mas.textContent = T3.verMas(acciones.length - 3); mas.setAttribute("aria-expanded", "false");
+
+    // ---- 3. pintar las barras ----
+    const lb = $("xBarras"); lb.textContent = "";
+    const maximo = barras.length ? barras[0].v : 1;
+    for (const b of barras) {
+      const li = el("li"), btn = el("button", "r3-bar"); btn.type = "button";
+      const fila = el("span", "r3-bar-f"); fila.appendChild(el("span", "r3-bar-n", b.titulo)); fila.appendChild(el("span", "r3-bar-v", eur(b.v)));
+      const pista = el("span", "r3-bar-p"), lleno = el("span", "r3-bar-l");
+      lleno.style.width = Math.max(2, Math.round(b.v / maximo * 100)) + "%";
+      pista.appendChild(lleno); btn.appendChild(fila); btn.appendChild(pista);
+      btn.addEventListener("click", () => abrirDetalle(b.codigo === "otros" ? $("xTodo") : document.querySelector('#xTodo [data-codigo="' + b.codigo + '"]')));
+      li.appendChild(btn); lb.appendChild(li);
+    }
+    $("xVa").hidden = !barras.length;
+
+    // ---- 4. Buenas noticias: una línea con lo que te devolvieron ----
+    const devuelto = ((r.grupos || []).find((g) => g.codigo === "devoluciones") || {}).ids || [];
+    const sumaDev = devuelto.map((id) => porId[id]).filter(Boolean).reduce((t, x) => t + (x.importe || 0), 0);
+    $("xBuena").textContent = T3.devolvieron(eur(sumaDev));
+    $("xBuenas").hidden = !(sumaDev > 0);
+
+    // ---- 5. La tarjeta: vista previa y barra fija ----
+    const det = $("xDetalle"); if (det) det.hidden = true;
+    const vd = $("xVerDetalle"); if (vd) { vd.textContent = T3.verDetalle; vd.setAttribute("aria-expanded", "false"); }
+    vistaTarjeta().catch(() => {});
+  }
+
+  // La tarjeta se dibuja una vez al salir el resultado, en este dispositivo y sin guardarse; compartir usa la misma
+  async function vistaTarjeta() {
+    blobTarjeta = null; if (urlTarjeta) { URL.revokeObjectURL(urlTarjeta); urlTarjeta = null; }
+    const p = personalidad(), caja = $("xTarjeta"), barra = $("xBarra");
+    if (!p) { if (caja) caja.hidden = true; if (barra) barra.hidden = true; return; }
+    const [m, tm, nt] = await Promise.all([motor(), import(new URL(ROOT + "assets/extracto/tarjeta.js", location.href).href), import(new URL(ROOT + "assets/extracto/nucleo/tarjeta.js", location.href).href)]);
+    const [blob, prep] = await Promise.all([m.generarTarjeta(p.id, p.dato || {}, { idioma: LANG }), tm.preparar(p.id, { idioma: LANG })]);
+    if (personalidad() !== p) return; // ha llegado otro resultado mientras tanto
+    blobTarjeta = blob; urlTarjeta = URL.createObjectURL(blob);
+    const t = prep.t, nombre = nt.rellenar(Array.isArray(t.lineas) && t.lineas.length ? t.lineas.join(" ") : t.nombre, p.dato || {}, LANG);
+    $("xTarjetaImg").src = urlTarjeta; $("xTarjetaImg").alt = (t.cabecera || "") + " " + nombre;
+    $("xBarraImg").src = urlTarjeta; $("xBarraNom").textContent = nombre;
+    caja.hidden = false; barra.hidden = false;
+  }
+
+  // «Añadir»: vuelve a la carga con el extracto de ahora en la lista y abre el selector para sumar el de la tarjeta
+  function anadirTarjeta() {
+    show("up");
+    const inp = $("xFile"); if (inp) inp.click();
+  }
   function limpiar() { while (extras.length) extras.pop().remove(); ["xList", "xAlertas", "xNoticias", "xTodo", "xPreguntas"].forEach((id) => { if ($(id)) $(id).textContent = ""; }); }
 
   // Una fila: nombre con etiquetas, una línea debajo (y otra si hace falta), enlace de baja y la cifra a la derecha
@@ -277,7 +499,7 @@
   }
 
   function render(r, cobros) {
-    if ($("tAlerta") && $("xAlertas")) return renderAccion(r, cobros);
+    if ($("tAlerta") && $("xAlertas")) { const d = renderAccion(r, cobros); if (TRES) renderTres(r, cobros, d); return; }
     renderLista(r, cobros);
   }
 
@@ -420,7 +642,7 @@
     for (const c of deGrupo("dobles")) {
       const rep = (c.movimientos || []).find((m) => m.doble);
       const imp = (c.doble && c.doble.importe) || (rep && Math.abs(rep.importe)) || c.importe;
-      avisos.push({ tipo: "doble", corto: c.nombre + ", " + e2(imp) + " € " + TX.el + " " + fecha(rep ? rep.fecha : c.ultimo_cargo), euros: imp, nodo: alerta("doble", TX.aDoble[0], TX.aDoble[1](c.nombre, e2(imp), fecha(rep ? rep.fecha : c.ultimo_cargo)), e2(imp) + " €", TX.aDoble[2]) });
+      avisos.push({ tipo: "doble", c, imp, fechaD: rep ? rep.fecha : c.ultimo_cargo, corto: c.nombre + ", " + e2(imp) + " € " + TX.el + " " + fecha(rep ? rep.fecha : c.ultimo_cargo), euros: imp, nodo: alerta("doble", TX.aDoble[0], TX.aDoble[1](c.nombre, e2(imp), fecha(rep ? rep.fecha : c.ultimo_cargo)), e2(imp) + " €", TX.aDoble[2]) });
     }
     for (const c of deGrupo("subidas")) {
       const s1 = c.subida || {}, anual = (c.subida_mensual || 0) * 12;
@@ -437,11 +659,11 @@
         const otros = movs.filter((x) => x !== m).map((x) => Math.abs(x.importe)), med = media(otros), v = Math.abs(m.importe);
         if (v > med * (1 + RECIBO_ALTO) && (!peor || v - med > peor.dif)) peor = { m, v, med, dif: v - med };
       }
-      if (peor) avisos.push({ tipo: "recibo", corto: nombreR + ", " + e2(peor.v) + " € " + TX.el + " " + fecha(peor.m.fecha), euros: peor.dif, nodo: alerta("recibo", TX.aRecibo[0], TX.aRecibo[1](nombreR, e2(peor.v), fecha(peor.m.fecha), pct(peor.dif / peor.med), e2(peor.med)), "+" + e2(peor.dif) + " €", ...(seDaDeBaja(c) ? [TX.darme, enviarBaja(c), true] : [TX.aRecibo[2]])) });
+      if (peor) avisos.push({ tipo: "recibo", c, nombreR, peor, corto: nombreR + ", " + e2(peor.v) + " € " + TX.el + " " + fecha(peor.m.fecha), euros: peor.dif, nodo: alerta("recibo", TX.aRecibo[0], TX.aRecibo[1](nombreR, e2(peor.v), fecha(peor.m.fecha), pct(peor.dif / peor.med), e2(peor.med)), "+" + e2(peor.dif) + " €", ...(seDaDeBaja(c) && !TRES ? [TX.darme, enviarBaja(c), true] : [TX.aRecibo[2]])) });
     }
     const comisiones = deGrupo("comisiones");
     for (const c of comisiones.filter((x) => (x.etiquetas || []).indexOf("reclamable") >= 0 && (x.etiquetas || []).indexOf("devuelto") < 0)) {
-      avisos.push({ tipo: "comision", corto: c.nombre + ", " + e2(c.coste_anual || c.importe) + " €", euros: c.coste_anual || c.importe, nodo: alerta("comision", TX.aReclamar[0], TX.aReclamar[1](c.nombre), e2(c.coste_anual || c.importe) + " €", TX.aReclamar[2]) });
+      avisos.push({ tipo: "comision", reclamable: true, corto: c.nombre + ", " + e2(c.coste_anual || c.importe) + " €", euros: c.coste_anual || c.importe, nodo: alerta("comision", TX.aReclamar[0], TX.aReclamar[1](c.nombre), e2(c.coste_anual || c.importe) + " €", TX.aReclamar[2]) });
     }
     const pagadas = comisiones.filter((x) => (x.etiquetas || []).indexOf("devuelto") < 0 && (x.etiquetas || []).indexOf("reclamable") < 0);
     if (pagadas.length) {
@@ -468,14 +690,16 @@
     const textoTarjeta = tarjeta && tarjeta.datos ? TX.aTarjeta[1](e2(tarjeta.datos.importe || 0), tarjeta.datos.n || 0) : "";
     const nota = $("xNota");
     // Con sitio para la nota (diseño de preguntas), la tarjeta de crédito va ahí y no como aviso
-    if (textoTarjeta && !nota) avisos.push({ tipo: "tarjeta", euros: 0, nodo: alerta("tarjeta", TX.aTarjeta[0], textoTarjeta, "", TX.aTarjeta[2]) });
+    const enTarjeta = (r.terminados || []).filter((c) => c.quiza_en_tarjeta);
+    const textoTarjeta2 = TRES && enTarjeta.length ? (textoTarjeta ? textoTarjeta + " " : "") + enTarjeta.map((c) => TX.nFinT(c.nombre, fecha(c.ultimo_cargo))).join(". ") + "." : textoTarjeta;
+    if (textoTarjeta2 && !nota) avisos.push({ tipo: "tarjeta", euros: 0, datos: tarjeta && tarjeta.datos, enTarjeta, nodo: alerta("tarjeta", TX.aTarjeta[0], textoTarjeta2, "", TX.aTarjeta[2]) });
     if (nota) { nota.textContent = textoTarjeta ? textoTarjeta + " " + TX.aTarjeta[2] + "." : ""; nota.hidden = !textoTarjeta; }
     avisos.forEach((a) => $("xAlertas").appendChild(a.nodo));
     if ($("xAvisosN")) $("xAvisosN").textContent = TX.avisosN(avisos.length);
     mostrar($("xAlertas"), avisos.length);
 
     // ---- Diseño por pasos: lo que está bien, en una sola línea (#xBien) ----
-    const bien = $("xBien");
+    const bien = TRES ? null : $("xBien");
     if (bien) {
       const ok = TX.preguntas.map(([tipo]) => tipo).filter((tipo) => !avisos.some((a) => a.tipo === tipo)).map((tipo) => TX.temas[tipo]);
       const lista = ok.length > 1 ? ok.slice(0, -1).join(", ") + TX.yy + ok[ok.length - 1] : ok[0] || "";
@@ -501,7 +725,7 @@
     const noticias = [];
     for (const d of deGrupo("devoluciones")) noticias.push([d.tipo === "comision" || /^comisi|^comissi|fee/i.test(d.nombre) ? TX.nDevC(d.nombre, e2(d.importe)) : TX.nDevol(d.nombre, e2(d.importe)), ""]);
     for (const c of deGrupo("bajadas")) if (c.bajada) noticias.push([TX.nBaja(c.nombre, e2(c.bajada.antes), e2(c.bajada.ahora)), ""]);
-    for (const c of r.terminados || []) noticias.push([(c.quiza_en_tarjeta ? TX.nFinT : TX.nFin)(c.nombre, fecha(c.ultimo_cargo)), ""]);
+    for (const c of r.terminados || []) if (!(TRES && c.quiza_en_tarjeta)) noticias.push([(c.quiza_en_tarjeta ? TX.nFinT : TX.nFin)(c.nombre, fecha(c.ultimo_cargo)), ""]);
     for (const [t, cifra] of noticias) { const n = plantilla("tNoticia"); poner(n, "texto", t); const cx = poner(n, "cifra", cifra); if (cx && !cifra) cx.remove(); $("xNoticias").appendChild(n); }
     mostrar($("xNoticias"), noticias.length);
 
@@ -513,7 +737,8 @@
       const sec = plantilla("tSeccion");
       // «.sec» ya es la clase de las secciones grandes de la web (con mucho relleno): aquí se cambia por «res-sec»
       if (sec.classList.contains("sec")) { sec.classList.remove("sec"); sec.classList.add("res-sec"); if ($("xTodo").children.length) sec.style.borderTop = "1px solid var(--ink)"; }
-      poner(sec, "titulo", g.titulo);
+      sec.dataset.codigo = g.codigo;
+      poner(sec, "titulo", TRES && g.codigo === "recibos" ? T3.recibos : g.titulo);
       const sueltas = items.some((c) => c.periodicidad === "puntual");
       // lo que te devolvieron no cuenta en el total de la sección
       const tot = g.codigo === "comisiones" ? items.filter((c) => (c.etiquetas || []).indexOf("devuelto") < 0).reduce((t, c) => t + (c.coste_anual || 0), 0) : typeof g.total === "number" ? g.total : items.reduce((t, c) => t + (c.coste_anual || 0), 0);
@@ -541,7 +766,8 @@
     }
     mostrar($("xTodo"), $("xTodo").querySelectorAll('[data-c="nombre"]').length);
     const pack = $("xPack");
-    if (pack) pack.hidden = !cobros.some(compatible);
+    if (pack) pack.hidden = TRES || !cobros.some(compatible);
+    return { avisos, porId, deGrupo };
   }
 
   // Cada bloque va dentro de un botón (<details>) o de una sección: se oculta si está vacío y su contador dice cuántos hay
@@ -560,7 +786,7 @@
     const p = personalidad();
     if (!p) return;
     const m = await motor();
-    const blob = await m.generarTarjeta(p.id, p.dato || {}, { idioma: LANG });
+    const blob = blobTarjeta || await m.generarTarjeta(p.id, p.dato || {}, { idioma: LANG });
     const como = await m.compartirTarjeta(blob);
     if (como === "descargada") msg($("xMsg"), TX.dl);
     if (como !== "cancelada" && propio) contar("comparte");
@@ -611,6 +837,19 @@
   });
   $("xDemo").addEventListener("click", () => { contrasenas = {}; ejemplo().then((f) => { f.deEjemplo = true; return analyze(f); }, () => msg($("xErr"), TX.bad)); });
   $("xShare").addEventListener("click", () => share().catch(() => {}));
+  if ($("xShare2")) $("xShare2").addEventListener("click", () => share().catch(() => {}));
+  if ($("xMas")) $("xMas").addEventListener("click", () => {
+    const abrir = $("xMas").getAttribute("aria-expanded") !== "true";
+    document.querySelectorAll("#xAcciones .r3-ac--mas").forEach((li) => { li.hidden = !abrir; });
+    $("xMas").setAttribute("aria-expanded", String(abrir));
+    const n = document.querySelectorAll("#xAcciones .r3-ac--mas").length;
+    $("xMas").textContent = abrir ? T3.verMenos : T3.verMas(n);
+  });
+  if ($("xVerDetalle")) $("xVerDetalle").addEventListener("click", () => {
+    const det = $("xDetalle"), abrir = det.hidden;
+    if (abrir) abrirDetalle(null); else { det.hidden = true; $("xVerDetalle").textContent = T3.verDetalle; $("xVerDetalle").setAttribute("aria-expanded", "false"); }
+  });
+  if ($("xBuena")) $("xBuena").addEventListener("click", () => abrirDetalle($("xNoticias")));
   contar("abre");
   const btnIcs = $("xIcs"); if (btnIcs) btnIcs.addEventListener("click", () => ics().catch(() => {}));
   $("xAgain").addEventListener("click", () => {

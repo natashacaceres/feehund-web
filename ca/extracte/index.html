@@ -31,7 +31,7 @@
 <meta name="twitter:image" content="https://feehund.com/assets/brand/og-image.png?v=202611111722">
 <link rel="preload" href="../../assets/fonts/fraunces-800.woff" as="font" type="font/woff" crossorigin>
 <link rel="preload" href="../../assets/fonts/atkinson-next-400.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="../../assets/app.css?v=20261116140713">
+<link rel="stylesheet" href="../../assets/app.css?v=20261116142423">
 <link rel="preload" href="../../data/bancos-descarga.json" as="fetch" crossorigin>
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "WebApplication", "name": "Què es repeteix al teu compte?", "url": "https://feehund.com/ca/extracte/", "description": "Deixa anar el teu extracte i mira quines subscripcions i comissions es repeteixen al teu compte. Es llegeix al teu dispositiu i no es puja.", "inLanguage": "ca", "applicationCategory": "FinanceApplication", "operatingSystem": "Web", "isAccessibleForFree": true, "offers": {"@type": "Offer", "price": "0", "priceCurrency": "EUR"}, "publisher": {"@type": "Organization", "name": "Feehund", "url": "https://feehund.com/"}}</script>
 </head>
@@ -76,16 +76,31 @@
   <section class="ext-s ext-res" id="xRes" hidden>
     <p class="x-ejemplo" id="xEjemplo" hidden>Exemple</p>
     <h2 class="sr" id="xResH" tabindex="-1">El teu resultat</h2>
-    <p class="res-count" id="xCount"><span class="sr" id="xTotal"></span></p>
-    <button type="button" class="btn res-share" id="xShare">Compartir la meva personalitat</button>
+    <div class="r3">
+    <div class="r3-top"><span class="r3-meses" id="xMeses">12 mesos llegits</span></div>
+    <div class="r3-tiqui"><img src="../assets/img/tiqui-web.webp?v=202611111722" alt="" aria-hidden="true" width="48" height="48" class="r3-tiqui-i" decoding="async"><p class="r3-frase" id="xFrase">Ho he revisat tot. T'explico només el que importa.</p></div>
+    <p class="r3-cifra-l" id="xCifraL">Pagues l'any en coses que es repeteixen</p>
+    <p class="r3-cifra" aria-hidden="true"><span id="xCifra">0 €</span></p>
+    <p class="sr" id="xTotal" aria-live="polite"></p>
+    <p class="r3-calc" id="xCalc" hidden></p>
+    <p class="r3-escapo" id="xEscapo" data-ok="no"></p>
+    <section class="r3-blq" id="xHacer" aria-labelledby="xHacerH"><h2 class="r3-h" id="xHacerH">Què fer ara</h2><ul class="r3-acciones" id="xAcciones"></ul><button type="button" class="r3-mas" id="xMas" aria-expanded="false" hidden></button></section>
+    <section class="r3-blq" id="xVa" aria-labelledby="xVaH"><h2 class="r3-h" id="xVaH">En què se te'n va</h2><ul class="r3-barras" id="xBarras"></ul></section>
+    <section class="r3-blq" id="xBuenas" aria-labelledby="xBuenasH"><h2 class="r3-h" id="xBuenasH">Bones notícies</h2><button type="button" class="r3-buena" id="xBuena"></button></section>
+    <section class="r3-blq r3-tarjeta" id="xTarjeta" hidden><img class="r3-tarjeta-i" id="xTarjetaImg" alt="" width="1080" height="1920"><button type="button" class="r3-compartir" id="xShare">Compartir la meva targeta</button></section>
+    <div class="r3-links"><button type="button" class="r3-link" id="xVerDetalle" aria-expanded="false" aria-controls="xDetalle">Veure tot el detall</button><button type="button" class="r3-link ext-again" id="xAgain">Provar amb un altre fitxer</button></div>
+    <div class="r3-detalle" id="xDetalle" hidden>
+    <p class="res-count" id="xCount" hidden></p>
     <ol class="res-pasos">
-      <li class="res-paso"><h2 class="res-h">El que se t'escapa</h2><p class="res-bien" id="xBien" hidden></p><p class="res-nota" id="xNota" hidden></p><div class="res-alertas" id="xAlertas"></div></li>
+      <li class="res-paso"><h2 class="res-h">El que se t'escapa</h2><div class="res-alertas" id="xAlertas"></div></li>
       <li class="res-paso"><h2 class="res-h">Tot el que pagues</h2><div class="res-secs" id="xTodo"></div></li>
       <li class="res-paso"><h2 class="res-h">Bones notícies</h2><ul class="res-noticias" id="xNoticias"></ul></li>
     </ol>
-    <div class="ext-act"><div class="ext-links"><button type="button" class="link-alt ext-again" id="xAgain">Provar amb un altre fitxer</button></div></div>
+    </div>
     <p class="ext-msg" id="xMsg" role="status" hidden></p>
     <a class="tb-franja" id="xPack" href="../baixa/" data-api="baja-pack" hidden><strong>Te'n sobra algun?</strong><span>T'enviem la baixa amb certificat</span></a>
+    <div class="r3-barra" id="xBarra" hidden><img class="r3-barra-i" id="xBarraImg" alt="" width="34" height="60"><p class="r3-barra-t"><span>El teu compte diu que ets…</span><strong id="xBarraNom"></strong></p><button type="button" class="r3-barra-b" id="xShare2">Compartir</button></div>
+    </div>
     <a class="ext-dat" href="../datafon/">Tens negoci? Mira el teu datàfon →</a>
     <template id="tPregunta"><li class="pq" data-respuesta="si"><div class="pq-m"><h3 class="pq-q" data-c="pregunta">T'han pujat algun preu?</h3><p class="pq-d" data-c="detalle">Netflix, de 12,99 a 13,99 €</p></div><p class="pq-r" data-c="respuesta">Sí</p></li></template>
     <template id="tAlerta"><article class="al" data-tipo="subida"><span class="al-i al-i--doble" role="img" aria-label="Cobrament doble"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="7" width="13" height="10" rx="2"/><path d="M8 4h11a2 2 0 0 1 2 2v8"/></svg></span><span class="al-i al-i--subida" role="img" aria-label="Pujada de preu"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 17l6-6 4 4 6-7"/><path d="M15 8h5v5"/></svg></span><span class="al-i al-i--recibo" role="img" aria-label="Rebut alt"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h12v18l-3-2-3 2-3-2-3 2z"/><path d="M9 8h6M9 12h6"/></svg></span><span class="al-i al-i--comision" role="img" aria-label="Comissió"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9.5 12 4l9 5.5"/><path d="M5 10v7M9.5 10v7M14.5 10v7M19 10v7M3 20h18"/></svg></span><span class="al-i al-i--tarjeta" role="img" aria-label="Targeta de crèdit"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5.5" width="18" height="13" rx="2"/><path d="M3 10h18M7 15h4"/></svg></span><div class="al-m"><h4 class="al-t" data-c="titulo">T'han pujat el preu</h4><p class="al-d" data-c="detalle">Netflix ha passat de 12,99 a 13,99 € al mes (+8 %)</p><a class="al-a" data-c="accion" href="../../ca/baixa/">Donar de baixa →</a><a class="al-a al-a--baja" data-c="accion-baja" href="../baixa/enviar/" hidden>Donar-me de baixa</a></div><p class="al-c" data-c="cifra">+12 €/any</p></article></template>
@@ -112,7 +127,7 @@
     <li>© 2026 <span data-marca>Feehund</span></li>
   </ul>
 </div></footer>
-<script src="../../assets/extracto.js?v=20261116134136" data-root="../../"></script>
+<script src="../../assets/extracto.js?v=20261116142423" data-root="../../"></script>
 <script src="../../assets/app.js?v=20261113141239"></script>
 <script src="../../assets/atras.js?v=20261113141239" defer></script>
 <script src="../../assets/bancos-guia.js?v=20261116140713" data-root="../../" defer></script>

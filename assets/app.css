@@ -1527,3 +1527,65 @@ main.art2 p a[href^="http"],main.art2 li a[href^="http"]{text-decoration:underli
 .calc .chips.fila .chip[aria-pressed="true"]::after{right:8px;width:16px;height:16px;background-size:16px}
 #pNdMas,#pFlojoQ .money{margin-top:var(--s-3)}
 #pPermMore .fields{margin-top:var(--s-4)}
+
+/* ===== Mi banco · resultado en «tres respuestas» (opción A, 16 nov 2026) ===== */
+/* Cifras sin el cero tachado de Atkinson: solo los dígitos salen en la letra del propio móvil */
+@font-face{font-family:"Feehund Cifras";src:local("Roboto"),local("Roboto-Regular"),local("Helvetica Neue"),local("HelveticaNeue"),local("Segoe UI"),local("Arial");font-weight:400;unicode-range:U+0030-0039;font-display:swap}
+@font-face{font-family:"Feehund Cifras";src:local("Roboto Medium"),local("Roboto-Medium"),local("Helvetica Neue Medium"),local("HelveticaNeue-Medium"),local("Segoe UI Semibold"),local("SegoeUI-Semibold"),local("Arial");font-weight:500 600;unicode-range:U+0030-0039;font-display:swap}
+@font-face{font-family:"Feehund Cifras";src:local("Roboto Bold"),local("Roboto-Bold"),local("Helvetica Neue Bold"),local("HelveticaNeue-Bold"),local("Segoe UI Bold"),local("SegoeUI-Bold"),local("Arial Bold"),local("Arial-BoldMT");font-weight:700 900;unicode-range:U+0030-0039;font-display:swap}
+.ext-res{--f-text:"Feehund Cifras","Atkinson Hyperlegible Next",system-ui,sans-serif}
+.r3{display:grid;gap:var(--s-5);max-width:560px;width:100%;margin:0 auto;text-align:left}
+.r3 p{margin:0}
+.r3-top{display:flex;justify-content:flex-end}
+.r3-meses{display:inline-flex;align-items:center;min-height:32px;padding:4px 14px;border-radius:999px;background:var(--brand-tint);color:var(--brand-dark);font:600 15px/1.2 var(--f-text)}
+.r3-tiqui{display:flex;align-items:flex-end;gap:var(--s-3)}
+.r3-tiqui-i{flex:none;width:48px;height:48px;object-fit:contain}
+.r3-frase{flex:1;padding:12px 16px;border-radius:18px 18px 18px 6px;background:var(--ink);color:var(--bg);font:400 17px/1.4 var(--f-text)}
+.r3-cifra-l{font:600 17px/1.3 var(--f-text);color:var(--ink);margin-bottom:-12px !important}
+.r3-cifra{font:800 clamp(56px,17vw,80px)/1.05 var(--f-display);color:var(--ink);letter-spacing:-.02em;font-variant-numeric:lining-nums}
+.r3-calc{font:400 16px/1.4 var(--f-text);color:var(--ink);margin-top:-16px !important}
+.r3-escapo{padding:14px 18px;border-radius:16px;background:var(--amber);color:var(--ink);font:700 18px/1.35 var(--f-text);text-wrap:pretty}
+.r3-escapo[data-ok="si"]{background:var(--brand-tint);color:var(--brand-dark)}
+.r3-blq{display:grid;gap:var(--s-3);margin-top:var(--s-4)}
+.r3-blq[hidden]{display:none}
+.r3-h{margin:0;font:800 26px/1.2 var(--f-head);color:var(--ink)}
+.r3-acciones,.r3-barras{list-style:none;margin:0;padding:0;display:grid;gap:var(--s-3)}
+.r3-ac{display:flex;align-items:center;gap:var(--s-3);padding:14px;border-radius:16px;background:var(--over-bg)}
+.r3-ac[hidden]{display:none}
+.r3-ac-i{flex:none;display:grid;place-items:center;width:40px;height:40px;border-radius:999px;background:var(--amber);color:var(--ink)}
+.r3-ac-i--tarjeta,.r3-ac-i--baja{background:var(--bg)}
+.r3-ac-i svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.r3-ac-m{flex:1;min-width:0}
+.r3-ac-t{font:700 17px/1.3 var(--f-text);color:var(--ink);text-wrap:pretty}
+.r3-ac-l{font:400 16px/1.35 var(--f-text);color:var(--ink);margin-top:2px !important}
+.r3-btn{flex:none;display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:0 18px;border:0;border-radius:999px;background:var(--brand);color:var(--bg);font:700 16px/1.1 var(--f-text);text-decoration:none;cursor:pointer;white-space:nowrap}
+.r3-btn:hover{background:var(--brand-dark);color:var(--bg)}
+.r3-btn:focus-visible,.r3-mas:focus-visible,.r3-bar:focus-visible,.r3-buena:focus-visible,.r3-link:focus-visible,.r3-compartir:focus-visible,.r3-barra-b:focus-visible{outline:2px solid var(--brand);outline-offset:2px}
+.r3-mas,.r3-link{justify-self:start;min-height:44px;padding:0;border:0;background:none;color:var(--brand);font:700 16px/1.2 var(--f-text);text-decoration:underline;text-underline-offset:3px;cursor:pointer}
+.r3-mas[hidden]{display:none}
+.r3-bar{display:grid;gap:6px;width:100%;padding:6px 0;border:0;background:none;color:var(--ink);text-align:left;cursor:pointer}
+.r3-bar-f{display:flex;justify-content:space-between;gap:var(--s-3);font:600 16px/1.3 var(--f-text)}
+.r3-bar-v{font-weight:700;white-space:nowrap}
+.r3-bar-p{display:block;height:12px;border-radius:999px;background:var(--brand-tint);overflow:hidden}
+.r3-bar-l{display:block;height:100%;border-radius:999px;background:var(--brand)}
+.r3-buena{display:flex;align-items:center;gap:var(--s-2);min-height:44px;padding:0;border:0;background:none;color:var(--ink);font:600 17px/1.3 var(--f-text);text-align:left;cursor:pointer}
+.r3-buena::before{content:"";flex:none;width:26px;height:26px;border-radius:999px;background:var(--brand-tint) var(--ico-check) center/16px no-repeat}
+.r3-tarjeta{justify-items:center;margin-top:var(--s-5)}
+.r3-tarjeta[hidden]{display:none}
+.r3-tarjeta-i{width:min(100%,320px);height:auto;aspect-ratio:9/16;border-radius:20px}
+.r3-compartir{width:100%;min-height:54px;border:0;border-radius:999px;background:var(--amber);color:var(--ink);font:800 18px/1.2 var(--f-text);cursor:pointer}
+.r3-links{display:grid;justify-items:center;gap:var(--s-1)}
+.r3-links .r3-link{justify-self:center}
+.r3-detalle{margin-top:var(--s-4)}
+.r3-detalle[hidden]{display:none}
+.r3-foco{animation:r3-foco 1.6s ease-out}
+@keyframes r3-foco{0%{box-shadow:0 0 0 3px var(--brand)}100%{box-shadow:0 0 0 3px transparent}}
+/* Barra fija para compartir: siempre a mano y sin tapar nada (el cuerpo deja su hueco al final) */
+.r3-barra{position:fixed;left:0;right:0;bottom:0;z-index:40;display:flex;align-items:center;gap:var(--s-3);max-width:560px;margin:0 auto;padding:10px 12px calc(10px + env(safe-area-inset-bottom));background:var(--ink);color:var(--bg);border-radius:18px 18px 0 0}
+.r3-barra[hidden]{display:none}
+.r3-barra-i{flex:none;width:34px;height:60px;border-radius:6px;object-fit:cover}
+.r3-barra-t{flex:1;min-width:0;display:grid;font:400 15px/1.25 var(--f-text);margin:0}
+.r3-barra-t strong{font:700 16px/1.25 var(--f-text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.r3-barra-b{flex:none;min-height:44px;padding:0 20px;border:0;border-radius:999px;background:var(--amber);color:var(--ink);font:800 16px/1.1 var(--f-text);cursor:pointer}
+body.con-barra{padding-bottom:calc(88px + env(safe-area-inset-bottom))}
+@media (prefers-reduced-motion:reduce){.r3-foco{animation:none;outline:3px solid var(--brand)}}
