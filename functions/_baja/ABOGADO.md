@@ -55,8 +55,14 @@ fuero, resolución de litigios en línea.
 - Datos nuevos: nombre, correo, dato del contrato, DNI/NIE (solo el número; **no se pide foto del documento**), firma
   dibujada, carta, prueba de la firma. Sección nueva en /privacidad/ (y ca/en). ¿Base jurídica «ejecución del contrato»?
   La carta dice que la persona enviará copia del DNI si la empresa se la pide (10 empresas la piden en sus condiciones).
-- Encargados: **Resend** (correo, EE. UU.), **Lleida.net** (¿encargado o tercero de confianza responsable del
-  certificado?), **Stripe**, **Cloudflare** (KV y copias de seguridad en R2, datos cifrados con AES-GCM). Contratos de encargo (DPA) y transferencias
+- Encargados: **Brevo** (correo, UE), **Lleida.net** (¿encargado o tercero de confianza responsable del
+  certificado?), **Stripe**, **Cloudflare** (KV y copias de seguridad en R2, datos cifrados con AES-GCM).
+- **Proveedores sin nombre:** por decisión de la titular, ni las páginas, ni la carta, ni los correos, ni las
+  condiciones nombran a los proveedores; dicen «correo electrónico certificado». En privacidad figuran por
+  **categoría**: «un prestador cualificado de servicios de confianza que certifica el envío», «un servicio de envío de
+  correo electrónico», «el procesador de pagos», «el alojamiento web y las copias de seguridad». ¿Basta con la
+  categoría de destinatarios (art. 13.1 e RGPD) o hay que nombrarlos? (El justificante que se adjunta lo emite y firma
+  el prestador y lleva su nombre.) Contratos de encargo (DPA) y transferencias
   fuera del EEE (cláusulas tipo / Data Privacy Framework).
 - **Lectura con IA de Mi banco**: si el móvil no puede leer el extracto, se envía a **Anthropic (fuera de la UE)** y no se
   guarda. Ya está en /privacidad/ con «⚖ abogado». En «Te damos de baja» el extracto **no viaja** (la comprobación de un

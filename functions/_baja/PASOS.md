@@ -7,11 +7,18 @@ en las 24 horas siguientes (el asunto dice hasta cuándo). Si la baja estaba pro
 - Habla con tu **gestor**: cobrar este servicio sin ser autónoma ni empresa.
 - **Abogado**: la lista está en `functions/_baja/ABOGADO.md`.
 
-## 1. Resend (envía los correos de la web; gratis hasta 3.000 al mes)
-1. Crea la cuenta en resend.com › Domains › Add domain › `feehund.com`.
-2. Te da 3 registros DNS: cópialos en Cloudflare › feehund.com › DNS › Add record (o dime y lo hacemos juntas).
-   Espera a que Resend diga «Verified».
-3. API Keys › Create › permiso «Sending access» › copia la clave (`re_…`). Va en el paso 3.
+## 1. Brevo (envía los correos de la web; ya tienes cuenta, como en Ipso)
+1. Brevo › **Senders, Domains & Dedicated IPs** › **Domains** › **Add a domain** › `feehund.com`.
+2. Elige autenticar con Cloudflare (te lleva y los pone solo) o copia a mano los registros que te da en
+   Cloudflare › feehund.com › DNS: el código de Brevo (`brevo-code`), DKIM (`brevo1._domainkey`, `brevo2._domainkey`)
+   y DMARC.
+3. **SPF, con cuidado:** feehund.com ya tiene `v=spf1 include:_spf.mx.cloudflare.net ~all` (para recibir con Email
+   Routing). Tiene que quedar **un solo** registro SPF con los dos:
+   `v=spf1 include:_spf.mx.cloudflare.net include:spf.brevo.com ~all`
+   Si Brevo propone crear otro registro SPF, no lo crees: edita el que hay y deja esa línea.
+4. Espera a que Brevo diga que el dominio está autenticado.
+5. **SMTP & API** › **API keys** › **Generate a new API key**, nombre «feehund-web». Copia la clave (`xkeysib-…`).
+   Va en el paso 3 como `BREVO_API_KEY`.
 
 ## 2. Stripe (cuenta «Calculadora datáfono»)
 El producto (`prod_VdmVGkorJMQg6T`) y el webhook ya están creados; el webhook está apagado hasta publicar y se enciende
@@ -24,7 +31,7 @@ ese día. Tú solo:
 1. Storage & Databases › KV › Create: nombre `feehund-baja`.
 2. Workers & Pages › **feehund-web** › Settings › Bindings › Add › KV namespace: nombre `FEEHUND_KV`, espacio `feehund-baja`.
 3. Settings › Variables and secrets › Add, en **Production**:
-   - tipo **Secret**: `STRIPE_SECRET_KEY` (la `rk_live_…`), `STRIPE_WEBHOOK_SECRET` (la `whsec_…`), `RESEND_API_KEY` (la `re_…`).
+   - tipo **Secret**: `STRIPE_SECRET_KEY` (la `rk_live_…`), `STRIPE_WEBHOOK_SECRET` (la `whsec_…`), `BREVO_API_KEY` (la `xkeysib-…`).
    - tipo **Secret**, tres claves al azar: `TOKEN_SECRET`, `DATA_KEY` y `TAREA_SECRET`. Para cada una, abre Terminal,
      pega `openssl rand -base64 32`, pulsa Enter y copia lo que sale. **Guarda `DATA_KEY` en tu gestor de contraseñas.**
    - tipo **Text**: `STRIPE_PRODUCT_BAJA` = `prod_VdmVGkorJMQg6T`; `AVISOS_CORREO` = el correo donde

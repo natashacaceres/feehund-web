@@ -1,9 +1,9 @@
-// Simulador local de Stripe, Resend y Lleida.net para probar «Te damos de baja» sin claves ni dinero.
+// Simulador local de Stripe, Brevo y Lleida.net para probar «Te damos de baja» sin claves ni dinero.
 // Uso: node pruebas/te-damos-de-baja/simulador.mjs   (puerto 8791; la web en wrangler pages dev, puerto 8788)
 //   http://localhost:8791/correo        buzón: todos los correos «enviados» (con el código de firma)
 //   http://localhost:8791/pagar/<id>    la «página de pago» de Stripe (tarjeta de prueba)
 // Imita solo lo que usa el servicio, con los mismos nombres de campos que las API de verdad.
-// Un destinatario que contiene «rebota» devuelve bounced (para probar la devolución automática).
+// Un destinatario que contiene «rebota» devuelve hardBounces (para probar la devolución automática).
 import http from 'node:http';
 import crypto from 'node:crypto';
 
@@ -83,17 +83,21 @@ http.createServer(async (req, res) => {
 <form method="post"><p>Tarjeta 4242 4242 4242 4242 · 12/34 · 123</p><button style="width:100%;padding:14px;font-size:17px;background:#0E5E6F;color:#fff;border:0;border-radius:8px" id="pagar">Pagar</button></form>
 <p><a href="${esc(s.cancel_url)}" id="volver">← Volver sin pagar</a></p></body>`);
     }
-    /* ---- Resend ---- */
-    if (ruta === '/emails' && req.method === 'POST') {
-      if (!/^Bearer re_/.test(req.headers.authorization || '')) return jsonR(res, 401, { name: 'validation_error' });
-      const j = JSON.parse(cuerpo), idem = req.headers['idempotency-key'];
-      const ya = correos.find((c) => idem && c.idem === idem); if (ya) return jsonR(res, 200, { id: ya.id });
-      const c = { id: crypto.randomUUID(), idem, en: new Date().toISOString(), ...j, last_event: j.to.some((x) => x.includes('rebota')) || (rebotar && (j.cc || []).length) ? 'bounced' : 'delivered' };
-      if ((j.cc || []).length) rebotar = false;
-      correos.push(c); console.log('correo →', j.to.join(', '), '·', j.subject); return jsonR(res, 200, { id: c.id });
+    /* ---- Brevo (correo transaccional) ---- */
+    if (ruta === '/v3/smtp/email' && req.method === 'POST') {
+      if (!/^xkeysib-/.test(req.headers['api-key'] || '')) return jsonR(res, 401, { code: 'unauthorized', message: 'Key not found' });
+      const j = JSON.parse(cuerpo);
+      if (!j.sender?.email || !j.to?.length || !j.subject || !(j.textContent || j.htmlContent)) return jsonR(res, 400, { code: 'missing_parameter', message: 'falta algo' });
+      const a = (l) => (l || []).map((x) => x.email);
+      const c = { id: `<${crypto.randomUUID()}@smtp-relay.mailin.fr>`, en: new Date().toISOString(), from: `"${j.sender.name}" <${j.sender.email}>`, to: a(j.to), cc: j.cc ? a(j.cc) : undefined,
+        reply_to: j.replyTo ? [j.replyTo.email] : undefined, subject: j.subject, text: j.textContent, attachments: (j.attachment || []).map((x) => ({ filename: x.name, content: x.content })) };
+      c.last_event = c.to.some((x) => x.includes('rebota')) || (rebotar && (c.cc || []).length) ? 'hardBounces' : 'delivered';
+      if ((c.cc || []).length) rebotar = false;
+      correos.push(c); console.log('correo →', c.to.join(', '), '·', c.subject); return jsonR(res, 201, { messageId: c.id });
     }
-    if (ruta.startsWith('/emails/') && req.method === 'GET') {
-      const c = correos.find((x) => x.id === ruta.split('/').pop()); return c ? jsonR(res, 200, { id: c.id, last_event: c.last_event }) : jsonR(res, 404, {});
+    if (ruta === '/v3/smtp/statistics/events' && req.method === 'GET') {
+      const c = correos.find((x) => x.id === url.searchParams.get('messageId'));
+      return jsonR(res, 200, { events: c ? [{ event: 'requests', email: c.to[0], messageId: c.id, date: c.en }, { event: c.last_event, email: c.to[0], messageId: c.id, date: c.en }] : [] });
     }
     if (ruta === '/control/vaciar') { correos.length = 0; devoluciones.length = 0; sesiones.clear(); rebotar = false; return jsonR(res, 200, { ok: true }); }
     if (ruta === '/control/rebotar') { rebotar = true; return jsonR(res, 200, { ok: true }); }

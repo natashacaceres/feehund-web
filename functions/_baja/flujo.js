@@ -12,7 +12,7 @@ import DATOS from '../../data/te-damos-de-baja.json' with { type: 'json' };
 import { calcularEnvio, carta, cartaRecobro, fechaLarga, hoyEspana, sumarDias, validarDatos, MAX_BAJAS, total, euros, esFecha } from '../../assets/te-damos-de-baja/carta.js';
 import { aleatorio, codigo6, referencia, hmac, sha256, igual, firmarId, leerToken, b64, deB64 } from './cripto.js';
 import { leer, borrar, listar, guardarBaja, guardarCompra, guardar, limitar, exportar } from './almacen.js';
-import { crearPago, leerPago, devolver, enviarCorreo, estadoCorreo, buscarCertificados, descargarCertificado, LLEIDA_CC, REMITE } from './servicios.js';
+import { crearPago, leerPago, devolver, enviarCorreo, estadoCorreo, buscarCertificados, descargarCertificado, LLEIDA_CC } from './servicios.js';
 import { cartaPdf } from './pdf.js';
 import { msj, urgente } from './mensajes.js';
 
@@ -28,7 +28,7 @@ export const RUTA = {
 };
 const diasBorrado = (env) => Number(env.DIAS_BORRADO) || 90;
 const ANOS_ARCHIVO = 6;        // prueba ante reclamaciones y contabilidad [REVISIÓN LEGAL]
-const DIAS_SIN_ENTREGA = 4;   // (modo lleida) sin «delivered» de Resend en estos días: no entregada y se devuelve
+const DIAS_SIN_ENTREGA = 4;   // (modo lleida) sin «delivered» de Brevo en estos días: no entregada y se devuelve
 const DIAS_RESTANTES = 180;   // bajas pagadas sin usar: se devuelven solas
 const MAX_ENVIOS_CODIGO = 4, MAX_INTENTOS = 5, MIN_CODIGO = 15;
 
@@ -220,8 +220,8 @@ export async function enviar(env, origen, b) {
   if (b.fechaCarta < b.envio) b.fechaCarta = b.envio; // la carta programada lleva la fecha del día en que sale
   const c = laCarta(b), pdf = await pdfDe(env, b, c);
   const adjuntos = [{ nombre: archivoCarta(c, b), bytes: pdf, tipo: 'application/pdf' }];
-  b.resendId = await enviarCorreo(env, {
-    de: `"${b.datos.nombre.replace(/["<>\\]/g, '')} (vía Feehund)" <${REMITE}>`, para: env.ENVIO_PRUEBA || e.correo, cc: LLEIDA_CC, responderA: b.datos.correo,
+  b.correoId = await enviarCorreo(env, {
+    de: { nombre: `${b.datos.nombre} (vía Feehund)` }, para: env.ENVIO_PRUEBA || e.correo, cc: LLEIDA_CC, responderA: b.datos.correo,
     asunto: c.asunto, texto: c.cuerpo.join('\n'), adjuntos, idem: `baja-${b.id}`, etiquetas: [{ name: 'tipo', value: 'baja' }],
   });
   b.estado = 'enviada'; b.enviadaEn = ahoraISO();
@@ -304,8 +304,8 @@ async function noEntregada(env, b) {
 /** (modo lleida) Cómo va una baja enviada: rebote (devolución) o entrega, y el certificado. */
 export async function revisar(env, origen, b) {
   if (modo(env) !== 'lleida' || b.enviadaA === 'mano') return b;
-  if (b.estado === 'enviada' && b.resendId) {
-    const ev = await estadoCorreo(env, b.resendId);
+  if (b.estado === 'enviada' && b.correoId) {
+    const ev = await estadoCorreo(env, b.correoId);
     if (ev === 'bounced' || ev === 'failed') { await noEntregada(env, b); return b; }
     if (ev !== 'delivered' && Date.now() - Date.parse(b.enviadaEn) > DIAS_SIN_ENTREGA * 864e5) { await noEntregada(env, b); return b; }
   }
@@ -328,7 +328,7 @@ export async function estado(env, req, token) {
   // Al volver de Stripe, si su aviso aún no ha llegado, se pregunta directamente
   if (c && c.estado === 'abierta' && c.sesion && b.estado === 'firmada') {
     const s = await leerPago(env, c.sesion).catch(() => null);
-    if (s && (await compraPagada(env, origen, c.id, s))) { b = await leer(env, 'baja', b.id); c = await leer(env, 'compra', c.id); }
+    if (s && (await compraPagada(env, origen, c.id, s).catch(() => false))) { b = await leer(env, 'baja', b.id); c = await leer(env, 'compra', c.id); }
   }
   // El justificante lo trae la tarea (cada hora), no esta consulta: así se ve igual que con el envío a mano
   const e = empresaDe(b.empresa);
@@ -369,7 +369,7 @@ export async function recobro(env, req, token, cuerpo) {
   if (cert) adjuntos.push({ nombre: `justificante-${b.ref}.pdf`, bytes: deBase64(cert.pdf), tipo: 'application/pdf' });
   if (modo(env) === 'lleida') {
     await enviarCorreo(env, {
-      de: `"${b.datos.nombre.replace(/["<>\\]/g, '')} (vía Feehund)" <${REMITE}>`, para: env.ENVIO_PRUEBA || e.correo, cc: LLEIDA_CC, responderA: b.datos.correo,
+      de: { nombre: `${b.datos.nombre} (vía Feehund)` }, para: env.ENVIO_PRUEBA || e.correo, cc: LLEIDA_CC, responderA: b.datos.correo,
       asunto: r.asunto, texto: r.cuerpo.join('\n'), adjuntos, idem: `recobro-${b.id}`,
     });
   } else {

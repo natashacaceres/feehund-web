@@ -29,11 +29,12 @@ Mi banco y el cobro no coinciden.
 | | Fase 1 · `manual` (ahora) | Fase 2 · `lleida` |
 |---|---|---|
 | Al pagar | correo «Recibido: enviamos hoy…» a la persona y correo **URGENTE** a `AVISOS_CORREO` | igual a la persona; la carta sale sola |
-| Envío | a mano por Lleida.net, con lo que trae el correo urgente | desde hola@feehund.com, Cc correo@certificado.lleida.net, Reply-To la persona |
+| Envío | a mano por Lleida.net, con lo que trae el correo urgente | desde hola@feehund.com (Brevo), Cc correo@certificado.lleida.net, Reply-To la persona |
 | Justificante | en `/baja/gestion/?g=…` se sube el certificado de Lleida y se pulsa «Hecho» | la tarea lo trae de la API de Lleida (`list_pdf` por la referencia, `download_pdf`) |
-| No se entrega | «No se pudo entregar» en la página de gestión → devolución | rebote en Resend o 4 días sin entrega → devolución |
+| No se entrega | «No se pudo entregar» en la página de gestión → devolución | rebote en Brevo o 4 días sin entrega → devolución |
 
-Pantallas, correos y plazos son idénticos en las dos (`pruebas/te-damos-de-baja/modos.test.mjs` lo comprueba). Pasar a
+La persona nunca ve el nombre de los proveedores, solo «correo electrónico certificado» (`proveedores.test.mjs`); en
+privacidad, la categoría. Pantallas, correos y plazos son idénticos en las dos (`pruebas/te-damos-de-baja/modos.test.mjs` lo comprueba). Pasar a
 la fase 2 es poner `ENVIO_MODO=lleida` y las claves de Lleida.
 
 ## El recorrido
@@ -68,17 +69,17 @@ semanal** de todo (cifrado) en R2 (`COPIAS`), las 12 últimas (`workers/baja-tar
 | `assets/te-damos-de-baja.js`, `/estilo.css`, `/gestion.js` | páginas enviar, estado, gracias y gestión |
 | `functions/api/baja/[[ruta]].js` | la API |
 | `functions/_baja/flujo.js` | el recorrido, los dos modos y la tarea |
-| `functions/_baja/servicios.js` | Stripe, Resend y Lleida.net (HTTP directo, sin npm) |
+| `functions/_baja/servicios.js` | Stripe, Brevo (correo) y Lleida.net (HTTP directo, sin npm) |
 | `functions/_baja/almacen.js`, `cripto.js` | KV cifrado (AES-GCM con `DATA_KEY`), enlaces firmados, códigos |
 | `functions/_baja/pdf.js` | la carta en PDF de una hoja |
 | `functions/_baja/mensajes.js` | correos a la persona (es/ca/en) y urgentes al equipo |
-| `pruebas/te-damos-de-baja/` | simulador de Stripe/Resend/Lleida, prueba en Chrome, carta, coherencia y los dos modos |
+| `pruebas/te-damos-de-baja/` | simulador de Stripe/Brevo/Lleida, prueba en Chrome, carta, coherencia, los dos modos, aviso de Stripe y proveedores |
 
 Todo lo personal va **cifrado** en KV; los metadatos sin datos personales los lee la tarea sin descifrar.
 
 ## Variables (Cloudflare Pages › Settings › Variables and secrets; nunca en el repositorio)
 
-Secretos: `STRIPE_SECRET_KEY` (clave restringida), `STRIPE_WEBHOOK_SECRET`, `RESEND_API_KEY`, `TOKEN_SECRET`,
+Secretos: `STRIPE_SECRET_KEY` (clave restringida), `STRIPE_WEBHOOK_SECRET`, `BREVO_API_KEY`, `TOKEN_SECRET`,
 `DATA_KEY` (32 bytes en base64), `TAREA_SECRET` (la misma en el Worker). Texto: `STRIPE_PRODUCT_BAJA`, `AVISOS_CORREO`
 (adónde llegan los urgentes). Enlace KV: `FEEHUND_KV`; enlace R2: `COPIAS` (copias semanales). Fase 2: `ENVIO_MODO=lleida`, `LLEIDA_USER`, `LLEIDA_API_KEY`.
 Opcionales: `URL_WEB`, `DIAS_BORRADO` (90), `ENVIO_PRUEBA` (fase 2: todas las cartas a esta dirección).
@@ -87,8 +88,8 @@ Si falta alguna, la página dice «Este servicio aún no está abierto» y enlaz
 ## Probar en local
 
 ```bash
-node --test pruebas/te-damos-de-baja/carta.test.mjs pruebas/te-damos-de-baja/coherencia.test.mjs pruebas/te-damos-de-baja/modos.test.mjs pruebas/te-damos-de-baja/webhook.test.mjs
-# en Chrome: .dev.vars con claves de prueba apuntando al simulador (STRIPE_API, RESEND_API, LLEIDA_API) y PRUEBAS=1
+node --test pruebas/te-damos-de-baja/*.test.mjs
+# en Chrome: .dev.vars con claves de prueba apuntando al simulador (STRIPE_API, BREVO_API, LLEIDA_API) y PRUEBAS=1
 node pruebas/te-damos-de-baja/simulador.mjs            # buzón en http://localhost:8791/correo
 npx wrangler pages dev . --port 8788 --kv FEEHUND_KV   # con el almacén local vacío
 PLAYWRIGHT=<ruta>/playwright/index.mjs node pruebas/te-damos-de-baja/e2e.mjs

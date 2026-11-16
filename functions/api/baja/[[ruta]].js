@@ -28,7 +28,7 @@ const json = (cuerpo, estado = 200) => new Response(JSON.stringify(cuerpo), { st
 const archivo = ({ bytes, pdf, nombre, tipo = 'application/pdf' }) => new Response(bytes || pdf, { headers: { 'content-type': tipo, 'content-disposition': `inline; filename="${nombre}"`, 'cache-control': 'private, no-store', 'x-robots-tag': 'noindex' } });
 
 // Lo que tiene que estar puesto en Cloudflare para abrir el servicio (si falta algo, la página dice que aún no está abierto)
-const OBLIGATORIAS = { comun: ['TOKEN_SECRET', 'DATA_KEY', 'RESEND_API_KEY', 'STRIPE_SECRET_KEY', 'STRIPE_WEBHOOK_SECRET', 'STRIPE_PRODUCT_BAJA'], manual: ['AVISOS_CORREO'], lleida: ['LLEIDA_USER', 'LLEIDA_API_KEY'] };
+const OBLIGATORIAS = { comun: ['TOKEN_SECRET', 'DATA_KEY', 'BREVO_API_KEY', 'STRIPE_SECRET_KEY', 'STRIPE_WEBHOOK_SECRET', 'STRIPE_PRODUCT_BAJA'], manual: ['AVISOS_CORREO'], lleida: ['LLEIDA_USER', 'LLEIDA_API_KEY'] };
 const LISTO = (env) => Boolean(env.FEEHUND_KV) && [...OBLIGATORIAS.comun, ...OBLIGATORIAS[modo(env)]].every((k) => env[k]);
 
 async function cuerpoJson(request, max = 12_000_000) {

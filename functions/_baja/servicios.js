@@ -1,5 +1,5 @@
-// Los tres servicios de fuera, con llamadas HTTP directas (la web no tiene paso de compilación ni npm).
-// Las direcciones se pueden cambiar con STRIPE_API, RESEND_API y LLEIDA_API: así las pruebas usan un simulador
+// Los tres servicios de fuera (Stripe, Brevo, Lleida.net), con llamadas HTTP directas (la web no tiene paso de compilación ni npm).
+// Las direcciones se pueden cambiar con STRIPE_API, BREVO_API y LLEIDA_API: así las pruebas usan un simulador
 // local. En producción no se ponen y se usan las de verdad.
 
 import { b64, igual } from './cripto.js';
@@ -73,36 +73,55 @@ export async function eventoStripe(env, cuerpo, cabecera, ahora = Date.now()) {
   try { return JSON.parse(cuerpo); } catch { return null; }
 }
 
-/* ================= Resend (correo) ================= */
-const resendBase = (env) => env.RESEND_API || 'https://api.resend.com';
+/* ================= Brevo (correo transaccional) ================= */
+// POST /v3/smtp/email con la cabecera api-key (BREVO_API_KEY). Remitente hola@feehund.com (dominio autenticado en Brevo).
+// Brevo no tiene clave de idempotencia: la ponemos nosotros en KV («correo:<hash>») para que un reintento (aviso de
+// Stripe repetido, tarea que corre dos veces) no mande el mismo correo dos veces.
+const brevoBase = (env) => env.BREVO_API || 'https://api.brevo.com';
 export const REMITE = 'hola@feehund.com';
+const html = (t) => '<div style="font:15px/1.5 Arial,sans-serif;white-space:pre-wrap">' + String(t).replace(/[&<>]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' })[c]) + '</div>';
+const nombre70 = (n) => String(n || '').replace(/["<>\\]/g, '').slice(0, 70);
 
 /**
- * Envía un correo. adjuntos: [{ nombre, bytes: Uint8Array, tipo }]. idem: clave para que un reintento no lo duplique.
- * Devuelve el id de Resend.
+ * Envía un correo. de: { nombre } (el remitente es siempre hola@feehund.com). adjuntos: [{ nombre, bytes, tipo }].
+ * idem: clave para que un reintento no lo duplique. Devuelve el messageId de Brevo.
  */
-export async function enviarCorreo(env, { de, para, cc, responderA, asunto, texto, html, adjuntos = [], idem, etiquetas }) {
-  if (!env.RESEND_API_KEY) throw new ErrorServicio('resend', 0, 'sin_clave');
-  const h = { authorization: 'Bearer ' + env.RESEND_API_KEY, 'content-type': 'application/json' };
-  if (idem) h['idempotency-key'] = idem;
-  const r = await fetch(resendBase(env) + '/emails', {
-    method: 'POST', headers: h,
+export async function enviarCorreo(env, { de, para, cc, responderA, asunto, texto, adjuntos = [], idem, etiquetas }) {
+  if (!env.BREVO_API_KEY) throw new ErrorServicio('brevo', 0, 'sin_clave');
+  const marca = idem && env.FEEHUND_KV ? 'correo:' + (await crypto.subtle.digest('SHA-256', te.encode(idem)).then((h) => b64(h).slice(0, 32))) : null;
+  if (marca) {
+    const ya = await env.FEEHUND_KV.get(marca);
+    if (ya && ya !== 'enviando') return ya;
+    if (ya === 'enviando') throw new ErrorServicio('brevo', 409, 'en_curso');
+    await env.FEEHUND_KV.put(marca, 'enviando', { expirationTtl: 120 });
+  }
+  const r = await fetch(brevoBase(env) + '/v3/smtp/email', {
+    method: 'POST',
+    headers: { 'api-key': env.BREVO_API_KEY, 'content-type': 'application/json', accept: 'application/json' },
     body: JSON.stringify({
-      from: de || `Feehund <${REMITE}>`, to: [].concat(para), cc: cc ? [].concat(cc) : undefined,
-      reply_to: responderA ? [].concat(responderA) : undefined, subject: asunto, text: texto, html,
-      attachments: adjuntos.length ? adjuntos.map((a) => ({ filename: a.nombre, content: b64(a.bytes), content_type: a.tipo })) : undefined,
-      tags: etiquetas,
+      sender: { name: nombre70(de?.nombre || 'Feehund'), email: REMITE },
+      to: [].concat(para).map((email) => ({ email })), cc: cc ? [].concat(cc).map((email) => ({ email })) : undefined,
+      replyTo: responderA ? { email: responderA } : undefined, subject: asunto, textContent: texto, htmlContent: html(texto),
+      attachment: adjuntos.length ? adjuntos.map((a) => ({ name: a.nombre, content: b64(a.bytes) })) : undefined,
+      tags: etiquetas?.length ? etiquetas.map((t) => t.value) : undefined,
     }),
   });
   const j = await r.json().catch(() => ({}));
-  if (!r.ok || !j.id) throw new ErrorServicio('resend', r.status, j.name);
-  return j.id;
+  if (!r.ok || !j.messageId) {
+    if (marca) await env.FEEHUND_KV.delete(marca);
+    throw new ErrorServicio('brevo', r.status, j.code);
+  }
+  if (marca) await env.FEEHUND_KV.put(marca, j.messageId, { expirationTtl: 30 * 86400 });
+  return j.messageId;
 }
-/** Último estado del correo en Resend: 'delivered', 'bounced', 'sent', 'delivery_delayed', 'complained'… */
-export async function estadoCorreo(env, id) {
-  const r = await fetch(resendBase(env) + '/emails/' + encodeURIComponent(id), { headers: { authorization: 'Bearer ' + env.RESEND_API_KEY } });
-  if (!r.ok) throw new ErrorServicio('resend', r.status);
-  return (await r.json()).last_event || null;
+/** (fase 2) Cómo va un correo: 'delivered', 'bounced' (rebote, bloqueo, dirección no válida, error) o null si aún no se sabe. */
+export async function estadoCorreo(env, messageId) {
+  const r = await fetch(brevoBase(env) + '/v3/smtp/statistics/events?messageId=' + encodeURIComponent(messageId) + '&days=90', { headers: { 'api-key': env.BREVO_API_KEY, accept: 'application/json' } });
+  if (!r.ok) throw new ErrorServicio('brevo', r.status);
+  const ev = ((await r.json()).events || []).map((e) => e.event);
+  if (ev.includes('delivered')) return 'delivered';
+  if (ev.some((e) => ['hardBounces', 'bounces', 'blocked', 'invalid', 'error'].includes(e))) return 'bounced';
+  return null;
 }
 
 /* ================= Lleida.net Mailcert ================= */

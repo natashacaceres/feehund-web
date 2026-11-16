@@ -1,6 +1,6 @@
 // La persona ve EXACTAMENTE lo mismo con el envío a mano (fase 1, ENVIO_MODO=manual) que con el automático
 // (fase 2, ENVIO_MODO=lleida): mismos correos (asunto, texto, adjuntos) y mismo estado en cada paso.
-// Corre el recorrido entero con functions/_baja/flujo.js, un KV en memoria y el simulador de Stripe/Resend/Lleida.
+// Corre el recorrido entero con functions/_baja/flujo.js, un KV en memoria y el simulador de Stripe/Brevo/Lleida.
 // node --test pruebas/te-damos-de-baja/modos.test.mjs
 import test from 'node:test';
 import assert from 'node:assert/strict';
@@ -26,9 +26,9 @@ function kvMemoria() {
 }
 const entorno = (modo) => ({
   ENVIO_MODO: modo, FEEHUND_KV: kvMemoria(), TOKEN_SECRET: crypto.randomBytes(32).toString('hex'), DATA_KEY: crypto.randomBytes(32).toString('base64'),
-  RESEND_API_KEY: 're_prueba', STRIPE_SECRET_KEY: 'sk_test_prueba', STRIPE_PRODUCT_BAJA: 'prod_prueba', STRIPE_WEBHOOK_SECRET: 'whsec_prueba_local',
+  BREVO_API_KEY: 'xkeysib-prueba', STRIPE_SECRET_KEY: 'sk_test_prueba', STRIPE_PRODUCT_BAJA: 'prod_prueba', STRIPE_WEBHOOK_SECRET: 'whsec_prueba_local',
   LLEIDA_USER: 'prueba', LLEIDA_API_KEY: 'prueba', AVISOS_CORREO: 'equipo@example.com', URL_WEB: 'https://feehund.com',
-  STRIPE_API: SIM, RESEND_API: SIM, LLEIDA_API: SIM + '/cgi-bin/mailcertapi.cgi',
+  STRIPE_API: SIM, BREVO_API: SIM, LLEIDA_API: SIM + '/cgi-bin/mailcertapi.cgi',
 });
 const req = () => new Request('https://feehund.com/api/baja/x', { headers: { 'cf-connecting-ip': '192.0.2.1', 'user-agent': 'prueba' } });
 const correos = async () => (await fetch(SIM + '/correo.json')).json();
@@ -82,6 +82,7 @@ test('envío a mano y automático: la persona recibe los mismos correos y ve lo 
   assert.equal(a.vistas[0].quedan, 1);
   assert.deepEqual(a.suyos[2].adjuntos, ['justificante-FH-REF.pdf', 'solicitud-de-baja-del-contrato-FH-REF.pdf']);
   for (const c of a.suyos) assert.doesNotMatch(c.texto + c.asunto, /al instante|inmediat|\bhoy\b/i); // la promesa es «en 24 horas»
+  for (const c of [...a.suyos, ...b.suyos]) assert.doesNotMatch(c.texto + c.asunto + c.adjuntos.join(' '), /lleida|brevo|stripe|cloudflare/i); // sin nombres de proveedores
 });
 
 test('a los 90 días se archiva (6 años) y se borra lo demás; copia semanal cifrada en R2', async () => {

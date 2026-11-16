@@ -10,7 +10,7 @@ const SECRETO = 'whsec_prueba_local';
 function entorno() {
   const escrituras = [];
   const kv = { get: async () => null, put: async (k) => { escrituras.push(k); }, delete: async (k) => { escrituras.push('borrar ' + k); }, list: async () => ({ keys: [], list_complete: true }) };
-  return { escrituras, env: { FEEHUND_KV: kv, STRIPE_WEBHOOK_SECRET: SECRETO, TOKEN_SECRET: 'x'.repeat(40), DATA_KEY: crypto.randomBytes(32).toString('base64'), RESEND_API_KEY: 're_x', STRIPE_SECRET_KEY: 'sk_x', STRIPE_PRODUCT_BAJA: 'prod_x', AVISOS_CORREO: 'equipo@example.com' } };
+  return { escrituras, env: { FEEHUND_KV: kv, STRIPE_WEBHOOK_SECRET: SECRETO, TOKEN_SECRET: 'x'.repeat(40), DATA_KEY: crypto.randomBytes(32).toString('base64'), BREVO_API_KEY: 'xkeysib-x', STRIPE_SECRET_KEY: 'sk_x', STRIPE_PRODUCT_BAJA: 'prod_x', AVISOS_CORREO: 'equipo@example.com' } };
 }
 function aviso(objeto, { tipo = 'checkout.session.completed', firma } = {}) {
   const cuerpo = JSON.stringify({ id: 'evt_x', type: tipo, data: { object: objeto } });
