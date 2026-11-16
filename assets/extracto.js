@@ -225,7 +225,7 @@
       escDoble: (x, n) => x + " se te escaparon en " + (n === 1 ? "un posible cobro repetido" : n + " posibles cobros repetidos"),
       escComision: (x) => x + " se te escaparon en comisiones del banco",
       escVarios: (x, m) => x + " se te escaparon " + (m >= 12 ? "este año" : m <= 1 ? "este mes" : "en estos " + m + " meses"), escNada: "No se te escapa nada",
-      nada: "No hemos visto cobros que se repitan.", otros: "Otros", recibos: "Recibos que varían", devolvieron: (x) => "Te devolvieron " + x,
+      nada: "No hemos visto cobros que se repitan.", otros: "Otros", recibos: "Recibos que varían", devolvieron: (x) => "Te devolvieron " + x, devoluciones: (n) => (n === 1 ? "1 devolución" : n + " devoluciones"),
       verMas: (n) => "Ver " + n + " más", verMenos: "Ver menos", verDetalle: "Ver todo el detalle", ocultarDetalle: "Ocultar el detalle",
       revisar: "Revisar", anadir: "Añadir", ver: "Ver", darme: "Darme de baja", darBaja: "Dar de baja",
       dobleT: (x) => x + ": posible cobro repetido", dobleL: (i, f) => i + " dos veces, el " + f,
@@ -238,7 +238,7 @@
       escDoble: (x, n) => x + " se t'han escapat en " + (n === 1 ? "un possible cobrament repetit" : n + " possibles cobraments repetits"),
       escComision: (x) => x + " se t'han escapat en comissions del banc",
       escVarios: (x, m) => x + " se t'han escapat " + (m >= 12 ? "aquest any" : m <= 1 ? "aquest mes" : "en aquests " + m + " mesos"), escNada: "No se t'escapa res",
-      nada: "No hem vist cobraments que es repeteixin.", otros: "Altres", recibos: "Rebuts que varien", devolvieron: (x) => "T'han retornat " + x,
+      nada: "No hem vist cobraments que es repeteixin.", otros: "Altres", recibos: "Rebuts que varien", devolvieron: (x) => "T'han retornat " + x, devoluciones: (n) => (n === 1 ? "1 devolució" : n + " devolucions"),
       verMas: (n) => "Veure'n " + n + " més", verMenos: "Veure'n menys", verDetalle: "Veure tot el detall", ocultarDetalle: "Amagar el detall",
       revisar: "Revisar", anadir: "Afegir", ver: "Veure", darme: "Donar-me de baixa", darBaja: "Donar de baixa",
       dobleT: (x) => x + ": possible cobrament repetit", dobleL: (i, f) => i + " dues vegades, el " + f,
@@ -251,7 +251,7 @@
       escDoble: (x, n) => x + " slipped away on " + (n === 1 ? "a possible repeat charge" : n + " possible repeat charges"),
       escComision: (x) => x + " slipped away on bank fees",
       escVarios: (x, m) => x + " slipped away " + (m >= 12 ? "this year" : m <= 1 ? "this month" : "in these " + m + " months"), escNada: "Nothing is slipping away",
-      nada: "We have not seen any repeating charges.", otros: "Other", recibos: "Bills that vary", devolvieron: (x) => "You got " + x + " back",
+      nada: "We have not seen any repeating charges.", otros: "Other", recibos: "Bills that vary", devolvieron: (x) => "You got " + x + " back", devoluciones: (n) => (n === 1 ? "1 refund" : n + " refunds"),
       verMas: (n) => "See " + n + " more", verMenos: "See less", verDetalle: "See all the detail", ocultarDetalle: "Hide the detail",
       revisar: "Check", anadir: "Add", ver: "See", darme: "Cancel it for me", darBaja: "Cancel",
       dobleT: (x) => x + ": possible repeat charge", dobleL: (i, f) => i + " twice, on " + f,
@@ -398,11 +398,15 @@
     }
     $("xVa").hidden = !barras.length;
 
-    // ---- 4. Buenas noticias: una línea con lo que te devolvieron ----
-    const devuelto = ((r.grupos || []).find((g) => g.codigo === "devoluciones") || {}).ids || [];
-    const sumaDev = devuelto.map((id) => porId[id]).filter(Boolean).reduce((t, x) => t + (x.importe || 0), 0);
-    $("xBuena").textContent = T3.devolvieron(eur(sumaDev));
+    // ---- 4. Buenas noticias: una fila con lo que te devolvieron y cuántas veces (sin palabras delicadas) ----
+    const devuelto = (((r.grupos || []).find((g) => g.codigo === "devoluciones") || {}).ids || []).map((id) => porId[id]).filter(Boolean);
+    const sumaDev = devuelto.reduce((t, x) => t + (x.importe || 0), 0);
+    const nDev = devuelto.reduce((t, x) => t + (x.num || 1), 0);
+    if ($("xBuenaT")) { $("xBuenaT").textContent = T3.devolvieron(eur(sumaDev)); $("xBuenaN").textContent = T3.devoluciones(nDev); }
+    else $("xBuena").textContent = T3.devolvieron(eur(sumaDev));
     $("xBuenas").hidden = !(sumaDev > 0);
+    // «¿Otro banco o tarjeta?»: no sale si arriba ya está la acción de añadir el extracto de la tarjeta
+    if ($("xOtro")) $("xOtro").hidden = acciones.some((a) => a.anadir);
 
     // ---- 5. La tarjeta: vista previa y barra fija ----
     const det = $("xDetalle"); if (det) det.hidden = true;
@@ -865,6 +869,10 @@
   $("xDemo").addEventListener("click", () => { contrasenas = {}; ejemplo().then((f) => { f.deEjemplo = true; return analyze(f); }, () => msg($("xErr"), TX.bad)); });
   $("xShare").addEventListener("click", () => share().catch(() => {}));
   if ($("xShare2")) $("xShare2").addEventListener("click", () => share().catch(() => {}));
+  // La barra fija se aparta mientras se ve el botón grande de «Compartir mi tarjeta»: así nunca lo tapa
+  if ($("xBarra") && "IntersectionObserver" in window) {
+    new IntersectionObserver((es) => { for (const e of es) $("xBarra").classList.toggle("r3-barra--fuera", e.isIntersecting); }).observe($("xShare"));
+  }
   if ($("xMas")) $("xMas").addEventListener("click", () => {
     const abrir = $("xMas").getAttribute("aria-expanded") !== "true";
     document.querySelectorAll("#xAcciones .r3-ac--mas").forEach((li) => { li.hidden = !abrir; });

@@ -1553,9 +1553,6 @@ main.art2 p a[href^="http"],main.art2 li a[href^="http"]{text-decoration:underli
 .r3-ac{display:flex;align-items:center;gap:var(--s-3);padding:14px;border-radius:16px;background:var(--over-bg)}
 .r3-ac[hidden]{display:none}
 .r3-ac-logo{flex:none;width:40px;height:40px;border-radius:10px;object-fit:contain;background:#fff}
-.r3-mas-ext{display:grid;justify-items:center;gap:2px;margin-top:var(--s-4);text-align:center}
-.r3-mas-ext p{font:400 16px/1.4 var(--f-text);color:var(--ink)}
-.r3-mas-ext .r3-link{justify-self:center}
 .r3-ac-i{flex:none;display:grid;place-items:center;width:40px;height:40px;border-radius:999px;background:var(--amber);color:var(--ink)}
 .r3-ac-i--tarjeta,.r3-ac-i--baja{background:var(--bg)}
 .r3-ac-i svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
@@ -1581,18 +1578,44 @@ main.art2 p a[href^="http"],main.art2 li a[href^="http"]{text-decoration:underli
 .r3-links{display:grid;justify-items:center;gap:var(--s-1)}
 .r3-links .r3-link{justify-self:center}
 .r3-detalle{margin-top:var(--s-4)}
+/* Mi banco · final de la página (opción A): buenas noticias, ver el detalle, la tarjeta, compartir, otro extracto y el pie */
+#xRes .r3-buena::before{content:none}
+#xRes .r3-buena{display:flex;align-items:center;gap:var(--s-3);width:100%;min-height:64px;padding:14px 16px;border:0;border-radius:16px;background:var(--brand-tint);color:var(--ink);text-align:left;cursor:pointer}
+#xRes .r3-buena:hover{background:var(--fair-bg)}
+#xRes .r3-buena-i{flex:none;display:grid;place-items:center;width:32px;height:32px;border-radius:999px;background:var(--brand)}
+#xRes .r3-buena-i svg{width:18px;height:18px;fill:none;stroke:var(--bg);stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round}
+#xRes .r3-buena-m{flex:1;min-width:0;display:grid;gap:2px}
+#xRes .r3-buena-t{font:700 18px/1.3 var(--f-text)}
+#xRes .r3-buena-n{font:400 16px/1.35 var(--f-text)}
+#xRes .r3-buena-n:empty{display:none}
+#xRes .r3-buena-f{flex:none;width:22px;height:22px;fill:none;stroke:var(--brand-dark);stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+#xRes .r3-ver{font-weight:600}
+#xRes .r3-tarjeta{justify-items:start}
+#xRes .r3-tarjeta[hidden]{display:none}
+#xRes .r3-tarjeta-v{width:min(46%,180px);aspect-ratio:9/16;border-radius:14px;background:var(--tarjeta);overflow:hidden}
+#xRes .r3-tarjeta-i{display:block;width:100%;height:100%;object-fit:cover}
+#xRes .r3-compartir{width:100%;min-height:60px;border:0;border-radius:999px;background:var(--amber);color:var(--ink);font:800 19px/1.2 var(--f-text);cursor:pointer}
+#xRes .r3-compartir:hover{filter:brightness(.96)}
+#xRes .ext-dat{display:inline;margin-top:var(--s-6);text-align:center;font:400 16px/1.4 var(--f-text);color:var(--ink);text-decoration:none}
+#xRes .ext-dat strong{font-weight:700;color:var(--brand)}
+#xRes .ext-dat:hover strong{color:var(--brand-dark);text-decoration:underline}
+#xRes .r3-tarjeta{margin-top:var(--s-4)}
+#xRes .r3-detalle{margin-top:0}
+#xRes .r3-tarjeta-i[hidden]{display:none}
 .r3-detalle[hidden]{display:none}
 .r3-foco{animation:r3-foco 1.6s ease-out}
 @keyframes r3-foco{0%{box-shadow:0 0 0 3px var(--brand)}100%{box-shadow:0 0 0 3px transparent}}
 /* Barra fija para compartir: siempre a mano y sin tapar nada (el cuerpo deja su hueco al final) */
 .r3-barra{position:fixed;left:0;right:0;bottom:0;z-index:40;display:flex;align-items:center;gap:var(--s-3);max-width:560px;margin:0 auto;padding:10px 12px calc(10px + env(safe-area-inset-bottom));background:var(--ink);color:var(--bg);border-radius:18px 18px 0 0}
 .r3-barra[hidden]{display:none}
+.r3-barra{transition:transform .25s ease,visibility .25s}
+.r3-barra.r3-barra--fuera{transform:translateY(110%);visibility:hidden}
 .r3-barra-i{flex:none;width:34px;height:60px;border-radius:6px;object-fit:cover}
 .r3-barra-t{flex:1;min-width:0;display:grid;font:400 15px/1.25 var(--f-text);margin:0}
 .r3-barra-t strong{font:700 16px/1.25 var(--f-text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .r3-barra-b{flex:none;min-height:44px;padding:0 20px;border:0;border-radius:999px;background:var(--amber);color:var(--ink);font:800 16px/1.1 var(--f-text);cursor:pointer}
 body.con-barra{padding-bottom:calc(88px + env(safe-area-inset-bottom))}
-@media (prefers-reduced-motion:reduce){.r3-foco{animation:none;outline:3px solid var(--brand)}}
+@media (prefers-reduced-motion:reduce){.r3-foco{animation:none;outline:3px solid var(--brand)}.r3-barra{transition:none}}
 
 .r3-tarjeta-i[hidden],.r3-barra-i[hidden]{display:none}
 
