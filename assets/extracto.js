@@ -355,7 +355,7 @@
     return c && c.comercio_id ? ROOT + "assets/logos/" + String(c.comercio_id).replace(/_/g, "-") + ".png" : null;
   };
   const eur = (x) => (Math.abs(x) >= 1 ? e0(x) : e2(x)) + " €";
-  let blobTarjeta = null, urlTarjeta = null;
+  let blobTarjeta = null, urlTarjeta = null, turnoTarjeta = 0;
 
   // Abre el detalle de siempre y lleva la vista a lo que se ha tocado
   function abrirDetalle(nodo) {
@@ -500,7 +500,7 @@
 
     // ---- 5. La tarjeta: vista previa y barra fija ----
     const det = $("xDetalle"); if (det) det.hidden = true;
-    const vd = $("xVerDetalle"); if (vd) { vd.textContent = T3.verDetalle; vd.setAttribute("aria-expanded", "false"); }
+    const vd = $("xVerDetalle"); if (vd) { vd.textContent = T3.verDetalle; vd.setAttribute("aria-expanded", "false"); vd.classList.remove("r3-ver--late"); delete vd.dataset.latio; }
     vistaTarjeta().catch(() => {});
   }
 
@@ -513,6 +513,11 @@
     if (!p) { if (caja) caja.hidden = true; if (barra) barra.hidden = true; return; }
     // el botón y la barra salen ya, con el resultado; la imagen llega después (si no llega, compartir la dibuja al pulsar)
     caja.hidden = false; barra.hidden = false; img.hidden = true; mini.hidden = true; $("xBarraNom").textContent = "";
+    // Nunca una caja vacía: si la imagen no llega en 4 s o falla, se oculta la vista previa (el botón sigue y la dibuja al pulsar)
+    const turno = ++turnoTarjeta, vista = img.closest(".r3-tarjeta-v") || img;
+    vista.hidden = false;
+    const sinVista = (motivo, e) => { if (turno !== turnoTarjeta || !img.hidden) return; vista.hidden = true; console.error("Feehund: vista previa de la tarjeta oculta (" + motivo + ")", e || ""); };
+    const espera = setTimeout(() => sinVista("no ha llegado en 4 s"), 4000);
     const ruta = (x) => import(new URL(ROOT + x, location.href).href);
     ruta("assets/extracto/tarjeta.js").then((tm) => Promise.all([tm.preparar(p.id, { idioma: LANG }), ruta("assets/extracto/nucleo/tarjeta.js")])).then(([prep, nt]) => {
       if (personalidad() !== p) return;
@@ -524,8 +529,10 @@
       const blob = await m.generarTarjeta(p.id, p.dato || {}, { idioma: LANG });
       if (personalidad() !== p) return; // ha llegado otro resultado mientras tanto
       blobTarjeta = blob; urlTarjeta = URL.createObjectURL(blob);
-      img.src = urlTarjeta; mini.src = urlTarjeta; img.hidden = false; mini.hidden = false;
-    } catch (e) { console.error("Feehund: vista previa de la tarjeta", e); }
+      img.onerror = () => { clearTimeout(espera); img.hidden = true; sinVista("la imagen no se ha podido mostrar"); };
+      img.onload = () => { clearTimeout(espera); if (turno === turnoTarjeta) vista.hidden = false; };
+      img.src = urlTarjeta; mini.src = urlTarjeta; img.hidden = false; mini.hidden = false; vista.hidden = false;
+    } catch (e) { clearTimeout(espera); sinVista("no se ha podido dibujar", e); }
   }
 
   // «Añadir»: vuelve a la carga con el extracto de ahora en la lista y abre el selector para sumar el de la tarjeta
@@ -959,6 +966,12 @@
   $("xDemo").addEventListener("click", () => { contrasenas = {}; ejemplo().then((f) => { f.deEjemplo = true; return analyze(f); }, () => msg($("xErr"), TX.bad)); });
   $("xShare").addEventListener("click", () => share().catch(() => {}));
   if ($("xShare2")) $("xShare2").addEventListener("click", () => share().catch(() => {}));
+  // «Ver todo el detalle» da unos latidos la primera vez que se ve con cada resultado, y luego se queda quieto
+  if ($("xVerDetalle") && "IntersectionObserver" in window) {
+    new IntersectionObserver((es) => {
+      for (const e of es) if (e.isIntersecting && !e.target.dataset.latio && !$("xRes").hidden) { e.target.dataset.latio = "1"; e.target.classList.add("r3-ver--late"); }
+    }, { threshold: 1 }).observe($("xVerDetalle"));
+  }
   // La barra fija se aparta mientras se ve el botón grande de «Compartir mi tarjeta»: así nunca lo tapa
   if ($("xBarra") && "IntersectionObserver" in window) {
     new IntersectionObserver((es) => { for (const e of es) $("xBarra").classList.toggle("r3-barra--fuera", e.isIntersecting); }).observe($("xShare"));
