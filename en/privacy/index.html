@@ -59,6 +59,13 @@
 </ul>
 <h2>The calculator</h2>
 <p>The amounts and answers are processed in the user's browser and are not sent to or stored on any server.</p>
+<h2>My bank (statement reader)</h2>
+<p>The statement is read in the user's browser. If the browser cannot read all of it, for example a PDF in a layout it does not recognise or a photo, the file is sent encrypted to Anthropic, whose artificial intelligence Claude extracts the transactions and returns them. The controller does not store the file or the transactions on any server.</p>
+<ul class="list">
+<li><strong>Purpose:</strong> reading the statement's transactions to show the result the user asks for.</li>
+<li><strong>Legal basis:</strong> providing the service the user requests by choosing their statement.</li>
+<li><strong>Retention:</strong> the controller keeps nothing. Anthropic processes the request under its API terms.</li>
+</ul>
 <h2>Buying the report</h2>
 <p>Payment is handled by Stripe, which processes the card details; the owner has no access to them. The owner receives the name, email address, billing address and, if provided, the tax ID (NIF) or company name.</p>
 <ul class="list">
@@ -84,6 +91,7 @@
 <ul class="list">
 <li><strong>Cloudflare:</strong> hosting.</li>
 <li><strong>Stripe:</strong> payments.</li>
+<li><strong>Anthropic:</strong> artificial intelligence reading of statements the browser cannot read.</li>
 <li><strong>FormSubmit:</strong> form delivery.</li>
 </ul>
 <p>Some may process data outside the European Economic Area with the safeguards provided for in the RGPD (GDPR), such as standard contractual clauses. No data is passed on to third parties unless required by law.</p>

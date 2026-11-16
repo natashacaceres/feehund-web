@@ -59,6 +59,13 @@
 </ul>
 <h2>La calculadora</h2>
 <p>Los importes y las respuestas se procesan en el navegador del usuario y no se envían ni se guardan en ningún servidor.</p>
+<h2>Mi banco (lector del extracto)</h2>
+<p>El extracto se lee en el navegador del usuario. Si el navegador no puede leerlo entero, por ejemplo un PDF con un formato que no reconoce o una foto, el archivo se envía cifrado a Anthropic, que con su inteligencia artificial Claude extrae los movimientos y los devuelve. El titular no guarda el archivo ni los movimientos en ningún servidor.</p>
+<ul class="list">
+<li><strong>Finalidad:</strong> leer los movimientos del extracto para mostrar el resultado que pide el usuario.</li>
+<li><strong>Base jurídica:</strong> prestación del servicio que el usuario solicita al elegir su extracto.</li>
+<li><strong>Conservación:</strong> el titular no conserva nada. Anthropic trata la petición según sus condiciones de la API.</li>
+</ul>
 <h2>Compra del informe</h2>
 <p>El pago lo gestiona Stripe, que trata los datos de la tarjeta; el titular no tiene acceso a ellos. El titular recibe el nombre, el correo, la dirección de facturación y, si se facilita, el NIF o el nombre de la empresa.</p>
 <ul class="list">
@@ -84,6 +91,7 @@
 <ul class="list">
 <li><strong>Cloudflare:</strong> alojamiento.</li>
 <li><strong>Stripe:</strong> pagos.</li>
+<li><strong>Anthropic:</strong> lectura con inteligencia artificial de los extractos que el navegador no puede leer.</li>
 <li><strong>FormSubmit:</strong> envío de formularios.</li>
 </ul>
 <p>Algunos pueden tratar datos fuera del Espacio Económico Europeo con las garantías previstas en el RGPD, como las cláusulas contractuales tipo. No se ceden datos a terceros salvo obligación legal.</p>

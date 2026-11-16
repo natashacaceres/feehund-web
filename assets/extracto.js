@@ -40,7 +40,7 @@
       veces: (n) => (n === 1 ? "Cobrada 1 vez" : "Cobrada " + n + " veces"), de: (a, b, c) => "De " + a + " a " + b + " € " + c, repetido: (f) => "Repetido el " + f,
       devol: (n, f) => (n === 1 ? "Una devolución, el " + f : n + " devoluciones, la última el " + f), ultimo: (f, x, c) => "Último cargo el " + f + " · " + x + " € " + c,
       tarjeta: "Puede que ahora lo pagues con la tarjeta de crédito.", darBaja: "Dar de baja", darme: "Darme de baja",
-      aDuplicado: ["Pagas dos servicios para lo mismo", (a, b) => a + " y " + b + " hacen lo mismo. Puedes quedarte con uno."], priv: "Se lee en tu dispositivo. No se sube.",
+      aDuplicado: ["Pagas dos servicios para lo mismo", (a, b) => a + " y " + b + " hacen lo mismo. Puedes quedarte con uno."], priv: "Se lee en tu dispositivo. Si no puede, lo lee la IA de Claude sin guardarlo.",
       none: "No ha encontrado cobros que se repitan. Prueba con más meses.", bad: "No se ha podido leer. Prueba con Excel o CSV.", mapeo: "No reconocemos las columnas de este archivo. Prueba a descargarlo en Excel o CSV.",
       dl: "Imagen descargada.", ics: "Archivo de avisos descargado.", sinIcs: "No hay cobros para avisar.", share: (x) => x + " €/año en cobros que se repiten · feehund.com", lista: "Cobros que se repiten" },
     ca: { datafono: "Això és el resum del teu datàfon, no l'extracte del teu compte. Es llegeix a El meu datàfon.", irDatafono: "Anar a El meu datàfon", year: "€/any", menos: " menys/any",
@@ -68,7 +68,7 @@
       veces: (n) => (n === 1 ? "Cobrada 1 vegada" : "Cobrada " + n + " vegades"), de: (a, b, c) => "De " + a + " a " + b + " € " + c, repetido: (f) => "Repetit el " + f,
       devol: (n, f) => (n === 1 ? "Una devolució, el " + f : n + " devolucions, l'última el " + f), ultimo: (f, x, c) => "Últim càrrec el " + f + " · " + x + " € " + c,
       tarjeta: "Potser ara el pagues amb la targeta de crèdit.", darBaja: "Donar de baixa", darme: "Donar-me de baixa",
-      aDuplicado: ["Pagues dos serveis per al mateix", (a, b) => a + " i " + b + " fan el mateix. Pots quedar-te amb un."], priv: "Es llegeix al teu dispositiu. No es puja.",
+      aDuplicado: ["Pagues dos serveis per al mateix", (a, b) => a + " i " + b + " fan el mateix. Pots quedar-te amb un."], priv: "Es llegeix al teu dispositiu. Si no pot, el llegeix la IA de Claude sense desar-lo.",
       none: "No ha trobat cobraments que es repeteixin. Prova amb més mesos.", bad: "No s'ha pogut llegir. Prova amb Excel o CSV.", mapeo: "No reconeixem les columnes d'aquest fitxer. Prova de descarregar-lo en Excel o CSV.",
       dl: "Imatge descarregada.", ics: "Fitxer d'avisos descarregat.", sinIcs: "No hi ha cobraments per avisar.", share: (x) => x + " €/any en cobraments que es repeteixen · feehund.com", lista: "Cobraments que es repeteixen" },
     en: { datafono: "This is your card machine summary, not your bank statement. It goes in My card machine.", irDatafono: "Go to My card machine", year: "€/year", menos: " less/year",
@@ -96,7 +96,7 @@
       veces: (n) => (n === 1 ? "Charged once" : "Charged " + n + " times"), de: (a, b, c) => "From " + a + " to " + b + " € " + c, repetido: (f) => "Repeated on " + f,
       devol: (n, f) => (n === 1 ? "One refund, on " + f : n + " refunds, the last on " + f), ultimo: (f, x, c) => "Last charge on " + f + " · " + x + " € " + c,
       tarjeta: "You may now be paying it with your credit card.", darBaja: "Cancel", darme: "Cancel it for me",
-      aDuplicado: ["Two services for the same thing", (a, b) => a + " and " + b + " do the same. You could keep just one."], priv: "It's read on your device. Nothing is uploaded.",
+      aDuplicado: ["Two services for the same thing", (a, b) => a + " and " + b + " do the same. You could keep just one."], priv: "It's read on your device. If it can't be, Claude's AI reads it without storing it.",
       none: "No recurring charges found. Try with more months.", bad: "The file could not be read. Try Excel or CSV.", mapeo: "We do not recognise the columns in this file. Try downloading it as Excel or CSV.",
       dl: "Image downloaded.", ics: "Reminder file downloaded.", sinIcs: "There are no charges to remind you about.", share: (x) => "€" + x + "/year in recurring charges · feehund.com", lista: "Recurring charges" },
   }[LANG];
@@ -153,6 +153,11 @@
         if (!pedida) break;
         r = await m.analizar(entrada, { idioma: LANG, contrasenas, onProgreso: (p) => { if (cargando && p && p.texto) cargando.textContent = p.texto; } });
       }
+      // Si el dispositivo no lo ha leído entero (filas sin leer, saldo que no cuadra, foto), lo lee Claude
+      if (r && lecturaDudosa(r) && paraIA(entrada).length) {
+        const r2 = await leerConIA(entrada, m).catch((e) => { console.error("Feehund: lectura con IA", e); return null; });
+        if (r2 && mejorLectura(r2, r)) r = r2;
+      }
     } catch (e) { error = e; }
     await new Promise((ok) => setTimeout(ok, Math.max(0, 900 - (Date.now() - t0))));
     if (cargando) cargando.textContent = textoCarga;
@@ -176,6 +181,86 @@
     // Etiqueta «Ejemplo» (#xEjemplo, de Design): solo cuando lo leído es el extracto inventado de ejemplo
     const ej = $("xEjemplo"); if (ej) ej.hidden = !(entrada && entrada.deEjemplo);
     const h = $("xResH"); if (h) h.focus({ preventScroll: true });
+  }
+
+  // ---------- Lectura con IA (Claude) cuando el dispositivo no puede leerlo entero ----------
+  // El archivo va a /api/leer (Cloudflare), que se lo pasa a Claude y devuelve los movimientos sin guardar nada.
+  // Los movimientos vuelven a pasar por el motor de siempre como un CSV: el mismo análisis y la misma comprobación de saldos.
+  const AVISOS_DUDOSOS = ["no_cuadra", "filas_sin_leer"];
+  // Mientras lee, la misma pantalla de carga de siempre (Tiqui olfateando), sin textos de IA (decisión del 16 nov)
+  const TIPO_IA = { pdf: "application/pdf", jpg: "image/jpeg", jpeg: "image/jpeg", png: "image/png", webp: "image/webp", gif: "image/gif" };
+  const tipoIA = (f) => {
+    if (!f || typeof f.name !== "string") return null;
+    const t = (f.type || "").toLowerCase();
+    if (t === "application/pdf" || /^image\/(jpeg|png|webp|gif)$/.test(t)) return t;
+    return TIPO_IA[(f.name.split(".").pop() || "").toLowerCase()] || null;
+  };
+  const archivosDe = (entrada) => (Array.isArray(entrada) ? entrada : [entrada]).filter(Boolean);
+  const paraIA = (entrada) => archivosDe(entrada).filter((f) => tipoIA(f) && f.size > 0 && f.size <= 10 * 1024 * 1024);
+  function lecturaDudosa(r) {
+    const l = r.lectura || {};
+    if (!(l.movimientos || []).length || r.necesita_confirmacion) return true;
+    return (l.avisos || []).some((a) => AVISOS_DUDOSOS.indexOf(a.codigo) >= 0);
+  }
+  // Mejor la de la IA si su saldo cuadra y no lee menos movimientos que el dispositivo
+  function mejorLectura(r2, r) {
+    const n = (x) => ((x.lectura && x.lectura.movimientos) || []).length;
+    if (!n(r2)) return false;
+    const cuadra2 = !((r2.lectura.avisos || []).some((a) => a.codigo === "no_cuadra"));
+    const cuadra = !((r.lectura && r.lectura.avisos) || []).some((a) => a.codigo === "no_cuadra");
+    return (cuadra2 && n(r2) >= n(r) * 0.9) || (!cuadra && n(r2) > n(r));
+  }
+  // Un CSV como los de los bancos: «Fecha;Concepto;Importe;Saldo» con coma decimal
+  function aCSV(movs) {
+    const num = (x) => (x === null || x === undefined || !Number.isFinite(x)) ? "" : x.toFixed(2).replace(".", ",");
+    const fechaES = (f) => /^\d{4}-\d{2}-\d{2}$/.test(f) ? f.slice(8, 10) + "/" + f.slice(5, 7) + "/" + f.slice(0, 4) : f;
+    const lineas = ["Fecha;Concepto;Importe;Saldo"];
+    for (const m of movs) lineas.push([fechaES(m.fecha), String(m.concepto || "").replace(/[;\r\n]+/g, " ").trim(), num(m.importe), num(m.saldo)].join(";"));
+    return lineas.join("\n") + "\n";
+  }
+  async function movimientosConIA(f, cual) {
+    const res = await fetch(ROOT + "api/leer" + (cual === "preciso" ? "?modelo=preciso" : ""), { method: "POST", body: f, headers: { "content-type": tipoIA(f) }, credentials: "omit", cache: "no-store" });
+    if (!res.ok || !res.body || !/event-stream/.test(res.headers.get("content-type") || "")) throw new Error("lectura con IA: " + res.status);
+    const lector = res.body.getReader(), dec = new TextDecoder();
+    let resto = "", texto = "", parada = null;
+    for (;;) {
+      const { done, value } = await lector.read();
+      if (done) break;
+      resto += dec.decode(value, { stream: true });
+      let i;
+      while ((i = resto.indexOf("\n\n")) >= 0) {
+        const ev = resto.slice(0, i); resto = resto.slice(i + 2);
+        const linea = ev.split("\n").find((l) => l.indexOf("data:") === 0);
+        if (!linea) continue;
+        let d; try { d = JSON.parse(linea.slice(5)); } catch (e) { continue; }
+        if (d.type === "content_block_delta" && d.delta && d.delta.type === "text_delta") texto += d.delta.text;
+        else if (d.type === "message_delta" && d.delta) parada = d.delta.stop_reason;
+        else if (d.type === "error") throw new Error("lectura con IA: " + ((d.error && d.error.type) || "error"));
+      }
+    }
+    if (parada === "refusal" || !texto) throw new Error("lectura con IA: sin respuesta");
+    const datos = JSON.parse(texto);
+    return datos && datos.es_extracto !== false && Array.isArray(datos.movimientos) ? datos.movimientos : [];
+  }
+  // Primero el modelo rápido; si su lectura no cuadra con el saldo, el preciso
+  async function leerConIA(entrada, m) {
+    const otros = archivosDe(entrada).filter((f) => !paraIA([f]).length);
+    const pasada = async (cual) => {
+      const leidos = [];
+      for (const f of paraIA(entrada)) {
+        const movs = await movimientosConIA(f, cual);
+        if (movs.length) leidos.push(new File([aCSV(movs)], f.name.replace(/\.[^.]+$/, "") + ".csv", { type: "text/csv" }));
+      }
+      if (!leidos.length) return null;
+      const r = await m.analizar(otros.concat(leidos), { idioma: LANG, contrasenas });
+      if (r) r.leidoConIA = cual;
+      return r;
+    };
+    const rapida = await pasada("rapido").catch((e) => { console.error("Feehund: lectura rápida", e); return null; });
+    if (rapida && !lecturaDudosa(rapida)) return rapida;
+    const precisa = await pasada("preciso").catch((e) => { console.error("Feehund: lectura precisa", e); return null; });
+    if (precisa && (!rapida || mejorLectura(precisa, rapida))) return precisa;
+    return rapida;
   }
 
   /** ¿Lo lee el lector del datáfono con ventas o cobros? Solo se mira cuando aquí no se ha leído ningún movimiento. */
