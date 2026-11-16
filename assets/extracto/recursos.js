@@ -5,7 +5,7 @@
 //   ACTUALIZAR_RECURSOS=1 node --test tests/unit/worker-montaje.test.mjs
 // La versión es una huella de todos los archivos de las listas: cambia en cuanto cambia cualquiera de ellos.
 globalThis.RECURSOS_EXTRACTO = {
-  version: '4c43c6e82a24',
+  version: '9de4d604ecea',
   // Página, fuentes, motor, núcleo, lectores y textos: se guardan al instalar.
   PAGINA: [
     '/extracto/',
@@ -99,6 +99,7 @@ globalThis.RECURSOS_EXTRACTO = {
     '/data/ejemplo.csv',
     '/data/personalidades.json',
     '/data/tarifas-datafono.json',
+    '/data/te-damos-de-baja.json',
     '/vendor/fflate-0.8.3/fflate.mjs',
     '/vendor/papaparse-5.7.0/papaparse.mjs',
     '/vendor/pdfjs-6.5.438/legacy/pdf.min.mjs',
