@@ -599,8 +599,9 @@
   const envioP = fetch(ROOT + "data/bajas-envio.json", { cache: "no-cache" }).then((r) => (r.ok ? r.json() : {})).then((d) => { ENVIO = d || {}; }).catch(() => {});
   const fichaBaja = (c) => (c && c.comercio_id && ENVIO[c.comercio_id]) || null;
   const seDaDeBaja = (c) => Boolean(c && c.tipo === "comercio" && c.comercio_id && c.periodicidad !== "puntual" && SIN_BAJA.indexOf(c.categoria) < 0 && fichaBaja(c));
-  // «Te damos de baja» (envío de pago) apagado hasta que el pago, la firma y el envío funcionen: todos van a la guía gratis
-  const ENVIO_ACTIVO = false;
+  // «Te damos de baja» (envío de pago): encendido con el servicio. Qué empresas lo llevan lo dice data/bajas-envio.json
+  // (campo e), con la misma regla que las guías y el cobro (envio_web.py del motor).
+  const ENVIO_ACTIVO = true;
   const compatible = (c) => Boolean(ENVIO_ACTIVO && seDaDeBaja(c) && fichaBaja(c).e);
   // compatible: «Te damos de baja»; si no, la página con los pasos para hacerlo uno mismo, en el idioma de la página
   const enviarBaja = (c) => compatible(c)
