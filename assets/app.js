@@ -168,7 +168,7 @@ function seguro(I) {
     const peor = filas.reduce((a, r) => (r.ahorro_m < a.ahorro_m ? r : a));
     const fila = Object.assign({}, peor, {
       neto24: Math.min(...filas.map(r => r.neto24)), neto24_espera: Math.min(...filas.map(r => r.neto24_espera)),
-      ano2_max: Math.max(...filas.map(r => r.ano2)) });
+      ano2_max: Math.max(...filas.map(r => r.ano2)), tasa_max: Math.max(...filas.map(r => r.tasa)) });
     ok.push(fila);
   }
   ok.sort((a, b) => Math.max(b.neto24, b.neto24_espera) - Math.max(a.neto24, a.neto24_espera));
@@ -218,6 +218,17 @@ function iniciarUI(){
     es: {
       vYes: "Sí, pagas de más.", vNo: "No, está bien.", noSub: "Ninguna tarifa te ahorra lo bastante para que compense cambiar.",
       payLine: (x, p) => "Ahorras al menos " + x + " al año · Recomendación por " + p,
+      mes: x => "Tu mes: " + x + " con tarjeta", cifraSi: "Pagas de más cada mes, como mínimo", cifraEff: "Pagas por cada 100 € que cobras",
+      claveSi: x => "Cambiando de tarifa ahorras al menos " + x + " al año.",
+      acPagoT: "A quién cambiarte, exactamente", acPagoL: "El plan, cuándo salir y qué pedir", acPagoB: p => "Verlo · " + p,
+      acBajaT: n => "Te damos de baja de " + n, acBajaL: "Enviamos la carta por ti", acBajaB: "Empezar", tuBanco: "tu banco",
+      acFalta: { pagado: ["Mira lo que te cobró el banco", "Está en tu resumen o en tu cuenta"], perm: ["Mira si tienes permanencia", "Está en tu contrato del datáfono"],
+        iva: ["Pregunta si recuperas el IVA", "Te lo dice tu gestoría"], caja: ["Mira si la caja está conectada", "Pregunta a quien te la vendió"] },
+      acMezcla: ["Separa tus ventas por tarjeta", "Tu banco te da el desglose"], acFlojo: ["Revisa tu mes más flojo", "Mira el resumen de ese mes"],
+      acPersona: ["Pide un análisis personalizado", "Una persona revisa tu caso", "Pedirlo"], contestar: "Contestar",
+      barHoy: "Tú, hoy", barMedia: "Media de los bancos, solo comisión", barNueva: "Tarifa recomendada, como mucho",
+      buena2: x => "En 2 años ahorras al menos " + x + ".", buenaMedia: "Pagas menos que la media de los bancos.",
+      verDetalle: "Ver todo el detalle", ocultarDetalle: "Ocultar el detalle",
       vFalta: n => n === 1 ? "Nos falta un dato." : "Nos faltan datos.", falta: l => "Para decirte algo seguro necesitamos " + l + ".", y: " y ",
       faltaN: { pagado: "lo que te cobró el banco ese mes", perm: "si tienes permanencia", iva: "si recuperas el IVA", caja: "si tu datáfono está conectado a la caja" },
       vDuda: "No podemos asegurártelo.", duda: c => "Con tus datos, el ahorro depende de " + c + ". Por eso no te recomendamos nada.",
@@ -241,6 +252,17 @@ function iniciarUI(){
     ca: {
       vYes: "Sí, pagues de més.", vNo: "No, està bé.", noSub: "Cap tarifa t'estalvia prou perquè compensi canviar.",
       payLine: (x, p) => "Estalvies almenys " + x + " l'any · Recomanació per " + p,
+      mes: x => "El teu mes: " + x + " amb targeta", cifraSi: "Pagues de més cada mes, com a mínim", cifraEff: "Pagues per cada 100 € que cobres",
+      claveSi: x => "Canviant de tarifa estalvies almenys " + x + " l'any.",
+      acPagoT: "A qui canviar-te, exactament", acPagoL: "El pla, quan sortir i què demanar", acPagoB: p => "Veure-ho · " + p,
+      acBajaT: n => "Et donem de baixa de " + n, acBajaL: "Enviem la carta per tu", acBajaB: "Començar", tuBanco: "el teu banc",
+      acFalta: { pagado: ["Busca el que et cobra el banc", "És al resum o al compte"], perm: ["Mira si tens permanència", "És al contracte del datàfon"],
+        iva: ["Pregunta si recuperes l'IVA", "T'ho diu la gestoria"], caja: ["Mira si la caixa està connectada", "Pregunta a qui te la va vendre"] },
+      acMezcla: ["Separa les vendes per targeta", "El banc et dona el desglossament"], acFlojo: ["Revisa el teu mes més fluix", "Mira el resum d'aquell mes"],
+      acPersona: ["Demana una anàlisi personalitzada", "Una persona revisa el teu cas", "Demanar-la"], contestar: "Respondre",
+      barHoy: "Tu, avui", barMedia: "Mitjana dels bancs, només comissió", barNueva: "Tarifa recomanada, com a màxim",
+      buena2: x => "En 2 anys estalvies almenys " + x + ".", buenaMedia: "Pagues menys que la mitjana dels bancs.",
+      verDetalle: "Veure tot el detall", ocultarDetalle: "Amagar el detall",
       vFalta: n => n === 1 ? "Ens falta una dada." : "Ens falten dades.", falta: l => "Per dir-te alguna cosa segura necessitem " + l + ".", y: " i ",
       faltaN: { pagado: "el que et va cobrar el banc aquell mes", perm: "si tens permanència", iva: "si recuperes l'IVA", caja: "si el teu datàfon està connectat a la caixa" },
       vDuda: "No t'ho podem assegurar.", duda: c => "Amb les teves dades, l'estalvi depèn de " + c + ". Per això no et recomanem res.",
@@ -264,6 +286,17 @@ function iniciarUI(){
     en: {
       vYes: "Yes, you are paying too much.", vNo: "No, you are fine.", noSub: "No rate saves you enough to make switching worth it.",
       payLine: (x, p) => "You save at least " + x + " a year · Recommendation for " + p,
+      mes: x => "Your month: " + x + " by card", cifraSi: "You overpay each month, at least", cifraEff: "You pay per €100 you take",
+      claveSi: x => "Switching rates saves you at least " + x + " a year.",
+      acPagoT: "Who to switch to, exactly", acPagoL: "The plan, when to leave, what to ask", acPagoB: p => "See it · " + p,
+      acBajaT: n => "We cancel " + n + " for you", acBajaL: "We send the letter for you", acBajaB: "Start", tuBanco: "your bank",
+      acFalta: { pagado: ["Find what your bank charged you", "It's on your statement or account"], perm: ["Check your minimum term", "It's in your card machine contract"],
+        iva: ["Ask if you reclaim VAT", "Your accountant will know"], caja: ["Check if your till is linked", "Ask whoever sold it to you"] },
+      acMezcla: ["Split your sales by card", "Your bank can give you the breakdown"], acFlojo: ["Check your quietest month", "Look at that month's statement"],
+      acPersona: ["Ask for a personal review", "A person looks at your case", "Ask"], contestar: "Answer",
+      barHoy: "You, today", barMedia: "Bank average, fee only", barNueva: "Recommended rate, at most",
+      buena2: x => "In 2 years you save at least " + x + ".", buenaMedia: "You pay less than the bank average.",
+      verDetalle: "See all the detail", ocultarDetalle: "Hide the detail",
       vFalta: n => n === 1 ? "We're missing one answer." : "We're missing some answers.", falta: l => "To give you a sure answer we need " + l + ".", y: " and ",
       faltaN: { pagado: "what your bank charged you that month", perm: "whether you have a minimum term", iva: "whether you reclaim VAT", caja: "whether your card machine is linked to your till" },
       vDuda: "We can't be sure.", duda: c => "With your answers, the saving depends on " + c + ". So we don't recommend anything.",
@@ -445,32 +478,93 @@ function iniciarUI(){
     requestAnimationFrame(() => goTo($("res"), true));
   }
   const lista = (xs, t) => xs.length < 2 ? xs.join("") : xs.slice(0, -1).join(", ") + t.y + xs[xs.length - 1];
+  // Resultado con el mismo orden que «Mi banco»: el mes leído, la frase de Tiqui, la cifra, lo importante,
+  // qué hacer ahora (3 como mucho), las barras de lo que pagas por cada 100 €, una buena noticia, compartir y el detalle.
+  const LOGOS = { "BBVA": "bancos/bbva", "CaixaBank": "bancos/caixabank", "Santander-Getnet": "bancos/santander", "Sabadell": "bancos/sabadell",
+    "Bankinter": "bancos/bankinter", "Unicaja": "bancos/unicaja", "Cajamar": "bancos/cajamar", "Abanca": "bancos/abanca", "Ibercaja": "bancos/ibercaja",
+    "Revolut": "bancos/revolut", "SumUp": "sumup", "Zettle": "zettle" };
+  const el = (tag, cls, txt) => { const e = document.createElement(tag); if (cls) e.className = cls; if (txt != null) e.textContent = txt; return e; };
+  function irAPaso(i){ tok++; hideOut(); pp.hidden = false; showStep(i, true); goTo(pp, true); }
   function fill(){
-    const { I, R, S } = last, t = T(), b = R && R.best, yes = S.estado === "si";
+    const { I, R, S } = last, t = T(), b = R && R.best, yes = S.estado === "si", no = S.estado === "no";
     const wait = yes && (I.MREM || 0) > 0 && b.neto24_espera > b.neto24;
-    $("rVerdict").textContent = yes ? t.vYes : S.estado === "no" ? t.vNo : S.estado === "falta" ? t.vFalta(S.faltan.length) : t.vDuda;
-    $("rHero").hidden = $("rFacts").hidden = !yes; $("rNo").hidden = yes;
-    $("rNo").textContent = S.estado === "no" ? t.noSub : S.estado === "falta" ? t.falta(lista(S.faltan.map(k => t.faltaN[k]), t)) : t.duda(lista(S.causas.map(k => t.dudaC[k]), t));
-    // Sin respuesta segura no hay nada que compartir; lo que paga por cada 100 € solo si sabemos lo que paga
-    $("rShare").hidden = !yes && S.estado !== "no";
-    const cmp = $("rEff").closest(".cmp"); if (cmp) cmp.hidden = !(I.curCost > 0);
+    const sabe = I.curCost > 0 && I.V > 0, hoy = sabe ? I.curCost / I.V * 100 : null, ref = REFERENCIA;
+    // 1 y 2: el mes y la frase de Tiqui
+    $("rMes").textContent = t.mes(eur(I.V));
+    $("rVerdict").textContent = yes ? t.vYes : no ? t.vNo : S.estado === "falta" ? t.vFalta(S.faltan.length) : t.vDuda;
+    // 3: la cifra (lo que pagas de más al mes, como mínimo; si no compensa, lo que pagas por cada 100 €)
+    $("rHero").hidden = !(yes || sabe);
+    $("rPre").textContent = yes ? t.cifraSi : t.cifraEff;
+    $("rBig").textContent = yes ? eur(Math.max(0, b.ahorro_m)) : sabe ? eur(hoy, 2) : "";
+    // 4: lo importante (azul claro si es buena noticia, ámbar si hay algo que hacer)
+    const clave = $("rNo");
+    clave.dataset.ok = no ? "si" : "no";
+    clave.textContent = yes ? t.claveSi(eur(anual(R))) : no ? t.noSub : S.estado === "falta" ? t.falta(lista(S.faltan.map(k => t.faltaN[k]), t)) : t.duda(lista(S.causas.map(k => t.dudaC[k]), t));
+    // 5: qué hacer ahora
+    const acc = [];
     if (yes) {
-      $("rPre").textContent = t.pre;
-      $("rBig").textContent = t.one(eur(Math.max(0, b.ahorro_m)));
-      $("rPost").textContent = t.post;
+      acc.push({ t: t.acPagoT, l: t.acPagoL, b: t.acPagoB(precio()), fn: () => { const pay = $("pay"); goTo(pay, true); const c = $("payOk"); if (c) c.focus({ preventScroll: true }); } });
+      const plan = PLANS.find(p => p.id === I.cur), prov = plan ? plan.prov : "";
+      const nombre = prov === "Santander-Getnet" ? "Santander" : prov;
+      acc.push({ logo: LOGOS[prov] ? "/assets/logos/" + LOGOS[prov] + ".png" : null, t: t.acBajaT(nombre || t.tuBanco), l: t.acBajaL, b: t.acBajaB, fn: () => { const a = $("rBajaA"); if (a) location.href = a.href; } });
+    } else if (S.estado === "falta") {
+      const paso = { pagado: 3, perm: 5, iva: 8, caja: 9 };
+      for (const k of S.faltan) acc.push({ t: t.acFalta[k][0], l: t.acFalta[k][1], b: t.contestar, fn: () => irAPaso(paso[k]) });
+    } else if (S.estado === "duda") {
+      if (S.causas.indexOf("mezcla") >= 0) acc.push({ t: t.acMezcla[0], l: t.acMezcla[1], b: t.contestar, fn: () => irAPaso(0) });
+      if (S.causas.indexOf("flojo") >= 0) acc.push({ t: t.acFlojo[0], l: t.acFlojo[1], b: t.contestar, fn: () => irAPaso(2) });
+      if (S.causas.indexOf("tarifas") >= 0) acc.push({ t: t.acPersona[0], l: t.acPersona[1], b: t.acPersona[2], fn: () => $("ctaBtn").click() });
+    }
+    const ul = $("rAcciones"); ul.textContent = "";
+    acc.slice(0, 3).forEach(a => {
+      const li = el("li", "r3-ac");
+      if (a.logo) { const ic = el("img", "r3-ac-logo"); ic.alt = ""; ic.width = 40; ic.height = 40; ic.decoding = "async"; ic.src = a.logo; ic.addEventListener("error", () => ic.remove()); li.appendChild(ic); }
+      const m = el("div", "r3-ac-m"); m.appendChild(el("p", "r3-ac-t", a.t)); m.appendChild(el("p", "r3-ac-l", a.l)); li.appendChild(m);
+      const btn = el("button", "r3-btn", a.b); btn.type = "button"; btn.addEventListener("click", a.fn); li.appendChild(btn);
+      ul.appendChild(li);
+    });
+    $("rHacer").hidden = !acc.length;
+    // 6: barras de lo que pagas por cada 100 € (tú hoy, la media de los bancos y, si compensa, la tarifa recomendada como mucho)
+    const barras = [];
+    if (sabe) barras.push({ n: t.barHoy, v: hoy });
+    if (sabe && ref) barras.push({ n: t.barMedia, v: ref.valor });
+    if (yes && b.tasa_max != null) barras.push({ n: t.barNueva, v: b.tasa_max * 100 });
+    const lb = $("rBarras"); lb.textContent = "";
+    const maximo = Math.max(...barras.map(x => x.v), 0.01);
+    for (const x of barras) {
+      const li = el("li"), caja = el("div", "r3-bar");
+      const fila = el("span", "r3-bar-f"); fila.appendChild(el("span", "r3-bar-n", x.n)); fila.appendChild(el("span", "r3-bar-v", eur(x.v, 2)));
+      const pista = el("span", "r3-bar-p"), lleno = el("span", "r3-bar-l"); lleno.style.width = Math.max(2, Math.round(x.v / maximo * 100)) + "%";
+      pista.appendChild(lleno); caja.appendChild(fila); caja.appendChild(pista); li.appendChild(caja); lb.appendChild(li);
+    }
+    $("rCien").hidden = barras.length < 2;
+    // 7: una buena noticia
+    const buena = yes ? t.buena2(eur(Math.max(0, wait ? b.neto24_espera : b.neto24))) : no && sabe && ref && hoy < ref.valor ? t.buenaMedia : "";
+    $("rBuena").textContent = buena; $("rBuenas").hidden = !buena;
+    // 8: compartir (solo con una respuesta segura) y el detalle
+    $("rShare").hidden = !yes && !no;
+    $("rDetalle").hidden = true; $("rVerDetalle").setAttribute("aria-expanded", "false"); $("rVerDetalle").textContent = t.verDetalle;
+    $("rFacts").hidden = !yes;
+    const cmp = $("rEff").closest(".cmp"); if (cmp) cmp.hidden = !sabe;
+    $("rVerDetalle").hidden = !yes && !sabe;
+    if (yes) {
       $("f24").textContent = eur(Math.max(0, wait ? b.neto24_espera : b.neto24));
       const pb = b.payback;
       $("fPay").textContent = typeof pb === "number" ? (pb < 1 ? t.instant : t.months(Math.ceil(pb))) : "—";
       $("fCheap").textContent = S.ok.length;
       $("fCheapK").textContent = t.cheap(SIM.length);
     }
-    $("rEff").textContent = I.curCost > 0 && I.V > 0 ? eur(I.curCost / I.V * 100, 2) : "—";
-    const ref = REFERENCIA;
+    $("rEff").textContent = sabe ? eur(hoy, 2) : "—";
     $("rRef").hidden = !ref;
     if (ref) $("rRef").textContent = t.ref(String(ref.valor).replace(".", ","), ref.periodo ? ref.periodo + ", " : "");
     if (yes) $("payLine").textContent = t.payLine(eur(anual(R)), precio());
     if (!$("informe").hidden && last.I) fillInforme();
   }
+  $("rVerDetalle").addEventListener("click", () => {
+    const d = $("rDetalle"), abrir = d.hidden, t = T();
+    d.hidden = !abrir; $("rVerDetalle").setAttribute("aria-expanded", String(abrir)); $("rVerDetalle").textContent = abrir ? t.ocultarDetalle : t.verDetalle;
+    if (abrir) d.scrollIntoView({ behavior: reduced() ? "auto" : "smooth", block: "nearest" });
+  });
   async function shareCard(){
     if (!last) return;
     const t = T(), yes = last.S.estado === "si", url = location.origin + location.pathname;

@@ -1595,3 +1595,18 @@ body.con-barra{padding-bottom:calc(88px + env(safe-area-inset-bottom))}
 @media (prefers-reduced-motion:reduce){.r3-foco{animation:none;outline:3px solid var(--brand)}}
 
 .r3-tarjeta-i[hidden],.r3-barra-i[hidden]{display:none}
+
+/* ===== Mi datáfono · resultado con el mismo orden y estilo que «Mi banco» (16 nov 2026) ===== */
+#res .r3{--f-text:"Feehund Cifras","Atkinson Hyperlegible Next",system-ui,sans-serif}
+#res .r3-cifras{display:grid;gap:var(--s-5)}
+#res .r3-buena{cursor:default}
+#res .r3-frase:focus{outline:none}
+#res .r3-frase:focus-visible{outline:2px solid var(--brand);outline-offset:2px}
+#res .r3-detalle{display:grid;gap:var(--s-4)}
+/* «Te damos de baja» ya va como una fila de «Qué hacer ahora» */
+#rBaja{display:none!important}
+/* en la calculadora los botones heredan el color: aquí, blanco sobre petróleo y enlaces en petróleo, como en «Mi banco» */
+#res .r3-btn,#res .r3-btn:hover{color:var(--bg)}
+#res .r3-link{color:var(--brand);font:700 16px/1.2 var(--f-text)}
+#res .r3-compartir{color:var(--ink)}
+#res .r3-bar{cursor:default}
