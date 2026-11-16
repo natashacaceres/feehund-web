@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
-  <url><loc>https://feehund.com/blog/</loc><lastmod>2026-11-11</lastmod></url>
+  <url><loc>https://feehund.com/blog/</loc><lastmod>2026-11-16</lastmod></url>
   <url><loc>https://feehund.com/blog/comparativas-datafonos/</loc><lastmod>2026-10-30</lastmod></url>
   <url><loc>https://feehund.com/blog/resumen-datafono/</loc><lastmod>2026-11-04</lastmod></url>
   <url><loc>https://feehund.com/blog/devolver-recibo-seguro/</loc><lastmod>2026-11-10</lastmod></url>
@@ -429,12 +429,12 @@
   <url><loc>https://feehund.com/ca/baixa/zettle/</loc><lastmod>2026-11-12</lastmod></url>
   <url><loc>https://feehund.com/ca/baixa/zoom/</loc><lastmod>2026-11-12</lastmod></url>
   <url><loc>https://feehund.com/ca/baixa/zurich/</loc><lastmod>2026-11-12</lastmod></url>
-  <url><loc>https://feehund.com/ca/blog/</loc><lastmod>2026-11-12</lastmod></url>
+  <url><loc>https://feehund.com/ca/blog/</loc><lastmod>2026-11-16</lastmod></url>
   <url><loc>https://feehund.com/ca/condicions/</loc><lastmod>2026-11-12</lastmod></url>
   <url><loc>https://feehund.com/ca/contacte/</loc><lastmod>2026-11-12</lastmod></url>
   <url><loc>https://feehund.com/ca/galetes/</loc><lastmod>2026-11-12</lastmod></url>
   <url><loc>https://feehund.com/ca/privacitat/</loc><lastmod>2026-11-12</lastmod></url>
-  <url><loc>https://feehund.com/en/blog/</loc><lastmod>2026-11-12</lastmod></url>
+  <url><loc>https://feehund.com/en/blog/</loc><lastmod>2026-11-16</lastmod></url>
   <url><loc>https://feehund.com/en/cancel/abc/</loc><lastmod>2026-11-12</lastmod></url>
   <url><loc>https://feehund.com/en/cancel/acnur/</loc><lastmod>2026-11-12</lastmod></url>
   <url><loc>https://feehund.com/en/cancel/adamo/</loc><lastmod>2026-11-12</lastmod></url>
@@ -640,4 +640,7 @@
   <url><loc>https://feehund.com/blog/baja-mas-facil/</loc><lastmod>2026-11-13</lastmod></url>
   <url><loc>https://feehund.com/ca/blog/baja-mas-facil/</loc><lastmod>2026-11-13</lastmod></url>
   <url><loc>https://feehund.com/en/blog/baja-mas-facil/</loc><lastmod>2026-11-13</lastmod></url>
+  <url><loc>https://feehund.com/blog/devolver-recibo/</loc><lastmod>2026-11-16</lastmod></url>
+  <url><loc>https://feehund.com/ca/blog/devolver-recibo/</loc><lastmod>2026-11-16</lastmod></url>
+  <url><loc>https://feehund.com/en/blog/devolver-recibo/</loc><lastmod>2026-11-16</lastmod></url>
 </urlset>
