@@ -1501,6 +1501,12 @@ details.opc summary:hover{background:var(--brand-tint);border-radius:11px}
 .bk-q-w{position:relative;display:block}
 .bk-q-logo{position:absolute;left:12px;top:50%;width:26px;height:26px;margin-top:-13px;border-radius:7px;object-fit:contain;background:#fff;pointer-events:none}
 .bk-q-logo[hidden]{display:none}
+/* X del buscador de bancos: siempre visible con la lista abierta o algo escrito (sustituye a la flecha y a la X del navegador) */
+.bk-q::-webkit-search-cancel-button{-webkit-appearance:none;appearance:none;display:none}
+.bk-q.bk-q--x{background-image:none}
+.bk-qx{position:absolute;right:2px;top:50%;width:44px;height:44px;margin-top:-22px;padding:0;border:0;border-radius:10px;cursor:pointer;background:transparent url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%230E5E6F' stroke-width='2.4' stroke-linecap='round'%3E%3Cpath d='M6 6l12 12M18 6L6 18'/%3E%3C/svg%3E") center/20px no-repeat}
+.bk-qx:focus-visible{outline:2px solid var(--brand);outline-offset:-2px}
+.bk-qx[hidden]{display:none}
 .bk-q.bk-q--logo{padding-left:50px}
 
 /* Blog: los enlaces a fuentes dentro del texto se distinguen también sin color (subrayados) */

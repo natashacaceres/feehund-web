@@ -6,9 +6,9 @@
   const caja = document.getElementById("xBk"); if (!caja) return;
   const L = ["es", "ca", "en"].indexOf(document.documentElement.lang) >= 0 ? document.documentElement.lang : "es";
   const TX = {
-    es: { app: "En la app", web: "En la web", fmt: (f) => "Se descarga en " + f + ".", meses: (n) => n === 1 ? "Cada archivo es de un mes." : "Hasta " + n + " meses.", rev: (b, f) => "Comprobado el " + f + " con la ayuda oficial de " + b + ".", sin: (b) => "Todavía no tenemos comprobados los pasos de " + b + ".", otro: "Cambiar de banco", nada: "No lo tenemos todavía.", o: " o " },
-    ca: { app: "A l'app", web: "Al web", fmt: (f) => "Es descarrega en " + f + ".", meses: (n) => n === 1 ? "Cada fitxer és d'un mes." : "Fins a " + n + " mesos.", rev: (b, f) => "Comprovat el " + f + " amb l'ajuda oficial de " + b + ".", sin: (b) => "Encara no tenim comprovats els passos de " + b + ".", otro: "Canviar de banc", nada: "Encara no el tenim.", o: " o " },
-    en: { app: "In the app", web: "On the website", fmt: (f) => "Downloads as " + f + ".", meses: (n) => n === 1 ? "Each file covers one month." : "Up to " + n + " months.", rev: (b, f) => "Checked on " + f + " against " + b + "'s official help (steps in Spanish).", sin: (b) => "We have not checked the steps for " + b + " yet.", otro: "Change bank", nada: "Not available yet.", o: " or " },
+    es: { app: "En la app", web: "En la web", fmt: (f) => "Se descarga en " + f + ".", meses: (n) => n === 1 ? "Cada archivo es de un mes." : "Hasta " + n + " meses.", rev: (b, f) => "Comprobado el " + f + " con la ayuda oficial de " + b + ".", sin: (b) => "Todavía no tenemos comprobados los pasos de " + b + ".", otro: "Cambiar de banco", cerrarX: "Borrar y cerrar", nada: "No lo tenemos todavía.", o: " o " },
+    ca: { app: "A l'app", web: "Al web", fmt: (f) => "Es descarrega en " + f + ".", meses: (n) => n === 1 ? "Cada fitxer és d'un mes." : "Fins a " + n + " mesos.", rev: (b, f) => "Comprovat el " + f + " amb l'ajuda oficial de " + b + ".", sin: (b) => "Encara no tenim comprovats els passos de " + b + ".", otro: "Canviar de banc", cerrarX: "Esborrar i tancar", nada: "Encara no el tenim.", o: " o " },
+    en: { app: "In the app", web: "On the website", fmt: (f) => "Downloads as " + f + ".", meses: (n) => n === 1 ? "Each file covers one month." : "Up to " + n + " months.", rev: (b, f) => "Checked on " + f + " against " + b + "'s official help (steps in Spanish).", sin: (b) => "We have not checked the steps for " + b + " yet.", otro: "Change bank", cerrarX: "Clear and close", nada: "Not available yet.", o: " or " },
   }[L];
   const general = document.getElementById("xBkGeneral"), etiqueta = caja.querySelector(".bk-l"), q = document.getElementById("xBkQ"), lista = document.getElementById("xBkLista"), pasos = document.getElementById("xBkPasos");
   const raiz = (document.currentScript && document.currentScript.dataset.root) || "../";
@@ -27,13 +27,30 @@
   };
   // el logo del banco elegido, dentro del buscador a la izquierda del nombre (una imagen encima del campo, sin estilos
   // en línea: la CSP no los deja en Safari)
-  let logoQ = null;
+  let logoQ = null, botonX = null;
+  const montar = () => {
+    if (logoQ) return;
+    const envoltorio = el("span", "bk-q-w"); q.parentNode.insertBefore(envoltorio, q); envoltorio.appendChild(q);
+    logoQ = el("img", "bk-q-logo"); logoQ.alt = ""; logoQ.width = 26; logoQ.height = 26; logoQ.hidden = true; envoltorio.appendChild(logoQ);
+    logoQ.addEventListener("error", () => { logoQ.hidden = true; q.classList.remove("bk-q--logo"); });
+    // X siempre a mano (lista abierta o algo escrito): borra, olvida el banco y cierra todo
+    botonX = el("button", "bk-qx"); botonX.type = "button"; botonX.setAttribute("aria-label", TX.cerrarX); botonX.hidden = true;
+    botonX.addEventListener("mousedown", (e) => e.preventDefault());
+    botonX.addEventListener("click", () => {
+      q.value = ""; vaciar(); cerrar(); q.blur();
+      if (q.hidden) { q.hidden = false; if (etiqueta) etiqueta.hidden = false; }
+      ponerX();
+    });
+    envoltorio.appendChild(botonX);
+  };
+  // la X se ve si hay algo escrito o la lista está abierta; si no, la flecha del desplegable
+  const ponerX = () => {
+    if (!botonX) return;
+    const ver = q.value !== "" || !lista.hidden;
+    botonX.hidden = !ver; q.classList.toggle("bk-q--x", ver);
+  };
   const logoEnBuscador = (b) => {
-    if (!logoQ) {
-      const envoltorio = el("span", "bk-q-w"); q.parentNode.insertBefore(envoltorio, q); envoltorio.appendChild(q);
-      logoQ = el("img", "bk-q-logo"); logoQ.alt = ""; logoQ.width = 26; logoQ.height = 26; logoQ.hidden = true; envoltorio.appendChild(logoQ);
-      logoQ.addEventListener("error", () => { logoQ.hidden = true; q.classList.remove("bk-q--logo"); });
-    }
+    montar();
     const con = Boolean(b && b.logo);
     if (con) logoQ.src = raiz + "assets/logos/bancos/" + b.id + ".png";
     logoQ.hidden = !con; q.classList.toggle("bk-q--logo", con);
@@ -56,6 +73,7 @@
     }
     if (!vis.length) lista.appendChild(el("li", "bk-nada", TX.nada + (general ? " " + general.textContent : "")));
     lista.hidden = false;
+    ponerX();
   }
 
   // buscador vacío (la X o borrar a mano): se olvida el banco elegido y se cierran sus pasos
@@ -65,7 +83,7 @@
     try { localStorage.removeItem("feehund-banco"); } catch (e) {}
   }
 
-  function cerrar() { if (!q.hidden) { lista.hidden = true; q.setAttribute("aria-expanded", "false"); } }
+  function cerrar() { if (!q.hidden) { lista.hidden = true; q.setAttribute("aria-expanded", "false"); } ponerX(); }
 
   function elegir(b) {
     try { localStorage.setItem("feehund-banco", b.id); } catch (e) {}
@@ -94,11 +112,13 @@
     // el banco elegido se queda escrito en el buscador; el botón «Elegir extracto» sigue justo debajo y los pasos, después
     q.value = b.n; q.dataset.elegido = b.n; logoEnBuscador(b);
     lista.hidden = true; q.setAttribute("aria-expanded", "false"); pasos.hidden = false;
+    ponerX();
   }
 
   // se pide desde el <head> (preload) para que el buscador esté listo nada más abrir la página
   fetch(raiz + "data/bancos-descarga.json").then((r) => r.ok ? r.json() : []).then((d) => {
     bancos = d || []; if (!bancos.length) { caja.hidden = true; return; }
+    montar();
     q.setAttribute("role", "combobox"); q.setAttribute("aria-controls", "xBkLista"); q.setAttribute("aria-expanded", "false");
     lista.setAttribute("role", "listbox");
     // al escribir otro nombre, el logo del banco elegido se quita (vuelve si se deja el nombre como estaba)
