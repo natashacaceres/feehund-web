@@ -1593,3 +1593,5 @@ main.art2 p a[href^="http"],main.art2 li a[href^="http"]{text-decoration:underli
 .r3-barra-b{flex:none;min-height:44px;padding:0 20px;border:0;border-radius:999px;background:var(--amber);color:var(--ink);font:800 16px/1.1 var(--f-text);cursor:pointer}
 body.con-barra{padding-bottom:calc(88px + env(safe-area-inset-bottom))}
 @media (prefers-reduced-motion:reduce){.r3-foco{animation:none;outline:3px solid var(--brand)}}
+
+.r3-tarjeta-i[hidden],.r3-barra-i[hidden]{display:none}

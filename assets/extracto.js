@@ -413,16 +413,23 @@
   // La tarjeta se dibuja una vez al salir el resultado, en este dispositivo y sin guardarse; compartir usa la misma
   async function vistaTarjeta() {
     blobTarjeta = null; if (urlTarjeta) { URL.revokeObjectURL(urlTarjeta); urlTarjeta = null; }
-    const p = personalidad(), caja = $("xTarjeta"), barra = $("xBarra");
+    const p = personalidad(), caja = $("xTarjeta"), barra = $("xBarra"), img = $("xTarjetaImg"), mini = $("xBarraImg");
     if (!p) { if (caja) caja.hidden = true; if (barra) barra.hidden = true; return; }
-    const [m, tm, nt] = await Promise.all([motor(), import(new URL(ROOT + "assets/extracto/tarjeta.js", location.href).href), import(new URL(ROOT + "assets/extracto/nucleo/tarjeta.js", location.href).href)]);
-    const [blob, prep] = await Promise.all([m.generarTarjeta(p.id, p.dato || {}, { idioma: LANG }), tm.preparar(p.id, { idioma: LANG })]);
-    if (personalidad() !== p) return; // ha llegado otro resultado mientras tanto
-    blobTarjeta = blob; urlTarjeta = URL.createObjectURL(blob);
-    const t = prep.t, nombre = nt.rellenar(Array.isArray(t.lineas) && t.lineas.length ? t.lineas.join(" ") : t.nombre, p.dato || {}, LANG);
-    $("xTarjetaImg").src = urlTarjeta; $("xTarjetaImg").alt = (t.cabecera || "") + " " + nombre;
-    $("xBarraImg").src = urlTarjeta; $("xBarraNom").textContent = nombre;
-    caja.hidden = false; barra.hidden = false;
+    // el botón y la barra salen ya, con el resultado; la imagen llega después (si no llega, compartir la dibuja al pulsar)
+    caja.hidden = false; barra.hidden = false; img.hidden = true; mini.hidden = true; $("xBarraNom").textContent = "";
+    const ruta = (x) => import(new URL(ROOT + x, location.href).href);
+    ruta("assets/extracto/tarjeta.js").then((tm) => Promise.all([tm.preparar(p.id, { idioma: LANG }), ruta("assets/extracto/nucleo/tarjeta.js")])).then(([prep, nt]) => {
+      if (personalidad() !== p) return;
+      const t = prep.t, nombre = nt.rellenar(Array.isArray(t.lineas) && t.lineas.length ? t.lineas.join(" ") : t.nombre, p.dato || {}, LANG);
+      $("xBarraNom").textContent = nombre; img.alt = (t.cabecera || "") + " " + nombre;
+    }).catch((e) => console.error("Feehund: nombre de la personalidad", e));
+    try {
+      const m = await motor();
+      const blob = await m.generarTarjeta(p.id, p.dato || {}, { idioma: LANG });
+      if (personalidad() !== p) return; // ha llegado otro resultado mientras tanto
+      blobTarjeta = blob; urlTarjeta = URL.createObjectURL(blob);
+      img.src = urlTarjeta; mini.src = urlTarjeta; img.hidden = false; mini.hidden = false;
+    } catch (e) { console.error("Feehund: vista previa de la tarjeta", e); }
   }
 
   // «Añadir»: vuelve a la carga con el extracto de ahora en la lista y abre el selector para sumar el de la tarjeta
