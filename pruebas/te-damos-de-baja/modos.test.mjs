@@ -83,3 +83,36 @@ test('envío a mano y automático: la persona recibe los mismos correos y ve lo 
   assert.deepEqual(a.suyos[2].adjuntos, ['justificante-FH-REF.pdf', 'solicitud-de-baja-del-contrato-FH-REF.pdf']);
   for (const c of a.suyos) assert.doesNotMatch(c.texto + c.asunto, /al instante|inmediat|\bhoy\b/i); // la promesa es «en 24 horas»
 });
+
+test('a los 90 días se archiva (6 años) y se borra lo demás; copia semanal cifrada en R2', async () => {
+  const env = entorno('manual'), correo = 'ana.archivo@example.com';
+  const objetos = new Map();
+  env.COPIAS = { head: async (k) => (objetos.has(k) ? {} : null), put: async (k, v) => { objetos.set(k, v); }, delete: async (k) => { objetos.delete(k); }, list: async () => ({ objects: [...objetos.keys()].map((key) => ({ key })) }) };
+  const r = await F.crearBaja(env, req(), { empresa: 'dkv', idioma: 'es', eleccion: { cuando: 'ren', fecha: new Date(Date.now() + 200 * 864e5).toISOString().slice(0, 10) }, datos: { nombre: 'Ana Prueba Ejemplo', correo, dni: '12345678Z', dato: 'POLIZA-1' } });
+  const codigo = (await correos()).filter((c) => c.to.includes(correo)).pop().subject.slice(-6);
+  await F.firmar(env, req(), r.p, { codigo, autorizo: true });
+  const pago = await F.pagar(env, req(), r.p, { unidades: 1, renuncia: true });
+  await fetch(pago.url + '?aviso=no', { method: 'POST', redirect: 'manual' });
+  await F.estado(env, req(), r.p);
+  const envio = (await F.estado(env, req(), r.p)).envio;
+  await F.tarea(env, 'https://feehund.com', envio); // ese día: aviso urgente
+  const g = await firmarId(env, 'gestion', r.p.split('.')[0]);
+  await F.gestionHecho(env, req(), g, { certificado: PDF });
+  // Copia semanal: una por semana, con los valores cifrados (ni el nombre ni el DNI se leen)
+  const t1 = await F.tarea(env, 'https://feehund.com');
+  assert.ok(t1.copia && t1.copia.filas > 0, JSON.stringify(t1));
+  assert.equal((await F.tarea(env, 'https://feehund.com')).copia, null, 'una sola copia por semana');
+  const copia = [...objetos.values()][0];
+  assert.doesNotMatch(copia, /Ana Prueba|12345678Z|ana\.archivo/);
+  // A los 90 días: archivo cifrado con lo que prueba la baja; la página de estado ya no existe
+  const t2 = await F.tarea(env, 'https://feehund.com', new Date(Date.now() + 92 * 864e5).toISOString().slice(0, 10));
+  assert.equal(t2.archivadas, 1, JSON.stringify(t2));
+  await assert.rejects(F.estado(env, req(), r.p), (e) => e.codigo === 'no_existe');
+  const { leer } = await import('../../functions/_baja/almacen.js');
+  const a = await leer(env, 'archivo', r.p.split('.')[0]);
+  assert.equal(a.persona.dni, '12345678Z'); assert.ok(a.certificado && a.carta.texto.includes('oposición a la prórroga') && a.firma.en && a.autorizacion.renunciaEn && a.fechas.enviada);
+  assert.equal(await leer(env, 'baja', r.p.split('.')[0]), null);
+  // Doce semanas de copias como mucho
+  for (let i = 1; i <= 14; i++) await F.copiaSemanal(env, new Date(Date.now() + i * 7 * 864e5).toISOString().slice(0, 10));
+  assert.equal(objetos.size, F.COPIAS_GUARDADAS);
+});

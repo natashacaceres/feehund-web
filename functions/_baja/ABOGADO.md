@@ -8,7 +8,7 @@ de baja se envía en las 24 horas siguientes por correo electrónico certificado
 **Fase 1 (al principio):** la envía a mano la titular desde su cuenta de Lleida.net con los datos que le llegan en un
 correo urgente. **Fase 2:** sale sola desde hola@feehund.com con copia a Lleida.net y «responder a» la persona.
 La persona ve y recibe exactamente lo mismo en las dos fases. Si no llega, se devuelve el dinero. Si la empresa
-vuelve a cobrar, segunda carta gratis (una por compra). Los datos se borran a los 30 días de la entrega.
+vuelve a cobrar, segunda carta gratis (una por compra). El registro de cada baja se guarda 6 años; lo demás se borra a los 90 días.
 
 ## 1. Mandato: enviar bajas en nombre de otra persona
 - Texto de la casilla (paso 3): «Autorizo a Feehund a enviar esta carta en mi nombre a [empresa] por correo electrónico
@@ -52,24 +52,27 @@ baja ni evitamos penalizaciones). Revisar: limitación de responsabilidad, ident
 fuero, resolución de litigios en línea.
 
 ## 5. Protección de datos (RGPD)
-- Datos nuevos: nombre, correo, dato del contrato, DNI/NIE, **foto del DNI** (17 de las 31 empresas piden copia), firma
-  dibujada, carta, prueba de la firma. Sección nueva en /privacidad/ (y ca/en). ¿Base jurídica «ejecución del contrato»
-  vale también para la foto del DNI? ¿Minimización?
+- Datos nuevos: nombre, correo, dato del contrato, DNI/NIE (solo el número; **no se pide foto del documento**), firma
+  dibujada, carta, prueba de la firma. Sección nueva en /privacidad/ (y ca/en). ¿Base jurídica «ejecución del contrato»?
+  La carta dice que la persona enviará copia del DNI si la empresa se la pide (10 empresas la piden en sus condiciones).
 - Encargados: **Resend** (correo, EE. UU.), **Lleida.net** (¿encargado o tercero de confianza responsable del
-  certificado?), **Stripe**, **Cloudflare** (KV, datos cifrados con AES-GCM). Contratos de encargo (DPA) y transferencias
+  certificado?), **Stripe**, **Cloudflare** (KV y copias de seguridad en R2, datos cifrados con AES-GCM). Contratos de encargo (DPA) y transferencias
   fuera del EEE (cláusulas tipo / Data Privacy Framework).
 - **Lectura con IA de Mi banco**: si el móvil no puede leer el extracto, se envía a **Anthropic (fuera de la UE)** y no se
   guarda. Ya está en /privacidad/ con «⚖ abogado». En «Te damos de baja» el extracto **no viaja** (la comprobación de un
   cobro posterior se hace en el dispositivo).
-- **Plazo de borrado**: 30 días tras la entrega. Choca con la segunda carta gratis: si el cobro posterior llega después
-  de esos 30 días (seguros anuales, por ejemplo), ya no tenemos los datos. ¿60 o 90 días son razonables?
+- **Plazos (decididos, a confirmar):** el registro de cada baja (nombre, DNI/NIE, empresa, fechas, carta, justificante,
+  pago y prueba de la autorización) se guarda **6 años**, como prueba ante reclamaciones y por la contabilidad. ¿Son
+  correctos los 6 años (art. 30 del Código de Comercio; plazos de reclamación) y la base jurídica (art. 17.3 b y e RGPD
+  frente a una petición de supresión)? Lo demás se borra a los **90 días** del envío; hasta entonces se puede pedir la
+  segunda carta gratis. Copias de seguridad cifradas semanales, 12 semanas.
 - Registro de actividades de tratamiento; ¿hace falta evaluación de impacto?
 
 ## 6. Fase 1: envío a mano
 - Los datos de la persona y la carta llegan al **buzón de correo de la titular** (correo urgente) y se envían desde **su
   cuenta personal de Lleida.net**. ¿Cómo se cuenta en privacidad (texto nuevo: «el equipo de Feehund recibe tu carta y
   tus datos por correo… y los borra de ese correo cuando está enviada»)? ¿Hace falta algo más con su proveedor de correo?
-- La foto del DNI no va en el correo: se descarga de la página de gestión, protegida con un enlace firmado.
+- No se pide foto del DNI; el correo urgente lleva el número y la carta.
 - La web promete «la enviamos **en 24 horas**» (o «el <fecha>» si está programada). ¿Algún riesgo si un día no se puede
   (enfermedad, vacaciones)?
 - La titular **no es autónoma ni empresa** (solo NIF): ¿puede cobrar este servicio así? (también con el gestor)

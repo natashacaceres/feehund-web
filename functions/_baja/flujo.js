@@ -1,6 +1,7 @@
 // «Te damos de baja», de principio a fin.
 //   borrador (datos + código) → firmada (código + autorización) → pagada → [programada] → enviada → entregada (justificante)
-//   → borrada a los DIAS_BORRADO días. Si no llega: devuelta (con reembolso).
+//   → archivada a los DIAS_BORRADO días (90): se guarda 6 años lo que prueba la baja y el pago, y se borra lo demás.
+//   Si no llega: devuelta (con reembolso).
 // Dos modos (variable ENVIO_MODO), y la persona ve EXACTAMENTE lo mismo en los dos (pantallas, correos, plazos):
 //   «manual» (fase 1, por defecto): al tocar enviar llega un correo URGENTE a AVISOS_CORREO con todo lo necesario; se
 //            envía a mano por Lleida.net y en /baja/gestion/ se sube el certificado y se marca hecho.
@@ -10,7 +11,7 @@
 import DATOS from '../../data/te-damos-de-baja.json' with { type: 'json' };
 import { calcularEnvio, carta, cartaRecobro, fechaLarga, hoyEspana, sumarDias, validarDatos, MAX_BAJAS, total, euros, esFecha } from '../../assets/te-damos-de-baja/carta.js';
 import { aleatorio, codigo6, referencia, hmac, sha256, igual, firmarId, leerToken, b64, deB64 } from './cripto.js';
-import { leer, borrar, listar, guardarBaja, guardarCompra, guardar, limitar } from './almacen.js';
+import { leer, borrar, listar, guardarBaja, guardarCompra, guardar, limitar, exportar } from './almacen.js';
 import { crearPago, leerPago, devolver, enviarCorreo, estadoCorreo, buscarCertificados, descargarCertificado, LLEIDA_CC, REMITE } from './servicios.js';
 import { cartaPdf } from './pdf.js';
 import { msj, urgente } from './mensajes.js';
@@ -25,7 +26,8 @@ export const RUTA = {
   ca: { estado: '/ca/baixa/estat/', enviar: '/ca/baixa/enviar/', gracias: '/ca/baixa/gracies/' },
   en: { estado: '/en/cancel/status/', enviar: '/en/cancel/send/', gracias: '/en/cancel/thanks/' },
 };
-const diasBorrado = (env) => Number(env.DIAS_BORRADO) || 30;
+const diasBorrado = (env) => Number(env.DIAS_BORRADO) || 90;
+const ANOS_ARCHIVO = 6;        // prueba ante reclamaciones y contabilidad [REVISIÓN LEGAL]
 const DIAS_SIN_ENTREGA = 4;   // (modo lleida) sin «delivered» de Resend en estos días: no entregada y se devuelve
 const DIAS_RESTANTES = 180;   // bajas pagadas sin usar: se devuelven solas
 const MAX_ENVIOS_CODIGO = 4, MAX_INTENTOS = 5, MIN_CODIGO = 15;
@@ -46,7 +48,7 @@ const deBase64 = (s) => Uint8Array.from(atob(s), (x) => x.charCodeAt(0));
 /* ---------- la carta ---------- */
 function laCarta(b) {
   const e = empresaDe(b.empresa);
-  return carta(e, { datos: b.datos, eleccion: b.eleccion, fecha: b.fechaCarta, firma: b.firma ? { cuando: b.firma.cuando, correo: b.datos.correo } : null, ref: b.ref, adjuntaDni: Boolean(b.tieneDni) });
+  return carta(e, { datos: b.datos, eleccion: b.eleccion, fecha: b.fechaCarta, firma: b.firma ? { cuando: b.firma.cuando, correo: b.datos.correo } : null, ref: b.ref });
 }
 async function pdfDe(env, b, c = laCarta(b)) {
   const adj = (await leer(env, 'adj', b.id)) || {};
@@ -73,7 +75,6 @@ export async function crearBaja(env, req, cuerpo) {
   if (!env1.ok) throw new Fallo(env1.error);
   const v = validarDatos(e, cuerpo.datos);
   if (!v.ok) throw new Fallo('datos:' + v.errores.join(','));
-  const dni = e.dni === 'copia' ? jpeg(cuerpo.dniFoto) : null;
 
   // Frenos: 30 borradores al día por conexión y 10 por correo (un lote de 5 con algún reintento)
   const ip = await hmac(env.TOKEN_SECRET, 'ip:' + (req.headers.get('cf-connecting-ip') || '') + hoy);
@@ -90,9 +91,8 @@ export async function crearBaja(env, req, cuerpo) {
   const b = {
     id: aleatorio(16), ref: referencia(), empresa: String(cuerpo.empresa).toLowerCase().replace(/_/g, '-'), idioma,
     eleccion: { cuando: cuerpo.eleccion.cuando, fecha: env1.objetivo }, envio: env1.envio, tarde: env1.tarde, datos: v.datos,
-    tieneDni: Boolean(dni), estado: 'borrador', creada: ahoraISO(), fechaCarta: hoy, compraLote: compra, otp: null, intentos: 0, enviosCodigo: 0,
+    estado: 'borrador', creada: ahoraISO(), fechaCarta: hoy, compraLote: compra, otp: null, intentos: 0, enviosCodigo: 0,
   };
-  if (dni) await guardar(env, 'adj', b.id, { dni }, { ttlDias: 2 });
   await mandarCodigo(env, b);
   await guardarBaja(env, b);
   return { p: await tokenBaja(env, b), envio: b.envio, programada: env1.programada, tarde: b.tarde, ref: b.ref };
@@ -187,7 +187,7 @@ export async function compraPagada(env, origen, compraId, sesion) {
 
 async function pagada(env, origen, b) {
   b.pagadaEn = ahoraISO();
-  const adj = await leer(env, 'adj', b.id); // copia del DNI y firma: duran lo que dure la baja
+  const adj = await leer(env, 'adj', b.id); // la firma dibujada dura lo que dure la baja
   if (adj) await guardar(env, 'adj', b.id, adj, { ttlDias: 400 });
   const programada = b.envio > hoyEspana();
   b.estado = programada ? 'programada' : 'pagada'; b.programada = programada;
@@ -218,9 +218,8 @@ export async function enviar(env, origen, b) {
   if (!['firmada', 'programada', 'pagada'].includes(b.estado) || !b.pagadaEn) throw new Fallo('estado');
   const e = empresaDe(b.empresa);
   if (b.fechaCarta < b.envio) b.fechaCarta = b.envio; // la carta programada lleva la fecha del día en que sale
-  const c = laCarta(b), pdf = await pdfDe(env, b, c), adj = (await leer(env, 'adj', b.id)) || {};
+  const c = laCarta(b), pdf = await pdfDe(env, b, c);
   const adjuntos = [{ nombre: archivoCarta(c, b), bytes: pdf, tipo: 'application/pdf' }];
-  if (adj.dni) adjuntos.push({ nombre: `documento-identidad-${b.ref}.jpg`, bytes: deB64(adj.dni), tipo: 'image/jpeg' });
   b.resendId = await enviarCorreo(env, {
     de: `"${b.datos.nombre.replace(/["<>\\]/g, '')} (vía Feehund)" <${REMITE}>`, para: env.ENVIO_PRUEBA || e.correo, cc: LLEIDA_CC, responderA: b.datos.correo,
     asunto: c.asunto, texto: c.cuerpo.join('\n'), adjuntos, idem: `baja-${b.id}`, etiquetas: [{ name: 'tipo', value: 'baja' }],
@@ -233,18 +232,15 @@ export async function enviar(env, origen, b) {
 /* ---------- 4b. hecho a mano (modo manual): /baja/gestion/ ---------- */
 export async function gestion(env, token) {
   const b = await bajaDe(env, token, 'gestion'), e = empresaDe(b.empresa), c = laCarta(b);
-  const adj = (await leer(env, 'adj', b.id)) || {};
   return {
     ref: b.ref, estado: b.estado, empresa: e.nombre, para: e.correo, asunto: c.asunto, texto: c.cuerpo.join('\n'), envio: b.envio,
-    persona: { nombre: b.datos.nombre, correo: b.datos.correo, dni: b.datos.dni || null, dato: b.datos.dato || null }, dni: Boolean(adj.dni),
+    persona: { nombre: b.datos.nombre, correo: b.datos.correo, dni: b.datos.dni || null, dato: b.datos.dato || null },
     pagadaEn: b.pagadaEn || null, certificado: Boolean(b.certificado), recobro: b.recobro || null,
   };
 }
 export async function gestionArchivo(env, token, cual) {
   const b = await bajaDe(env, token, 'gestion');
   if (cual === 'carta') { const c = laCarta(b); return { bytes: await pdfDe(env, b, c), nombre: archivoCarta(c, b), tipo: 'application/pdf' }; }
-  const adj = (await leer(env, 'adj', b.id)) || {};
-  if (cual === 'dni' && adj.dni) return { bytes: deB64(adj.dni), nombre: `documento-identidad-${b.ref}.jpg`, tipo: 'image/jpeg' };
   if (cual === 'recobro' && b.recobro) { const r = laRecobro(b); return { bytes: cartaPdf({ lineas: r.cuerpo, negrita: [r.asunto.split(' · ')[0]], titulo: r.asunto }), nombre: `reclamacion-${b.ref}.pdf`, tipo: 'application/pdf' }; }
   throw new Fallo('no_existe', 404);
 }
@@ -268,7 +264,7 @@ export async function gestionDevolver(env, token) {
 
 /* ---------- justificante: el mismo en los dos modos ---------- */
 async function justificante(env, origen, b, pdf) {
-  await guardar(env, 'cert', b.id, { pdf: b64(pdf) }, { ttlDias: diasBorrado(env) + 5 });
+  await guardar(env, 'cert', b.id, { pdf: b64(pdf) }, { ttlDias: diasBorrado(env) + 30 }); // se archiva antes
   b.certificado = { en: ahoraISO() };
   b.estado = 'entregada'; b.entregadaEn = b.entregadaEn || ahoraISO(); b.borrarEl = sumarDias(hoyEspana(), diasBorrado(env));
   await guardarBaja(env, b);
@@ -385,18 +381,34 @@ export async function recobro(env, req, token, cuerpo) {
   return { ok: true };
 }
 
-/* ---------- borrar mis datos ya (y cancelar si aún no ha salido) ---------- */
-export async function borrarYa(env, token) {
+/* ---------- cancelar una baja programada (antes de que salga) ---------- */
+export async function cancelar(env, token) {
   const b = await bajaDe(env, token);
-  if (b.estado === 'pagada' || b.estado === 'enviada') throw new Fallo('espera'); // en marcha: hasta tener el justificante
-  let imp = 0;
-  if (b.estado === 'programada') {
-    imp = await reembolsar(env, b, 'cancelada');
-    const [asunto, texto] = msj(b.idioma).cancelada(empresaDe(b.empresa).nombre, euros(imp, b.idioma));
-    await enviarCorreo(env, { para: b.datos.correo, asunto, texto, idem: `cancelada-${b.id}` });
-  }
-  await Promise.all([borrar(env, 'baja', b.id), borrar(env, 'adj', b.id), borrar(env, 'cert', b.id)]);
+  if (b.estado !== 'programada') throw new Fallo('estado');
+  const imp = await reembolsar(env, b, 'cancelada');
+  b.estado = 'cancelada'; b.canceladaEn = ahoraISO();
+  const [asunto, texto] = msj(b.idioma).cancelada(empresaDe(b.empresa).nombre, euros(imp, b.idioma));
+  await enviarCorreo(env, { para: b.datos.correo, asunto, texto, idem: `cancelada-${b.id}` });
+  await archivar(env, b);
   return { ok: true, devuelto: imp };
+}
+
+/* ---------- archivo: lo que se guarda 6 años (prueba y contabilidad); lo demás se borra ---------- */
+// [REVISIÓN LEGAL] qué se guarda y cuánto
+export async function archivar(env, b) {
+  const e = empresaDe(b.empresa), adj = (await leer(env, 'adj', b.id)) || {}, cert = await leer(env, 'cert', b.id);
+  const c = await leer(env, 'compra', b.compra || b.compraLote || '-');
+  const carta = b.firma ? laCarta(b) : null;
+  const a = {
+    ref: b.ref, empresa: { id: b.empresa, nombre: e?.nombre, correo: e?.correo }, persona: { nombre: b.datos.nombre, dni: b.datos.dni || null },
+    fechas: { creada: b.creada, firmada: b.firma?.en || null, pagada: b.pagadaEn || null, enviada: b.enviadaEn || null, entregada: b.entregadaEn || null, devuelta: b.devueltaEn || null, cancelada: b.canceladaEn || null },
+    estado: b.estado, carta: carta && { asunto: carta.asunto, texto: carta.cuerpo.join('\n'), sha256: b.cartaHash }, firma: b.firma ? { ...b.firma, imagen: adj.firma || null } : null,
+    autorizacion: { autorizo: Boolean(b.firma), renunciaEn: b.renunciaEn || null }, certificado: cert?.pdf || null,
+    pago: { compra: b.compra || null, intento: c?.pago || null, importe: b.precio || null, devuelto: Boolean(c?.devueltas?.includes(b.id)) },
+    recobro: b.recobro || null, archivadaEn: ahoraISO(),
+  };
+  await guardar(env, 'archivo', b.id, a, { meta: { ref: b.ref, emp: b.empresa, e: b.estado }, ttlDias: ANOS_ARCHIVO * 366 });
+  await Promise.all([borrar(env, 'baja', b.id), borrar(env, 'adj', b.id), borrar(env, 'cert', b.id)]);
 }
 
 /** Devuelve las bajas pagadas de un lote que no se han usado. */
@@ -419,7 +431,7 @@ async function devolverResto(env, c, motivo) {
 
 /* ---------- tarea diaria (la llama el Worker feehund-baja-tarea) ---------- */
 export async function tarea(env, origen, hoy = hoyEspana()) {
-  const hecho = { enviadas: 0, avisos: 0, revisadas: 0, borradas: 0, restos: 0, errores: [] };
+  const hecho = { enviadas: 0, avisos: 0, revisadas: 0, archivadas: 0, restos: 0, copia: null, errores: [] };
   const intentar = async (que, f) => { try { await f(); } catch (err) { hecho.errores.push(`${que}: ${err.codigo || err.message}`.slice(0, 120)); } };
   for (const { id, meta } of await listar(env, 'baja')) {
     if (meta.e === 'programada' && meta.env <= hoy) {
@@ -431,7 +443,7 @@ export async function tarea(env, origen, hoy = hoyEspana()) {
       await intentar('revision ' + id.slice(0, 6), async () => { await revisar(env, origen, await leer(env, 'baja', id)); hecho.revisadas++; });
     }
     if ((meta.e === 'entregada' || meta.e === 'devuelta') && meta.borrar && meta.borrar <= hoy) {
-      await intentar('borrado ' + id.slice(0, 6), async () => { await Promise.all([borrar(env, 'baja', id), borrar(env, 'adj', id), borrar(env, 'cert', id)]); hecho.borradas++; });
+      await intentar('archivo ' + id.slice(0, 6), async () => { await archivar(env, await leer(env, 'baja', id)); hecho.archivadas++; });
     }
   }
   for (const { id, meta } of await listar(env, 'compra')) {
@@ -445,5 +457,22 @@ export async function tarea(env, origen, hoy = hoyEspana()) {
       if (!vivas.some(Boolean) && (vieja || c.unidades <= c.bajas.length)) await borrar(env, 'compra', id);
     });
   }
+  // Copia de seguridad semanal en R2 (enlace COPIAS). Si no está puesto, no se hace.
+  if (env.COPIAS) await intentar('copia', async () => { hecho.copia = await copiaSemanal(env, hoy); });
   return hecho;
+}
+
+/* ---------- copia de seguridad semanal (R2) ---------- */
+// Lo que hay en KV tal cual: los valores ya van cifrados con DATA_KEY (sin esa clave no se pueden leer). Una por semana
+// (la primera ejecución de la tarea cada lunes o después), se guardan las 12 últimas. Restaurar: workers/baja-tarea/restaurar.mjs
+export const COPIAS_GUARDADAS = 12;
+export async function copiaSemanal(env, hoy = hoyEspana()) {
+  const dia = new Date(hoy + 'T12:00:00Z').getUTCDay() || 7;
+  const nombre = `semanal/${sumarDias(hoy, 1 - dia)}.json`; // la semana se nombra por su lunes
+  if (await env.COPIAS.head(nombre)) return null;
+  const filas = await exportar(env, ['baja', 'compra', 'archivo', 'adj', 'cert']);
+  await env.COPIAS.put(nombre, JSON.stringify({ version: 1, creada: ahoraISO(), cifrado: 'AES-GCM con DATA_KEY (cada valor)', filas }), { httpMetadata: { contentType: 'application/json' } });
+  const todas = (await env.COPIAS.list({ prefix: 'semanal/' })).objects.map((o) => o.key).sort();
+  for (const vieja of todas.slice(0, Math.max(0, todas.length - COPIAS_GUARDADAS))) await env.COPIAS.delete(vieja);
+  return { nombre, filas: filas.length };
 }

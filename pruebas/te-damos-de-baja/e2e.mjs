@@ -70,7 +70,7 @@ const page = await ctx.newPage();
 const fallos = []; ctx.on('weberror', (e) => fallos.push(e.error().message));
 console.log(`(modo ${MODO})`);
 
-console.log('1 · O2, lo antes posible, con foto del DNI, firma dibujada y lote de 3');
+console.log('1 · O2, lo antes posible, con DNI (sin foto), firma dibujada y lote de 3');
 await page.goto(WEB + '/baja/enviar/?empresa=o2&nombre=O2');
 await page.waitForSelector('#tbH1:visible');
 assert.equal(await page.locator('input[name="cuando"][value="ya"]').isChecked(), true); // O2 solo tiene «lo antes posible»
@@ -78,11 +78,10 @@ await foto(page, 'paso1-cuando');
 await page.click('#tbN1');
 await page.fill('#tbNombre', PERSONA.nombre); await page.fill('#tbCorreo', PERSONA.correo);
 await page.fill('#tbDato', 'LINEA-DE-PRUEBA-1'); await page.fill('#tbDni', PERSONA.dni);
-const png = Buffer.from(await page.evaluate(async () => { const c = document.createElement('canvas'); c.width = 400; c.height = 250; const g = c.getContext('2d'); g.fillStyle = '#cde'; g.fillRect(0, 0, 400, 250); g.fillStyle = '#123'; g.font = '28px sans-serif'; g.fillText('DOCUMENTO DE PRUEBA', 20, 130); return [...new Uint8Array(await (await fetch(c.toDataURL('image/png'))).arrayBuffer())]; }));
-await page.setInputFiles('#tbDniFoto', { name: 'dni.png', mimeType: 'image/png', buffer: png });
-await page.waitForSelector('#tbDniFotoOk:visible');
+assert.equal(await page.locator('input[type="file"]').count(), 0, 'sin subida de la foto del DNI');
+assert.match(await page.textContent('#tbDniCopia'), /O2 suele pedir copia del DNI\. No hace falta ahora/);
 const carta1 = await page.textContent('#tbCartaTxt');
-assert.match(carta1, /Ana Prueba Ejemplo/); assert.ok(carta1.includes(PERSONA.correo)); assert.match(carta1, /DNI\/NIE: 12345678Z/); assert.match(carta1, /dos días hábiles/); assert.match(carta1, /Adjunto copia/);
+assert.match(carta1, /Ana Prueba Ejemplo/); assert.ok(carta1.includes(PERSONA.correo)); assert.match(carta1, /DNI\/NIE: 12345678Z/); assert.match(carta1, /dos días hábiles/); assert.match(carta1, /Indico mi DNI\/NIE para identificarme/);
 await foto(page, 'paso2-datos-y-carta');
 await page.click('#tbN2');
 await firmarYSeguir(page);
@@ -231,11 +230,11 @@ await page.goto(WEB + '/baja/gracias/'); await page.waitForURL(/\/baja\/$/);
 await page.goto(WEB + '/baja/gracias/?p=inventadoinventado.xxxxxxxxxxxxxxxxxxxxxx'); await page.waitForURL(/\/baja\/$/);
 ok('sin pago, a /baja/');
 
-console.log('7 · Borrado a los 30 días');
-t = await tarea(dia(31)); assert.ok(t.borradas >= 2, JSON.stringify(t));
+console.log('7 · A los 90 días: se archiva lo que prueba la baja y se borra lo demás');
+t = await tarea(dia(91)); assert.ok(t.archivadas >= 2, JSON.stringify(t));
 await page.goto(urlBasic); await page.waitForSelector('.tb-est[data-estado="error"]:visible');
-await foto(page, 'borrada-a-los-30-dias');
-ok(`borradas ${t.borradas} bajas`);
+await foto(page, 'archivada-a-los-90-dias');
+ok(`archivadas ${t.archivadas} bajas; su página ya no se ve`);
 
 console.log('8 · Errores: código malo, pago cancelado, empresa no compatible');
 await page.goto(WEB + '/ca/baixa/enviar/?empresa=ara');

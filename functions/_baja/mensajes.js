@@ -70,7 +70,7 @@ export const urgente = {
       `2. Para: ${e.correo}`,
       `3. Asunto (cópialo tal cual, lleva la referencia): ${c.asunto}`,
       '4. Texto: el de abajo, entre las dos rayas.',
-      `5. Adjunta la carta en PDF (va en este correo)${b.tieneDni ? ' y la foto del DNI (descárgala en la página de gestión)' : ''}.`,
+      `5. Adjunta la carta en PDF (va en este correo).${e.dni === 'copia' ? ` ${e.nombre} suele pedir copia del DNI: la carta dice que la persona la enviará si se la piden.` : ''}`,
       `6. Cuando Lleida.net te mande el certificado en PDF, súbelo y pulsa «Hecho»: ${gestion}`,
       '   Eso le manda a la persona su justificante. Si la carta no se puede entregar, en la misma página: «No se pudo entregar» (se le devuelve el dinero).',
       '',

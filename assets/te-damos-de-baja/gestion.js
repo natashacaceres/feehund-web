@@ -1,5 +1,5 @@
 /* /baja/gestion/?g=… — página del equipo para enviar a mano una baja (fase 1). Solo se llega desde el correo urgente.
-   Muestra lo que hay que poner en Lleida.net, descarga la carta y el DNI, y al subir el certificado en PDF manda a la
+   Muestra lo que hay que poner en Lleida.net, descarga la carta, y al subir el certificado en PDF manda a la
    persona su justificante (el mismo correo que en el envío automático). */
 (function () {
   "use strict";
@@ -26,7 +26,6 @@
     $("geEnvio").textContent = d.envio;
     $("gePersona").textContent = [d.persona.nombre, d.persona.correo, d.persona.dni, d.persona.dato].filter(Boolean).join(" · ");
     $("geCarta").href = q("gestion/carta.pdf");
-    $("geDni").hidden = !d.dni; $("geDni").href = q("gestion/dni.jpg");
     $("geRec").hidden = !d.recobro; $("geRec").href = q("gestion/recobro.pdf");
     const abierta = ["pagada", "programada", "enviada"].indexOf(d.estado) >= 0;
     $("geAcciones").hidden = !abierta;

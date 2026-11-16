@@ -2,7 +2,8 @@
 // Claves:
 //   baja:<id>    una carta: datos, carta, firma, estado, envío, certificado (cifrado)
 //   compra:<id>  un pago de Stripe con 1 a 5 bajas (cifrado: lleva el correo de quien paga)
-//   adj:<id>     copia del DNI y firma dibujada de una baja (cifrado, aparte para que «baja:» sea pequeño)
+//   adj:<id>     firma dibujada de una baja (cifrado, aparte para que «baja:» sea pequeño)
+//   archivo:<id> lo que se guarda 6 años de cada baja: prueba de la baja, la autorización y el pago (cifrado)
 //   cert:<id>    certificado de Lleida.net en PDF (cifrado)
 //   lim:<…>      contadores para frenar abusos (sin datos: solo un hash), caducan solos
 // Los metadatos de KV (sin datos personales) dicen el estado y las fechas: la tarea diaria los lee sin descifrar.
@@ -34,6 +35,18 @@ export async function listar(env, tipo) {
     cursor = r.list_complete ? null : r.cursor;
   } while (cursor);
   return out;
+}
+
+/** Copia de seguridad: los valores tal cual están en KV (ya cifrados con DATA_KEY) y sus metadatos. */
+export async function exportar(env, tipos) {
+  const filas = [];
+  for (const tipo of tipos) {
+    for (const { id, meta } of await listar(env, tipo)) {
+      const v = await kv(env).get(`${tipo}:${id}`);
+      if (v != null) filas.push({ k: `${tipo}:${id}`, v, meta });
+    }
+  }
+  return filas;
 }
 
 /** Cuenta un uso; devuelve false si ya se pasó del máximo en la ventana. */

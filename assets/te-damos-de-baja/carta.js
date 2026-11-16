@@ -99,7 +99,7 @@ const CARTA = {
     seguro: (f) => `Conforme al artículo 22 de la Ley 50/1980, de Contrato de Seguro, comunico mi oposición a la prórroga del contrato, que no deberá renovarse a su vencimiento${f ? ', el ' + f : ''}.`,
     motivo: 'Motivo de la baja: decisión personal.',
     cargos: (c) => `Pido que a partir de esa fecha no se me haga ningún cargo más, que se anule la domiciliación de los recibos y que me confirméis la baja por escrito en ${c}.`,
-    adjunto: 'Adjunto copia de mi documento de identidad.',
+    copia: 'Indico mi DNI/NIE para identificarme. Si necesitáis copia del documento, os la envío en cuanto me la pidáis.',
     feehund: 'Envío esta carta a través de Feehund, que la remite en mi nombre y con mi autorización.',
     saludo: 'Atentamente,',
     firma: (f, c, r) => `Firmado electrónicamente el ${f} con un código de verificación enviado a ${c}. Referencia ${r}.`,
@@ -115,7 +115,7 @@ const CARTA = {
     seguro: (f) => `D'acord amb l'article 22 de la Llei 50/1980, de Contracte d'Assegurança, comunico la meva oposició a la pròrroga del contracte, que no s'ha de renovar al venciment${f ? ', el ' + f : ''}.`,
     motivo: 'Motiu de la baixa: decisió personal.',
     cargos: (c) => `Demano que a partir d'aquesta data no se'm faci cap més càrrec, que s'anul·li la domiciliació dels rebuts i que em confirmeu la baixa per escrit a ${c}.`,
-    adjunto: 'Adjunto còpia del meu document d\'identitat.',
+    copia: 'Indico el meu DNI/NIE per identificar-me. Si necessiteu còpia del document, us l\'envio tan bon punt me la demaneu.',
     feehund: 'Envio aquesta carta a través de Feehund, que la tramet en nom meu i amb la meva autorització.',
     saludo: 'Atentament,',
     firma: (f, c, r) => `Signat electrònicament el ${f} amb un codi de verificació enviat a ${c}. Referència ${r}.`,
@@ -131,7 +131,7 @@ const CARTA = {
     seguro: (f) => `Under article 22 of Spanish Law 50/1980 on Insurance Contracts, I give notice that I object to the renewal of the contract, which must not renew on expiry${f ? ', ' + f : ''}.`,
     motivo: 'Reason for cancelling: personal decision.',
     cargos: (c) => `Please make no further charges from that date, cancel any direct debit or automatic payment, and confirm the cancellation in writing to ${c}.`,
-    adjunto: 'A copy of my identity document is attached.',
+    copia: 'I give my ID number to identify myself. If you need a copy of the document, I will send it as soon as you ask.',
     feehund: 'I am sending this letter through Feehund, which forwards it on my behalf and with my authorisation.',
     saludo: 'Yours faithfully,',
     firma: (f, c, r) => `Signed electronically on ${f} with a verification code sent to ${c}. Reference ${r}.`,
@@ -142,7 +142,7 @@ const CARTA = {
 /**
  * La carta, en el idioma de la empresa. Devuelve { idioma, asunto, cuerpo: string[] } (líneas; '' = línea en blanco).
  * p: { datos: {nombre, correo, dato, dni}, eleccion: {cuando, fecha}, fecha: 'AAAA-MM-DD' (de la carta),
- *      firma?: {cuando: 'AAAA-MM-DD HH:MM', correo}, ref?: 'FH-…', adjuntaDni?: boolean }
+ *      firma?: {cuando: 'AAAA-MM-DD HH:MM', correo}, ref?: 'FH-…' }
  */
 export function carta(empresa, p) {
   const idioma = CARTA[empresa.idioma] ? empresa.idioma : 'es';
@@ -167,7 +167,7 @@ export function carta(empresa, p) {
   if (empresa.tipo === 'telecos') cuerpo.push('', T.telecos);
   if (empresa.motivo) cuerpo.push('', T.motivo);
   cuerpo.push('', T.cargos(correo));
-  if (p.adjuntaDni) cuerpo.push('', T.adjunto);
+  if (empresa.dni === 'copia') cuerpo.push('', T.copia); // la empresa suele pedir copia: la envía la persona si se la piden
   cuerpo.push('', T.feehund, '', T.saludo, '', nombre);
   cuerpo.push(p.firma ? T.firma(p.firma.cuando, p.firma.correo, p.ref) : T.sinFirma);
   return { idioma, asunto: T.asunto(empresa) + (p.ref ? ` · ${nombre} · ${p.ref}` : ''), cuerpo };

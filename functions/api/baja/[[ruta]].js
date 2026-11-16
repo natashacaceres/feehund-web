@@ -10,15 +10,15 @@
 //   GET  carta.pdf?p=           la carta firmada (carta-pdf)
 //   GET  certificado.pdf?p=     el justificante (certificado-pdf)
 //   POST recobro                segunda carta gratis (recobro-detectado)
-//   POST borrar                 borrar mis datos ya / cancelar si aún no ha salido
+//   POST cancelar               cancelar una baja programada antes de que salga (se devuelve el dinero)
 //   POST lote/devolver          devolver las bajas del lote que no se han usado
 //   GET  gestion?g=             (equipo) datos para enviar la carta a mano
-//   GET  gestion/carta.pdf|dni.jpg|recobro.pdf?g=
+//   GET  gestion/carta.pdf|recobro.pdf?g=
 //   POST gestion/hecho          (equipo) subir el certificado de Lleida.net: la persona recibe el justificante
 //   POST gestion/devolver       (equipo) no se pudo entregar: devolución
 //   POST tarea                  tarea diaria (la llama el Worker con TAREA_SECRET)
 
-import { EMPRESAS, PRECIO, empresaDe, modo, base, Fallo, crearBaja, reenviarCodigo, firmar, pagar, compraPagada, estado, pdfCarta, pdfCertificado, recobro, borrarYa, devolverRestantes, gestion, gestionArchivo, gestionHecho, gestionDevolver, tarea } from '../../_baja/flujo.js';
+import { EMPRESAS, PRECIO, empresaDe, modo, base, Fallo, crearBaja, reenviarCodigo, firmar, pagar, compraPagada, estado, pdfCarta, pdfCertificado, recobro, cancelar, devolverRestantes, gestion, gestionArchivo, gestionHecho, gestionDevolver, tarea } from '../../_baja/flujo.js';
 import { eventoStripe } from '../../_baja/servicios.js';
 import { igual } from '../../_baja/cripto.js';
 import { calcularEnvio, hoyEspana } from '../../../assets/te-damos-de-baja/carta.js';
@@ -76,7 +76,7 @@ export async function onRequest({ request, env, params }) {
       if (ruta === 'carta.pdf') return archivo(await pdfCarta(env, p));
       if (ruta === 'certificado.pdf') return archivo(await pdfCertificado(env, p));
       if (ruta === 'gestion') return json(await gestion(env, g));
-      const m = /^gestion\/(carta\.pdf|dni\.jpg|recobro\.pdf)$/.exec(ruta);
+      const m = /^gestion\/(carta\.pdf|recobro\.pdf)$/.exec(ruta);
       if (m) return archivo(await gestionArchivo(env, g, m[1].split('.')[0]));
       return json({ error: 'ruta' }, 404);
     }
@@ -92,7 +92,7 @@ export async function onRequest({ request, env, params }) {
       case 'firma': return json(await firmar(env, request, c.p, c));
       case 'pago': return json(await pagar(env, request, c.p, c));
       case 'recobro': return json(await recobro(env, request, c.p, c));
-      case 'borrar': return json(await borrarYa(env, c.p));
+      case 'cancelar': return json(await cancelar(env, c.p));
       case 'lote/devolver': return json(await devolverRestantes(env, c.compra));
       case 'gestion/hecho': return json(await gestionHecho(env, request, c.g, c));
       case 'gestion/devolver': return json(await gestionDevolver(env, c.g));

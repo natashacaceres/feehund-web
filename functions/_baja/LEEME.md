@@ -47,11 +47,17 @@ la fase 2 es poner `ENVIO_MODO=lleida` y las claves de Lleida.
 4. **Pago** en Stripe Checkout (1 a 3 bajas) con la casilla de renuncia al desistimiento. Vuelta a **`/baja/gracias/`**
    (check verde; si no hay pago válido, lleva a `/baja/`).
 5. **Estado** (`/baja/estado/?p=…`): programada, en marcha, enviada con justificante, devuelta. Desde ahí: usar las bajas
-   del lote, devolverlas, segunda carta gratis (una por compra; el extracto se lee en el dispositivo), borrar mis datos.
+   del lote, devolverlas, segunda carta gratis (una por compra, hasta los 90 días; el extracto se lee en el
+   dispositivo), cancelar una programada antes de que salga.
+
+DNI: solo el número, nunca foto. En las empresas que piden copia, la carta dice que la persona la enviará si se la piden
+(`COPIA_DNI_OBLIGATORIA` y `QUITAR_SI_PIDEN_COPIA` en envio_web.py).
 
 **Tarea** (Worker `workers/baja-tarea`, cada hora → `POST /api/baja/tarea` con `TAREA_SECRET`): programadas del día
 (aviso urgente o envío), recordatorio diario de las que siguen sin enviar, justificantes (fase 2), devoluciones, borrado a
-los 30 días (`DIAS_BORRADO`), devolución de bajas del lote sin usar a los 180 días.
+los 90 días (`DIAS_BORRADO`): se **archiva 6 años** lo que prueba la baja (nombre, DNI/NIE, empresa, fechas, carta,
+justificante, pago, autorización) y se borra lo demás; devolución de bajas del lote sin usar a los 180 días; **copia
+semanal** de todo (cifrado) en R2 (`COPIAS`), las 12 últimas (`workers/baja-tarea/restaurar.mjs` la devuelve a KV).
 
 ## Archivos
 
@@ -74,8 +80,8 @@ Todo lo personal va **cifrado** en KV; los metadatos sin datos personales los le
 
 Secretos: `STRIPE_SECRET_KEY` (clave restringida), `STRIPE_WEBHOOK_SECRET`, `RESEND_API_KEY`, `TOKEN_SECRET`,
 `DATA_KEY` (32 bytes en base64), `TAREA_SECRET` (la misma en el Worker). Texto: `STRIPE_PRODUCT_BAJA`, `AVISOS_CORREO`
-(adónde llegan los urgentes). Enlace KV: `FEEHUND_KV`. Fase 2: `ENVIO_MODO=lleida`, `LLEIDA_USER`, `LLEIDA_API_KEY`.
-Opcionales: `URL_WEB`, `DIAS_BORRADO` (30), `ENVIO_PRUEBA` (fase 2: todas las cartas a esta dirección).
+(adónde llegan los urgentes). Enlace KV: `FEEHUND_KV`; enlace R2: `COPIAS` (copias semanales). Fase 2: `ENVIO_MODO=lleida`, `LLEIDA_USER`, `LLEIDA_API_KEY`.
+Opcionales: `URL_WEB`, `DIAS_BORRADO` (90), `ENVIO_PRUEBA` (fase 2: todas las cartas a esta dirección).
 Si falta alguna, la página dice «Este servicio aún no está abierto» y enlaza la guía gratis.
 
 ## Probar en local

@@ -21,17 +21,16 @@ const T = {
     idiomaCarta: { es: "La carta va en castellano, el idioma de la empresa.", ca: "La carta va en catalán, el idioma de la empresa.", en: "La carta va en inglés, el idioma de la empresa." },
     sms: (e) => `${e} te mandará un SMS para confirmar la baja: ábrelo y confírmala.`,
     formulario: (e) => `${e} tiene su propio formulario. Enviamos tu carta con todos los datos que pide; si aun así te lo piden, te escribirán a ti.`,
-    dniCopia: (e) => `${e} pide copia del DNI. Si no la adjuntas, puede que te la pidan por correo.`,
-    fotoOk: "Foto lista.", fotoMal: "No hemos podido leer esa foto. Prueba con otra (JPG o PNG).",
+    dniCopia: (e) => `${e} suele pedir copia del DNI. No hace falta ahora: si te la pide, se la envías tú.`,
     opcional: "(opcional)", pay: (p, x) => `${p ? "Pagar y programar" : "Pagar y enviar"} · ${x}`, usar: (p) => p ? "Programar mi baja" : "Enviar mi baja",
     pack: (n, x) => n === 1 ? `1 baja · ${x}` : `${n} bajas · ${x}`, packNota: (x) => `La segunda y las siguientes, ${x} cada una. Las que no uses te las devolvemos.`,
     reenv: "Código reenviado.", sinCodigos: "Ya te hemos enviado varios códigos. Revisa el correo no deseado o empieza de nuevo.",
     caducado: "El código ha caducado. Pide otro.", intentos: "Demasiados intentos. Vuelve a empezar.",
     servicio: "Ahora mismo no podemos hacerlo. Prueba en unos minutos.", limite: "Has hecho muchos intentos hoy. Prueba mañana.",
-    perdido: "Esta baja ya no existe o el enlace no es correcto. Si han pasado más de 30 días desde la entrega, ya borramos los datos.",
+    perdido: "Esta página ya no está disponible o el enlace no es correcto. A los 90 días del envío solo guardamos la prueba de tu baja: si necesitas el justificante, escríbenos a hola@feehund.com.",
     prog: (f) => f, quedan: (n) => n === 1 ? "Te queda 1 baja pagada" : `Te quedan ${n} bajas pagadas`,
     devuelto: (x) => `Te devolvemos ${x}. Tarda de 5 a 10 días en verse en tu tarjeta.`, borrado: "Hemos borrado tus datos.",
-    borrarProg: "Cancelar el envío y borrar mis datos", borrarEl: (f) => `Borramos tus datos solos el ${f}.`, esperaBorrar: "Podrás borrarlos cuando tengas el justificante.",
+    borrarProg: "Cancelar el envío", guardamos: (f) => `Guardamos tu carta, el justificante y el pago 6 años, como prueba de tu baja. Lo demás lo borramos ${f ? "el " + f : "90 días después del envío"}.`, cancelada: "Envío cancelado.",
     nadaRecobro: (e) => `No vemos cobros de ${e} después de la baja en ese extracto.`, recobroVisto: (f, x) => `Vemos un cobro de ${x} el ${f}.`,
     leyendo: "Leyendo tu extracto en tu dispositivo…", noLeido: "No hemos podido leer ese archivo. Escríbelo a mano.",
     confirmarBorrar: "¿Seguro? No se puede deshacer.",
@@ -44,17 +43,16 @@ const T = {
     idiomaCarta: { es: "La carta va en castellà, l'idioma de l'empresa.", ca: "La carta va en català, l'idioma de l'empresa.", en: "La carta va en anglès, l'idioma de l'empresa." },
     sms: (e) => `${e} t'enviarà un SMS per confirmar la baixa: obre'l i confirma-la.`,
     formulario: (e) => `${e} té el seu propi formulari. Enviem la teva carta amb totes les dades que demana; si tot i així te'l demanen, t'escriuran a tu.`,
-    dniCopia: (e) => `${e} demana còpia del DNI. Si no l'adjuntes, potser te la demanen per correu.`,
-    fotoOk: "Foto a punt.", fotoMal: "No hem pogut llegir aquesta foto. Prova amb una altra (JPG o PNG).",
+    dniCopia: (e) => `${e} sol demanar còpia del DNI. Ara no cal: si te la demana, l'hi envies tu.`,
     opcional: "(opcional)", pay: (p, x) => `${p ? "Pagar i programar" : "Pagar i enviar"} · ${x}`, usar: (p) => p ? "Programar la meva baixa" : "Enviar la meva baixa",
     pack: (n, x) => n === 1 ? `1 baixa · ${x}` : `${n} baixes · ${x}`, packNota: (x) => `La segona i les següents, ${x} cadascuna. Les que no facis servir te les retornem.`,
     reenv: "Codi reenviat.", sinCodigos: "Ja t'hem enviat diversos codis. Revisa el correu brossa o torna a començar.",
     caducado: "El codi ha caducat. Demana'n un altre.", intentos: "Massa intents. Torna a començar.",
     servicio: "Ara mateix no ho podem fer. Prova-ho d'aquí a uns minuts.", limite: "Avui has fet molts intents. Prova-ho demà.",
-    perdido: "Aquesta baixa ja no existeix o l'enllaç no és correcte. Si han passat més de 30 dies des del lliurament, ja hem esborrat les dades.",
+    perdido: "Aquesta pàgina ja no està disponible o l'enllaç no és correcte. Als 90 dies de l'enviament només guardem la prova de la teva baixa: si necessites el justificant, escriu-nos a hola@feehund.com.",
     prog: (f) => f, quedan: (n) => n === 1 ? "Et queda 1 baixa pagada" : `Et queden ${n} baixes pagades`,
     devuelto: (x) => `Et retornem ${x}. Triga de 5 a 10 dies a veure's a la targeta.`, borrado: "Hem esborrat les teves dades.",
-    borrarProg: "Cancel·lar l'enviament i esborrar les meves dades", borrarEl: (f) => `Esborrem les teves dades soles el ${f}.`, esperaBorrar: "Les podràs esborrar quan tinguis el justificant.",
+    borrarProg: "Cancel·lar l'enviament", guardamos: (f) => `Guardem la teva carta, el justificant i el pagament 6 anys, com a prova de la teva baixa. La resta l'esborrem ${f ? "el " + f : "90 dies després de l'enviament"}.`, cancelada: "Enviament cancel·lat.",
     nadaRecobro: (e) => `No veiem cobraments de ${e} després de la baixa en aquest extracte.`, recobroVisto: (f, x) => `Veiem un cobrament de ${x} el ${f}.`,
     leyendo: "Llegint el teu extracte al teu dispositiu…", noLeido: "No hem pogut llegir aquest fitxer. Escriu-ho a mà.",
     confirmarBorrar: "Segur? No es pot desfer.",
@@ -67,17 +65,16 @@ const T = {
     idiomaCarta: { es: "The letter is in Spanish, the company's language.", ca: "The letter is in Catalan, the company's language.", en: "The letter is in English, the company's language." },
     sms: (e) => `${e} will text you to confirm the cancellation: open it and confirm.`,
     formulario: (e) => `${e} has its own form. We send your letter with everything it asks for; if they still ask for the form, they will write to you.`,
-    dniCopia: (e) => `${e} asks for a copy of your ID. If you do not attach it, they may ask you for it by email.`,
-    fotoOk: "Photo ready.", fotoMal: "We could not read that photo. Try another one (JPG or PNG).",
+    dniCopia: (e) => `${e} often asks for a copy of your ID. You do not need it now: if they ask, you send it yourself.`,
     opcional: "(optional)", pay: (p, x) => `${p ? "Pay and schedule" : "Pay and send"} · ${x}`, usar: (p) => p ? "Schedule my cancellation" : "Send my cancellation",
     pack: (n, x) => n === 1 ? `1 cancellation · ${x}` : `${n} cancellations · ${x}`, packNota: (x) => `The second and the rest, ${x} each. We refund the ones you do not use.`,
     reenv: "Code sent again.", sinCodigos: "We have already sent you several codes. Check your spam folder or start again.",
     caducado: "The code has expired. Ask for a new one.", intentos: "Too many attempts. Start again.",
     servicio: "We cannot do it right now. Try again in a few minutes.", limite: "You have tried many times today. Try tomorrow.",
-    perdido: "This cancellation no longer exists or the link is wrong. If more than 30 days have passed since delivery, we have already deleted the details.",
+    perdido: "This page is no longer available or the link is wrong. 90 days after sending we only keep the proof of your cancellation: if you need the proof of sending, email us at hola@feehund.com.",
     prog: (f) => f, quedan: (n) => n === 1 ? "You have 1 paid cancellation left" : `You have ${n} paid cancellations left`,
     devuelto: (x) => `We are refunding ${x}. It takes 5 to 10 days to show on your card.`, borrado: "We have deleted your details.",
-    borrarProg: "Cancel sending and delete my details", borrarEl: (f) => `We delete your details automatically on ${f}.`, esperaBorrar: "You can delete them once you have the proof of sending.",
+    borrarProg: "Cancel sending", guardamos: (f) => `We keep your letter, the proof of sending and the payment for 6 years, as proof of your cancellation. We delete the rest ${f ? "on " + f : "90 days after sending"}.`, cancelada: "Sending cancelled.",
     nadaRecobro: (e) => `We see no ${e} charges after the cancellation in that statement.`, recobroVisto: (f, x) => `We see a charge of ${x} on ${f}.`,
     leyendo: "Reading your statement on your device…", noLeido: "We could not read that file. Type it in instead.",
     confirmarBorrar: "Are you sure? It cannot be undone.",
@@ -94,15 +91,6 @@ async function api(ruta, cuerpo) {
   return j;
 }
 const espera = (btn, on) => { if (!btn) return; btn.disabled = on; btn.setAttribute("aria-busy", on ? "true" : "false"); };
-
-// Foto → JPEG reducido (lado mayor 1600 px). Devuelve «data:image/jpeg;base64,…»
-async function aJpeg(archivo, lado = 1600) {
-  const bmp = await createImageBitmap(archivo);
-  const k = Math.min(1, lado / Math.max(bmp.width, bmp.height));
-  const c = document.createElement("canvas"); c.width = Math.round(bmp.width * k); c.height = Math.round(bmp.height * k);
-  const g = c.getContext("2d"); g.fillStyle = "#fff"; g.fillRect(0, 0, c.width, c.height); g.drawImage(bmp, 0, 0, c.width, c.height);
-  return c.toDataURL("image/jpeg", 0.82);
-}
 
 /* ============ FLUJO (/baja/enviar/) ============ */
 async function flujo() {
@@ -163,21 +151,14 @@ async function flujo() {
   /* Paso 2 · Tus datos */
   $("tbDatoL").textContent = DATO[LANG][E.dato] + " "; $("tbDatoOpc").textContent = datoObligatorio(E) ? "" : T.opcional;
   if (E.dato === "tarjeta4") { $("tbDato").inputMode = "numeric"; $("tbDato").maxLength = 4; }
-  $("tbDniBox").hidden = E.dni === "no"; $("tbDniFotoBox").hidden = E.dni !== "copia";
-  if (E.dni === "copia") $("tbDniFotoNota").textContent = T.dniCopia(E.nombre);
+  $("tbDniBox").hidden = E.dni === "no"; $("tbDniCopia").hidden = E.dni !== "copia";
+  if (E.dni === "copia") $("tbDniCopia").textContent = T.dniCopia(E.nombre);
   const extra = E.aviso_extra ? T[E.aviso_extra](E.nombre) : ""; $("tbExtra").hidden = !extra; if (extra) $("tbExtra").querySelector("span").textContent = extra;
   $("tbCartaIdioma").hidden = E.idioma === LANG; $("tbCartaIdioma").textContent = T.idiomaCarta[E.idioma] || "";
-  let dniFoto = null;
-  $("tbDniFoto").addEventListener("change", async (ev) => {
-    const f = ev.target.files[0]; dniFoto = null; $("tbDniFotoOk").hidden = true; err("tbDniFotoE", false);
-    if (!f) return;
-    try { dniFoto = await aJpeg(f); $("tbDniFotoOk").textContent = T.fotoOk; $("tbDniFotoOk").hidden = false; pintarCarta(); }
-    catch { err("tbDniFotoE", true, T.fotoMal); }
-  });
   const datos = () => ({ nombre: $("tbNombre").value, correo: $("tbCorreo").value, dato: $("tbDato").value, dni: $("tbDni").value });
   function pintarCarta() {
     const v = validarDatos(E, datos());
-    const c = carta(E, { datos: { ...v.datos, nombre: v.datos.nombre, dni: v.datos.dni || $("tbDni").value.trim() }, eleccion: eleccion(), fecha: hoy, adjuntaDni: Boolean(dniFoto) });
+    const c = carta(E, { datos: { ...v.datos, nombre: v.datos.nombre, dni: v.datos.dni || $("tbDni").value.trim() }, eleccion: eleccion(), fecha: hoy });
     $("tbCartaTxt").textContent = c.cuerpo.join("\n");
   }
   const CAMPOS = { nombre: "tbNombre", correo: "tbCorreo", dni: "tbDni", dato: "tbDato" };
@@ -191,7 +172,7 @@ async function flujo() {
     if (token && !editado) { show(3); return; } // vuelve atrás sin cambiar nada: mismo código
     espera($("tbN2"), true);
     try {
-      const r = await api("pedido", { empresa: slug, idioma: LANG, eleccion: eleccion(), datos: v.datos, dniFoto, compra: lote || undefined });
+      const r = await api("pedido", { empresa: slug, idioma: LANG, eleccion: eleccion(), datos: v.datos, compra: lote || undefined });
       token = r.p; editado = false; show(3);
     } catch (e) {
       if (e.codigo.indexOf("datos:") === 0) { const m = e.codigo.slice(6).split(","); marcar(m); $(CAMPOS[m[0]] || "tbNombre").focus(); }
@@ -333,12 +314,11 @@ async function estado() {
 
   // Tus datos
   const b = $("tbBorrar");
-  if (S.estado === "programada") b.textContent = T.borrarProg;
-  $("tbBorrarNota").textContent = S.estado === "en_marcha" ? T.esperaBorrar : S.borrarEl ? T.borrarEl(fd(S.borrarEl)) : "";
-  b.hidden = S.estado === "en_marcha";
+  b.textContent = T.borrarProg; b.hidden = S.estado !== "programada"; // solo se puede cancelar antes de que salga
+  $("tbBorrarNota").textContent = T.guardamos(S.borrarEl ? fd(S.borrarEl) : null);
   b.addEventListener("click", async () => {
     if (!confirm(T.confirmarBorrar)) return;
-    try { const r = await api("borrar", { p }); $("tbBorrarNota").textContent = T.borrado + (r.devuelto ? " " + T.devuelto(euros(r.devuelto, LANG)) : ""); b.hidden = true; document.querySelectorAll(".tb-est, #tbRecBox, #tbLoteBox").forEach((el) => { el.hidden = true; }); }
+    try { const r = await api("cancelar", { p }); $("tbBorrarNota").textContent = T.cancelada + (r.devuelto ? " " + T.devuelto(euros(r.devuelto, LANG)) : ""); b.hidden = true; document.querySelectorAll(".tb-est, #tbRecBox, #tbLoteBox").forEach((el) => { el.hidden = true; }); }
     catch { $("tbBorrarNota").textContent = T.servicio; }
   });
 }
