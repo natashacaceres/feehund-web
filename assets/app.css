@@ -1514,3 +1514,10 @@ main.art2 p a[href^="http"],main.art2 li a[href^="http"]{text-decoration:underli
 .hdr .brand{flex-shrink:0}
 @media (max-width:400px){.hdr .wrap{gap:12px}.hdr-baja{padding:0 6px}.hdr-r{gap:4px}}
 @media (max-width:360px){.hdr .brand img{height:30px}}
+/* Calculadora: preguntas que aparecen dentro de un paso (tipo de tarjeta, datáfonos, mes flojo) y números en fila */
+.calc .sub-q.on{display:block}
+.calc .chips.fila{grid-template-columns:repeat(4,minmax(0,1fr))}
+.calc .chips.fila .chip{justify-content:center;padding:var(--s-2)}
+.calc .chips.fila .chip[aria-pressed="true"]::after{right:8px;width:16px;height:16px;background-size:16px}
+#pNdMas,#pFlojoQ .money{margin-top:var(--s-3)}
+#pPermMore .fields{margin-top:var(--s-4)}

@@ -129,7 +129,58 @@ function calcular(PLANS, I) {
   else { verdict = "Compensa cambiar a " + best.p.plan + ": ahorras unos " + eur(best.ahorro_m) + "\u00a0€/mes" + minimo + "."; tono = "si"; }
   return { CURANN, cur: c, best, ranked, out, verdict, tono };
 }
-if (typeof module !== "undefined") module.exports = { calcular };
+if (typeof module !== "undefined") module.exports = { calcular, seguro };
+
+// Recomendación segura (sin tocar calcular()). Solo se recomienda lo que es cierto en todos los casos posibles:
+// - si falta un dato (seg.faltan), no se dice nada;
+// - si no se sabe qué tarjetas usan los clientes, se prueba como si todas fueran de particular, de empresa o de fuera de Europa;
+// - si hay meses flojos, se prueba con las ventas de cada mes entre el flojo y el normal (lo que se paga hoy, a esa escala);
+// - solo cuentan las tarifas comprobadas (fiabilidad Alta) y gana una tarifa si ahorra en todos los casos.
+// Devuelve {estado: "si"|"no"|"duda"|"falta", R (para pintar, con best = la tarifa en su peor caso), ok, casos, causas, faltan}.
+function seguro(I) {
+  const s = I.seg || { faltan: [], mezcla: "conocida", flojo: null };
+  if (s.faltan && s.faltan.length) return { estado: "falta", faltan: s.faltan, R: null, ok: [], casos: 0, causas: [] };
+  const base = calcular(PLANS, I); if (!base) return null;
+  const sumaPEN = I.wP + I.wE + I.wN;
+  const mezclas = s.mezcla === "desconocida" ? [[1, 0, 0], [0, 1, 0], [0, 0, 1]].map(m => ({ wP: sumaPEN * m[0], wE: sumaPEN * m[1], wN: sumaPEN * m[2] })) : [{}];
+  const vols = [I.V];
+  if (s.flojo > 0 && Math.abs(s.flojo - I.V) > 0.005) for (let k = 1; k <= 6; k++) vols.push(I.V + (s.flojo - I.V) * k / 6);
+  const coste = J => { const r = calcular(PLANS, Object.assign({}, J, { curCost: 0 })); return r ? r.cur.Cn : 0; };
+  const casos = [];
+  for (const m of mezclas) {
+    const J0 = Object.assign({}, I, m), c0 = coste(J0);
+    for (const v of vols) {
+      const J = Object.assign({}, J0, { V: v });
+      // lo que paga hoy a otra escala de ventas: lo pagado de verdad × lo que cambia su tarifa actual
+      if (v !== I.V && I.curCost > 0) { const cv = coste(J); J.curCost = c0 > 0 ? I.curCost * cv / c0 : I.curCost; }
+      const r = calcular(PLANS, J); if (r) casos.push(r);
+    }
+  }
+  const umbral = typeof PAGO !== "undefined" ? PAGO.umbralAhorro : 50;
+  const gana = r => !!r && r.sim && r.ahorro_m * 12 >= umbral && Math.max(r.neto24, r.neto24_espera) > 0;
+  const candidatas = base.ranked.filter(r => !r.es_actual && r.p.fiab === "Alta");
+  const ok = [], alguna = [];
+  for (const cand of candidatas) {
+    const filas = casos.map(R => R.ranked.find(r => r.p.id === cand.p.id) || null);
+    if (filas.some(gana)) alguna.push(cand.p.id);
+    if (!filas.every(gana)) continue;
+    // la fila del peor caso: la que menos ahorra; y lo más que puede costar al año
+    const peor = filas.reduce((a, r) => (r.ahorro_m < a.ahorro_m ? r : a));
+    const fila = Object.assign({}, peor, {
+      neto24: Math.min(...filas.map(r => r.neto24)), neto24_espera: Math.min(...filas.map(r => r.neto24_espera)),
+      ano2_max: Math.max(...filas.map(r => r.ano2)) });
+    ok.push(fila);
+  }
+  ok.sort((a, b) => Math.max(b.neto24, b.neto24_espera) - Math.max(a.neto24, a.neto24_espera));
+  const causas = [];
+  if (alguna.length && s.mezcla === "desconocida") causas.push("mezcla");
+  if (alguna.length && vols.length > 1) causas.push("flojo");
+  if (ok.length) return { estado: "si", R: Object.assign({}, base, { best: ok[0], ranked: ok, tono: "si" }), ok, casos: casos.length, causas, faltan: [] };
+  // «No, está bien» solo si ninguna tarifa, tampoco las que no están comprobadas, ahorra en ningún caso
+  const otraGana = casos.some(R => R.ranked.some(r => !r.es_actual && r.p.fiab !== "Alta" && gana(r)));
+  if (otraGana && !alguna.length) causas.push("tarifas");
+  return { estado: causas.length ? "duda" : "no", R: base, ok: [], casos: casos.length, causas, faltan: [] };
+}
 
 let REFERENCIA = null;
 
@@ -166,7 +217,12 @@ function iniciarUI(){
   const TX = {
     es: {
       vYes: "Sí, pagas de más.", vNo: "No, está bien.", noSub: "Ninguna tarifa te ahorra lo bastante para que compense cambiar.",
-      payLine: (x, p) => "Ahorro estimado de " + x + " al año · Recomendación por " + p,
+      payLine: (x, p) => "Ahorras al menos " + x + " al año · Recomendación por " + p,
+      vFalta: n => n === 1 ? "Nos falta un dato." : "Nos faltan datos.", falta: l => "Para decirte algo seguro necesitamos " + l + ".", y: " y ",
+      faltaN: { pagado: "lo que te cobró el banco ese mes", perm: "si tienes permanencia", iva: "si recuperas el IVA", caja: "si tu datáfono está conectado a la caja" },
+      vDuda: "No podemos asegurártelo.", duda: c => "Con tus datos, el ahorro depende de " + c + ". Por eso no te recomendamos nada.",
+      dudaC: { mezcla: "qué tarjetas usan tus clientes", flojo: "cuánto vendes en los meses flojos", tarifas: "tarifas que aún no hemos podido comprobar" },
+      iCostMax: (c, s) => "Cuesta como mucho " + c + " al mes y ahorras al menos " + s + " al año",
       iCost: (c, s) => "Cuesta " + c + " al mes y ahorras " + s + " al año", iAltCost: c => c + "/mes",
       iWait2: (d, pen) => "Cuando acabe tu permanencia, en " + d + "." + (pen ? " Así evitas la penalización de " + pen + "." : ""),
       iBankX: (x, y) => "Pide igualar " + x + "/mes o la tarifa " + y + "; si no, solicita la baja.",
@@ -184,7 +240,12 @@ function iniciarUI(){
     },
     ca: {
       vYes: "Sí, pagues de més.", vNo: "No, està bé.", noSub: "Cap tarifa t'estalvia prou perquè compensi canviar.",
-      payLine: (x, p) => "Estalvi estimat de " + x + " l'any · Recomanació per " + p,
+      payLine: (x, p) => "Estalvies almenys " + x + " l'any · Recomanació per " + p,
+      vFalta: n => n === 1 ? "Ens falta una dada." : "Ens falten dades.", falta: l => "Per dir-te alguna cosa segura necessitem " + l + ".", y: " i ",
+      faltaN: { pagado: "el que et va cobrar el banc aquell mes", perm: "si tens permanència", iva: "si recuperes l'IVA", caja: "si el teu datàfon està connectat a la caixa" },
+      vDuda: "No t'ho podem assegurar.", duda: c => "Amb les teves dades, l'estalvi depèn de " + c + ". Per això no et recomanem res.",
+      dudaC: { mezcla: "quines targetes fan servir els teus clients", flojo: "quant vens els mesos fluixos", tarifas: "tarifes que encara no hem pogut comprovar" },
+      iCostMax: (c, s) => "Costa com a màxim " + c + " al mes i estalvies almenys " + s + " l'any",
       iCost: (c, s) => "Costa " + c + " al mes i estalvies " + s + " l'any", iAltCost: c => c + "/mes",
       iWait2: (d, pen) => "Quan acabi la permanència, el " + d + "." + (pen ? " Així evites la penalització de " + pen + "." : ""),
       iBankX: (x, y) => "Demana igualar " + x + "/mes o la tarifa " + y + "; si no, sol·licita la baixa.",
@@ -202,7 +263,12 @@ function iniciarUI(){
     },
     en: {
       vYes: "Yes, you are paying too much.", vNo: "No, you are fine.", noSub: "No rate saves you enough to make switching worth it.",
-      payLine: (x, p) => "Estimated saving of " + x + " a year · Recommendation for " + p,
+      payLine: (x, p) => "You save at least " + x + " a year · Recommendation for " + p,
+      vFalta: n => n === 1 ? "We're missing one answer." : "We're missing some answers.", falta: l => "To give you a sure answer we need " + l + ".", y: " and ",
+      faltaN: { pagado: "what your bank charged you that month", perm: "whether you have a minimum term", iva: "whether you reclaim VAT", caja: "whether your card machine is linked to your till" },
+      vDuda: "We can't be sure.", duda: c => "With your answers, the saving depends on " + c + ". So we don't recommend anything.",
+      dudaC: { mezcla: "which cards your customers use", flojo: "how much you sell in quieter months", tarifas: "rates we haven't been able to check yet" },
+      iCostMax: (c, s) => "Costs at most " + c + " a month and saves at least " + s + " a year",
       iCost: (c, s) => "Costs " + c + " a month and saves " + s + " a year", iAltCost: c => c + "/month",
       iWait2: (d, pen) => "When your minimum term ends, in " + d + "." + (pen ? " That way you avoid the " + pen + " penalty." : ""),
       iBankX: (x, y) => "Ask them to match " + x + "/month or the " + y + " rate; if not, request cancellation.",
@@ -280,8 +346,17 @@ function iniciarUI(){
     const s = ["pPart","pEmp","pNoe","pAmex","pBiz"].map(id => num($(id).value) || 0);
     return { s, V: s.reduce((a, b) => a + b, 0), ops: num($("pOps").value) || 0 };
   }
-  const stepOK = i => i === 0 ? vals().V > 0 : i === 1 ? vals().ops > 0 : i === 2 ? num($("pPaid").value) > 0 : true;
-  function navState(){ steps.forEach((st, i) => st.querySelectorAll("[data-pnext]").forEach(b => b.disabled = !stepOK(i))); }
+  // Lo que hace falta para seguir: sin una respuesta no se avanza («No lo sé» es una respuesta, pero luego no se recomienda nada)
+  const mixDuda = () => { const s = vals().s; return s[0] > 0 && s.slice(1).every(x => !(x > 0)); };
+  const nd = () => P.pNd === "Más" ? (num($("pNdN").value) || 0) : (+P.pNd || 0);
+  const flojo = () => num($("pFlojo").value) || 0;
+  const permOK = () => P.pPermS === "No" || P.pPermS === "No sé" || (P.pPermS === "Sí" && !!$("pPermM").value && !!$("pPermY").value && num($("pPen").value) !== null);
+  const stepOK = i => i === 0 ? vals().V > 0 && (!mixDuda() || !!P.pMix)
+    : i === 1 ? vals().ops > 0 && nd() > 0
+    : i === 2 ? P.pEst === "Igual" || (P.pEst === "Flojo" && flojo() > 0)
+    : i === 3 ? num($("pPaid").value) > 0 || !!pp.querySelector('[data-paid-no][aria-pressed="true"]')
+    : i === 5 ? permOK() : true;
+  function navState(){ $("pMixQ").hidden = !mixDuda(); steps.forEach((st, i) => st.querySelectorAll("[data-pnext]").forEach(b => b.disabled = !stepOK(i))); }
   let pi = 0, advT = 0;
   function showStep(i, focus){
     clearTimeout(advT);
@@ -299,7 +374,7 @@ function iniciarUI(){
     if (e.target.closest("[data-pback]")) { showStep(pi - 1, true); return; }
     const n = e.target.closest("[data-pnext]"); if (n) { if (!n.disabled) next(pi); return; }
     const no = e.target.closest("[data-paid-no]");
-    if (no) { no.setAttribute("aria-pressed", "true"); $("pPaid").value = ""; navState(); answered(2); return; }
+    if (no) { no.setAttribute("aria-pressed", "true"); $("pPaid").value = ""; navState(); answered(3); return; }
     const b = e.target.closest(".chip[data-v]"); if (!b) return;
     const name = b.parentElement.dataset.name; if (!name) return;
     press(b);
@@ -315,6 +390,9 @@ function iniciarUI(){
     }
     if (name === "plan") { P.cur = v; answered(pi); return; }
     P[name] = v;
+    if (name === "pEst") { $("pFlojoQ").hidden = v !== "Flojo"; if (v === "Flojo") $("pFlojo").focus(); }
+    if (name === "pNd") { $("pNdMas").hidden = v !== "Más"; if (v === "Más") $("pNdN").focus(); }
+    if (name === "pPermS") $("pPermMore").hidden = v !== "Sí";
     if (name === "pLock") { $("pLockMore").hidden = $("pLockNext").hidden = v !== "Sí"; if (v === "Sí") return; }
     answered(pi);
   });
@@ -337,9 +415,16 @@ function iniciarUI(){
     const v = vals(), V = v.V, w = v.s.map(x => x / V);
     const contrato = P.cur === "CONTRATO" ? { rp:numPct($("cP").value), re:numPct($("cE").value), rn:numPct($("cN").value), ra:numPct($("cA").value), rb:numPct($("cB").value),
       f:num($("cF").value) || 0, cuota:num($("cQ").value) || 0, alq:num($("cL").value) || 0 } : null;
-    const lock = P.pLock === "Sí";
+    const lock = P.pLock === "Sí", perm = P.pPermS === "Sí";
+    // Lo que no se sabe no se supone: se apunta en seg.faltan y entonces no se recomienda nada
+    const faltan = [];
+    if (!(num($("pPaid").value) > 0)) faltan.push("pagado");
+    if (P.pPermS !== "No" && !(perm && $("pPermM").value && $("pPermY").value)) faltan.push("perm");
+    if (P.pIva === "No sé" || !P.pIva) faltan.push("iva");
+    if (P.pLock === "No sé" || !P.pLock || (lock && num($("pCaja").value) === null)) faltan.push("caja");
+    const seg = { faltan, mezcla: mixDuda() && P.pMix !== "Sí" ? "desconocida" : "conocida", flojo: P.pEst === "Flojo" ? flojo() : null };
     const I = { V, T: V / v.ops, wP:w[0], wE:w[1], wN:w[2], wA:w[3], wB:w[4], NP:.025, BZ:.005, PROMO:true, IVAQ:false, IVA:.21, CTA:true,
-      ND:1, nF:2, pF:.5, PEN: num($("pPen").value) || 0, MREM: num($("pPerm").value) || 0, CAJA: lock ? (num($("pCaja").value) || 0) : 0,
+      ND: nd() || 1, nF:0, pF:1, PEN: perm ? (num($("pPen").value) || 0) : 0, MREM: perm ? (num($("pPerm").value) || 0) : 0, CAJA: lock ? (num($("pCaja").value) || 0) : 0, seg,
       cur: P.cur, curCost: num($("pPaid").value) || 0, sector: P.pSector, cons:0, forma: P.pForma || null, incBaja:false, maxDias:null, swLock: lock,
       swF: num($("pSwF").value) || 0, swNew: num($("pSwN").value) || 0, contrato };
     if (P.pIva === "Sí") I.IVA = 0;
@@ -351,20 +436,24 @@ function iniciarUI(){
   const hideOut = () => { ["res","pay","informe","resLoad"].forEach(id => $(id).hidden = true); $("shareMsg").hidden = true; $("contacto").hidden = true; };
   function run(I){
     const v = vals();
-    if (!(v.V > 0 && v.ops > 0 && P.cur && P.pSector)) { showStep(!(v.V > 0) ? 0 : !(v.ops > 0) ? 1 : !P.cur ? 3 : 5, true); return; }
-    const R = calcular(PLANS, I); if (!R) return;
-    last = { kind: "precisa", I, R };
+    if (!(v.V > 0 && v.ops > 0 && P.cur && P.pSector)) { showStep(!(v.V > 0) ? 0 : !(v.ops > 0) ? 1 : !P.cur ? 4 : 6, true); return; }
+    const S = seguro(I); if (!S) return;
+    last = { kind: "precisa", I, R: S.R, S };
     tok++; hideOut();
-    fill(); $("res").hidden = false; $("pay").hidden = !ofrecer(last.R);
+    fill(); $("res").hidden = false; $("pay").hidden = !ofrecer(last);
     $("rVerdict").focus({ preventScroll: true });
     requestAnimationFrame(() => goTo($("res"), true));
   }
+  const lista = (xs, t) => xs.length < 2 ? xs.join("") : xs.slice(0, -1).join(", ") + t.y + xs[xs.length - 1];
   function fill(){
-    const { I, R } = last, t = T(), b = R.best, yes = R.tono === "si";
+    const { I, R, S } = last, t = T(), b = R && R.best, yes = S.estado === "si";
     const wait = yes && (I.MREM || 0) > 0 && b.neto24_espera > b.neto24;
-    $("rVerdict").textContent = yes ? t.vYes : t.vNo;
+    $("rVerdict").textContent = yes ? t.vYes : S.estado === "no" ? t.vNo : S.estado === "falta" ? t.vFalta(S.faltan.length) : t.vDuda;
     $("rHero").hidden = $("rFacts").hidden = !yes; $("rNo").hidden = yes;
-    $("rNo").textContent = t.noSub;
+    $("rNo").textContent = S.estado === "no" ? t.noSub : S.estado === "falta" ? t.falta(lista(S.faltan.map(k => t.faltaN[k]), t)) : t.duda(lista(S.causas.map(k => t.dudaC[k]), t));
+    // Sin respuesta segura no hay nada que compartir; lo que paga por cada 100 € solo si sabemos lo que paga
+    $("rShare").hidden = !yes && S.estado !== "no";
+    const cmp = $("rEff").closest(".cmp"); if (cmp) cmp.hidden = !(I.curCost > 0);
     if (yes) {
       $("rPre").textContent = t.pre;
       $("rBig").textContent = t.one(eur(Math.max(0, b.ahorro_m)));
@@ -372,20 +461,19 @@ function iniciarUI(){
       $("f24").textContent = eur(Math.max(0, wait ? b.neto24_espera : b.neto24));
       const pb = b.payback;
       $("fPay").textContent = typeof pb === "number" ? (pb < 1 ? t.instant : t.months(Math.ceil(pb))) : "—";
-      $("fCheap").textContent = R.ranked.filter(r => !r.es_actual && r.ahorro_m > 0).length;
+      $("fCheap").textContent = S.ok.length;
       $("fCheapK").textContent = t.cheap(SIM.length);
     }
-    const vol = I.V * ((12 - I.nF) + I.nF * I.pF);
-    $("rEff").textContent = vol > 0 ? eur(R.CURANN / vol * 100, 2) : "—";
+    $("rEff").textContent = I.curCost > 0 && I.V > 0 ? eur(I.curCost / I.V * 100, 2) : "—";
     const ref = REFERENCIA;
     $("rRef").hidden = !ref;
     if (ref) $("rRef").textContent = t.ref(String(ref.valor).replace(".", ","), ref.periodo ? ref.periodo + ", " : "");
-    $("payLine").textContent = t.payLine(eur(anual(R)), precio());
+    if (yes) $("payLine").textContent = t.payLine(eur(anual(R)), precio());
     if (!$("informe").hidden && last.I) fillInforme();
   }
   async function shareCard(){
     if (!last) return;
-    const t = T(), yes = last.R.tono === "si", url = location.origin + location.pathname;
+    const t = T(), yes = last.S.estado === "si", url = location.origin + location.pathname;
     const fig = yes ? t.one(eur(Math.max(0, last.R.best.ahorro_m))) : null;
     const big = fig || $("rEff").textContent, line = fig ? t.shYes : t.shNo, text = fig ? t.shareTxtYes(fig) : t.shareTxtNo;
     const c = document.createElement("canvas"); c.width = 1080; c.height = 1080;
@@ -436,7 +524,7 @@ function iniciarUI(){
   const KEY = "nc-calc";
   const precio = () => eur(PAGO.precio);
   const anual = R => Math.max(0, R.best.ahorro_m * 12);
-  const ofrecer = R => R.tono === "si" && anual(R) >= PAGO.umbralAhorro;
+  const ofrecer = x => x.S.estado === "si" && anual(x.R) >= PAGO.umbralAhorro;
   $("paySoon").hidden = PAGABLE;
   $("payOk").addEventListener("change", () => { $("payBtn").disabled = !(PAGABLE && $("payOk").checked); });
   $("payBtn").addEventListener("click", () => {
@@ -445,12 +533,13 @@ function iniciarUI(){
     location.href = PAGO.enlace;
   });
   function fillInforme(){
-    const { I, R } = last, t = T(), b = R.best;
+    const { I, R, S } = last, t = T(), b = R.best;
     const name = p => p.id === "CONTRATO" ? t.own2 : p.plan;
-    const mes = r => eur(Math.max(0, r.ano2 / 12));
+    // lo que cuesta cada tarifa en el peor de los casos posibles (con un solo caso, lo que cuesta)
+    const mes = r => eur(Math.max(0, (r.ano2_max != null ? r.ano2_max : r.ano2) / 12));
     $("iPlan").textContent = name(b.p);
-    $("iSave").textContent = t.iCost(mes(b), eur(anual(R)));
-    $("iAlts").innerHTML = R.ranked.filter(r => r !== b && !r.es_actual).slice(0, 2).map(r => '<li><b>' + name(r.p) + '</b> · ' + t.iAltCost(mes(r)) + '</li>').join("");
+    $("iSave").textContent = (S.casos > 1 ? t.iCostMax : t.iCost)(mes(b), eur(anual(R)));
+    $("iAlts").innerHTML = R.ranked.filter(r => r.p.id !== b.p.id && !r.es_actual).slice(0, 2).map(r => '<li><b>' + name(r.p) + '</b> · ' + t.iAltCost(mes(r)) + '</li>').join("");
     const wait = (I.MREM || 0) > 0 && b.neto24_espera > b.neto24;
     if (wait) { const d = new Date(); d.setMonth(d.getMonth() + I.MREM); $("iWhen").textContent = t.iWait2(d.toLocaleDateString({ es:"es-ES", ca:"ca-ES", en:"en-GB" }[lang()], { month:"long", year:"numeric" }), I.PEN > 0 ? eur(I.PEN) : ""); }
     else $("iWhen").textContent = b.coste_cambio > 0 ? t.iNowCost(eur(b.coste_cambio)) : t.iNow;
@@ -481,8 +570,8 @@ function iniciarUI(){
     }
     try { history.replaceState(null, "", location.pathname); } catch(_) {}
     pp.hidden = true;
-    const R = saved && saved.I ? calcular(PLANS, saved.I) : null;
-    if (R) { last = { kind: "precisa", I: saved.I, R }; fillInforme(); }
+    const S = saved && saved.I ? seguro(saved.I) : null, R = S && S.estado === "si" ? S.R : null;
+    if (R) { last = { kind: "precisa", I: saved.I, R, S }; fillInforme(); }
     $("iBody").hidden = !R; $("iMissing").hidden = !!R;
     $("informe").hidden = false;
     try { sessionStorage.removeItem(KEY); } catch(_) {}
@@ -652,15 +741,15 @@ const PAISES = [{codigo:"ES", nombre:"España", ruta:"/datafono/", idiomas:"Espa
   });
 })();
 
-// ---------- recibo: cabecera «1 de 9», líneas impresas con las respuestas y colita (solo presentación; no toca el cálculo)
+// ---------- recibo: cabecera «1 de 10», líneas impresas con las respuestas y colita (solo presentación; no toca el cálculo)
 (function recibo(){
   const pp = document.getElementById("calc"), wrap = document.getElementById("reciboWrap"); if (!pp || !wrap) return;
   const $ = id => document.getElementById(id);
   const lang = () => ["es","ca","en"].indexOf(document.documentElement.lang) >= 0 ? document.documentElement.lang : "es";
   const TX = {
-    es: { q: "Pregunta", de: "de", ventas: "Ventas con tarjeta", cobros: "Pagos con tarjeta", pagado: "Pagado al banco", prov: "Banco o empresa", perm: "Permanencia", neg: "Negocio", forma: "Forma", iva: "Recupera el IVA", imp: "Importe al datáfono", mios: "Mis precios", nada: "Sin permanencia", meses: n => n + (n === 1 ? " mes" : " meses"), edit: "Cambiar" },
-    ca: { q: "Pregunta", de: "de", ventas: "Vendes amb targeta", cobros: "Pagaments amb targeta", pagado: "Pagat al banc", prov: "Banc o empresa", perm: "Permanència", neg: "Negoci", forma: "Forma", iva: "Recupera l'IVA", imp: "Import al datàfon", mios: "Els meus preus", nada: "Sense permanència", meses: n => n + (n === 1 ? " mes" : " mesos"), edit: "Canviar" },
-    en: { q: "Question", de: "of", ventas: "Card sales", cobros: "Card payments", pagado: "Paid to bank", prov: "Bank or company", perm: "Minimum term", neg: "Business", forma: "Legal form", iva: "Reclaims VAT", imp: "Amount entry", mios: "My own prices", nada: "None", meses: n => n + (n === 1 ? " month" : " months"), edit: "Change" }
+    es: { q: "Pregunta", de: "de", ventas: "Ventas con tarjeta", cobros: "Pagos con tarjeta", anio: "Mes flojo", pagado: "Pagado al banco", prov: "Banco o empresa", perm: "Permanencia", neg: "Negocio", forma: "Forma", iva: "Recupera el IVA", imp: "Importe al datáfono", mios: "Mis precios", nada: "Sin permanencia", meses: n => n + (n === 1 ? " mes" : " meses"), edit: "Cambiar" },
+    ca: { q: "Pregunta", de: "de", ventas: "Vendes amb targeta", cobros: "Pagaments amb targeta", anio: "Mes fluix", pagado: "Pagat al banc", prov: "Banc o empresa", perm: "Permanència", neg: "Negoci", forma: "Forma", iva: "Recupera l'IVA", imp: "Import al datàfon", mios: "Els meus preus", nada: "Sense permanència", meses: n => n + (n === 1 ? " mes" : " mesos"), edit: "Canviar" },
+    en: { q: "Question", de: "of", ventas: "Card sales", cobros: "Card payments", anio: "Quiet month", pagado: "Paid to bank", prov: "Bank or company", perm: "Minimum term", neg: "Business", forma: "Legal form", iva: "Reclaims VAT", imp: "Amount entry", mios: "My own prices", nada: "None", meses: n => n + (n === 1 ? " month" : " months"), edit: "Change" }
   };
   const num = s => {
     if (s == null) return null; s = String(s).trim().replace(/\s|€|%/g, ""); if (s === "") return null;
@@ -675,19 +764,21 @@ const PAISES = [{codigo:"ES", nombre:"España", ruta:"/datafono/", idiomas:"Espa
   const txt = el => { if (!el) return ""; const s = el.querySelector('[data-l="' + lang() + '"]'); return (s || el).textContent.trim(); };
   const on = sel => pp.querySelector(sel + ' .chip[aria-pressed="true"]');
   const steps = [...pp.querySelectorAll(":scope > .q")], N = steps.length;
-  const LAB = ["ventas","cobros","pagado","prov","perm","neg","forma","iva","imp"];
-  const CORTO = { es: ["Ventas tarjeta","Nº pagos","Pagado","Banco","Permanencia","Negocio","Forma","IVA","Importe"], ca: ["Vendes targeta","Nº pagaments","Pagat","Banc","Permanència","Negoci","Forma","IVA","Import"], en: ["Card sales","No. payments","Paid","Bank","Term","Business","Form","VAT","Entry"] };
+  const LAB = ["ventas","cobros","anio","pagado","prov","perm","neg","forma","iva","imp"];
+  const CORTO = { es: ["Ventas tarjeta","Nº pagos","Mes flojo","Pagado","Banco","Permanencia","Negocio","Forma","IVA","Importe"], ca: ["Vendes targeta","Nº pagaments","Mes fluix","Pagat","Banc","Permanència","Negoci","Forma","IVA","Import"], en: ["Card sales","No. payments","Quiet month","Paid","Bank","Term","Business","Form","VAT","Entry"] };
   const valor = i => {
     const T = TX[lang()];
     if (i === 0) { const v = ["pPart","pEmp","pNoe","pAmex","pBiz"].reduce((a, id) => a + (num($(id).value) || 0), 0); return v > 0 ? eur(v) : ""; }
     if (i === 1) { const v = num($("pOps").value); return v > 0 ? fmt(v) : ""; }
-    if (i === 2) { const v = num($("pPaid").value); if (v > 0) return eur(v); const no = pp.querySelector('[data-paid-no][aria-pressed="true"]'); return no ? txt(no) : ""; }
-    if (i === 3) { const pl = on("#pPlanChips"); if (pl) return txt(pl); const pv = on("#pProvChips"); if (!pv) return ""; if (pv.dataset.v === "CONTRATO") return T.mios; if (pv.dataset.v === "OTRO") { const s = $("pProv"); return s.value && s.selectedIndex > 0 ? s.options[s.selectedIndex].text : ""; } return txt(pv); }
-    if (i === 4) { const m = num($("pPerm").value), p = num($("pPen").value); if (!(m > 0) && !(p > 0)) return T.nada; return [m > 0 ? T.meses(m) : "", p > 0 ? eur(p) : ""].filter(Boolean).join(" · "); }
-    if (i === 5) return txt(on("#pSectorChips"));
-    if (i === 6) return txt(on('[data-name="pForma"]'));
-    if (i === 7) return txt(on('[data-name="pIva"]'));
-    if (i === 8) return txt(on("#pLockChips"));
+    if (i === 2) { const e = on('[data-name="pEst"]'); if (!e) return ""; if (e.dataset.v !== "Flojo") return txt(e); const f = num($("pFlojo").value); return f > 0 ? eur(f) : ""; }
+    if (i === 3) { const v = num($("pPaid").value); if (v > 0) return eur(v); const no = pp.querySelector('[data-paid-no][aria-pressed="true"]'); return no ? txt(no) : ""; }
+    if (i === 4) { const pl = on("#pPlanChips"); if (pl) return txt(pl); const pv = on("#pProvChips"); if (!pv) return ""; if (pv.dataset.v === "CONTRATO") return T.mios; if (pv.dataset.v === "OTRO") { const s = $("pProv"); return s.value && s.selectedIndex > 0 ? s.options[s.selectedIndex].text : ""; } return txt(pv); }
+    if (i === 5) { const st = on('[data-name="pPermS"]'); if (!st) return ""; if (st.dataset.v === "No") return T.nada; if (st.dataset.v !== "Sí") return txt(st);
+      const m = num($("pPerm").value), p = num($("pPen").value); if (!(m > 0) && !(p > 0)) return T.nada; return [m > 0 ? T.meses(m) : "", p > 0 ? eur(p) : ""].filter(Boolean).join(" · "); }
+    if (i === 6) return txt(on("#pSectorChips"));
+    if (i === 7) return txt(on('[data-name="pForma"]'));
+    if (i === 8) return txt(on('[data-name="pIva"]'));
+    if (i === 9) return txt(on("#pLockChips"));
     return "";
   };
   const actual = () => steps.findIndex(s => !s.hidden);
@@ -781,8 +872,10 @@ const PAISES = [{codigo:"ES", nombre:"España", ruta:"/datafono/", idiomas:"Espa
     const num = s => { s = String(s || "").replace(/\s|€/g, "").replace(/\./g, "").replace(",", "."); const v = parseFloat(s); return isFinite(v) ? v : 0; };
     const elegido = () => { const pv = document.querySelector('#pProvChips .chip[aria-pressed="true"]'), pl = document.querySelector('#pPlanChips .chip[aria-pressed="true"]'), s = document.getElementById("pProv");
       if (pl) return true; if (!pv) return false; if (pv.dataset.v === "CONTRATO") return true; if (pv.dataset.v === "OTRO") return !!(s && s.value); return document.getElementById("pPlanChips").hidden; };
-    const ok = i => i === 2 ? (num(document.getElementById("pPaid").value) > 0 || !!form.querySelector('[data-paid-no][aria-pressed="true"]'))
-      : i === 3 ? elegido() : i >= 5 ? !!qs[i].querySelector('.chips .chip[aria-pressed="true"]') : null;
+    // 0 a 2 y 5 (permanencia) los decide la calculadora (stepOK en iniciarUI)
+    const caja = () => { const c = document.querySelector('#pLockChips .chip[aria-pressed="true"]'); return !!c && (c.dataset.v !== "Sí" || String(document.getElementById("pCaja").value).trim() !== ""); };
+    const ok = i => i === 3 ? (num(document.getElementById("pPaid").value) > 0 || !!form.querySelector('[data-paid-no][aria-pressed="true"]'))
+      : i === 4 ? elegido() : i === 9 ? caja() : i >= 6 ? !!qs[i].querySelector('.chips .chip[aria-pressed="true"]') : null;
     const upd = () => qs.forEach((q, i) => { const r = ok(i); if (r === null) return; q.querySelectorAll("[data-pnext]").forEach(b => { if (b.disabled !== !r) b.disabled = !r; }); });
     const pedir = () => setTimeout(upd, 0);
     new MutationObserver(pedir).observe(form, { subtree: true, attributes: true, attributeFilter: ["aria-pressed", "hidden"] });
