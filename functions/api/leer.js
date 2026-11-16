@@ -5,7 +5,8 @@
 // Llamada HTTP directa (sin el SDK): esta web no tiene paso de compilación ni dependencias npm.
 // Clave: variable secreta ANTHROPIC_API_KEY del proyecto de Cloudflare Pages.
 
-const MODELO = 'claude-opus-5-5';
+// Dos pasadas: primero el modelo rápido y barato; si el saldo no cuadra, la página pide el preciso (?modelo=preciso)
+const MODELOS = { rapido: 'claude-haiku-5-5', preciso: 'claude-opus-5-5' };
 const MAX_BYTES = 10 * 1024 * 1024; // el mismo límite por archivo que la bandeja de la página
 const TIPOS = {
   'application/pdf': 'document',
@@ -72,19 +73,19 @@ export async function onRequestPost({ request, env }) {
     ? { type: 'document', source: { type: 'base64', media_type: 'application/pdf', data: aBase64(datos) } }
     : { type: 'image', source: { type: 'base64', media_type: tipo, data: aBase64(datos) } };
 
+  const cual = new URL(request.url).searchParams.get('modelo') === 'preciso' ? 'preciso' : 'rapido';
+  const cabeceras = { 'content-type': 'application/json', 'x-api-key': env.ANTHROPIC_API_KEY, 'anthropic-version': '2026-10-21' };
+  const extra = {};
+  // El preciso (Opus) lleva el modelo de reserva del servidor si se niega; Haiku no lo tiene
+  if (cual === 'preciso') { cabeceras['anthropic-beta'] = 'server-side-fallback-2026-07-01'; extra.fallbacks = 'default'; }
   const respuesta = await fetch('https://api.anthropic.com/v1/messages', {
     method: 'POST',
-    headers: {
-      'content-type': 'application/json',
-      'x-api-key': env.ANTHROPIC_API_KEY,
-      'anthropic-version': '2026-10-21',
-      'anthropic-beta': 'server-side-fallback-2026-07-01',
-    },
+    headers: cabeceras,
     body: JSON.stringify({
-      model: MODELO,
+      model: MODELOS[cual],
       max_tokens: 64000,
       stream: true,
-      fallbacks: 'default',
+      ...extra,
       system: INSTRUCCIONES,
       // Copiar no exige razonar: con poco esfuerzo tarda y cuesta mucho menos; el saldo comprueba después cada fila
       output_config: { effort: 'low', format: { type: 'json_schema', schema: ESQUEMA } },
