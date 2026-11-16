@@ -13,7 +13,7 @@
 //   POST cancelar               cancelar una baja programada antes de que salga (se devuelve el dinero)
 //   POST lote/devolver          devolver las bajas del lote que no se han usado
 //   GET  gestion?g=             (equipo) datos para enviar la carta a mano
-//   GET  gestion/carta.pdf|recobro.pdf?g=
+//   GET  gestion/carta.pdf|dni.jpg|recobro.pdf?g=
 //   POST gestion/hecho          (equipo) subir el certificado de Lleida.net: la persona recibe el justificante
 //   POST gestion/devolver       (equipo) no se pudo entregar: devolución
 //   POST tarea                  tarea diaria (la llama el Worker con TAREA_SECRET)
@@ -76,7 +76,7 @@ export async function onRequest({ request, env, params }) {
       if (ruta === 'carta.pdf') return archivo(await pdfCarta(env, p));
       if (ruta === 'certificado.pdf') return archivo(await pdfCertificado(env, p));
       if (ruta === 'gestion') return json(await gestion(env, g));
-      const m = /^gestion\/(carta\.pdf|recobro\.pdf)$/.exec(ruta);
+      const m = /^gestion\/(carta\.pdf|dni\.jpg|recobro\.pdf)$/.exec(ruta);
       if (m) return archivo(await gestionArchivo(env, g, m[1].split('.')[0]));
       return json({ error: 'ruta' }, 404);
     }

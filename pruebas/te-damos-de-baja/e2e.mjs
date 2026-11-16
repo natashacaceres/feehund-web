@@ -70,7 +70,7 @@ const page = await ctx.newPage();
 const fallos = []; ctx.on('weberror', (e) => fallos.push(e.error().message));
 console.log(`(modo ${MODO})`);
 
-console.log('1 · O2, lo antes posible, con DNI (sin foto), firma dibujada y lote de 3');
+console.log('1 · O2, lo antes posible, con DNI y su foto (O2 la exige), firma dibujada y lote de 3');
 await page.goto(WEB + '/baja/enviar/?empresa=o2&nombre=O2');
 await page.waitForSelector('#tbH1:visible');
 assert.equal(await page.locator('input[name="cuando"][value="ya"]').isChecked(), true); // O2 solo tiene «lo antes posible»
@@ -78,10 +78,13 @@ await foto(page, 'paso1-cuando');
 await page.click('#tbN1');
 await page.fill('#tbNombre', PERSONA.nombre); await page.fill('#tbCorreo', PERSONA.correo);
 await page.fill('#tbDato', 'LINEA-DE-PRUEBA-1'); await page.fill('#tbDni', PERSONA.dni);
-assert.equal(await page.locator('input[type="file"]').count(), 0, 'sin subida de la foto del DNI');
-assert.match(await page.textContent('#tbDniCopia'), /O2 suele pedir copia del DNI\. No hace falta ahora/);
+assert.match(await page.textContent('#tbDniExige'), /O2 exige copia del DNI para tramitar la baja/);
+await page.click('#tbN2'); await page.waitForSelector('#tbDniFotoE:visible'); // sin foto no deja seguir
+const png = Buffer.from(await page.evaluate(async () => { const c = document.createElement('canvas'); c.width = 400; c.height = 250; const g = c.getContext('2d'); g.fillStyle = '#cde'; g.fillRect(0, 0, 400, 250); g.fillStyle = '#123'; g.font = '28px sans-serif'; g.fillText('DOCUMENTO DE PRUEBA', 20, 130); return [...new Uint8Array(await (await fetch(c.toDataURL('image/png'))).arrayBuffer())]; }));
+await page.setInputFiles('#tbDniFoto', { name: 'dni.png', mimeType: 'image/png', buffer: png });
+await page.waitForSelector('#tbDniFotoOk:visible');
 const carta1 = await page.textContent('#tbCartaTxt');
-assert.match(carta1, /Ana Prueba Ejemplo/); assert.ok(carta1.includes(PERSONA.correo)); assert.match(carta1, /DNI\/NIE: 12345678Z/); assert.match(carta1, /dos días hábiles/); assert.match(carta1, /Indico mi DNI\/NIE para identificarme/);
+assert.match(carta1, /Ana Prueba Ejemplo/); assert.ok(carta1.includes(PERSONA.correo)); assert.match(carta1, /DNI\/NIE: 12345678Z/); assert.match(carta1, /dos días hábiles/); assert.match(carta1, /Adjunto copia de mi DNI\/NIE/);
 await foto(page, 'paso2-datos-y-carta');
 await page.click('#tbN2');
 await firmarYSeguir(page);
@@ -115,7 +118,7 @@ await foto(page, 'estado-en-marcha');
 const urg = await enviarPorDetras(page, 'O2', { fotos: true });
 if (urg) {
   assert.match(urg.text, /Para: bajas@o2online\.es/); assert.match(urg.text, /Asunto \(cópialo tal cual[^\n]*: Solicitud de baja del contrato · Ana Prueba Ejemplo · FH-/);
-  assert.ok(urg.adjuntos.some((a) => a.startsWith('solicitud-de-baja'))); assert.ok(!urg.adjuntos.some((a) => a.includes('identidad')), 'la foto del DNI no va en el correo');
+  assert.ok(urg.adjuntos.some((a) => a.startsWith('solicitud-de-baja'))); assert.ok(urg.adjuntos.some((a) => a.startsWith('dni-nie-')), 'la foto del DNI va en el correo urgente');
   assert.ok(!(await correos()).some((c) => c.to.includes('bajas@o2online.es')), 'en modo manual la web no escribe a la empresa');
   ok('correo URGENTE al equipo con la dirección de la ficha, el asunto y la carta; gestión: certificado subido');
 } else {

@@ -52,9 +52,13 @@ baja ni evitamos penalizaciones). Revisar: limitación de responsabilidad, ident
 fuero, resolución de litigios en línea.
 
 ## 5. Protección de datos (RGPD)
-- Datos nuevos: nombre, correo, dato del contrato, DNI/NIE (solo el número; **no se pide foto del documento**), firma
-  dibujada, carta, prueba de la firma. Sección nueva en /privacidad/ (y ca/en). ¿Base jurídica «ejecución del contrato»?
-  La carta dice que la persona enviará copia del DNI si la empresa se la pide (10 empresas la piden en sus condiciones).
+- Datos nuevos: nombre, correo, dato del contrato, DNI/NIE, firma dibujada, carta, prueba de la firma. Sección nueva en
+  /privacidad/ (y ca/en). ¿Base jurídica «ejecución del contrato»?
+- **Foto del DNI/NIE**: solo se pide (obligatoria) en las 10 empresas cuyas condiciones la exigen para tramitar la baja
+  (O2, Tuenti, Orange, Amena, Jazztel, Simyo, R, Sector Alarm, Ocaso, Reale); va adjunta a la carta y al correo urgente.
+  Se guarda cifrada **solo hasta que se confirma la entrega** y se borra; el archivo de 6 años guarda únicamente «se
+  aportó copia» y su SHA-256. Las copias de seguridad semanales la conservan como mucho 12 semanas. ¿Minimización
+  suficiente? ¿Hay que avisar de algo más al pedirla? En las otras 7 que la mencionan, solo el número.
 - Encargados: **Brevo** (correo, UE), **Lleida.net** (¿encargado o tercero de confianza responsable del
   certificado?), **Stripe**, **Cloudflare** (KV y copias de seguridad en R2, datos cifrados con AES-GCM).
 - **Proveedores sin nombre:** por decisión de la titular, ni las páginas, ni la carta, ni los correos, ni las
@@ -78,7 +82,8 @@ fuero, resolución de litigios en línea.
 - Los datos de la persona y la carta llegan al **buzón de correo de la titular** (correo urgente) y se envían desde **su
   cuenta personal de Lleida.net**. ¿Cómo se cuenta en privacidad (texto nuevo: «el equipo de Feehund recibe tu carta y
   tus datos por correo… y los borra de ese correo cuando está enviada»)? ¿Hace falta algo más con su proveedor de correo?
-- No se pide foto del DNI; el correo urgente lleva el número y la carta.
+- El correo urgente lleva la foto del DNI adjunta (solo en esas 10 empresas): queda en el buzón de la titular hasta que
+  lo borre. ¿Basta con la instrucción de borrarlo tras el envío?
 - La web promete «la enviamos **en 24 horas**» (o «el <fecha>» si está programada). ¿Algún riesgo si un día no se puede
   (enfermedad, vacaciones)?
 - La titular **no es autónoma ni empresa** (solo NIF): ¿puede cobrar este servicio así? (también con el gestor)

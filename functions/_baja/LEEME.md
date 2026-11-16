@@ -51,8 +51,10 @@ la fase 2 es poner `ENVIO_MODO=lleida` y las claves de Lleida.
    del lote, devolverlas, segunda carta gratis (una por compra, hasta los 90 días; el extracto se lee en el
    dispositivo), cancelar una programada antes de que salga.
 
-DNI: solo el número, nunca foto. En las empresas que piden copia, la carta dice que la persona la enviará si se la piden
-(`COPIA_DNI_OBLIGATORIA` y `QUITAR_SI_PIDEN_COPIA` en envio_web.py).
+DNI: en las empresas que exigen copia (`copia_dni: obligatoria`, lista `COPIA_DNI_OBLIGATORIA` de envio_web.py) se pide la
+foto, obligatoria, y va adjunta a la carta y al correo urgente; se borra al confirmar la entrega y el archivo guarda solo
+su SHA-256. Donde la copia es solo posible (`posible`), el número y «os la envío si me la pedís». En las copias semanales
+de R2, lo borrado desaparece cuando rotan (12 semanas).
 
 **Tarea** (Worker `workers/baja-tarea`, cada hora → `POST /api/baja/tarea` con `TAREA_SECRET`): programadas del día
 (aviso urgente o envío), recordatorio diario de las que siguen sin enviar, justificantes (fase 2), devoluciones, borrado a

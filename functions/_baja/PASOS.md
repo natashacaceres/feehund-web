@@ -41,7 +41,8 @@ ese día. Tú solo:
 ## 4. Copias de seguridad (R2, gratis hasta 10 GB)
 1. R2 Object Storage › Create bucket: nombre `feehund-copias` (ubicación automática).
 2. Workers & Pages › **feehund-web** › Settings › Bindings › Add › R2 bucket: nombre `COPIAS`, bucket `feehund-copias`.
-Cada semana la tarea guarda ahí una copia de todo, cifrada con `DATA_KEY`, y conserva las 12 últimas. Para
+Cada semana la tarea guarda ahí una copia de todo, cifrada con `DATA_KEY`, y conserva las 12 últimas. Lo que se borra
+(la foto del DNI al entregar, los datos de trabajo a los 90 días) desaparece de las copias cuando rotan, a las 12 semanas. Para
 recuperarla: descargar la copia en R2 y `workers/baja-tarea/restaurar.mjs` (lo hago yo contigo).
 
 ## 5. La tarea de cada hora (recordatorios, programadas, archivo a los 90 días y copias)
@@ -58,8 +59,8 @@ alta tu dirección como remitente.
 ## Cuando llegue un correo URGENTE
 1. Abre Lleida.net › Correo electrónico certificado › nuevo envío.
 2. **Para**, **Asunto** y **Texto**: cópialos del correo urgente (el asunto lleva la referencia FH-…, déjalo igual).
-3. Adjunta la carta en PDF (va en el correo). No hay foto del DNI: la carta da el número y dice que la persona enviará
-   copia si la empresa se la pide (esa respuesta le llega a ella).
+3. Adjunta la carta en PDF y, si la hay, la foto del DNI/NIE (las dos van en el correo urgente; también en el enlace de
+   gestión). Solo la llevan las 10 empresas que exigen copia; en las demás la carta da el número.
 4. Envía. Cuando Lleida te mande el certificado en PDF, abre el enlace de gestión del correo, súbelo y pulsa
    **«Hecho»**: a la persona le llega su justificante.
 5. Si no se puede entregar: en esa misma página, **«No se pudo entregar»**. Se le devuelve el dinero y se le avisa.
@@ -74,6 +75,6 @@ de margen para que llegue a tiempo.
 - Lo demás (correo, enlaces, datos de trabajo) se borra **90 días** después del envío. Hasta entonces la persona puede
   ver su página de estado y pedir la segunda carta gratis.
 - Copia de seguridad cifrada **cada semana** en R2 (paso 4).
-- **DNI sin foto**: la carta da el número. 10 de las 31 empresas dicen en su ficha que la baja va con copia del DNI
-  (O2, Tuenti, Orange, Amena, Jazztel, Simyo, R, Sector Alarm, Ocaso, Reale). Siguen con botón: si les falta la copia,
-  se la pedirán a la persona. Para quitarles el botón: `QUITAR_SI_PIDEN_COPIA = True` en envio_web.py.
+- **DNI**: en las 10 empresas que exigen copia (O2, Tuenti, Orange, Amena, Jazztel, Simyo, R, Sector Alarm, Ocaso,
+  Reale) se pide la foto, obligatoria, y va adjunta. Se borra en cuanto subes el certificado («Hecho»); del archivo de
+  6 años solo queda que se aportó. En las otras 21, solo el número. Nadie pierde el botón.

@@ -65,6 +65,19 @@ function jpeg(dataUrl) {
   return m[1];
 }
 
+/* ---------- foto del DNI (solo empresas que la exigen): hasta la entrega ---------- */
+async function fotoDni(env, b) {
+  const adj = await leer(env, 'adj', b.id);
+  return adj?.dni ? [{ nombre: `dni-nie-${b.ref}.jpg`, bytes: deB64(adj.dni), tipo: 'image/jpeg' }] : [];
+}
+async function borrarFotoDni(env, b) {
+  const adj = await leer(env, 'adj', b.id);
+  if (!adj?.dni) return;
+  delete adj.dni;
+  if (Object.keys(adj).length) await guardar(env, 'adj', b.id, adj, { ttlDias: 400 }); else await borrar(env, 'adj', b.id);
+  b.dniCopia = { ...b.dniCopia, borradaEn: ahoraISO() };
+}
+
 /* ---------- 1. datos: borrador y código ---------- */
 export async function crearBaja(env, req, cuerpo) {
   const e = empresaDe(cuerpo.empresa);
@@ -74,7 +87,10 @@ export async function crearBaja(env, req, cuerpo) {
   const env1 = calcularEnvio(e, cuerpo.eleccion, hoy);
   if (!env1.ok) throw new Fallo(env1.error);
   const v = validarDatos(e, cuerpo.datos);
-  if (!v.ok) throw new Fallo('datos:' + v.errores.join(','));
+  // Foto del DNI/NIE: solo donde la empresa la exige para tramitar la baja (copia_dni = obligatoria)
+  const dni = e.copia_dni === 'obligatoria' ? jpeg(cuerpo.dniFoto) : null;
+  if (e.copia_dni === 'obligatoria' && !dni) v.errores.push('dnifoto');
+  if (v.errores.length) throw new Fallo('datos:' + v.errores.join(','));
 
   // Frenos: 30 borradores al día por conexión y 10 por correo (un lote de 5 con algún reintento)
   const ip = await hmac(env.TOKEN_SECRET, 'ip:' + (req.headers.get('cf-connecting-ip') || '') + hoy);
@@ -91,8 +107,9 @@ export async function crearBaja(env, req, cuerpo) {
   const b = {
     id: aleatorio(16), ref: referencia(), empresa: String(cuerpo.empresa).toLowerCase().replace(/_/g, '-'), idioma,
     eleccion: { cuando: cuerpo.eleccion.cuando, fecha: env1.objetivo }, envio: env1.envio, tarde: env1.tarde, datos: v.datos,
-    estado: 'borrador', creada: ahoraISO(), fechaCarta: hoy, compraLote: compra, otp: null, intentos: 0, enviosCodigo: 0,
+    estado: 'borrador', dniCopia: dni ? { sha256: await sha256(deB64(dni)) } : null, creada: ahoraISO(), fechaCarta: hoy, compraLote: compra, otp: null, intentos: 0, enviosCodigo: 0,
   };
+  if (dni) await guardar(env, 'adj', b.id, { dni }, { ttlDias: 2 });
   await mandarCodigo(env, b);
   await guardarBaja(env, b);
   return { p: await tokenBaja(env, b), envio: b.envio, programada: env1.programada, tarde: b.tarde, ref: b.ref };
@@ -187,7 +204,7 @@ export async function compraPagada(env, origen, compraId, sesion) {
 
 async function pagada(env, origen, b) {
   b.pagadaEn = ahoraISO();
-  const adj = await leer(env, 'adj', b.id); // la firma dibujada dura lo que dure la baja
+  const adj = await leer(env, 'adj', b.id); // firma dibujada y foto del DNI: duran hasta la entrega (o el archivo)
   if (adj) await guardar(env, 'adj', b.id, adj, { ttlDias: 400 });
   const programada = b.envio > hoyEspana();
   b.estado = programada ? 'programada' : 'pagada'; b.programada = programada;
@@ -210,7 +227,7 @@ async function avisoUrgente(env, origen, b, recordatorio) {
   if (!env.AVISOS_CORREO) throw new Fallo('sin_avisos', 503);
   const e = empresaDe(b.empresa), c = laCarta(b);
   const [asunto, texto] = urgente.baja({ e, b, c, recordatorio, gestion: await urlGestion(env, origen, b), lleidaCc: LLEIDA_CC, limite: plazo(b), programada: b.programada });
-  await enviarCorreo(env, { para: env.AVISOS_CORREO, asunto, texto, idem: `urgente-${b.id}-${b.avisadaEn}`, adjuntos: [{ nombre: archivoCarta(c, b), bytes: await pdfDe(env, b, c), tipo: 'application/pdf' }] });
+  await enviarCorreo(env, { para: env.AVISOS_CORREO, asunto, texto, idem: `urgente-${b.id}-${b.avisadaEn}`, adjuntos: [{ nombre: archivoCarta(c, b), bytes: await pdfDe(env, b, c), tipo: 'application/pdf' }, ...(await fotoDni(env, b))] });
 }
 
 /* ---------- 4a. envío automático (modo lleida) ---------- */
@@ -219,7 +236,7 @@ export async function enviar(env, origen, b) {
   const e = empresaDe(b.empresa);
   if (b.fechaCarta < b.envio) b.fechaCarta = b.envio; // la carta programada lleva la fecha del día en que sale
   const c = laCarta(b), pdf = await pdfDe(env, b, c);
-  const adjuntos = [{ nombre: archivoCarta(c, b), bytes: pdf, tipo: 'application/pdf' }];
+  const adjuntos = [{ nombre: archivoCarta(c, b), bytes: pdf, tipo: 'application/pdf' }, ...(await fotoDni(env, b))];
   b.correoId = await enviarCorreo(env, {
     de: { nombre: `${b.datos.nombre} (vía Feehund)` }, para: env.ENVIO_PRUEBA || e.correo, cc: LLEIDA_CC, responderA: b.datos.correo,
     asunto: c.asunto, texto: c.cuerpo.join('\n'), adjuntos, idem: `baja-${b.id}`, etiquetas: [{ name: 'tipo', value: 'baja' }],
@@ -234,13 +251,14 @@ export async function gestion(env, token) {
   const b = await bajaDe(env, token, 'gestion'), e = empresaDe(b.empresa), c = laCarta(b);
   return {
     ref: b.ref, estado: b.estado, empresa: e.nombre, para: e.correo, asunto: c.asunto, texto: c.cuerpo.join('\n'), envio: b.envio,
-    persona: { nombre: b.datos.nombre, correo: b.datos.correo, dni: b.datos.dni || null, dato: b.datos.dato || null },
+    persona: { nombre: b.datos.nombre, correo: b.datos.correo, dni: b.datos.dni || null, dato: b.datos.dato || null }, dniFoto: (await fotoDni(env, b)).length > 0,
     pagadaEn: b.pagadaEn || null, certificado: Boolean(b.certificado), recobro: b.recobro || null,
   };
 }
 export async function gestionArchivo(env, token, cual) {
   const b = await bajaDe(env, token, 'gestion');
   if (cual === 'carta') { const c = laCarta(b); return { bytes: await pdfDe(env, b, c), nombre: archivoCarta(c, b), tipo: 'application/pdf' }; }
+  if (cual === 'dni') { const [f] = await fotoDni(env, b); if (f) return f; }
   if (cual === 'recobro' && b.recobro) { const r = laRecobro(b); return { bytes: cartaPdf({ lineas: r.cuerpo, negrita: [r.asunto.split(' · ')[0]], titulo: r.asunto }), nombre: `reclamacion-${b.ref}.pdf`, tipo: 'application/pdf' }; }
   throw new Fallo('no_existe', 404);
 }
@@ -266,6 +284,7 @@ export async function gestionDevolver(env, token) {
 async function justificante(env, origen, b, pdf) {
   await guardar(env, 'cert', b.id, { pdf: b64(pdf) }, { ttlDias: diasBorrado(env) + 30 }); // se archiva antes
   b.certificado = { en: ahoraISO() };
+  await borrarFotoDni(env, b); // entregada: la copia del DNI ya no hace falta
   b.estado = 'entregada'; b.entregadaEn = b.entregadaEn || ahoraISO(); b.borrarEl = sumarDias(hoyEspana(), diasBorrado(env));
   await guardarBaja(env, b);
   const e = empresaDe(b.empresa), c = laCarta(b);
@@ -405,6 +424,7 @@ export async function archivar(env, b) {
     estado: b.estado, carta: carta && { asunto: carta.asunto, texto: carta.cuerpo.join('\n'), sha256: b.cartaHash }, firma: b.firma ? { ...b.firma, imagen: adj.firma || null } : null,
     autorizacion: { autorizo: Boolean(b.firma), renunciaEn: b.renunciaEn || null }, certificado: cert?.pdf || null,
     pago: { compra: b.compra || null, intento: c?.pago || null, importe: b.precio || null, devuelto: Boolean(c?.devueltas?.includes(b.id)) },
+    dniCopia: b.dniCopia ? { aportada: true, sha256: b.dniCopia.sha256 } : null, // la foto nunca entra en el archivo
     recobro: b.recobro || null, archivadaEn: ahoraISO(),
   };
   await guardar(env, 'archivo', b.id, a, { meta: { ref: b.ref, emp: b.empresa, e: b.estado }, ttlDias: ANOS_ARCHIVO * 366 });

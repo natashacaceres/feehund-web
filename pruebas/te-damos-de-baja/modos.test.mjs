@@ -32,6 +32,8 @@ const entorno = (modo) => ({
 });
 const req = () => new Request('https://feehund.com/api/baja/x', { headers: { 'cf-connecting-ip': '192.0.2.1', 'user-agent': 'prueba' } });
 const correos = async () => (await fetch(SIM + '/correo.json')).json();
+// «Foto» del DNI de prueba: un JPEG mínimo (solo cabecera), basta para el flujo
+const FOTO = 'data:image/jpeg;base64,' + Buffer.from([0xff, 0xd8, 0xff, 0xe0, 0, 16, 0x4a, 0x46, 0x49, 0x46, 0, 1, 1, 0, 0, 1, 0, 1, 0, 0, 0xff, 0xd9]).toString('base64');
 const PDF = 'data:application/pdf;base64,' + Buffer.from('%PDF-1.4\n' + 'x'.repeat(200) + '\n%%EOF\n').toString('base64');
 
 // Lo que la persona ve, sin lo que cambia en cada pasada (referencia, enlaces, código, fechas de hoy)
@@ -39,7 +41,10 @@ const limpio = (t) => String(t).replace(/FH-[A-Z0-9]{4}-[A-Z0-9]{4}/g, 'FH-REF')
 
 async function recorrido(modo, correo) {
   const env = entorno(modo), vistas = [];
-  const r = await F.crearBaja(env, req(), { empresa: 'o2', idioma: 'es', eleccion: { cuando: 'ya' }, datos: { nombre: 'Ana Prueba Ejemplo', correo, dni: '12345678Z', dato: 'LINEA-1' } });
+  // O2 exige copia del DNI: sin foto no se puede
+  await assert.rejects(F.crearBaja(env, req(), { empresa: 'o2', idioma: 'es', eleccion: { cuando: 'ya' }, datos: { nombre: 'Ana Prueba Ejemplo', correo, dni: '12345678Z', dato: 'LINEA-1' } }), (e) => e.codigo === 'datos:dnifoto');
+  const r = await F.crearBaja(env, req(), { empresa: 'o2', idioma: 'es', eleccion: { cuando: 'ya' }, datos: { nombre: 'Ana Prueba Ejemplo', correo, dni: '12345678Z', dato: 'LINEA-1' }, dniFoto: FOTO });
+  const { leer } = await import('../../functions/_baja/almacen.js'), id = r.p.split('.')[0];
   const codigo = (await correos()).filter((c) => c.to.includes(correo)).pop().subject.slice(-6);
   await F.firmar(env, req(), r.p, { codigo, autorizo: true });
   const pago = await F.pagar(env, req(), r.p, { unidades: 2, renuncia: true });
@@ -51,14 +56,16 @@ async function recorrido(modo, correo) {
     assert.match(urgente.subject, /^URGENTE · Enviar la baja de O2 antes del .+ · FH-/);
     assert.match(urgente.text, /le hemos dicho que sale en 24 horas/);
     assert.match(urgente.text, /Para: bajas@o2online\.es/); // la dirección de la ficha
+    assert.ok(urgente.adjuntos.some((n) => n.startsWith('dni-nie-')), 'la foto del DNI va en el correo urgente');
     const g = await firmarId(env, 'gestion', r.p.split('.')[0]);
     assert.equal((await F.gestion(env, g)).para, 'bajas@o2online.es');
     await F.gestionHecho(env, req(), g, { certificado: PDF });
   } else {
-    assert.ok((await correos()).some((c) => c.to.includes('bajas@o2online.es') && c.cc?.includes('correo@certificado.lleida.net')));
+    assert.ok((await correos()).some((c) => c.to.includes('bajas@o2online.es') && c.cc?.includes('correo@certificado.lleida.net') && c.adjuntos.some((n) => n.startsWith('dni-nie-'))));
     await F.tarea(env, 'https://feehund.com');
   }
   await vista(); // con el justificante
+  assert.equal((await leer(env, 'adj', id))?.dni, undefined, 'la foto del DNI se borra al confirmar la entrega');
   await F.recobro(env, req(), r.p, { fecha: new Date().toISOString().slice(0, 10), importe: 9.5 });
   await vista();
   const suyos = (await correos()).filter((c) => c.to.includes(correo)).map((c) => ({ asunto: limpio(c.subject), texto: limpio(c.text), adjuntos: c.adjuntos.map(limpio) }));

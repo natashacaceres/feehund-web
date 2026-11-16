@@ -47,6 +47,8 @@ test('carta: seguro con oposición a la prórroga; telecos con el plazo legal; i
   const s = carta(E.dkv, { datos: d, eleccion: { cuando: 'ren', fecha: '2027-03-01' }, fecha: '2026-11-16' }).cuerpo.join('\n');
   assert.match(s, /artículo 22 de la Ley 50\/1980/); assert.match(s, /Indico mi DNI\/NIE para identificarme\. Si necesitáis copia/); assert.doesNotMatch(s, /Adjunto/); assert.match(s, /1 de marzo de 2027/); assert.match(s, /Número de póliza: POLIZA-1/);
   const t = carta(E.jazztel, { datos: d, eleccion: { cuando: 'ya' }, fecha: '2026-11-16' }).cuerpo.join('\n');
+  assert.match(t, /Adjunto copia de mi DNI\/NIE\./); assert.doesNotMatch(t, /Indico mi DNI/); // Jazztel exige la copia
+  assert.equal(Object.values(E).filter((e) => e.copia_dni === 'obligatoria').length, 10);
   assert.match(t, /dos días hábiles/); assert.match(t, /Motivo de la baja: decisión personal/);
   assert.equal(carta(E.zoom, { datos: d, eleccion: { cuando: 'ya' } }).idioma, 'en');
 });

@@ -22,6 +22,7 @@ const T = {
     sms: (e) => `${e} te mandará un SMS para confirmar la baja: ábrelo y confírmala.`,
     formulario: (e) => `${e} tiene su propio formulario. Enviamos tu carta con todos los datos que pide; si aun así te lo piden, te escribirán a ti.`,
     dniCopia: (e) => `${e} suele pedir copia del DNI. No hace falta ahora: si te la pide, se la envías tú.`,
+    dniExige: (e) => `${e} exige copia del DNI para tramitar la baja.`, fotoOk: "Foto lista.", fotoMal: "No hemos podido leer esa foto. Prueba con otra (JPG o PNG).",
     opcional: "(opcional)", pay: (p, x) => `${p ? "Pagar y programar" : "Pagar y enviar"} · ${x}`, usar: (p) => p ? "Programar mi baja" : "Enviar mi baja",
     pack: (n, x) => n === 1 ? `1 baja · ${x}` : `${n} bajas · ${x}`, packNota: (x) => `La segunda y las siguientes, ${x} cada una. Las que no uses te las devolvemos.`,
     reenv: "Código reenviado.", sinCodigos: "Ya te hemos enviado varios códigos. Revisa el correo no deseado o empieza de nuevo.",
@@ -44,6 +45,7 @@ const T = {
     sms: (e) => `${e} t'enviarà un SMS per confirmar la baixa: obre'l i confirma-la.`,
     formulario: (e) => `${e} té el seu propi formulari. Enviem la teva carta amb totes les dades que demana; si tot i així te'l demanen, t'escriuran a tu.`,
     dniCopia: (e) => `${e} sol demanar còpia del DNI. Ara no cal: si te la demana, l'hi envies tu.`,
+    dniExige: (e) => `${e} exigeix còpia del DNI per tramitar la baixa.`, fotoOk: "Foto a punt.", fotoMal: "No hem pogut llegir aquesta foto. Prova amb una altra (JPG o PNG).",
     opcional: "(opcional)", pay: (p, x) => `${p ? "Pagar i programar" : "Pagar i enviar"} · ${x}`, usar: (p) => p ? "Programar la meva baixa" : "Enviar la meva baixa",
     pack: (n, x) => n === 1 ? `1 baixa · ${x}` : `${n} baixes · ${x}`, packNota: (x) => `La segona i les següents, ${x} cadascuna. Les que no facis servir te les retornem.`,
     reenv: "Codi reenviat.", sinCodigos: "Ja t'hem enviat diversos codis. Revisa el correu brossa o torna a començar.",
@@ -66,6 +68,7 @@ const T = {
     sms: (e) => `${e} will text you to confirm the cancellation: open it and confirm.`,
     formulario: (e) => `${e} has its own form. We send your letter with everything it asks for; if they still ask for the form, they will write to you.`,
     dniCopia: (e) => `${e} often asks for a copy of your ID. You do not need it now: if they ask, you send it yourself.`,
+    dniExige: (e) => `${e} requires a copy of your ID to process the cancellation.`, fotoOk: "Photo ready.", fotoMal: "We could not read that photo. Try another one (JPG or PNG).",
     opcional: "(optional)", pay: (p, x) => `${p ? "Pay and schedule" : "Pay and send"} · ${x}`, usar: (p) => p ? "Schedule my cancellation" : "Send my cancellation",
     pack: (n, x) => n === 1 ? `1 cancellation · ${x}` : `${n} cancellations · ${x}`, packNota: (x) => `The second and the rest, ${x} each. We refund the ones you do not use.`,
     reenv: "Code sent again.", sinCodigos: "We have already sent you several codes. Check your spam folder or start again.",
@@ -91,6 +94,15 @@ async function api(ruta, cuerpo) {
   return j;
 }
 const espera = (btn, on) => { if (!btn) return; btn.disabled = on; btn.setAttribute("aria-busy", on ? "true" : "false"); };
+
+// Foto → JPEG reducido (lado mayor 1600 px). Devuelve «data:image/jpeg;base64,…»
+async function aJpeg(archivo, lado = 1600) {
+  const bmp = await createImageBitmap(archivo);
+  const k = Math.min(1, lado / Math.max(bmp.width, bmp.height));
+  const c = document.createElement("canvas"); c.width = Math.round(bmp.width * k); c.height = Math.round(bmp.height * k);
+  const g = c.getContext("2d"); g.fillStyle = "#fff"; g.fillRect(0, 0, c.width, c.height); g.drawImage(bmp, 0, 0, c.width, c.height);
+  return c.toDataURL("image/jpeg", 0.82);
+}
 
 /* ============ FLUJO (/baja/enviar/) ============ */
 async function flujo() {
@@ -151,8 +163,17 @@ async function flujo() {
   /* Paso 2 · Tus datos */
   $("tbDatoL").textContent = DATO[LANG][E.dato] + " "; $("tbDatoOpc").textContent = datoObligatorio(E) ? "" : T.opcional;
   if (E.dato === "tarjeta4") { $("tbDato").inputMode = "numeric"; $("tbDato").maxLength = 4; }
-  $("tbDniBox").hidden = E.dni === "no"; $("tbDniCopia").hidden = E.dni !== "copia";
-  if (E.dni === "copia") $("tbDniCopia").textContent = T.dniCopia(E.nombre);
+  $("tbDniBox").hidden = E.dni === "no";
+  // Copia del DNI: foto obligatoria solo donde la empresa la exige; en las demás, solo el número
+  $("tbDniCopia").hidden = E.copia_dni !== "posible"; if (E.copia_dni === "posible") $("tbDniCopia").textContent = T.dniCopia(E.nombre);
+  $("tbDniFotoBox").hidden = E.copia_dni !== "obligatoria"; if (E.copia_dni === "obligatoria") $("tbDniExige").textContent = T.dniExige(E.nombre);
+  let dniFoto = null;
+  $("tbDniFoto").addEventListener("change", async (ev) => {
+    const f = ev.target.files[0]; dniFoto = null; $("tbDniFotoOk").hidden = true; err("tbDniFotoE", false); editado = true;
+    if (!f) return;
+    try { dniFoto = await aJpeg(f); $("tbDniFotoOk").textContent = T.fotoOk; $("tbDniFotoOk").hidden = false; }
+    catch { err("tbDniFotoE", true, T.fotoMal); }
+  });
   const extra = E.aviso_extra ? T[E.aviso_extra](E.nombre) : ""; $("tbExtra").hidden = !extra; if (extra) $("tbExtra").querySelector("span").textContent = extra;
   $("tbCartaIdioma").hidden = E.idioma === LANG; $("tbCartaIdioma").textContent = T.idiomaCarta[E.idioma] || "";
   const datos = () => ({ nombre: $("tbNombre").value, correo: $("tbCorreo").value, dato: $("tbDato").value, dni: $("tbDni").value });
@@ -168,14 +189,17 @@ async function flujo() {
     err("tbE2", false);
     const v = validarDatos(E, datos());
     marcar(v.errores);
+    const sinFoto = E.copia_dni === "obligatoria" && !dniFoto;
+    err("tbDniFotoE", sinFoto);
     if (!v.ok) { $(CAMPOS[v.errores[0]]).focus(); return; }
+    if (sinFoto) { $("tbDniFoto").focus(); return; }
     if (token && !editado) { show(3); return; } // vuelve atrás sin cambiar nada: mismo código
     espera($("tbN2"), true);
     try {
-      const r = await api("pedido", { empresa: slug, idioma: LANG, eleccion: eleccion(), datos: v.datos, compra: lote || undefined });
+      const r = await api("pedido", { empresa: slug, idioma: LANG, eleccion: eleccion(), datos: v.datos, dniFoto: dniFoto || undefined, compra: lote || undefined });
       token = r.p; editado = false; show(3);
     } catch (e) {
-      if (e.codigo.indexOf("datos:") === 0) { const m = e.codigo.slice(6).split(","); marcar(m); $(CAMPOS[m[0]] || "tbNombre").focus(); }
+      if (e.codigo.indexOf("datos:") === 0) { const m = e.codigo.slice(6).split(","); marcar(m); err("tbDniFotoE", m.indexOf("dnifoto") >= 0); $(CAMPOS[m[0]] || (m[0] === "dnifoto" ? "tbDniFoto" : "tbNombre")).focus(); }
       else err("tbE2", true, T[e.codigo] || T.servicio);
     } finally { espera($("tbN2"), false); }
   });
