@@ -94,10 +94,10 @@ export async function onRequestPost({ request, env }) {
   });
   if (!respuesta.ok || !respuesta.body) {
     // Solo el código de estado: nunca el cuerpo, que podría llevar algo del documento
-    return json({ error: 'api', estado: respuesta.status }, 502);
+    return json({ error: 'api', estado: respuesta.status, modelo: cual }, 502);
   }
   return new Response(respuesta.body, {
-    headers: { 'content-type': 'text/event-stream; charset=utf-8', 'cache-control': 'no-store', 'x-content-type-options': 'nosniff' },
+    headers: { 'content-type': 'text/event-stream; charset=utf-8', 'cache-control': 'no-store', 'x-content-type-options': 'nosniff', 'x-feehund-lectura': cual },
   });
 }
 
