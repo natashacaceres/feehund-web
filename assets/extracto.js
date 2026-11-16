@@ -229,7 +229,6 @@
       verMas: (n) => "Ver " + n + " más", verMenos: "Ver menos", verDetalle: "Ver todo el detalle", ocultarDetalle: "Ocultar el detalle",
       revisar: "Revisar", anadir: "Añadir", ver: "Ver", darme: "Darme de baja", darBaja: "Dar de baja",
       dobleT: (x) => x + ": posible cobro repetido", dobleL: (i, f) => i + " dos veces, el " + f,
-      tarjT: (n) => "Faltan " + n + " pagos con tarjeta", tarjT0: "Puede que pagues algo con tarjeta", tarjL: "Añade su extracto y lo verás todo",
       reciboT: (x, d, m) => x + ": +" + d + " en " + m, reciboL: (p) => p + " % más que tu media", reciboAnio: (p) => p + " % más que hace un año", consumo: "Puede ser por consumo",
       comT: (x) => "Comisiones del banco: " + x, comL: "Cobradas en este extracto", comLR: "Puedes pedir que te la devuelvan",
       subT: (x, a) => x + ": " + a + " al año", subL: "Tu suscripción más cara" },
@@ -243,7 +242,6 @@
       verMas: (n) => "Veure'n " + n + " més", verMenos: "Veure'n menys", verDetalle: "Veure tot el detall", ocultarDetalle: "Amagar el detall",
       revisar: "Revisar", anadir: "Afegir", ver: "Veure", darme: "Donar-me de baixa", darBaja: "Donar de baixa",
       dobleT: (x) => x + ": possible cobrament repetit", dobleL: (i, f) => i + " dues vegades, el " + f,
-      tarjT: (n) => "Falten " + n + " pagaments amb targeta", tarjT0: "Potser pagues alguna cosa amb targeta", tarjL: "Afegeix-ne l'extracte i ho veuràs tot",
       reciboT: (x, d, m) => x + ": +" + d + (/^[aeiou]/.test(m) ? " a l'" : " al ") + m, reciboL: (p) => p + " % més que la teva mitjana", reciboAnio: (p) => p + " % més que fa un any", consumo: "Pot ser pel consum",
       comT: (x) => "Comissions del banc: " + x, comL: "Cobrades en aquest extracte", comLR: "Pots demanar que te la retornin",
       subT: (x, a) => x + ": " + a + " l'any", subL: "La teva subscripció més cara" },
@@ -257,7 +255,6 @@
       verMas: (n) => "See " + n + " more", verMenos: "See less", verDetalle: "See all the detail", ocultarDetalle: "Hide the detail",
       revisar: "Check", anadir: "Add", ver: "See", darme: "Cancel it for me", darBaja: "Cancel",
       dobleT: (x) => x + ": possible repeat charge", dobleL: (i, f) => i + " twice, on " + f,
-      tarjT: (n) => n + " card payments missing", tarjT0: "You may pay some by card", tarjL: "Add its statement to see everything",
       reciboT: (x, d, m) => x + ": +" + d + " in " + m, reciboL: (p) => p + " % above your average", reciboAnio: (p) => p + " % more than a year ago", consumo: "Could be down to usage",
       comT: (x) => "Bank fees: " + x, comL: "Charged in this statement", comLR: "You can ask for it back",
       subT: (x, a) => x + ": " + a + " a year", subL: "Your most expensive subscription" },
@@ -265,11 +262,9 @@
   // «Darme de baja» solo en suscripciones: nunca luz, agua, gas, teléfono ni seguros
   const SUSCRIPCIONES = ["streaming", "musica", "nube_apps", "ia", "prensa", "gimnasios", "citas", "videojuegos", "idiomas", "reparto", "suscripciones", "club_descuentos", "bienestar"];
   const MESES_FRIO = [11, 12, 1, 2, 3];
+  // logo oficial de la empresa: el de su guía de baja (assets/logos/<página>.png); si no hay guía, ninguno
+  const logoDe = (c) => { const f = fichaBaja(c); return f && f.p ? ROOT + "assets/logos/" + f.p + ".png" : null; };
   const eur = (x) => (Math.abs(x) >= 1 ? e0(x) : e2(x)) + " €";
-  const svgIcono = (d) => {
-    const ns = "http://www.w3.org/2000/svg", svg = document.createElementNS(ns, "svg"), path = document.createElementNS(ns, "path");
-    svg.setAttribute("viewBox", "0 0 24 24"); svg.setAttribute("aria-hidden", "true"); path.setAttribute("d", d); svg.appendChild(path); return svg;
-  };
   let blobTarjeta = null, urlTarjeta = null;
 
   // Abre el detalle de siempre y lleva la vista a lo que se ha tocado
@@ -319,10 +314,8 @@
     const sumarEsc = (tipo, x) => { escapo += x; escTipos[tipo] = (escTipos[tipo] || 0) + 1; };
     for (const a of avisos.filter((x) => x.tipo === "doble" && x.c)) {
       sumarEsc("doble", a.imp || 0);
-      acciones.push({ p: 1, euros: a.imp || 0, icono: "doble", t: T3.dobleT(a.c.nombre), l: T3.dobleL(eur(a.imp || 0), fecha(a.fechaD)), b: T3.revisar, nodo: a.nodo });
+      acciones.push({ p: 1, euros: a.imp || 0, logo: logoDe(a.c), t: T3.dobleT(a.c.nombre), l: T3.dobleL(eur(a.imp || 0), fecha(a.fechaD)), b: T3.revisar, nodo: a.nodo });
     }
-    const tj = avisos.find((x) => x.tipo === "tarjeta");
-    if (tj) acciones.push({ p: 2, euros: 0, icono: "tarjeta", t: tj.datos && tj.datos.n ? T3.tarjT(tj.datos.n) : T3.tarjT0, l: T3.tarjL, b: T3.anadir, anadir: true, fija: true });
     for (const a of avisos.filter((x) => x.tipo === "recibo" && x.c)) {
       const { c, peor } = a, mes = +peor.m.fecha.slice(5, 7);
       let linea = T3.reciboL(pct(peor.dif / peor.med)), cuentaEsc = true;
@@ -336,21 +329,18 @@
         } else { linea = T3.consumo; cuentaEsc = false; }
       }
       if (cuentaEsc) sumarEsc("recibo", peor.dif);
-      acciones.push({ p: 3, euros: peor.dif, icono: "recibo", t: T3.reciboT(a.nombreR, eur(peor.dif), MESES[mes - 1]), l: linea, b: T3.revisar, nodo: a.nodo });
+      acciones.push({ p: 3, euros: peor.dif, logo: logoDe(c), t: T3.reciboT(a.nombreR, eur(peor.dif), MESES[mes - 1]), l: linea, b: T3.revisar, nodo: a.nodo });
     }
     const coms = avisos.filter((x) => x.tipo === "comision");
     if (coms.length) {
       const suma = coms.reduce((t, x) => t + (x.euros || 0), 0);
       for (const x of coms) sumarEsc("comision", x.euros || 0);
       escTipos.comision = 1;
-      acciones.push({ p: 4, euros: suma, icono: "comision", t: T3.comT(eur(suma)), l: coms.some((x) => x.reclamable) ? T3.comLR : T3.comL, b: T3.ver, nodo: coms[0].nodo });
+      acciones.push({ p: 4, euros: suma, logo: null, t: T3.comT(eur(suma)), l: coms.some((x) => x.reclamable) ? T3.comLR : T3.comL, b: T3.ver, nodo: coms[0].nodo });
     }
     const susc = cobros.filter((c) => c.estado === "seguro" && SUSCRIPCIONES.indexOf(c.categoria) >= 0 && seDaDeBaja(c)).sort((a, b) => (b.coste_anual || 0) - (a.coste_anual || 0))[0];
-    if (susc) acciones.push({ p: 5, euros: susc.coste_anual || 0, icono: "baja", t: T3.subT(susc.nombre, eur(susc.coste_anual || 0)), l: T3.subL, b: compatible(susc) ? T3.darme : T3.darBaja, enlace: enviarBaja(susc) });
+    if (susc) acciones.push({ p: 5, euros: susc.coste_anual || 0, logo: logoDe(susc), t: T3.subT(susc.nombre, eur(susc.coste_anual || 0)), l: T3.subL, b: compatible(susc) ? T3.darme : T3.darBaja, enlace: enviarBaja(susc) });
     acciones.sort((a, b) => a.p - b.p || b.euros - a.euros);
-    // sin el extracto de la tarjeta el análisis está incompleto: ese aviso siempre entra en los tres primeros
-    const iT = acciones.findIndex((a) => a.fija);
-    if (iT > 2) acciones.splice(2, 0, acciones.splice(iT, 1)[0]);
 
     // ---- 1. La respuesta ----
     $("xMeses").textContent = T3.meses(meses);
@@ -373,8 +363,12 @@
     // ---- 2. pintar las acciones: tres a la vista y el resto detrás de «Ver X más» ----
     const ul = $("xAcciones"); ul.textContent = "";
     acciones.forEach((a, i) => {
-      const li = el("li", "r3-ac" + (i >= 3 ? " r3-ac--mas" : "")), ic = el("span", "r3-ac-i r3-ac-i--" + a.icono);
-      ic.appendChild(svgIcono(a.icono === "baja" ? "M6 6l12 12M18 6L6 18" : ICONOS[a.icono]));
+      const li = el("li", "r3-ac" + (i >= 3 ? " r3-ac--mas" : ""));
+      let ic = null;
+      if (a.logo) {
+        ic = el("img", "r3-ac-logo"); ic.alt = ""; ic.width = 40; ic.height = 40; ic.decoding = "async"; ic.src = a.logo;
+        ic.addEventListener("error", () => ic.remove()); // sin logo, sin círculo
+      }
       const m = el("div", "r3-ac-m"); m.appendChild(el("p", "r3-ac-t", pegado(a.t))); m.appendChild(el("p", "r3-ac-l", pegado(a.l)));
       let btn;
       if (a.enlace) { btn = el("a", "r3-btn", a.b); btn.href = a.enlace; }
@@ -382,7 +376,8 @@
         btn = el("button", "r3-btn", a.b); btn.type = "button";
         btn.addEventListener("click", () => { if (a.anadir) anadirTarjeta(); else abrirDetalle(a.nodo); });
       }
-      li.appendChild(ic); li.appendChild(m); li.appendChild(btn);
+      if (ic) li.appendChild(ic);
+      li.appendChild(m); li.appendChild(btn);
       if (i >= 3) li.hidden = true;
       ul.appendChild(li);
     });
@@ -850,6 +845,7 @@
     if (abrir) abrirDetalle(null); else { det.hidden = true; $("xVerDetalle").textContent = T3.verDetalle; $("xVerDetalle").setAttribute("aria-expanded", "false"); }
   });
   if ($("xBuena")) $("xBuena").addEventListener("click", () => abrirDetalle($("xNoticias")));
+  if ($("xMasExtractos")) $("xMasExtractos").addEventListener("click", anadirTarjeta);
   contar("abre");
   const btnIcs = $("xIcs"); if (btnIcs) btnIcs.addEventListener("click", () => ics().catch(() => {}));
   $("xAgain").addEventListener("click", () => {

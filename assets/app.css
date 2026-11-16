@@ -1552,6 +1552,10 @@ main.art2 p a[href^="http"],main.art2 li a[href^="http"]{text-decoration:underli
 .r3-acciones,.r3-barras{list-style:none;margin:0;padding:0;display:grid;gap:var(--s-3)}
 .r3-ac{display:flex;align-items:center;gap:var(--s-3);padding:14px;border-radius:16px;background:var(--over-bg)}
 .r3-ac[hidden]{display:none}
+.r3-ac-logo{flex:none;width:40px;height:40px;border-radius:10px;object-fit:contain;background:#fff}
+.r3-mas-ext{display:grid;justify-items:center;gap:2px;margin-top:var(--s-4);text-align:center}
+.r3-mas-ext p{font:400 16px/1.4 var(--f-text);color:var(--ink)}
+.r3-mas-ext .r3-link{justify-self:center}
 .r3-ac-i{flex:none;display:grid;place-items:center;width:40px;height:40px;border-radius:999px;background:var(--amber);color:var(--ink)}
 .r3-ac-i--tarjeta,.r3-ac-i--baja{background:var(--bg)}
 .r3-ac-i svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
