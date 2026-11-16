@@ -390,7 +390,8 @@
     for (let p = x; p; p = p.parentElement) { if (p.tagName === "DETAILS") p.open = true; if (p.hidden && p !== det && det.contains(p)) p.hidden = false; }
     const destino = x || det;
     const quieto = matchMedia("(prefers-reduced-motion: reduce)").matches;
-    destino.scrollIntoView({ behavior: quieto ? "auto" : "smooth", block: "center" });
+    // «Ver todo el detalle» lleva al principio del detalle; lo demás (Revisar, una barra…) deja lo tocado en el centro
+    destino.scrollIntoView({ behavior: quieto ? "auto" : "smooth", block: x ? "center" : "start" });
     if (x) { x.classList.remove("r3-foco"); void x.offsetWidth; x.classList.add("r3-foco"); }
   }
 
@@ -525,6 +526,8 @@
       listaDev.textContent = ""; listaDev.hidden = true; $("xBuena").setAttribute("aria-expanded", "false");
       Array.prototype.slice.call($("xNoticias").children, 0, devuelto.length).forEach((li) => listaDev.appendChild(li.cloneNode(true)));
     }
+    // «Buenas noticias» va solo arriba: en el detalle no se repite
+    const pasoNot = $("xNoticias") && $("xNoticias").closest(".res-paso"); if (pasoNot) pasoNot.hidden = true;
     // «¿Otro banco o tarjeta?»: no sale si arriba ya está la acción de añadir el extracto de la tarjeta
     if ($("xOtro")) $("xOtro").hidden = acciones.some((a) => a.anadir);
 
