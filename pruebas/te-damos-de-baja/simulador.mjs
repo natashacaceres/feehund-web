@@ -104,7 +104,7 @@ http.createServer(async (req, res) => {
     if (ruta === '/devoluciones.json') return jsonR(res, 200, devoluciones);
     if (ruta === '/correo.json') return jsonR(res, 200, correos.map(({ attachments, ...c }) => ({ ...c, adjuntos: (attachments || []).map((a) => a.filename) })));
     if (ruta.startsWith('/adjunto/')) {
-      const [, , cid, n] = ruta.split('/'), a = correos.find((c) => c.id === cid)?.attachments?.[Number(n)];
+      const [, , cid, n] = ruta.split('/'), a = correos.find((c) => c.id === decodeURIComponent(cid))?.attachments?.[Number(n)];
       if (!a) { res.writeHead(404); return res.end(); }
       res.writeHead(200, { 'content-type': a.content_type || 'application/octet-stream', 'content-disposition': `inline; filename="${a.filename}"` }); return res.end(Buffer.from(a.content, 'base64'));
     }
@@ -114,7 +114,7 @@ http.createServer(async (req, res) => {
 <body style="font:15px system-ui;max-width:760px;margin:24px auto;padding:0 16px"><h1 style="font-size:20px">Buzón de prueba (${correos.length})</h1>
 ${correos.slice().reverse().map((c) => `<article style="border:1px solid #ccc;border-radius:8px;padding:12px;margin:12px 0"><div style="font-size:13px;color:#555">${esc(c.en)} · de ${esc(c.from)}<br>para <b>${esc(c.to.join(', '))}</b>${c.cc ? ' · cc ' + esc(c.cc.join(', ')) : ''}${c.reply_to ? ' · responder a ' + esc(c.reply_to.join(', ')) : ''}</div>
 <h2 style="font-size:16px;margin:6px 0">${esc(c.subject)}</h2><pre style="white-space:pre-wrap;font:13px/1.45 ui-monospace,monospace;background:#f6f8fa;padding:8px">${esc(c.text)}</pre>
-${(c.attachments || []).map((a, i) => `<a href="/adjunto/${c.id}/${i}" target="_blank">📎 ${esc(a.filename)}</a>`).join(' · ')}</article>`).join('')}</body>`);
+${(c.attachments || []).map((a, i) => `<a href="/adjunto/${encodeURIComponent(c.id)}/${i}" target="_blank">📎 ${esc(a.filename)}</a>`).join(' · ')}</article>`).join('')}</body>`);
     }
     /* ---- Lleida.net Mailcert ---- */
     if (ruta === '/cgi-bin/mailcertapi.cgi' && req.method === 'POST') {

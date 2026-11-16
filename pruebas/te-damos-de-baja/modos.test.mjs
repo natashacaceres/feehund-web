@@ -124,3 +124,21 @@ test('a los 90 días se archiva (6 años) y se borra lo demás; copia semanal ci
   for (let i = 1; i <= 14; i++) await F.copiaSemanal(env, new Date(Date.now() + i * 7 * 864e5).toISOString().slice(0, 10));
   assert.equal(objetos.size, F.COPIAS_GUARDADAS);
 });
+
+test('sin R2, la copia semanal llega por correo a AVISOS_CORREO (cifrada, una por semana)', async () => {
+  await fetch(SIM + '/control/vaciar');
+  const env = entorno('manual');
+  const r = await F.crearBaja(env, req(), { empresa: 'zoom', idioma: 'en', eleccion: { cuando: 'ya' }, datos: { nombre: 'Ana Prueba Ejemplo', correo: 'ana.copia@example.com' } });
+  assert.ok(r.p);
+  const t1 = await F.tarea(env, 'https://feehund.com');
+  assert.equal(t1.copia?.destino, 'correo', JSON.stringify(t1));
+  assert.equal((await F.tarea(env, 'https://feehund.com')).copia, null, 'una sola por semana');
+  const c = (await correos()).find((x) => x.to.includes('equipo@example.com') && /^Copia semanal · Te damos de baja · /.test(x.subject));
+  assert.ok(c && c.adjuntos.length === 1 && c.adjuntos[0].endsWith('.txt'));
+  const adjunto = await (await fetch(`${SIM}/adjunto/${encodeURIComponent(c.id)}/0`)).text();
+  assert.equal(JSON.parse(adjunto).version, 1);
+  assert.doesNotMatch(adjunto, /Ana Prueba|ana\.copia/);
+  // sin R2 ni correo: no hace nada y no falla
+  const sin = entorno('manual'); delete sin.AVISOS_CORREO;
+  assert.equal((await F.tarea(sin, 'https://feehund.com')).copia, null);
+});

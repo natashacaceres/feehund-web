@@ -477,22 +477,41 @@ export async function tarea(env, origen, hoy = hoyEspana()) {
       if (!vivas.some(Boolean) && (vieja || c.unidades <= c.bajas.length)) await borrar(env, 'compra', id);
     });
   }
-  // Copia de seguridad semanal en R2 (enlace COPIAS). Si no está puesto, no se hace.
-  if (env.COPIAS) await intentar('copia', async () => { hecho.copia = await copiaSemanal(env, hoy); });
+  // Copia de seguridad semanal: en R2 si existe el enlace COPIAS; si no, por correo a AVISOS_CORREO. Sin ninguno, nada.
+  if (env.COPIAS || (env.AVISOS_CORREO && env.BREVO_API_KEY)) await intentar('copia', async () => { hecho.copia = await copiaSemanal(env, hoy); });
   return hecho;
 }
 
-/* ---------- copia de seguridad semanal (R2) ---------- */
+/* ---------- copia de seguridad semanal ---------- */
 // Lo que hay en KV tal cual: los valores ya van cifrados con DATA_KEY (sin esa clave no se pueden leer). Una por semana
-// (la primera ejecución de la tarea cada lunes o después), se guardan las 12 últimas. Restaurar: workers/baja-tarea/restaurar.mjs
+// (la primera ejecución de la tarea de cada semana). Dos destinos:
+//   - R2 (enlace COPIAS): se guardan las 12 últimas; lo borrado desaparece de las copias a las 12 semanas.
+//   - Sin R2: por correo a AVISOS_CORREO, como adjunto .txt (Brevo no admite .json). Las de más de 12 semanas se
+//     borran a mano en el buzón (PASOS.md). Si pasara de 8 MB, se avisa en vez de adjuntarla.
+// Restaurar: workers/baja-tarea/restaurar.mjs
 export const COPIAS_GUARDADAS = 12;
+const MAX_COPIA_CORREO = 8_000_000;
 export async function copiaSemanal(env, hoy = hoyEspana()) {
   const dia = new Date(hoy + 'T12:00:00Z').getUTCDay() || 7;
-  const nombre = `semanal/${sumarDias(hoy, 1 - dia)}.json`; // la semana se nombra por su lunes
-  if (await env.COPIAS.head(nombre)) return null;
+  const lunes = sumarDias(hoy, 1 - dia); // la semana se nombra por su lunes
+  const nombre = `semanal/${lunes}.json`;
+  if (env.COPIAS ? await env.COPIAS.head(nombre) : await env.FEEHUND_KV.get('copiahecha:' + lunes)) return null;
   const filas = await exportar(env, ['baja', 'compra', 'archivo', 'adj', 'cert']);
-  await env.COPIAS.put(nombre, JSON.stringify({ version: 1, creada: ahoraISO(), cifrado: 'AES-GCM con DATA_KEY (cada valor)', filas }), { httpMetadata: { contentType: 'application/json' } });
-  const todas = (await env.COPIAS.list({ prefix: 'semanal/' })).objects.map((o) => o.key).sort();
-  for (const vieja of todas.slice(0, Math.max(0, todas.length - COPIAS_GUARDADAS))) await env.COPIAS.delete(vieja);
-  return { nombre, filas: filas.length };
+  const contenido = JSON.stringify({ version: 1, creada: ahoraISO(), cifrado: 'AES-GCM con DATA_KEY (cada valor)', filas });
+  if (env.COPIAS) {
+    await env.COPIAS.put(nombre, contenido, { httpMetadata: { contentType: 'application/json' } });
+    const todas = (await env.COPIAS.list({ prefix: 'semanal/' })).objects.map((o) => o.key).sort();
+    for (const vieja of todas.slice(0, Math.max(0, todas.length - COPIAS_GUARDADAS))) await env.COPIAS.delete(vieja);
+    return { destino: 'r2', nombre, filas: filas.length };
+  }
+  const bytes = new TextEncoder().encode(contenido), grande = bytes.length > MAX_COPIA_CORREO;
+  await enviarCorreo(env, {
+    para: env.AVISOS_CORREO, asunto: `Copia semanal · Te damos de baja · ${lunes}`, idem: 'copia-' + lunes,
+    texto: grande
+      ? `La copia de esta semana ocupa ${(bytes.length / 1e6).toFixed(1)} MB y no cabe en un correo. Hay que activar R2 (PASOS.md, paso 4).`
+      : `Copia de seguridad de «Te damos de baja» (semana del ${fechaLarga(lunes, 'es')}): ${filas.length} registros.\n\nVa cifrada con DATA_KEY: sin esa clave no se puede leer. Guárdala. Borra las de más de 12 semanas.\nPara recuperarla: workers/baja-tarea/restaurar.mjs (LEEME.md).`,
+    adjuntos: grande ? [] : [{ nombre: `copia-te-damos-de-baja-${lunes}.txt`, bytes, tipo: 'text/plain' }],
+  });
+  await env.FEEHUND_KV.put('copiahecha:' + lunes, '1', { expirationTtl: 30 * 86400 });
+  return { destino: 'correo', nombre, filas: filas.length, grande };
 }

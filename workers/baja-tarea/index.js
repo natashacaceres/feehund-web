@@ -6,7 +6,7 @@ export default {
   async scheduled(evento, env, ctx) {
     ctx.waitUntil(llamar(env));
   },
-  // Para probarlo a mano: curl -H "authorization: Bearer <TAREA_SECRET>" https://feehund-baja-tarea.<cuenta>.workers.dev
+  // Sin dirección pública (workers_dev = false): esto solo responde si algún día se le pone una ruta
   async fetch(request, env) {
     const clave = (request.headers.get('authorization') || '').replace(/^Bearer /, '');
     if (!env.TAREA_SECRET || clave !== env.TAREA_SECRET) return new Response('No', { status: 401 });

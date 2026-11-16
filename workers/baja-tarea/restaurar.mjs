@@ -1,6 +1,7 @@
-// Convierte una copia semanal de R2 (semanal/AAAA-MM-DD.json) al formato de «wrangler kv bulk put», para devolverla a KV.
+// Convierte una copia semanal (de R2, semanal/AAAA-MM-DD.json, o el adjunto copia-te-damos-de-baja-AAAA-MM-DD.txt del
+// correo semanal; los dos son el mismo JSON) al formato de «wrangler kv bulk put», para devolverla a KV.
 // Los valores siguen cifrados con DATA_KEY: hay que usar la MISMA DATA_KEY en la web para poder leerlos.
-//   1. Descargar la copia: Cloudflare › R2 › feehund-copias › semanal/… › Download
+//   1. Descargar la copia: del correo semanal (adjunto .txt) o de Cloudflare › R2 › feehund-copias › semanal/…
 //   2. node workers/baja-tarea/restaurar.mjs copia.json > para-kv.json
 //   3. npx wrangler kv bulk put para-kv.json --namespace-id <id de feehund-baja>
 import fs from 'node:fs';

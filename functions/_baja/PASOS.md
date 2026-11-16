@@ -27,29 +27,28 @@ ese día. Tú solo:
    Checkout Sessions **Write**, Refunds **Write**, Products **Read**, PaymentIntents **Read**. Copia la clave (`rk_live_…`).
 2. Developers › Webhooks › el de `https://feehund.com/api/baja/stripe` › **Signing secret** › Reveal › copia (`whsec_…`).
 
-## 3. Cloudflare
-1. Storage & Databases › KV › Create: nombre `feehund-baja`.
-2. Workers & Pages › **feehund-web** › Settings › Bindings › Add › KV namespace: nombre `FEEHUND_KV`, espacio `feehund-baja`.
-3. Settings › Variables and secrets › Add, en **Production**:
-   - tipo **Secret**: `STRIPE_SECRET_KEY` (la `rk_live_…`), `STRIPE_WEBHOOK_SECRET` (la `whsec_…`), `BREVO_API_KEY` (la `xkeysib-…`).
-   - tipo **Secret**, tres claves al azar: `TOKEN_SECRET`, `DATA_KEY` y `TAREA_SECRET`. Para cada una, abre Terminal,
-     pega `openssl rand -base64 32`, pulsa Enter y copia lo que sale. **Guarda `DATA_KEY` en tu gestor de contraseñas.**
-   - tipo **Text**: `STRIPE_PRODUCT_BAJA` = `prod_VdmVGkorJMQg6T`; `AVISOS_CORREO` = el correo donde
-     quieres los avisos urgentes (el que mires en el móvil).
-4. Deployments › el último › **Retry deployment**, para que las coja.
+## 3. Cloudflare (lo que falta; el resto ya está hecho)
+Ya hecho: el espacio KV `feehund-baja` y los secretos `TOKEN_SECRET`, `DATA_KEY` y `TAREA_SECRET` en producción.
+Falta, en Workers & Pages › **feehund-web** › Settings (todo en **Production**):
+1. **Bindings** › Add › **KV namespace**: Variable name `FEEHUND_KV`, KV namespace `feehund-baja`. Save.
+2. **Variables and secrets** › Add:
+   - Type **Text**: `STRIPE_PRODUCT_BAJA` = `prod_VdmVGkorJMQg6T`
+   - Type **Text**: `AVISOS_CORREO` = el correo donde quieres los avisos urgentes y la copia semanal
+   - Type **Secret**: `STRIPE_SECRET_KEY` (la `rk_live_…`), `STRIPE_WEBHOOK_SECRET` (la `whsec_…`), `BREVO_API_KEY` (la `xkeysib-…`)
+   No toques `ANTHROPIC_API_KEY` (es de Mi banco).
+3. Las variables solo cuentan en el siguiente despliegue: se publican con la web.
 
-## 4. Copias de seguridad (R2, gratis hasta 10 GB)
-1. R2 Object Storage › Create bucket: nombre `feehund-copias` (ubicación automática).
-2. Workers & Pages › **feehund-web** › Settings › Bindings › Add › R2 bucket: nombre `COPIAS`, bucket `feehund-copias`.
-Cada semana la tarea guarda ahí una copia de todo, cifrada con `DATA_KEY`, y conserva las 12 últimas. Lo que se borra
-(la foto del DNI al entregar, los datos de trabajo a los 90 días) desaparece de las copias cuando rotan, a las 12 semanas. Para
-recuperarla: descargar la copia en R2 y `workers/baja-tarea/restaurar.mjs` (lo hago yo contigo).
+## 4. Copias de seguridad
+Sin hacer nada: cada semana te llega un correo «Copia semanal · Te damos de baja · <fecha>» con un adjunto `.txt`.
+Va cifrado con `DATA_KEY` (sin ella no se lee). Guárdalo, y una vez al mes busca en Gmail
+`subject:"Copia semanal · Te damos de baja" older_than:12w` y borra lo que salga: así lo borrado desaparece también de
+las copias a las 12 semanas. Para recuperar una copia: `workers/baja-tarea/restaurar.mjs` (lo hago yo contigo).
+Si algún día activas R2 (Cloudflare › R2, aceptar el plan): crea el bucket `feehund-copias` y enlázalo a feehund-web como
+`COPIAS`; desde entonces la copia va ahí, se guardan las 12 últimas solas y deja de llegar el correo.
 
 ## 5. La tarea de cada hora (recordatorios, programadas, archivo a los 90 días y copias)
-Workers & Pages › Create › Worker › nombre `feehund-baja-tarea` › Deploy › Edit code: borra lo que hay, pega el
-contenido de `workers/baja-tarea/index.js` (te lo paso) › Deploy. Después, en ese Worker:
-- Settings › Variables and secrets: Secret `TAREA_SECRET` (la misma del paso 3) y Text `URL_WEB` = `https://feehund.com`.
-- Settings › Trigger events › Add › Cron: `0 * * * *` (cada hora).
+La publico yo con `workers/baja-tarea/wrangler.toml` (cron cada hora) después de publicar la web, con la misma
+`TAREA_SECRET`. No tienes que hacer nada.
 
 ## 6. Lleida.net
 Cuando llegue el primer cliente: alta en Lleida.net (acepta personas físicas) y compra el **pack de bienvenida de 9,99 €**

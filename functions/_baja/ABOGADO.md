@@ -75,7 +75,9 @@ fuero, resolución de litigios en línea.
   pago y prueba de la autorización) se guarda **6 años**, como prueba ante reclamaciones y por la contabilidad. ¿Son
   correctos los 6 años (art. 30 del Código de Comercio; plazos de reclamación) y la base jurídica (art. 17.3 b y e RGPD
   frente a una petición de supresión)? Lo demás se borra a los **90 días** del envío; hasta entonces se puede pedir la
-  segunda carta gratis. Copias de seguridad cifradas semanales, 12 semanas.
+  segunda carta gratis. Copias de seguridad cifradas semanales, 12 semanas: de momento llegan **por correo al buzón
+  de la titular** (Gmail) como adjunto cifrado, y se borran a mano pasadas 12 semanas. ¿Basta (cifrado con una clave
+  que Google no tiene)? ¿Hay que mencionarlo como destinatario?
 - Registro de actividades de tratamiento; ¿hace falta evaluación de impacto?
 
 ## 6. Fase 1: envío a mano

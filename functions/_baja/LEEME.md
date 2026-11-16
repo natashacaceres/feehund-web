@@ -60,7 +60,8 @@ de R2, lo borrado desaparece cuando rotan (12 semanas).
 (aviso urgente o envío), recordatorio diario de las que siguen sin enviar, justificantes (fase 2), devoluciones, borrado a
 los 90 días (`DIAS_BORRADO`): se **archiva 6 años** lo que prueba la baja (nombre, DNI/NIE, empresa, fechas, carta,
 justificante, pago, autorización) y se borra lo demás; devolución de bajas del lote sin usar a los 180 días; **copia
-semanal** de todo (cifrado) en R2 (`COPIAS`), las 12 últimas (`workers/baja-tarea/restaurar.mjs` la devuelve a KV).
+semanal** de todo (cifrado): en R2 si existe el enlace `COPIAS` (las 12 últimas) y si no, por correo a `AVISOS_CORREO`
+como adjunto `.txt` (`workers/baja-tarea/restaurar.mjs` la devuelve a KV).
 
 ## Archivos
 
@@ -83,7 +84,9 @@ Todo lo personal va **cifrado** en KV; los metadatos sin datos personales los le
 
 Secretos: `STRIPE_SECRET_KEY` (clave restringida), `STRIPE_WEBHOOK_SECRET`, `BREVO_API_KEY`, `TOKEN_SECRET`,
 `DATA_KEY` (32 bytes en base64), `TAREA_SECRET` (la misma en el Worker). Texto: `STRIPE_PRODUCT_BAJA`, `AVISOS_CORREO`
-(adónde llegan los urgentes). Enlace KV: `FEEHUND_KV`; enlace R2: `COPIAS` (copias semanales). Fase 2: `ENVIO_MODO=lleida`, `LLEIDA_USER`, `LLEIDA_API_KEY`.
+(adónde llegan los urgentes y la copia semanal). Enlace KV: `FEEHUND_KV`; enlace R2 opcional: `COPIAS`.
+Los enlaces y variables se ponen en el panel de Pages (no hay wrangler.toml de Pages: tomaría el control de todas las
+variables del proyecto, también las de Mi banco). Fase 2: `ENVIO_MODO=lleida`, `LLEIDA_USER`, `LLEIDA_API_KEY`.
 Opcionales: `URL_WEB`, `DIAS_BORRADO` (90), `ENVIO_PRUEBA` (fase 2: todas las cartas a esta dirección).
 Si falta alguna, la página dice «Este servicio aún no está abierto» y enlaza la guía gratis.
 

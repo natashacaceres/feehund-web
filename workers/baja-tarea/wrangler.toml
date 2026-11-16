@@ -1,15 +1,19 @@
-# Worker aparte de la web (Cloudflare Pages no tiene tareas programadas).
-# Publicar: npx wrangler deploy --config workers/baja-tarea/wrangler.toml
-# Clave: npx wrangler secret put TAREA_SECRET --config workers/baja-tarea/wrangler.toml  (la misma que en Pages)
+# Worker aparte de la web (Cloudflare Pages no tiene tareas programadas). Solo llama cada hora a
+# https://feehund.com/api/baja/tarea con TAREA_SECRET; toda la lógica y las demás claves están en Pages.
+# Publicar (desde la raíz del repositorio de la web, después de publicar la web):
+#   npx wrangler deploy --config workers/baja-tarea/wrangler.toml
+#   npx wrangler secret put TAREA_SECRET --config workers/baja-tarea/wrangler.toml < ~/.feehund/secretos/tarea_secret
+# Ver que corre: npx wrangler tail feehund-baja-tarea   (cada hora escribe «tarea 200 {…}»)
 name = "feehund-baja-tarea"
 main = "index.js"
+account_id = "ba7394bd25941fefddf1ca6ebb7353f0"
 compatibility_date = "2026-11-01"
-workers_dev = true
+workers_dev = false   # sin dirección pública: solo el cron
 
 [vars]
 URL_WEB = "https://feehund.com"
 
 # Cada hora: envía las programadas del día, recuerda las que siguen sin enviar (una vez al día), trae los justificantes
-# (envío automático), devuelve lo que no llega y borra lo que toca. Todo es idempotente: repetirlo no duplica nada.
+# (envío automático), devuelve lo que no llega, archiva a los 90 días y hace la copia semanal. Todo es idempotente.
 [triggers]
 crons = ["0 * * * *"]
