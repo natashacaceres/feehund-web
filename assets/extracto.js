@@ -188,6 +188,8 @@
   // Los movimientos vuelven a pasar por el motor de siempre como un CSV: el mismo análisis y la misma comprobación de saldos.
   const AVISOS_DUDOSOS = ["no_cuadra", "filas_sin_leer"];
   const TX_IA = { es: "Leyendo tu extracto con IA…", ca: "Llegint el teu extracte amb IA…", en: "Reading your statement with AI…" }[LANG];
+  // Mientras llega: cuántos movimientos lleva leídos (así la espera no parece colgada)
+  const TX_IA_N = { es: (n) => "Leyendo con IA… " + n + " movimientos", ca: (n) => "Llegint amb IA… " + n + " moviments", en: (n) => "Reading with AI… " + n + " transactions" }[LANG];
   const TIPO_IA = { pdf: "application/pdf", jpg: "image/jpeg", jpeg: "image/jpeg", png: "image/png", webp: "image/webp", gif: "image/gif" };
   const tipoIA = (f) => {
     if (!f || typeof f.name !== "string") return null;
@@ -233,7 +235,11 @@
         const linea = ev.split("\n").find((l) => l.indexOf("data:") === 0);
         if (!linea) continue;
         let d; try { d = JSON.parse(linea.slice(5)); } catch (e) { continue; }
-        if (d.type === "content_block_delta" && d.delta && d.delta.type === "text_delta") texto += d.delta.text;
+        if (d.type === "content_block_delta" && d.delta && d.delta.type === "text_delta") {
+          texto += d.delta.text;
+          const n = (texto.match(/"fecha"/g) || []).length;
+          if (cargando && n) cargando.textContent = TX_IA_N(n);
+        }
         else if (d.type === "message_delta" && d.delta) parada = d.delta.stop_reason;
         else if (d.type === "error") throw new Error("lectura con IA: " + ((d.error && d.error.type) || "error"));
       }
