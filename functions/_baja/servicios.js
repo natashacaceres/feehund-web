@@ -72,7 +72,8 @@ export async function ivaNegocios(env) {
 export async function crearPagoTiqui(env, { ref, plan, importe, producto, idioma, vuelta, cancelar, textos, amigo, factura }) {
   const meta = amigo ? { servicio: 'tiqui', plan, amigo } : { servicio: 'tiqui', plan };
   // negocios: el IVA se suma en la página de pago (4,99 € + 21 %)
-  const iva = factura ? await ivaNegocios(env) : null;
+  // si Stripe no deja leer o crear el IVA (llave sin permiso), el pago sigue saliendo, sin IVA, y queda en el registro
+  const iva = factura ? await ivaNegocios(env).catch((e) => { console.log('iva negocios', String(e.message)); return null; }) : null;
   return stripe(env, 'POST', '/v1/checkout/sessions', {
     mode: 'payment',
     line_items: { 0: { quantity: 1, price_data: { currency: 'eur', unit_amount: importe, product: producto, tax_behavior: 'exclusive' }, ...(iva ? { tax_rates: { 0: iva } } : {}) } },
