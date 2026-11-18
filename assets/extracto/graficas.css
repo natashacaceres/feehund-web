@@ -44,13 +44,19 @@
 .pg-ico{width:22px;height:22px;flex:none;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 #xTarjeta.pg-plegada,#xTarjeta.pg-abierta{display:flex;flex-direction:column;align-items:center;transition:background .3s ease,padding .3s ease}
 #xTarjeta #xShare{align-self:stretch;display:inline-flex;align-items:center;justify-content:center;gap:10px}
-#xTarjeta.pg-plegada #xShare{order:-1}
+#xTarjeta #xShare[hidden]{display:none}
+.pg-acc{align-self:stretch;display:flex;flex-direction:column}
+#xTarjeta.pg-plegada .pg-acc{order:-1}
 #xTarjeta.pg-abierta{background:#F3E6CC;border-radius:24px;padding:20px 16px 16px}
-#xTarjeta.pg-abierta #xShare{order:2;margin-top:16px}
+#xTarjeta.pg-abierta .pg-acc{order:2;flex-direction:row;justify-content:center;gap:16px;margin-top:16px}
+#xTarjeta.pg-abierta .pg-acc > button{flex:none;display:inline-flex;align-items:center;justify-content:center;width:52px;height:52px;min-height:0;padding:0;border:0;border-radius:50%;background:#8C7D6E;color:#fff;box-shadow:none;cursor:pointer}
+#xTarjeta.pg-abierta .pg-acc > button:hover{background:#776959}
+#xTarjeta.pg-abierta .pg-acc > button span{display:none}
+#xTarjeta.pg-abierta .pg-acc .pg-ico{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
 #xTarjeta .r3-tarjeta-v{position:relative;overflow:hidden;transition:max-height .6s ease,opacity .45s ease .1s,margin .6s ease}
 #xTarjeta.pg-plegada .r3-tarjeta-v{max-height:0;opacity:0;margin-top:0;margin-bottom:0}
 #xTarjeta.pg-abierta .r3-tarjeta-v{max-height:1100px;opacity:1}
-.pg-guardar{position:absolute;bottom:10px;right:10px;display:none;align-items:center;justify-content:center;width:44px;height:44px;padding:0;border:0;border-radius:50%;background:var(--amber);color:var(--ink);cursor:pointer;box-shadow:0 2px 10px rgba(0,0,0,.3)}
+.pg-guardar{display:none}
 #xTarjeta.pg-abierta .pg-guardar{display:inline-flex}
 #xTarjeta.pg-abierta #xTarjetaImg{cursor:pointer}
 @media (prefers-reduced-motion:reduce){.pg-tabs button,.pg-wf i,#xTarjeta .r3-tarjeta-v,#xTarjeta{transition:none}}

@@ -233,11 +233,12 @@
     // En el ejemplo solo se ve el botón: no se abre ni se comparte (no es la tarjeta de nadie)
     const ej = $("xEjemplo"); tj.dataset.ejemplo = ej && !ej.hidden ? "1" : "";
     if (tj.dataset.ejemplo) sh.setAttribute("aria-disabled", "true"); else sh.removeAttribute("aria-disabled");
-    sh.innerHTML = ICO_SHARE; const sp = document.createElement("span"); sp.textContent = T.compartirMi; sh.appendChild(sp);
+    sh.innerHTML = ICO_SHARE; sh.removeAttribute("aria-label"); sh.removeAttribute("title"); const sp = document.createElement("span"); sp.textContent = T.compartirMi; sh.appendChild(sp);
     if (tj.dataset.pgPlegable) return;
     tj.dataset.pgPlegable = "1";
     const gu = document.createElement("button"); gu.type = "button"; gu.className = "pg-guardar"; gu.innerHTML = ICO_BAJAR; gu.setAttribute("aria-label", T.guardar); gu.title = T.guardar;
-    (tj.querySelector(".r3-tarjeta-v") || tj).appendChild(gu);
+    // Guardar y compartir: dos botones redondos grises debajo de la tarjeta, sin taparla
+    const acc = document.createElement("div"); acc.className = "pg-acc"; sh.before(acc); acc.append(gu, sh);
     const guardar = () => {
       const img = $("xTarjetaImg"); if (!img || !img.src) return;
       const a = document.createElement("a"); a.href = img.src; a.download = "feehund-mi-tarjeta.png"; document.body.appendChild(a); a.click(); a.remove();
@@ -249,7 +250,7 @@
       if (!tj.classList.contains("pg-plegada")) return; // ya abierta: comparte como siempre (WhatsApp, Instagram…)
       e.preventDefault(); e.stopImmediatePropagation();
       tj.classList.remove("pg-plegada"); tj.classList.add("pg-abierta");
-      sh.innerHTML = ICO_SHARE; const s2 = document.createElement("span"); s2.textContent = T.compartir; sh.appendChild(s2);
+      sh.innerHTML = ICO_SHARE; sh.setAttribute("aria-label", T.compartir); sh.title = T.compartir;
       setTimeout(() => tj.scrollIntoView({ behavior: "smooth", block: "center" }), 450);
     }, true);
   }
