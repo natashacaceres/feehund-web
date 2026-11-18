@@ -191,7 +191,7 @@
       const cols = document.createElement("div"); cols.className = "pg-mm-cols";
       repe.porMes.forEach(([k, v]) => {
         const c = document.createElement("div"); c.className = "pg-mm-c"; c.tabIndex = 0;
-        const b = document.createElement("i"); b.style.height = Math.max(2, Math.round((v / mx) * 100)) + "%"; if (v > media * 1.3) b.className = "alto"; // solo si se dispara de verdad
+        const b = document.createElement("i"); b.style.height = Math.max(2, Math.round((v / mx) * 100)) + "%"; if (v > media + 0.5) b.className = "alto"; // los meses que se pasan de lo habitual, en otro color
         const et = document.createElement("span"); et.textContent = T.meses[+k.slice(5) - 1];
         c.append(b, et); cols.appendChild(c);
         const t = T.mesTip(T.meses[+k.slice(5) - 1] + " " + k.slice(0, 4), eur(v));

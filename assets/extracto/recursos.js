@@ -5,7 +5,7 @@
 //   ACTUALIZAR_RECURSOS=1 node --test tests/unit/worker-montaje.test.mjs
 // La versión es una huella de todos los archivos de las listas: cambia en cuanto cambia cualquiera de ellos.
 globalThis.RECURSOS_EXTRACTO = {
-  version: '1bcff9eb4666',
+  version: '26824ee03da7',
   // Página, fuentes, motor, núcleo, lectores y textos: se guardan al instalar.
   PAGINA: [
     '/extracto/',
@@ -33,9 +33,9 @@ globalThis.RECURSOS_EXTRACTO = {
     '/assets/extracto/datafono/rellenar.js',
     '/assets/extracto/datafono/resumen.js',
     '/assets/extracto/graficas.css',
-    '/assets/extracto/graficas.css?v=20261118040934',
+    '/assets/extracto/graficas.css?v=20261118042403',
     '/assets/extracto/graficas.js',
-    '/assets/extracto/graficas.js?v=20261118040934',
+    '/assets/extracto/graficas.js?v=20261118042403',
     '/assets/extracto/lectores/camt053.js',
     '/assets/extracto/lectores/csv.js',
     '/assets/extracto/lectores/formato.js',

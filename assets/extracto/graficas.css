@@ -101,3 +101,9 @@ body.dq-abierta{overflow:hidden}
 .pg-mm-c span{position:absolute;bottom:-24px;font:400 14px/1 var(--f-text);color:var(--ink-2)}
 .pg-mm-media{position:absolute;left:0;right:0;border-top:2px dashed #8A8270;pointer-events:none}
 .pg-mm-media span{position:absolute;right:0;top:-22px;font:700 13px/1 var(--f-text);color:var(--ink-2);background:var(--bg);padding:2px 4px;border-radius:6px}
+
+/* Gráficas: cada una bien separada de la siguiente, para que no parezcan la misma */
+#pgGr{gap:72px}
+#pgGr .pg-blq{gap:18px}
+#pgGr .pg-h{font-size:22px}
+@media (max-width:480px){#pgGr{gap:60px}}
