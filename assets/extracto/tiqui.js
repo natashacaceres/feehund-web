@@ -181,13 +181,8 @@
     msgs.appendChild(m); m.scrollIntoView({ block: "nearest", behavior: "smooth" });
     return m;
   }
-  // Las cifras en negrita, sin innerHTML con texto del modelo
-  function conNegrita(texto) {
-    const f = document.createDocumentFragment(), re = /(\d{1,3}(?:\.\d{3})*(?:,\d{1,2})?\s?€)/g; let i = 0, m;
-    while ((m = re.exec(texto))) { if (m.index > i) f.appendChild(document.createTextNode(texto.slice(i, m.index))); f.appendChild(mk("b", null, m[1])); i = m.index + m[1].length; }
-    if (i < texto.length) f.appendChild(document.createTextNode(texto.slice(i)));
-    return f;
-  }
+  // El texto del modelo tal cual, sin negritas (igual que los chats de ejemplo de Tu Tiqui) y sin innerHTML
+  const conNegrita = (texto) => document.createTextNode(String(texto).replace(/(\d) €/g, "$1\u00a0€")); // la cifra y el € siempre juntos
   function respuesta(texto, pagos) {
     const f = document.createDocumentFragment(); f.appendChild(conNegrita(texto));
     const usados = todos.filter((m) => (pagos || []).indexOf(m.id) >= 0);

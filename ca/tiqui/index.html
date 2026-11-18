@@ -27,6 +27,9 @@
   .tq-demo{position:relative;overflow:hidden;background:var(--ink);border-radius:24px;padding:var(--s-4) var(--s-4) var(--s-5);display:grid;gap:12px}
   .tq-demo::after{content:"";position:absolute;right:-70px;bottom:-60px;width:300px;height:300px;border-radius:50%;background:url("../../assets/img/tiqui-olfatea.webp") center/cover;opacity:.07;filter:grayscale(1);pointer-events:none}
   .tq-demo>*{position:relative;z-index:1}
+  .tq-in{display:flex;gap:8px;margin-top:4px}
+  .tq-in span{flex:1;min-height:48px;display:flex;align-items:center;padding:0 18px;border:1px solid rgba(255,248,236,.22);border-radius:999px;background:rgba(255,248,236,.08);color:rgba(255,248,236,.65);font:400 16px/1 var(--f-text)}
+  .tq-in i{flex:none;width:48px;height:48px;border-radius:50%;display:grid;place-items:center;background:#FFF8EC;color:#14213D;font:700 20px/1 var(--f-text);font-style:normal}
   .tq-top{display:flex;align-items:center;gap:12px;padding-bottom:14px;margin-bottom:4px;border-bottom:1px solid rgba(255,248,236,.12)}
   .tq-top img{width:44px;height:44px;flex:none;border-radius:50%;object-fit:cover;background:#FFF8EC}
   .tq-nom{margin:0;font:800 20px/1.1 var(--f-head);color:#FFF8EC}
@@ -55,7 +58,7 @@
     .tq-hero{grid-area:hero;justify-items:start;text-align:left}
     .tq-img{width:140px}
     .tq-h{font-size:clamp(40px,3.9vw,56px);white-space:nowrap}
-    .tq-demo{grid-area:demo;padding:var(--s-6) var(--s-5)}
+    .tq-demo{grid-area:demo}
     .tq-dif{grid-area:dif}
     .tq-dif li{font-size:30px;padding-left:44px;background-size:28px}
     .tq-planes{grid-area:planes;margin-top:var(--s-4)}
@@ -116,22 +119,22 @@
     <section class="tq-demo" data-m="neg" hidden>
     <div class="tq-top"><img src="../../assets/img/tiqui-olfatea.webp" alt="" width="44" height="44"><div><p class="tq-nom">Tiqui</p><p class="tq-est"><i></i>Ensumant el teu datàfon</p></div><span class="tq-priv">Privat</span></div>
     <div class="p-m p-m--tu">Quant em cobra el banc al mes?</div>
-    <div class="p-m p-m--ia">A l'octubre, 83,42 €. Són 1,04 € de cada 100 que cobres amb targeta.</div>
+    <div class="p-m p-m--ia">A l'octubre, 83,42&nbsp;€. Són 1,04&nbsp;€ de cada 100 que cobres amb targeta.</div>
     <div class="p-m p-m--tu">Per què unes targetes em cobren més?</div>
-    <div class="p-m p-m--ia">Les de turistes i les d'empresa no tenen màxim per llei. Aquest mes et van costar 17,55 €.</div>
+    <div class="p-m p-m--ia">Les de turistes i les d'empresa no tenen màxim per llei. Aquest mes et van costar 17,55&nbsp;€.</div>
     <div class="p-m p-m--tu">A qui em canvio?</div>
-    <div class="p-m p-m--ia">Amb les teves vendes, n'hi ha que et cobrarien 0,63 €. Et dic qui i amb quines condicions.</div>
-  </section>
+    <div class="p-m p-m--ia">Amb les teves vendes, n'hi ha que et cobrarien 0,63&nbsp;€. Et dic qui i amb quines condicions.</div>
+    <div class="tq-in" aria-hidden="true"><span>Escriu la teva pregunta</span><i>→</i></div>  </section>
 
 <section class="tq-demo" data-m="ti" aria-label="Pregunta-li a Tiqui">
     <div class="tq-top"><img src="../../assets/img/tiqui-olfatea.webp" alt="" width="44" height="44"><div><p class="tq-nom">Tiqui</p><p class="tq-est"><i></i>Ensumant el teu extracte</p></div><span class="tq-priv">Privat</span></div>
     <div class="p-m p-m--tu">On van els meus diners?</div>
-    <div class="p-m p-m--ia">La meitat se'n va a casa, amb el lloguer, la llum i l'aigua. Després hi ha el súper, amb 312,40 € al mes.<span class="tq-pagos">Veure els pagaments</span></div>
+    <div class="p-m p-m--ia">La meitat se'n va a casa, amb el lloguer, la llum i l'aigua. Després hi ha el súper, amb 312,40&nbsp;€ al mes.<span class="tq-pagos">Veure els pagaments</span></div>
     <div class="p-m p-m--tu">Hi ha alguna cosa estranya al meu compte?</div>
-    <div class="p-m p-m--ia">Spotify et va cobrar dues vegades el 13 de març. Són 11,99 € de més.</div>
+    <div class="p-m p-m--ia">Spotify et va cobrar dues vegades el 13 de març. Són 11,99&nbsp;€ de més.</div>
     <div class="p-m p-m--tu">Quant porto a Glovo?</div>
-    <div class="p-m p-m--ia">186,40 € des de març, en 14 comandes.</div>
-  </section>
+    <div class="p-m p-m--ia">186,40&nbsp;€ des de març, en 14 comandes.</div>
+    <div class="tq-in" aria-hidden="true"><span>Escriu la teva pregunta</span><i>→</i></div>  </section>
 
     <ul class="tq-dif" data-m="neg" hidden>
     <li>Llegeix el resum del teu datàfon</li>
