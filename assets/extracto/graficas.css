@@ -107,3 +107,5 @@ body.dq-abierta{overflow:hidden}
 #pgGr .pg-blq{gap:18px}
 #pgGr .pg-h{font-size:22px}
 @media (max-width:480px){#pgGr{gap:60px}}
+/* En el ordenador, «al año, calculado con N meses» en una sola línea, al lado de la cifra */
+@media (min-width:761px){.pg-fila .r3-calc:not([hidden]),.pg-top .pg-calc{max-width:none;white-space:nowrap}}
