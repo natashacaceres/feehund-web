@@ -240,7 +240,7 @@ export async function onRequestPost({ request, env, params }) {
     const dura = { es: plan === 'basico' ? '7 días' : '3 meses', ca: plan === 'basico' ? '7 dies' : '3 mesos', en: plan === 'basico' ? '7 days' : '3 months' }[idioma];
     const textos = {
       descripcion: { es: 'Pregúntale a Tiqui · ' + dura + ' · Tu código ', ca: 'Pregunta-li a Tiqui · ' + dura + ' · El teu codi ', en: 'Ask Tiqui · ' + dura + ' · Your code ' }[idioma] + String(b.codigo).toUpperCase(),
-      renuncia: { es: 'Empieza en cuanto pagas. Al pagar aceptas que es contenido digital y que no hay periodo de devolución.', ca: 'Comença tan bon punt pagues. En pagar acceptes que és contingut digital i que no hi ha període de devolució.', en: 'It starts as soon as you pay. By paying you accept it is digital content with no cancellation period.' }[idioma],
+      renuncia: { es: 'Empieza en cuanto pagas. Al pagar aceptas que empiece ya y renuncias al desistimiento: no hay devoluciones.', ca: 'Comença tan bon punt pagues. En pagar acceptes que comenci ja i renuncies al desistiment: no hi ha devolucions.', en: 'It starts as soon as you pay. By paying you agree it starts now and waive the right to cancel: no refunds.' }[idioma],
     };
     try {
       const s2 = await crearPagoTiqui(env, { ref: h, plan, importe: P.precio, producto: env.STRIPE_PRODUCT_TIQUI || PRODUCTO_TIQUI, idioma, textos,

@@ -22,10 +22,10 @@ const MESES = {
   en: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
 };
 function correoTexto(idioma, codigo, hasta, origen) {
-  const d = new Date(hasta), enlace = origen + '/tiqui/#' + codigo;
-  if (idioma === 'ca') return { asunto: 'El teu codi de Tiqui', texto: `Aquest és el teu codi de Tiqui:\n\n${codigo}\n\nAmb ell tornes quan vulguis, des de qualsevol mòbil, sense pujar l'extracte una altra vegada:\n${enlace}\n\nEl tens fins al ${d.getUTCDate()} ${MESES.ca[d.getUTCMonth()]}.\n\nNo el comparteixis: obre els teus moviments.\n\nFeehund` };
-  if (idioma === 'en') return { asunto: 'Your Tiqui code', texto: `This is your Tiqui code:\n\n${codigo}\n\nUse it to come back any time, from any phone, without uploading your statement again:\n${enlace}\n\nIt's yours until ${d.getUTCDate()} ${MESES.en[d.getUTCMonth()]}.\n\nDon't share it: it opens your transactions.\n\nFeehund` };
-  return { asunto: 'Tu código de Tiqui', texto: `Este es tu código de Tiqui:\n\n${codigo}\n\nCon él vuelves cuando quieras, desde cualquier móvil, sin subir el extracto otra vez:\n${enlace}\n\nLo tienes hasta el ${d.getUTCDate()} de ${MESES.es[d.getUTCMonth()]}.\n\nNo lo compartas: abre tus movimientos.\n\nFeehund` };
+  const d = new Date(hasta), enlace = origen + ({ ca: '/ca/tiqui/#', en: '/en/tiqui/#' }[idioma] || '/tiqui/#') + codigo;
+  if (idioma === 'ca') return { asunto: 'El teu codi de Tiqui', texto: `Aquest és el teu codi de Tiqui:\n\n${codigo}\n\nAmb ell tornes quan vulguis, des de qualsevol mòbil, sense pujar l'extracte una altra vegada:\n${enlace}\n\nEl tens fins al ${d.getUTCDate()} ${MESES.ca[d.getUTCMonth()]}.\n\nNo el comparteixis: obre els teus moviments.\n\nVas acceptar que el servei comencés de seguida, així que no hi ha devolucions.\n\nFeehund` };
+  if (idioma === 'en') return { asunto: 'Your Tiqui code', texto: `This is your Tiqui code:\n\n${codigo}\n\nUse it to come back any time, from any phone, without uploading your statement again:\n${enlace}\n\nIt's yours until ${d.getUTCDate()} ${MESES.en[d.getUTCMonth()]}.\n\nDon't share it: it opens your transactions.\n\nYou agreed that the service starts right away, so there are no refunds.\n\nFeehund` };
+  return { asunto: 'Tu código de Tiqui', texto: `Este es tu código de Tiqui:\n\n${codigo}\n\nCon él vuelves cuando quieras, desde cualquier móvil, sin subir el extracto otra vez:\n${enlace}\n\nLo tienes hasta el ${d.getUTCDate()} de ${MESES.es[d.getUTCMonth()]}.\n\nNo lo compartas: abre tus movimientos.\n\nAceptaste que el servicio empezara al momento, así que no hay devoluciones.\n\nFeehund` };
 }
 
 /** Activa el pase si la sesión de Stripe está pagada y es de este código. Devuelve el pase o null. */
