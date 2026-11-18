@@ -24,7 +24,7 @@
       unPago: "Un solo pago. Sin suscripción", ahoraNo: "Ahora no", momento: "Un momento…", errorPago: "No se ha podido. Prueba otra vez.",
       tuyo: "Tiqui ya es tuyo", copiar: "Copiar", copiado: "Copiado", correo: "Te lo hemos mandado por correo. Con él vuelves desde Tu Tiqui, sin subir nada.",
       hasta: (d) => "Hasta el " + d.getDate() + " de " + ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"][d.getMonth()],
-      invita: "Invita a un amigo", invitaSub: "Tus preguntas nos salen caras. Si tu amigo paga, 30 días gratis para ti.",
+      invita: "Invitar a un amigo", invitaYo: "Tus preguntas me salen caras, jeje. Invita a un amigo: si paga, te regalo 30 días.", fin: "Se nos acabó el tiempo.",
       enlaceCopiado: "Enlace copiado. Pásaselo a quien quieras.", sinHuecos: "Ya te han regalado días 3 amigos. ¡Gracias!",
       regalo: (d) => "Un amigo ha pagado. Tienes 30 días más, " + d.charAt(0).toLowerCase() + d.slice(1) + ".", compartirTxt: "Mira lo que pagas cada mes sin darte cuenta. Es gratis.",
       topeDia: "Por hoy ya está. Mañana seguimos.", topeTotal: "Has llegado al máximo de este pase.", noAbre: "Ese código no existe o ya caducó.", sinPagar: "Aún no nos ha llegado el pago. Si has pagado, recarga en un momento.",
@@ -39,7 +39,7 @@
       unPago: "Un sol pagament. Sense subscripció", ahoraNo: "Ara no", momento: "Un moment…", errorPago: "No s'ha pogut. Torna-ho a provar.",
       tuyo: "Tiqui ja és teu", copiar: "Copiar", copiado: "Copiat", correo: "T'ho hem enviat per correu. Amb ell tornes des d'El teu Tiqui, sense pujar res.",
       hasta: (d) => "Fins al " + d.getDate() + " " + ["de gener", "de febrer", "de març", "d'abril", "de maig", "de juny", "de juliol", "d'agost", "de setembre", "d'octubre", "de novembre", "de desembre"][d.getMonth()],
-      invita: "Convida un amic", invitaSub: "Les teves preguntes ens surten cares. Si el teu amic paga, 30 dies gratis per a tu.",
+      invita: "Convidar un amic", invitaYo: "Les teves preguntes em surten cares, jeje. Convida un amic: si paga, et regalo 30 dies.", fin: "Se'ns ha acabat el temps.",
       enlaceCopiado: "Enllaç copiat. Passa'l a qui vulguis.", sinHuecos: "Ja t'han regalat dies 3 amics. Gràcies!",
       regalo: (d) => "Un amic ha pagat. Tens 30 dies més, " + d.charAt(0).toLowerCase() + d.slice(1) + ".", compartirTxt: "Mira què pagues cada mes sense adonar-te'n. És gratis.",
       topeDia: "Per avui ja està. Demà continuem.", topeTotal: "Has arribat al màxim d'aquest passi.", noAbre: "Aquest codi no existeix o ja ha caducat.", sinPagar: "Encara no ens ha arribat el pagament. Si has pagat, torna a carregar d'aquí a un moment.",
@@ -54,7 +54,7 @@
       unPago: "One payment. No subscription", ahoraNo: "Not now", momento: "One moment…", errorPago: "That didn't work. Try again.",
       tuyo: "Tiqui is yours", copiar: "Copy", copiado: "Copied", correo: "We've emailed it to you. Use it to come back from Your Tiqui, without uploading anything.",
       hasta: (d) => "Until " + d.getDate() + " " + ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"][d.getMonth()],
-      invita: "Invite a friend", invitaSub: "Your questions cost us a lot. If your friend pays, you get 30 days free.",
+      invita: "Invite a friend", invitaYo: "Your questions cost me a fortune, hehe. Invite a friend: if they pay, I'll give you 30 days.", fin: "Our time is up.",
       enlaceCopiado: "Link copied. Send it to anyone you like.", sinHuecos: "3 friends have already given you days. Thank you!",
       regalo: (d) => "A friend has paid. You have 30 more days, " + d.charAt(0).toLowerCase() + d.slice(1) + ".", compartirTxt: "See what you pay every month without noticing. It's free.",
       topeDia: "That's it for today. See you tomorrow.", topeTotal: "You've reached the limit of this pass.", noAbre: "That code doesn't exist or has expired.", sinPagar: "We haven't received the payment yet. If you've paid, reload in a moment.",
@@ -214,8 +214,10 @@
     const r = await api("pregunta", { codigo: p.codigo, pregunta: t, idioma: LANG, historial, movimientos: envio() });
     pensando.remove();
     if (!r.ok) {
-      if (r.d.error === "codigo") { poner(PASE, null); burbuja("ia", T.noAbre); return; }
-      burbuja("ia", r.d.error === "tope_dia" ? T.topeDia : r.d.error === "tope_total" ? T.topeTotal : r.d.error === "no_comprobado" ? T.noComprobado : T.noPuedo); return;
+      if (r.d.error === "codigo") { burbuja("ia", T.fin); invitar(p); return; }
+      burbuja("ia", r.d.error === "tope_dia" ? T.topeDia : r.d.error === "tope_total" ? T.topeTotal : r.d.error === "no_comprobado" ? T.noComprobado : T.noPuedo);
+      if (r.d.error === "tope_total") invitar(p);
+      return;
     }
     respuesta(r.d.texto, r.d.pagos);
     historial.push({ rol: "tu", texto: t }, { rol: "ia", texto: r.d.texto }); historial = historial.slice(-8);
@@ -246,7 +248,6 @@
     const env = mk("button", null, "→"); env.type = "submit"; env.setAttribute("aria-label", T.enviar);
     f.append(inp, env); f.addEventListener("submit", (e) => { e.preventDefault(); const t = inp.value.trim(); if (t) { inp.value = ""; preguntar(t); } });
     ch.append(top, msgs, sug, f);
-    if (pase) ch.appendChild(invitar(pase));
     caja.appendChild(ch);
     historial = [];
     const viejo = leer(PASE);
@@ -265,22 +266,24 @@
   // Invita a un amigo: un enlace propio (sin el código); si el amigo paga, 30 días más para ti
   const RUTA = { es: "/extracto/", ca: "/ca/extracte/", en: "/en/statement/" }[LANG];
   function invitar(pase) {
-    const w = mk("div", "tqc-inv");
+    const f = document.createDocumentFragment(); f.appendChild(document.createTextNode(T.invitaYo));
     const b = mk("button", "tqc-inv-b"); b.type = "button";
     b.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="8.5" width="17" height="4" rx="1"/><path d="M5 12.5v8h14v-8M12 8.5v12M12 8.5c-1.5-3.5-5.5-4-5.5-1.5S10 8.5 12 8.5zM12 8.5c1.5-3.5 5.5-4 5.5-1.5S14 8.5 12 8.5z"/></svg>';
     b.appendChild(mk("span", null, T.invita));
-    const s = mk("p", "tqc-inv-s", T.invitaSub);
+    const s = mk("span", "tqc-inv-s"); s.hidden = true;
     b.addEventListener("click", async () => {
       b.disabled = true;
       const r = await api("invitar", { codigo: pase.codigo }); b.disabled = false;
-      if (!r.ok || !r.d.id) { burbuja("ia", T.noPuedo); return; }
+      if (!r.ok || !r.d.id) { s.textContent = T.noPuedo; s.hidden = false; return; }
       poner(MIREF, r.d.id);
-      if (!r.d.quedan) { burbuja("ia", T.sinHuecos); return; }
+      if (!r.d.quedan) { s.textContent = T.sinHuecos; s.hidden = false; return; }
       const url = location.origin + RUTA + "?amigo=" + r.d.id;
       try { if (navigator.share) { await navigator.share({ title: "Feehund", text: T.compartirTxt, url }); return; } } catch (e) { if (e && e.name === "AbortError") return; }
       try { await navigator.clipboard.writeText(T.compartirTxt + " " + url); s.textContent = T.enlaceCopiado; } catch (e) { s.textContent = url; }
+      s.hidden = false;
     });
-    w.append(b, s); return w;
+    f.append(b, s);
+    burbuja("ia", f).classList.add("tqc-m--inv");
   }
   // Al abrir: lo que queda del pase (puede haber crecido por un amigo) y el aviso del regalo
   let regaloPendiente = 0;
@@ -290,6 +293,7 @@
     poner(PASE, Object.assign({}, pase, { plan: r.d.plan, hasta: r.d.hasta }));
     if (caducado) { // aquí ya había caducado, pero un amigo le ha dado más días: se vuelve a montar con el pase
       if (r.d.hasta > Date.now()) { regaloPendiente = r.d.regalo || 0; if (caja) caja.remove(); montarCaja(); colocar(); }
+      else if (msgs && !msgs.querySelector(".tqc-m--inv")) { const fin = burbuja("ia", T.fin); msgs.insertBefore(fin, msgs.firstChild); invitar(pase); }
       return;
     }
     if (sub) sub.textContent = T.hasta(new Date(r.d.hasta));

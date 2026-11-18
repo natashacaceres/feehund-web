@@ -12,7 +12,7 @@
 // Cerrada: Claude no tiene internet ni más herramientas que las de abajo, y TODA cifra en euros de su respuesta
 // tiene que haber salido de una herramienta. Si no, se le devuelve para que lo corrija; si sigue igual, no se enseña.
 
-import { PLANES, PRODUCTO_TIQUI, AMIGO, activarTiqui, codigoValido, refValido } from '../../_ia/pase.js';
+import { PLANES, PRODUCTO_TIQUI, AMIGO, GUARDA_PASE, activarTiqui, codigoValido, refValido } from '../../_ia/pase.js';
 import { crearPagoTiqui, leerPago } from '../../_baja/servicios.js';
 
 const MODELO = 'claude-opus-5-5';
@@ -284,18 +284,12 @@ export async function onRequestPost({ request, env, params }) {
   if (ruta === 'abrir' && !pase && (await env.FEEHUND_KV.get('ia:pend:' + h))) {
     return json({ caja: JSON.parse((await env.FEEHUND_KV.get('ia:caja:' + h)) || 'null'), pendiente: true });
   }
-  if (!pase || pase.hasta < Date.now()) return json({ error: 'codigo' }, 402);
+  if (!pase) return json({ error: 'codigo' }, 402);
   const ttl = Math.max(120, Math.ceil((pase.hasta - Date.now()) / 1000) + 86400);
-
-  if (ruta === 'caja') {
-    const caja = b.caja;
-    if (!caja || typeof caja.datos !== 'string' || caja.datos.length > 4e6) return json({ error: 'caja' }, 400);
-    await env.FEEHUND_KV.put('ia:caja:' + h, JSON.stringify({ sal: caja.sal, iv: caja.iv, datos: caja.datos }), { expirationTtl: ttl });
-    return json({ ok: true });
-  }
+  // Estado e invitar también con el pase caducado: así un amigo puede devolverle días
   if (ruta === 'estado') {
     const regalo = pase.regalo || 0;
-    if (regalo) { delete pase.regalo; await env.FEEHUND_KV.put('ia:pase:' + h, JSON.stringify(pase), { expirationTtl: ttl }); }
+    if (regalo) { delete pase.regalo; await env.FEEHUND_KV.put('ia:pase:' + h, JSON.stringify(pase), { expirationTtl: ttl + GUARDA_PASE }); }
     return json({ plan: pase.plan || 'basico', hasta: pase.hasta, regalo });
   }
   if (ruta === 'invitar') {
@@ -308,6 +302,14 @@ export async function onRequestPost({ request, env, params }) {
     }
     const ref = JSON.parse((await env.FEEHUND_KV.get('ia:ref:' + id)) || '{}');
     return json({ id, dias: AMIGO.dias, quedan: Math.max(0, AMIGO.max - (ref.n || 0)) });
+  }
+  if (pase.hasta < Date.now()) return json({ error: 'codigo' }, 402);
+
+  if (ruta === 'caja') {
+    const caja = b.caja;
+    if (!caja || typeof caja.datos !== 'string' || caja.datos.length > 4e6) return json({ error: 'caja' }, 400);
+    await env.FEEHUND_KV.put('ia:caja:' + h, JSON.stringify({ sal: caja.sal, iv: caja.iv, datos: caja.datos }), { expirationTtl: ttl });
+    return json({ ok: true });
   }
   if (ruta === 'abrir') {
     const caja = JSON.parse((await env.FEEHUND_KV.get('ia:caja:' + h)) || 'null');
@@ -326,7 +328,7 @@ export async function onRequestPost({ request, env, params }) {
     const res = await preguntar(env, movs, pregunta, b.historial);
     if (res.error) return json({ error: res.error, estado: res.estado, detalle: res.detalle, uso: env.IA_PRUEBAS === '1' ? res.uso : undefined }, 502);
     pase.usadas = (pase.usadas || 0) + 1; pase.hoy += 1; // solo cuenta si hay respuesta comprobada
-    await env.FEEHUND_KV.put('ia:pase:' + h, JSON.stringify(pase), { expirationTtl: ttl });
+    await env.FEEHUND_KV.put('ia:pase:' + h, JSON.stringify(pase), { expirationTtl: ttl + GUARDA_PASE });
     return json({ texto: res.texto, pagos: res.pagos, plan: pase.plan, hasta: pase.hasta, uso: env.IA_PRUEBAS === '1' ? res.uso : undefined });
   }
   return json({ error: 'ruta' }, 404);

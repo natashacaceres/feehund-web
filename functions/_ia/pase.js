@@ -12,6 +12,8 @@ export const PLANES = {
 export const PRODUCTO_TIQUI = 'prod_VeGsASLYslzV0Q'; // Stripe (en vivo): «Pregúntale a Tiqui»
 // Invita a un amigo: si paga, quien invitó tiene 30 días más (y 40 preguntas más), hasta 3 amigos.
 export const AMIGO = { dias: 30, preguntas: 40, max: 3 };
+// El pase (sin datos tuyos: solo plan y fechas) se guarda un año más tras caducar, para que un amigo pueda revivirlo.
+export const GUARDA_PASE = 365 * 86400;
 export const refValido = (r) => /^[0-9A-HJKMNP-TV-Z]{8}$/.test(String(r || ''));
 
 /** Si el pago trae el enlace de un amigo, le regala los días a quien invitó. Solo una vez por pago. */
@@ -29,7 +31,7 @@ async function regalarAmigo(env, h, sesion) {
   pase.extra = (pase.extra || 0) + AMIGO.preguntas;
   pase.regalo = (pase.regalo || 0) + AMIGO.dias;
   const ttl = Math.ceil((pase.hasta - Date.now()) / 1000) + 86400;
-  await env.FEEHUND_KV.put(kPase, JSON.stringify(pase), { expirationTtl: ttl });
+  await env.FEEHUND_KV.put(kPase, JSON.stringify(pase), { expirationTtl: ttl + GUARDA_PASE });
   const caja = await env.FEEHUND_KV.get('ia:caja:' + ref.h);
   if (caja) await env.FEEHUND_KV.put('ia:caja:' + ref.h, caja, { expirationTtl: ttl });
   ref.n = (ref.n || 0) + 1;
@@ -62,7 +64,7 @@ export async function activarTiqui(env, h, sesion, origen) {
   if (ya) return ya;
   const pase = { plan, hasta: Date.now() + P.dias * 864e5, usadas: 0, dia: '', hoy: 0, creado: Date.now(), sesion: sesion.id };
   const ttl = P.dias * 86400 + 86400;
-  await env.FEEHUND_KV.put(kPase, JSON.stringify(pase), { expirationTtl: ttl });
+  await env.FEEHUND_KV.put(kPase, JSON.stringify(pase), { expirationTtl: ttl + GUARDA_PASE });
   const caja = await env.FEEHUND_KV.get('ia:caja:' + h);
   if (caja) await env.FEEHUND_KV.put('ia:caja:' + h, caja, { expirationTtl: ttl });
   const pend = JSON.parse((await env.FEEHUND_KV.get('ia:pend:' + h)) || 'null');

@@ -56,6 +56,12 @@
     .tq-g--dentro .tq-hero{justify-items:center;text-align:center}
     .tq-g--dentro .tq-img{width:200px}
   }
+  .tq-inv{display:grid;grid-template-columns:44px minmax(0,1fr);gap:12px 14px;align-items:start;padding:18px;border-radius:20px;background:#F3E6CC}
+  .tq-inv img{width:44px;height:44px;border-radius:50%;object-fit:cover}
+  .tq-inv p{margin:0;font:400 17px/1.4 var(--f-text);color:var(--ink)}
+  .tq-inv-b{grid-column:2;justify-self:start;display:inline-flex;align-items:center;gap:8px;min-height:48px;padding:0 20px;border:0;border-radius:999px;background:var(--ink);color:var(--bg);font:700 16px/1 var(--f-text);cursor:pointer}
+  .tq-inv-b svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+  .tq-inv-s{grid-column:2;font-size:15px!important;color:var(--ink-2)!important;word-break:break-all}
   [hidden]{display:none!important}
   .tq-cod{display:grid;gap:8px;margin-top:8px}.tq-cod label{font:700 16px/1.2 var(--f-text);color:var(--ink)}.tq-cod .p-in{display:flex;gap:8px}.tq-cod input{flex:1;min-width:0;min-height:48px;padding:0 16px;border:1.5px solid var(--line);border-radius:999px;background:var(--bg);color:var(--ink);font:400 16px/1 ui-monospace,Menlo,monospace;text-transform:uppercase}.tq-cod button{flex:none;width:48px;height:48px;border:0;border-radius:50%;background:var(--ink);color:var(--bg);font:700 20px/1 var(--f-text);cursor:pointer}.tq-err{margin:0;min-height:1em;font:400 15px/1.3 var(--f-text);color:var(--amber-text)}
   .tq-demo .p-m--ia{position:relative;margin-left:48px;max-width:calc(88% - 48px)}
@@ -118,6 +124,12 @@
   <div class="tq-acc">
     <a class="tq-cta" id="tqAbrir" href="../../en/statement/">Upload my statement</a>
     <p class="tq-sin" id="tqSin">One payment. No subscription</p>
+    <div class="tq-inv" id="tqInv" hidden>
+      <img src="../../assets/img/tiqui-olfatea.webp" alt="" width="44" height="44">
+      <p>Your questions cost me a fortune, hehe. Invite a friend: if they pay, I'll give you 30 days.</p>
+      <button type="button" class="tq-inv-b" id="tqInvB"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="8.5" width="17" height="4" rx="1"/><path d="M5 12.5v8h14v-8M12 8.5v12M12 8.5c-1.5-3.5-5.5-4-5.5-1.5S10 8.5 12 8.5zM12 8.5c1.5-3.5 5.5-4 5.5-1.5S14 8.5 12 8.5z"/></svg>Invite a friend</button>
+      <p class="tq-inv-s" id="tqInvS" role="status" hidden></p>
+    </div>
     <form class="tq-cod" id="tqForm">
       <label for="tqCod">Already have your code?</label>
       <div class="p-in"><input id="tqCod" autocomplete="off" autocapitalize="characters" placeholder="FH-XXXX-XXXX-XXXX-XXXX"><button type="submit" aria-label="Entrar">→</button></div>
@@ -137,6 +149,25 @@
     var meses = ["January","February","March","April","May","June","July","August","September","October","November","December"], d = new Date(p.hasta);
     $("tqAbrir").textContent = "Open my spending"; $("tqAbrir").href = "../../en/statement/?vuelta";
     $("tqSin").textContent = "Until " + d.getDate() + " " + meses[d.getMonth()];
+  }
+  // Invita a un amigo (con pase, aunque haya caducado): si paga, Tiqui te regala 30 días
+  if (p && p.codigo) {
+    if (p.hasta <= Date.now()) $("tqSin").textContent = "Our time is up.";
+    $("tqInv").hidden = false;
+    $("tqInvB").addEventListener("click", function () {
+      var b = $("tqInvB"), s = $("tqInvS"); b.disabled = true;
+      var di = function (x) { s.textContent = x; s.hidden = false; };
+      fetch("../../api/ia/invitar", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ codigo: p.codigo }) })
+        .then(function (r) { return r.ok ? r.json() : null; }).then(function (j) {
+          b.disabled = false;
+          if (!j || !j.id) { di("I can't right now. Try again in a moment."); return; }
+          try { localStorage.setItem("fh-tiqui-ref", JSON.stringify(j.id)); } catch (e) {}
+          if (!j.quedan) { di("3 friends have already given you days. Thank you!"); return; }
+          var url = location.origin + "/en/statement/" + "?amigo=" + j.id, txt = "See what you pay every month without noticing. It's free.";
+          if (navigator.share) { navigator.share({ title: "Feehund", text: txt, url: url }).catch(function () {}); return; }
+          try { navigator.clipboard.writeText(txt + " " + url).then(function () { di("Link copied. Send it to anyone you like."); }, function () { di(url); }); } catch (e) { di(url); }
+        }, function () { b.disabled = false; di("I can't right now. Try again in a moment."); });
+    });
   }
   $("tqForm").addEventListener("submit", function (e) {
     e.preventDefault();
