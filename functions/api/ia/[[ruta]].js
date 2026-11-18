@@ -318,11 +318,13 @@ export async function onRequestPost({ request, env, params }) {
   }
   if (!pase) return json({ error: 'codigo' }, 402);
   const ttl = Math.max(120, Math.ceil((pase.hasta - Date.now()) / 1000) + 86400);
+  // cuántas preguntas lleva y cuántas tiene (el aviso «Has usado el 90 %» sale cuando le quedan 5 o menos)
+  const uso = () => ({ usadas: pase.usadas || 0, total: (PLANES[pase.plan] || PLANES.basico).total + (pase.extra || 0) });
   // Estado e invitar también con el pase caducado: así un amigo puede devolverle días
   if (ruta === 'estado') {
     const regalo = pase.regalo || 0;
     if (regalo) { delete pase.regalo; await env.FEEHUND_KV.put('ia:pase:' + h, JSON.stringify(pase), { expirationTtl: ttl + GUARDA_PASE }); }
-    return json({ plan: pase.plan || 'basico', hasta: pase.hasta, regalo });
+    return json(Object.assign({ plan: pase.plan || 'basico', hasta: pase.hasta, regalo }, uso()));
   }
   if (ruta === 'invitar') {
     let id = await env.FEEHUND_KV.get('ia:refde:' + h);
@@ -345,7 +347,7 @@ export async function onRequestPost({ request, env, params }) {
   }
   if (ruta === 'abrir') {
     const caja = JSON.parse((await env.FEEHUND_KV.get('ia:caja:' + h)) || 'null');
-    return json({ caja, plan: pase.plan || 'basico', hasta: pase.hasta });
+    return json(Object.assign({ caja, plan: pase.plan || 'basico', hasta: pase.hasta }, uso()));
   }
   if (ruta === 'pregunta') {
     if (!env.ANTHROPIC_API_KEY) return json({ error: 'sin_clave' }, 503);
@@ -362,7 +364,7 @@ export async function onRequestPost({ request, env, params }) {
     if (res.error) return json({ error: res.error, estado: res.estado, detalle: res.detalle, uso: env.IA_PRUEBAS === '1' ? res.uso : undefined }, 502);
     pase.usadas = (pase.usadas || 0) + 1; pase.hoy += 1; // solo cuenta si hay respuesta comprobada
     await env.FEEHUND_KV.put('ia:pase:' + h, JSON.stringify(pase), { expirationTtl: ttl + GUARDA_PASE });
-    return json({ texto: res.texto, pagos: res.pagos, plan: pase.plan, hasta: pase.hasta, uso: env.IA_PRUEBAS === '1' ? res.uso : undefined });
+    return json(Object.assign({ texto: res.texto, pagos: res.pagos, plan: pase.plan, hasta: pase.hasta, uso: env.IA_PRUEBAS === '1' ? res.uso : undefined }, uso()));
   }
   return json({ error: 'ruta' }, 404);
 }

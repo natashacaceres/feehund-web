@@ -180,11 +180,11 @@
   var $ = function (id) { return document.getElementById(id); };
   // Enlace del correo: /tiqui/#CÓDIGO abre tus gastos directamente
   var h = decodeURIComponent(location.hash.slice(1)).trim().toUpperCase();
-  if (/^FH-?[0-9A-Z]{4}/.test(h)) { location.replace("../extracto/?vuelta#" + encodeURIComponent(h)); return; }
+  if (/^FH-?[0-9A-Z]{4}/.test(h)) { location.replace("chat/#" + encodeURIComponent(h)); return; }
   var p = null; try { p = JSON.parse(localStorage.getItem("fh-tiqui-pase") || "null"); } catch (e) {}
   if (p && p.hasta > Date.now()) {
     var meses = ["enero","febrero","marzo","abril","mayo","junio","julio","agosto","septiembre","octubre","noviembre","diciembre"], d = new Date(p.hasta);
-    $("tqAbrir").textContent = "Abrir mis gastos"; $("tqAbrir").href = "../extracto/?vuelta";
+    $("tqAbrir").textContent = "Hablar con Tiqui"; $("tqAbrir").href = "chat/";
     $("tqSin").textContent = "Hasta el " + d.getDate() + " de " + meses[d.getMonth()];
   }
   // Invita a un amigo (con pase, aunque haya caducado): si paga, Tiqui te regala 30 días
@@ -215,7 +215,7 @@
     [].forEach.call(document.querySelectorAll("[data-m]:not(button)"), function (e) { e.hidden = e.dataset.m !== m; });
     if (m === "neg") {
       var vivo = pn && pn.hasta > Date.now();
-      $("tqAbrir").textContent = vivo ? 'Abrir mi datáfono' : 'Subir mi resumen del datáfono'; $("tqAbrir").href = '../datafono/' + (vivo ? "?vuelta" : "");
+      $("tqAbrir").textContent = vivo ? 'Hablar con Tiqui' : 'Subir mi resumen del datáfono'; $("tqAbrir").href = vivo ? 'chat/?negocio' : '../datafono/';
       $("tqSin").textContent = vivo ? 'Hasta el ' + new Date(pn.hasta).getDate() + ' de ' + mesesN[new Date(pn.hasta).getMonth()] : 'Un solo pago. Sin suscripción. Con factura';
       $("tqInv").hidden = true;
     } else { $("tqAbrir").textContent = ctaTi.t; $("tqAbrir").href = ctaTi.h; $("tqSin").textContent = ctaTi.s; $("tqInv").hidden = !(p && p.codigo); }
@@ -227,7 +227,7 @@
     e.preventDefault();
     var c = $("tqCod").value.trim().toUpperCase();
     if (!/^FH-?[0-9A-Z]{4}/.test(c)) { $("tqErr").textContent = "Revisa el código. Empieza por FH."; return; }
-    location.href = "../extracto/?vuelta#" + encodeURIComponent(c);
+    location.href = "chat/#" + encodeURIComponent(c);
   });
 })();
 </script>

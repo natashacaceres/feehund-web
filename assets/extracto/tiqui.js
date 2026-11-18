@@ -7,8 +7,11 @@
   const $ = (id) => document.getElementById(id);
   const LANG = ["es", "ca", "en"].indexOf(document.documentElement.lang) >= 0 ? document.documentElement.lang : "es";
   // Mi datáfono: Tiqui para negocios (pregunta por el resumen del datáfono, planes 4,99 € y 9,99 € con factura)
-  const NEG = /\/(datafono|datafon|card-machine)\//.test(location.pathname);
+  // Tu Tiqui (la página de quien paga, /tiqui/chat/): el chat a pantalla completa con los datos guardados del pase
+  const PAGINA = !!document.getElementById("tqcPagina");
+  const NEG = /\/(datafono|datafon|card-machine)\//.test(location.pathname) || (PAGINA && new URLSearchParams(location.search).has("negocio"));
   const PAG_DAT = { es: "/datafono/", ca: "/ca/datafon/", en: "/en/card-machine/" };
+  const PAG_CHAT = { es: "/tiqui/chat/", ca: "/ca/tiqui/xat/", en: "/en/tiqui/chat/" }, PAG_TIQUI = { es: "/tiqui/", ca: "/ca/tiqui/", en: "/en/tiqui/" };
   const ROOT = (document.currentScript && document.currentScript.dataset.root) || "../";
   const nf0 = new Intl.NumberFormat("es-ES", { maximumFractionDigits: 0, useGrouping: "always" });
   const nf2 = new Intl.NumberFormat("es-ES", { minimumFractionDigits: 2, maximumFractionDigits: 2, useGrouping: "always" });
@@ -19,7 +22,7 @@
   const T = {
     es: {
       titulo: "Pregúntale a Tiqui", gratis: "Tu primera pregunta es gratis", siguePlanes: "Elige cuánto tiempo y sigue preguntando",
-      estado: "Olfateando tu extracto", estadoNeg: "Olfateando tu datáfono", privado: "Privado", pensando: "Olfateando",
+      estado: "Olfateando tu extracto", estadoN: (n) => "Olfateando tus " + n + " extractos", estadoNeg: "Olfateando tu datáfono", uso: (p) => "Has usado el " + p + " % de tus preguntas", privado: "Privado", pensando: "Olfateando",
       hola: "¿Qué quieres saber de tus gastos?", escribe: "Escribe tu pregunta", enviar: "Enviar",
       adonde: "¿Adónde se va mi dinero?", raro: "¿Hay algo raro en mi cuenta?", llevo: (m) => "¿Cuánto llevo en " + m + "?", mesMas: "¿En qué mes gasté más?",
       seguimos: "¿Seguimos?", verPago: "Ver el pago", verPagos: (n) => "Ver los " + n + " pagos", ocultar: "Ocultar",
@@ -37,7 +40,7 @@
     },
     ca: {
       titulo: "Pregunta-li a Tiqui", gratis: "La teva primera pregunta és gratis", siguePlanes: "Tria quant de temps i continua preguntant",
-      estado: "Ensumant el teu extracte", estadoNeg: "Ensumant el teu datàfon", privado: "Privat", pensando: "Ensumant",
+      estado: "Ensumant el teu extracte", estadoN: (n) => "Ensumant els teus " + n + " extractes", estadoNeg: "Ensumant el teu datàfon", uso: (p) => "Has fet servir el " + p + " % de les teves preguntes", privado: "Privat", pensando: "Ensumant",
       hola: "Què vols saber de les teves despeses?", escribe: "Escriu la teva pregunta", enviar: "Enviar",
       adonde: "On van els meus diners?", raro: "Hi ha alguna cosa estranya al meu compte?", llevo: (m) => "Quant porto a " + m + "?", mesMas: "Quin mes vaig gastar més?",
       seguimos: "Continuem?", verPago: "Veure el pagament", verPagos: (n) => "Veure els " + n + " pagaments", ocultar: "Amagar",
@@ -55,7 +58,7 @@
     },
     en: {
       titulo: "Ask Tiqui", gratis: "Your first question is free", siguePlanes: "Pick how long and keep asking",
-      estado: "Sniffing your statement", estadoNeg: "Sniffing your card machine", privado: "Private", pensando: "Sniffing",
+      estado: "Sniffing your statement", estadoN: (n) => "Sniffing your " + n + " statements", estadoNeg: "Sniffing your card machine", uso: (p) => "You've used " + p + "% of your questions", privado: "Private", pensando: "Sniffing",
       hola: "What do you want to know about your spending?", escribe: "Type your question", enviar: "Send",
       adonde: "Where does my money go?", raro: "Is anything odd in my account?", llevo: (m) => "How much have I spent on " + m + "?", mesMas: "Which month did I spend the most?",
       seguimos: "Shall we carry on?", verPago: "See the payment", verPagos: (n) => "See the " + n + " payments", ocultar: "Hide",
@@ -157,7 +160,15 @@
     const claro = await crypto.subtle.decrypt({ name: "AES-GCM", iv: deB64(caja.iv) }, await llave(codigo, deB64(caja.sal)), deB64(caja.datos));
     return JSON.parse(new TextDecoder().decode(claro));
   }
-  let ultimoR = null, historial = [], codigoNuevo = null, datosNeg = null;
+  let ultimoR = null, historial = [], codigoNuevo = null, datosNeg = null, usoEl = null;
+  function pintarUso(d) {
+    if (!usoEl || !d || !(d.total > 0)) return;
+    const quedan = d.total - (d.usadas || 0);
+    usoEl.hidden = quedan > 5;
+    if (usoEl.hidden) return;
+    const pct = Math.min(100, Math.round((d.usadas || 0) / d.total * 100));
+    usoEl.firstChild.textContent = T.uso(pct); usoEl.querySelector("b").style.width = pct + "%";
+  }
   const datosPregunta = () => (NEG ? { negocio: datosNeg } : { movimientos: envio() });
   const gratisUsada = () => { try { return !!localStorage.getItem(GRATIS); } catch (e) { return false; } };
   const api = async (ruta, cuerpo) => {
@@ -254,7 +265,7 @@
       if (r.d.error === "tope_total") invitar(p);
       return;
     }
-    respuesta(r.d.texto, r.d.pagos);
+    respuesta(r.d.texto, r.d.pagos); pintarUso(r.d);
     historial.push({ rol: "tu", texto: t }, { rol: "ia", texto: r.d.texto }); historial = historial.slice(-8);
   }
   async function preguntar(t) {
@@ -278,16 +289,20 @@
     // Arriba, Tiqui como un contacto: su cara, su nombre, «Olfateando tu extracto» y «Privado»
     const top = mk("div", "tqc-top"), cara = mk("img", "tqc-cara"); cara.src = ROOT + "assets/img/tiqui-olfatea.webp"; cara.alt = ""; cara.width = 44; cara.height = 44;
     const quien = mk("div", "tqc-quien"), h2 = mk("h2", "tqc-h", "Tiqui"); h2.setAttribute("aria-label", T.titulo);
-    const est = mk("p", "tqc-est"); est.append(mk("i"), document.createTextNode(T.estado)); quien.append(h2, est);
+    const nArch = !NEG && ultimoR && ultimoR.lectura ? new Set((ultimoR.lectura.movimientos || []).map((m) => (m.origen && m.origen.archivo || "").replace(/\.[^.]+$/, ""))).size : 1;
+    const est = mk("p", "tqc-est"); est.append(mk("i"), document.createTextNode(nArch > 1 ? T.estadoN(nArch) : T.estado)); quien.append(h2, est);
     top.append(cara, quien, mk("span", "tqc-priv", T.privado));
     sub = mk("p", "tqc-sub", pase ? T.hasta(new Date(pase.hasta)) : gratisUsada() ? "" : T.gratis); sub.hidden = !sub.textContent;
+    if (PAGINA) sub.hidden = true; // en Tu Tiqui la fecha ya está arriba, a la izquierda
     msgs = mk("div", "tqc-msgs"); msgs.setAttribute("aria-live", "polite");
     sug = mk("div", "tqc-sug");
     sugerencias().forEach((q) => { const b = mk("button", null, q); b.type = "button"; b.addEventListener("click", () => preguntar(q)); sug.appendChild(b); });
     const f = mk("form", "tqc-in"); const inp = mk("input"); inp.id = "tqcTxt"; inp.autocomplete = "off"; inp.maxLength = 400; inp.placeholder = T.escribe; inp.setAttribute("aria-label", T.escribe);
     const env = mk("button", null, "→"); env.type = "submit"; env.setAttribute("aria-label", T.enviar);
     f.append(inp, env); f.addEventListener("submit", (e) => { e.preventDefault(); const t = inp.value.trim(); if (t) { inp.value = ""; preguntar(t); } });
-    ch.append(top, sub, msgs, sug, f);
+    // «Has usado el 90 % de tus preguntas»: solo cuando quedan 5 o menos (como ChatGPT, sin contador fijo)
+    usoEl = mk("div", "tqc-uso"); usoEl.hidden = true; usoEl.append(mk("span"), mk("i")); usoEl.lastChild.appendChild(mk("b"));
+    ch.append(top, sub, msgs, sug, usoEl, f);
     caja.appendChild(ch);
     historial = [];
     const viejo = leer(PASE);
@@ -336,7 +351,8 @@
       else if (msgs && !msgs.querySelector(".tqc-m--inv")) { const fin = burbuja("ia", T.fin); msgs.insertBefore(fin, msgs.firstChild); invitar(pase); }
       return;
     }
-    if (sub) sub.textContent = T.hasta(new Date(r.d.hasta));
+    if (sub && !PAGINA) sub.textContent = T.hasta(new Date(r.d.hasta));
+    pintarUso(r.d);
     if (r.d.regalo) burbuja("ia", T.regalo(T.hasta(new Date(r.d.hasta))));
   }
   // Llega por el enlace de un amigo: se guarda para cuando pague
@@ -352,6 +368,7 @@
   const ancho = matchMedia("(min-width:1100px)");
   function colocar() {
     if (!caja) return;
+    if (PAGINA) { const c = $("tqcPagina"); if (caja.parentNode !== c) c.appendChild(caja); return; }
     if (NEG) {
       const res = $("res"), solo = $("tqcSolo");
       if (res && !res.hidden) { if (ancho.matches) { if (caja.parentNode !== res) res.insertBefore(caja, res.firstChild); } else if (caja.parentNode !== res || caja.nextElementSibling) res.appendChild(caja); }
@@ -369,7 +386,7 @@
   // Ordenador: Tiqui cabe entero en la pantalla nada más entrar (con «Escribe tu pregunta» a la vista) y es lo bastante
   // alto para que, al final de la página, su borde de abajo coincida con el del contenido.
   function altoOrdenador() {
-    if (!caja) return;
+    if (!caja || PAGINA) return;
     if (!ancho.matches) { caja.style.removeProperty("--tqc-alto"); return; }
     // dónde empieza Tiqui sin hacer scroll: arriba de su columna (Tiqui es fijo al bajar, así que se mide la columna, no Tiqui)
     const res = caja.parentNode; if (!res || res.id === "tqcSolo") { caja.style.removeProperty("--tqc-alto"); return; }
@@ -380,8 +397,8 @@
   ancho.addEventListener("change", colocar);
   document.addEventListener("click", (e) => { if (e.target.closest && e.target.closest("#pgTabs")) setTimeout(colocar, 0); });
 
-  document.addEventListener("fh-resultado", async (e) => {
-    const r = e.detail; if (!r) return;
+  async function cargar(r) {
+    if (!r) return;
     await Promise.race([aprendidoP, new Promise((ok) => setTimeout(ok, 1500))]); // sin esperar más de 1,5 s
     try {
       ultimoR = r;
@@ -401,7 +418,8 @@
       if (caja) caja.remove();
       montarCaja(); setTimeout(colocar, 0); setTimeout(altoOrdenador, 800); // otra vez cuando ya está todo encima (el aviso de ejemplo llega después)
     } catch (err) { /* si algo falla, el resumen sigue como siempre */ }
-  });
+  }
+  document.addEventListener("fh-resultado", (e) => { cargar(e.detail); });
 
   // Mi datáfono: los datos del negocio salen del mismo cálculo que pinta el resultado (assets/app.js, evento «fh-datafono»)
   function datosDeCalculo(d) {
@@ -453,7 +471,34 @@
     }
     return !!(window.FeehundMostrar && datos && window.FeehundMostrar(datos.r));
   }
+  // Tu Tiqui: abre la caja con el código (del enlace o del pase guardado) y monta el chat en la página
+  async function abrirPagina() {
+    const h = decodeURIComponent(location.hash.slice(1)).trim().toUpperCase(), p = leer(PASE);
+    const codigo = /^FH-?[0-9A-Z]/.test(h) ? h : p && p.codigo;
+    history.replaceState(null, "", location.pathname + location.search);
+    const fuera = (t) => document.dispatchEvent(new CustomEvent("fh-tiqui-pagina", { detail: { error: t } }));
+    if (!codigo) { location.replace(PAG_TIQUI[LANG]); return; }
+    try { if (sessionStorage.getItem("fh-tiqui-nuevo") === codigo) codigoNuevo = codigo; sessionStorage.removeItem("fh-tiqui-nuevo"); } catch (e) {}
+    const r = await api("abrir", { codigo });
+    if (!r.ok || !r.d.caja) { fuera(T.noAbre); return; }
+    let datos; try { datos = await abrirCaja(codigo, r.d.caja); } catch (e) { fuera(T.noAbre); return; }
+    if (datos && datos.n && !NEG) { location.replace(location.pathname + "?negocio#" + encodeURIComponent(codigo)); return; }
+    if (datos && datos.r && NEG) { location.replace(location.pathname + "#" + encodeURIComponent(codigo)); return; }
+    poner(PASE, { codigo, plan: r.d.plan, hasta: r.d.hasta });
+    // Para el panel de la izquierda (assets/extracto/tiqui-pagina.js): sus extractos y guardar lo que sume
+    window.FeehundTiqui = {
+      guardar: async (r2) => {
+        const x = await api("caja", { codigo, caja: await cerrarCaja(codigo, { r: r2 }) });
+        if (!x.ok) throw new Error("caja");
+        await cargar(r2);
+      },
+    };
+    document.dispatchEvent(new CustomEvent("fh-tiqui-pagina", { detail: { codigo, plan: r.d.plan, hasta: r.d.hasta, datos, negocio: NEG } }));
+    if (NEG) { datosNeg = datos.n; if (caja) caja.remove(); montarCaja(); colocar(); } else await cargar(datos.r);
+    pintarUso(r.d);
+  }
   async function inicio() {
+    if (PAGINA) return abrirPagina();
     const q = new URLSearchParams(location.search), limpia = () => history.replaceState(null, "", location.pathname);
     if (q.get("tiqui") === "ok") {
       const pend = leer(PEND), sesion = q.get("s") || ""; limpia();
@@ -462,8 +507,9 @@
       if (!r.ok && r.d.error === "sin_pagar") { await new Promise((x) => setTimeout(x, 3000)); r = await api("canjear", { codigo: pend.codigo, sesion }); }
       if (!r.ok) { aviso(T.sinPagar); return; }
       poner(PASE, { codigo: pend.codigo, plan: r.d.plan, hasta: r.d.hasta }); poner(PEND, null);
-      codigoNuevo = pend.codigo;
-      await abrirYMostrar(pend.codigo);
+      // quien paga va a su página de Tu Tiqui (allí le sale su código)
+      try { sessionStorage.setItem("fh-tiqui-nuevo", pend.codigo); } catch (e) {}
+      location.replace(PAG_CHAT[LANG] + (NEG ? "?negocio" : "") + "#" + encodeURIComponent(pend.codigo));
     } else if (q.get("tiqui") === "no") {
       const pend = leer(PEND); limpia(); poner(PEND, null);
       if (pend) await abrirYMostrar(pend.codigo); // vuelve a ver lo suyo, sin subir nada

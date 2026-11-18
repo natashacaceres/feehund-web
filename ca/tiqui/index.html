@@ -180,11 +180,11 @@
   var $ = function (id) { return document.getElementById(id); };
   // Enlace del correo: /tiqui/#CÓDIGO abre tus gastos directamente
   var h = decodeURIComponent(location.hash.slice(1)).trim().toUpperCase();
-  if (/^FH-?[0-9A-Z]{4}/.test(h)) { location.replace("../../ca/extracte/?vuelta#" + encodeURIComponent(h)); return; }
+  if (/^FH-?[0-9A-Z]{4}/.test(h)) { location.replace("xat/#" + encodeURIComponent(h)); return; }
   var p = null; try { p = JSON.parse(localStorage.getItem("fh-tiqui-pase") || "null"); } catch (e) {}
   if (p && p.hasta > Date.now()) {
     var meses = ["de gener","de febrer","de març","d'abril","de maig","de juny","de juliol","d'agost","de setembre","d'octubre","de novembre","de desembre"], d = new Date(p.hasta);
-    $("tqAbrir").textContent = "Obrir les meves despeses"; $("tqAbrir").href = "../../ca/extracte/?vuelta";
+    $("tqAbrir").textContent = "Parlar amb Tiqui"; $("tqAbrir").href = "xat/";
     $("tqSin").textContent = "Fins al " + d.getDate() + " " + meses[d.getMonth()];
   }
   // Invita a un amigo (con pase, aunque haya caducado): si paga, Tiqui te regala 30 días
@@ -215,7 +215,7 @@
     [].forEach.call(document.querySelectorAll("[data-m]:not(button)"), function (e) { e.hidden = e.dataset.m !== m; });
     if (m === "neg") {
       var vivo = pn && pn.hasta > Date.now();
-      $("tqAbrir").textContent = vivo ? 'Obrir el meu datàfon' : 'Pujar el resum del datàfon'; $("tqAbrir").href = '../../ca/datafon/' + (vivo ? "?vuelta" : "");
+      $("tqAbrir").textContent = vivo ? 'Parlar amb Tiqui' : 'Pujar el resum del datàfon'; $("tqAbrir").href = vivo ? 'xat/?negocio' : '../../ca/datafon/';
       $("tqSin").textContent = vivo ? 'Fins al ' + new Date(pn.hasta).getDate() + ' ' + mesesN[new Date(pn.hasta).getMonth()] : 'Un sol pagament. Sense subscripció. Amb factura';
       $("tqInv").hidden = true;
     } else { $("tqAbrir").textContent = ctaTi.t; $("tqAbrir").href = ctaTi.h; $("tqSin").textContent = ctaTi.s; $("tqInv").hidden = !(p && p.codigo); }
@@ -227,7 +227,7 @@
     e.preventDefault();
     var c = $("tqCod").value.trim().toUpperCase();
     if (!/^FH-?[0-9A-Z]{4}/.test(c)) { $("tqErr").textContent = "Revisa el codi. Comença per FH."; return; }
-    location.href = "../../ca/extracte/?vuelta#" + encodeURIComponent(c);
+    location.href = "xat/#" + encodeURIComponent(c);
   });
 })();
 </script>

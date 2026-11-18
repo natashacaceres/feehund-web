@@ -95,3 +95,14 @@
 @media (min-width:1100px){#xRes>#tqcIa{margin-bottom:24px}}
 .tqc-iva{font:600 12px/1 var(--f-text);opacity:.7;letter-spacing:0;white-space:nowrap}
 
+
+/* «Has usado el 90 % de tus preguntas» (cuando quedan 5 o menos) */
+.tqc-uso{display:grid;gap:6px;justify-items:center;font:600 14px/1.2 var(--f-text);color:rgba(255,248,236,.85)}
+.tqc-uso[hidden]{display:none}
+.tqc-uso i{display:block;width:180px;height:6px;border-radius:99px;background:rgba(255,248,236,.15);overflow:hidden}
+.tqc-uso b{display:block;height:100%;background:var(--amber)}
+/* Tu Tiqui (la página de quien paga): el chat ocupa su columna entera */
+#tqcPagina .tqc{margin:0;height:100%}
+#tqcPagina .tqc-chat{height:100%;display:flex;flex-direction:column}
+#tqcPagina .tqc-msgs{flex:1 1 auto;min-height:0;max-height:none;align-content:start}
+#tqcPagina .tqc-chat>*:not(.tqc-msgs){flex:none}
