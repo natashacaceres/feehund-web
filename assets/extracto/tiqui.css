@@ -75,3 +75,10 @@
   #xRes:has(#tqcIa)>*:not(#tqcIa){margin-bottom:24px}
   #xRes:has(#tqcIa)>.pg-tabs{margin-bottom:40px}
 }
+/* Ordenador: Tiqui ocupa todo el alto de la pantalla (el chat arriba, la caja de escribir abajo). Así, al llegar al final,
+   su borde de abajo coincide con el final de la última gráfica o de «Compartir mi tarjeta». */
+@media (min-width:1100px){
+  #xRes>#tqcIa .tqc-chat{height:calc(100vh - var(--hdr) - 32px);height:calc(100dvh - var(--hdr) - 32px)}
+  #xRes>#tqcIa .tqc-msgs{flex:1 1 auto;align-content:start}
+}
+@media (min-width:1100px){#xRes>#tqcIa{margin-bottom:24px}}
