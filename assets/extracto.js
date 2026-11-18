@@ -354,7 +354,7 @@
       suscr: (n, x, r) => n ? "Tienes " + n + (n === 1 ? " suscripción que te cuesta " : " suscripciones que te cuestan ") + x + " al año" + (r ? ", y " + r + (r === 1 ? " recibo más." : " recibos más.") : ".")
         : "Tienes " + r + (r === 1 ? " recibo que se repite" : " recibos que se repiten") + " y ninguna suscripción.",
       dq: { titulo: "1 minuto y queda perfecto", que: "¿Qué es esto?", de: (i, n) => i + " de " + n, veces: (x, n, p) => x + " · " + n + " veces" + (p ? ", " + p : ""), mes: "cada mes", dosMeses: "cada 2 meses", ops: { vivienda: "Alquiler o hipoteca", casa: "Luz, agua o internet", susc: "Suscripción", seg: "Seguro", otros: "Otra cosa" }, nose: "No lo sé", grupo: "Lo que me has dicho",
-        pagos: (x, n) => x + " en " + n + (n === 1 ? " pago" : " pagos"), ops2: { fuera: "Bar o restaurante", super: "Súper", otro: "Tienda", transporte: "Transporte", salud: "Salud", ocio: "Ocio", persona: "Una persona" } },
+        pagos: (x, n) => x + " en " + n + (n === 1 ? " pago" : " pagos"), ops2: { fuera: "Comer fuera", super: "Súper", otro: "Tienda", transporte: "Transporte", salud: "Salud", ocio: "Ocio" }, persona: "Es una persona" },
       nada: "No hemos visto cobros que se repitan.", tipos: { casa: "Casa", susc: "Suscripciones", seg: "Seguros", banco: "Comisiones del banco", otros: "Otros pagos" }, otros: "Otros", recibos: "Recibos que varían", devolvieron: (x) => "Te devolvieron " + x, devoluciones: (n) => (n === 1 ? "1 devolución" : n + " devoluciones"),
       verMas: (n) => "Ver " + n + " más", verMenos: "Ver menos", verDetalle: "Ver todo el detalle", ocultarDetalle: "Ocultar el detalle",
       revisar: "Revisar", anadir: "Añadir", ver: "Ver", darme: "Darme de baja", darBaja: "Dar de baja",
@@ -372,7 +372,7 @@
       suscr: (n, x, r) => n ? "Tens " + n + (n === 1 ? " subscripció que et costa " : " subscripcions que et costen ") + x + " l'any" + (r ? ", i " + r + (r === 1 ? " rebut més." : " rebuts més.") : ".")
         : "Tens " + r + (r === 1 ? " rebut que es repeteix" : " rebuts que es repeteixen") + " i cap subscripció.",
       dq: { titulo: "1 minut i queda perfecte", que: "Què és això?", de: (i, n) => i + " de " + n, veces: (x, n, p) => x + " · " + n + " vegades" + (p ? ", " + p : ""), mes: "cada mes", dosMeses: "cada 2 mesos", ops: { vivienda: "Lloguer o hipoteca", casa: "Llum, aigua o internet", susc: "Subscripció", seg: "Assegurança", otros: "Una altra cosa" }, nose: "No ho sé", grupo: "El que m'has dit",
-        pagos: (x, n) => x + " en " + n + (n === 1 ? " pagament" : " pagaments"), ops2: { fuera: "Bar o restaurant", super: "Súper", otro: "Botiga", transporte: "Transport", salud: "Salut", ocio: "Oci", persona: "Una persona" } },
+        pagos: (x, n) => x + " en " + n + (n === 1 ? " pagament" : " pagaments"), ops2: { fuera: "Menjar fora", super: "Súper", otro: "Botiga", transporte: "Transport", salud: "Salut", ocio: "Oci" }, persona: "És una persona" },
       nada: "No hem vist cobraments que es repeteixin.", tipos: { casa: "Casa", susc: "Subscripcions", seg: "Assegurances", banco: "Comissions del banc", otros: "Altres pagaments" }, otros: "Altres", recibos: "Rebuts que varien", devolvieron: (x) => "T'han retornat " + x, devoluciones: (n) => (n === 1 ? "1 devolució" : n + " devolucions"),
       verMas: (n) => "Veure'n " + n + " més", verMenos: "Veure'n menys", verDetalle: "Veure tot el detall", ocultarDetalle: "Amagar el detall",
       revisar: "Revisar", anadir: "Afegir", ver: "Veure", darme: "Donar-me de baixa", darBaja: "Donar de baixa",
@@ -390,7 +390,7 @@
       suscr: (n, x, r) => n ? "You have " + n + (n === 1 ? " subscription costing " : " subscriptions costing ") + x + " a year" + (r ? ", and " + r + (r === 1 ? " more bill." : " more bills.") : ".")
         : "You have " + r + (r === 1 ? " bill that repeats" : " bills that repeat") + " and no subscriptions.",
       dq: { titulo: "1 minute and it's perfect", que: "What is this?", de: (i, n) => i + " of " + n, veces: (x, n, p) => x + " · " + n + " times" + (p ? ", " + p : ""), mes: "every month", dosMeses: "every 2 months", ops: { vivienda: "Rent or mortgage", casa: "Power, water or internet", susc: "Subscription", seg: "Insurance", otros: "Something else" }, nose: "I don't know", grupo: "What you told me",
-        pagos: (x, n) => x + " in " + n + (n === 1 ? " payment" : " payments"), ops2: { fuera: "Bar or restaurant", super: "Supermarket", otro: "Shop", transporte: "Transport", salud: "Health", ocio: "Leisure", persona: "A person" } },
+        pagos: (x, n) => x + " in " + n + (n === 1 ? " payment" : " payments"), ops2: { fuera: "Eating out", super: "Supermarket", otro: "Shop", transporte: "Transport", salud: "Health", ocio: "Leisure" }, persona: "It's a person" },
       nada: "We have not seen any repeating charges.", tipos: { casa: "Home", susc: "Subscriptions", seg: "Insurance", banco: "Bank fees", otros: "Other payments" }, otros: "Other", recibos: "Bills that vary", devolvieron: (x) => "You got " + x + " back", devoluciones: (n) => (n === 1 ? "1 refund" : n + " refunds"),
       verMas: (n) => "See " + n + " more", verMenos: "See less", verDetalle: "See all the detail", ocultarDetalle: "Hide the detail",
       revisar: "Check", anadir: "Add", ver: "See", darme: "Cancel it for me", darBaja: "Cancel",
@@ -752,12 +752,13 @@
   }
   // Marcas que todo el mundo conoce: se colocan solas, no se preguntan
   const CONOCIDAS = [
+    [/HIPOTECA|PRESTAMO HIPOT|ALQUILER/, "vivienda"],
     [/NETFLIX|SPOTIFY|HBO|DISNEY|PRIME VIDEO|AMAZON PRIME|YOUTUBE|DAZN|FILMIN|ATRESPLAYER|APPLE\.COM|ICLOUD|AUDIBLE|KINDLE|CHATGPT|OPENAI|CLAUDE|ANTHROPIC|CANVA|ADOBE|DROPBOX|GOOGLE ONE|DEEZER|TIDAL|PLAYSTATION|XBOX|NINTENDO|DUOLINGO|TINDER|BUMBLE|GYM|FITNESS|BASIC.?FIT|DREAMFIT|ALTAFIT/, "susc"],
     [/VODAFONE|MOVISTAR|TELEFONICA|ORANGE|YOIGO|DIGI|MASMOVIL|LOWI|PEPEPHONE|JAZZTEL|SIMYO|O2 |FINETWORK|ENDESA|IBERDROLA|NATURGY|HOLALUZ|OCTOPUS|REPSOL|TOTALENERGIES|AIGUES|AGUAS|CANAL DE ISABEL|AQUALIA|EMASESA|SECURITAS|PROSEGUR/, "casa"],
     [/MAPFRE|MUTUA|AXA|ALLIANZ|SANITAS|ADESLAS|DKV|ASISA|GENERALI|LINEA DIRECTA|LÍNEA DIRECTA|REALE|CASER|ZURICH|OCASO|SANTALUCIA|SANTA LUCIA|VERTI|PELAYO/, "seg"],
   ];
   const conocida = (k) => { const e = CONOCIDAS.find(([re]) => re.test(k)); return e ? e[1] : null; };
-  const bonito = (k) => k.toLowerCase().replace(/(^|\s)(\S)/g, (a, b, c) => b + c.toUpperCase());
+  const bonito = (k) => k.toLowerCase().replace(/(^|\s)(\S)/g, (a, b, c) => b + c.toUpperCase()).replace(/ (Sl|Slu|Sa|S\.l\.|S\.a\.)$/, (a) => a.toUpperCase());
   function desconocidos(r) {
     const per = (r.lectura && r.lectura.periodo) || {}, dias = per.dias || 365;
     const enCobro = new Set(); (r.cobros || []).forEach((c) => (c.movimientos || []).forEach((m) => enCobro.add(m.id)));
@@ -863,7 +864,9 @@
         const ops = el("div", "dq-ops"), OPS = x.comercio ? T.ops2 : T.ops;
         Object.keys(OPS).forEach((k) => { const b = el("button", "dq-op", OPS[k]); b.type = "button"; b.addEventListener("click", () => { x.op = k; contestadas.push(x); paso(i + 1); }); ops.appendChild(b); });
         c.appendChild(ops);
-        const no = el("button", "dq-nose", T.nose); no.type = "button"; no.addEventListener("click", () => { x.op = "nose"; contestadas.push(x); paso(i + 1); }); c.appendChild(no);
+        const enlaces = el("div", "dq-links");
+        if (x.comercio) { const pe = el("button", "dq-nose", T.persona); pe.type = "button"; pe.addEventListener("click", () => { x.op = "persona"; contestadas.push(x); paso(i + 1); }); enlaces.appendChild(pe); }
+        const no = el("button", "dq-nose", T.nose); no.type = "button"; no.addEventListener("click", () => { x.op = "nose"; contestadas.push(x); paso(i + 1); }); enlaces.appendChild(no); c.appendChild(enlaces);
         const b0 = ops.querySelector("button"); if (b0) b0.focus({ preventScroll: true });
       };
       paso(0);
