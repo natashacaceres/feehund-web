@@ -7,10 +7,12 @@
 //   POST /api/ia/pase-prueba {}                                          → crea un pase de prueba (solo con IA_PRUEBAS=1)
 //   POST /api/ia/caja        {codigo, caja}                              → guarda la caja cifrada (Feehund no tiene la llave)
 //   POST /api/ia/abrir       {codigo}                                    → devuelve la caja cifrada y lo que queda del pase
+//   POST /api/ia/estado      {codigo}                                    → lo que queda del pase y los días regalados por amigos
+//   POST /api/ia/invitar     {codigo}                                    → el enlace para invitar a un amigo (si paga, +30 días)
 // Cerrada: Claude no tiene internet ni más herramientas que las de abajo, y TODA cifra en euros de su respuesta
 // tiene que haber salido de una herramienta. Si no, se le devuelve para que lo corrija; si sigue igual, no se enseña.
 
-import { PLANES, PRODUCTO_TIQUI, activarTiqui, codigoValido } from '../../_ia/pase.js';
+import { PLANES, PRODUCTO_TIQUI, AMIGO, activarTiqui, codigoValido, refValido } from '../../_ia/pase.js';
 import { crearPagoTiqui, leerPago } from '../../_baja/servicios.js';
 
 const MODELO = 'claude-opus-5-5';
@@ -235,6 +237,7 @@ export async function onRequestPost({ request, env, params }) {
     const vuelta = ['/extracto/', '/ca/extracte/', '/en/statement/'].includes(b.vuelta) ? b.vuelta : '/extracto/';
     const idioma = ['ca', 'en'].includes(b.idioma) ? b.idioma : 'es';
     const h = await huella(b.codigo), base = new URL(request.url).origin;
+    const amigo = refValido(b.amigo) && (await env.FEEHUND_KV.get('ia:ref:' + b.amigo)) ? b.amigo : undefined;
     await env.FEEHUND_KV.put('ia:caja:' + h, JSON.stringify({ sal: caja.sal, iv: caja.iv, datos: caja.datos }), { expirationTtl: 2 * 86400 });
     await env.FEEHUND_KV.put('ia:pend:' + h, JSON.stringify({ plan, codigo: String(b.codigo).toUpperCase(), idioma, creado: Date.now() }), { expirationTtl: 2 * 86400 });
     const dura = { es: plan === 'basico' ? '7 días' : '3 meses', ca: plan === 'basico' ? '7 dies' : '3 mesos', en: plan === 'basico' ? '7 days' : '3 months' }[idioma];
@@ -243,7 +246,7 @@ export async function onRequestPost({ request, env, params }) {
       renuncia: { es: 'Empieza en cuanto pagas. Al pagar aceptas que empiece ya y renuncias al desistimiento: no hay devoluciones.', ca: 'Comença tan bon punt pagues. En pagar acceptes que comenci ja i renuncies al desistiment: no hi ha devolucions.', en: 'It starts as soon as you pay. By paying you agree it starts now and waive the right to cancel: no refunds.' }[idioma],
     };
     try {
-      const s2 = await crearPagoTiqui(env, { ref: h, plan, importe: P.precio, producto: env.STRIPE_PRODUCT_TIQUI || PRODUCTO_TIQUI, idioma, textos,
+      const s2 = await crearPagoTiqui(env, { ref: h, plan, importe: P.precio, producto: env.STRIPE_PRODUCT_TIQUI || PRODUCTO_TIQUI, idioma, textos, amigo,
         vuelta: base + vuelta + '?tiqui=ok&s={CHECKOUT_SESSION_ID}', cancelar: base + vuelta + '?tiqui=no' });
       return json({ url: s2.url });
     } catch (e) { return json({ error: 'pago', detalle: env.IA_PRUEBAS === '1' ? String(e.message) : undefined }, 502); }
@@ -290,6 +293,22 @@ export async function onRequestPost({ request, env, params }) {
     await env.FEEHUND_KV.put('ia:caja:' + h, JSON.stringify({ sal: caja.sal, iv: caja.iv, datos: caja.datos }), { expirationTtl: ttl });
     return json({ ok: true });
   }
+  if (ruta === 'estado') {
+    const regalo = pase.regalo || 0;
+    if (regalo) { delete pase.regalo; await env.FEEHUND_KV.put('ia:pase:' + h, JSON.stringify(pase), { expirationTtl: ttl }); }
+    return json({ plan: pase.plan || 'basico', hasta: pase.hasta, regalo });
+  }
+  if (ruta === 'invitar') {
+    let id = await env.FEEHUND_KV.get('ia:refde:' + h);
+    if (!id) {
+      const ALF = '0123456789ABCDEFGHJKMNPQRSTVWXYZ';
+      id = [...crypto.getRandomValues(new Uint8Array(8))].map((x) => ALF[x & 31]).join('');
+      await env.FEEHUND_KV.put('ia:ref:' + id, JSON.stringify({ h, n: 0, creado: Date.now() }), { expirationTtl: 400 * 86400 });
+      await env.FEEHUND_KV.put('ia:refde:' + h, id, { expirationTtl: 400 * 86400 });
+    }
+    const ref = JSON.parse((await env.FEEHUND_KV.get('ia:ref:' + id)) || '{}');
+    return json({ id, dias: AMIGO.dias, quedan: Math.max(0, AMIGO.max - (ref.n || 0)) });
+  }
   if (ruta === 'abrir') {
     const caja = JSON.parse((await env.FEEHUND_KV.get('ia:caja:' + h)) || 'null');
     return json({ caja, plan: pase.plan || 'basico', hasta: pase.hasta });
@@ -298,7 +317,7 @@ export async function onRequestPost({ request, env, params }) {
     if (!env.ANTHROPIC_API_KEY) return json({ error: 'sin_clave' }, 503);
     const tope = PLANES[pase.plan] || PLANES.basico, hoyEs = new Date().toISOString().slice(0, 10);
     if (pase.dia !== hoyEs) { pase.dia = hoyEs; pase.hoy = 0; }
-    if ((pase.usadas || 0) >= tope.total) return json({ error: 'tope_total', plan: pase.plan, hasta: pase.hasta }, 429);
+    if ((pase.usadas || 0) >= tope.total + (pase.extra || 0)) return json({ error: 'tope_total', plan: pase.plan, hasta: pase.hasta }, 429);
     if (pase.hoy >= tope.porDia) return json({ error: 'tope_dia', plan: pase.plan, hasta: pase.hasta }, 429);
     const pregunta = String(b.pregunta || '').trim().slice(0, 400) + ({ ca: '\n\n(Respon en català. Escriu els imports com 1.307,00 €.)', en: '\n\n(Answer in English. Write amounts like 1.307,00 €.)' }[b.idioma] || '');
     if (!pregunta) return json({ error: 'vacia' }, 400);

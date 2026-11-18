@@ -60,3 +60,10 @@
 .tqc-cod{display:block;padding:10px 12px;border-radius:10px;background:#F3E6CC;font:700 16px/1.2 ui-monospace,Menlo,monospace;letter-spacing:.02em;white-space:nowrap;overflow-x:auto}
 .tqc-cod-t{display:block;font:400 15px/1.4 var(--f-text);color:#4F5667}
 .tqc-cta:disabled{opacity:.7;cursor:default}
+/* Invita a un amigo (solo con pase) */
+.tqc-inv{display:grid;justify-items:center;gap:6px;margin-top:4px;text-align:center}
+.tqc-inv-b{display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:0 18px;border:0;border-radius:999px;background:var(--amber);color:#14213D;font:700 16px/1.2 var(--f-text);cursor:pointer}
+.tqc-inv-b:disabled{opacity:.7;cursor:default}
+.tqc-inv-b svg{width:20px;height:20px;flex:none;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+.tqc-inv-s{margin:0;max-width:34ch;font:400 14px/1.35 var(--f-text);color:rgba(255,248,236,.8)}
+#xRes>#tqcIa .tqc-inv{flex:none}

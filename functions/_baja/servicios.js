@@ -54,7 +54,8 @@ export function crearPago(env, { compra, unidades, precio, correo, idioma, vuelt
   }, 'pago-' + compra);
 }
 /** Pago de «Pregúntale a Tiqui» (Checkout). importe en céntimos; ref: huella del código (no el código). */
-export function crearPagoTiqui(env, { ref, plan, importe, producto, idioma, vuelta, cancelar, textos }) {
+export function crearPagoTiqui(env, { ref, plan, importe, producto, idioma, vuelta, cancelar, textos, amigo }) {
+  const meta = amigo ? { servicio: 'tiqui', plan, amigo } : { servicio: 'tiqui', plan };
   return stripe(env, 'POST', '/v1/checkout/sessions', {
     mode: 'payment',
     line_items: { 0: { quantity: 1, price_data: { currency: 'eur', unit_amount: importe, product: producto } } },
@@ -63,8 +64,8 @@ export function crearPagoTiqui(env, { ref, plan, importe, producto, idioma, vuel
     success_url: vuelta,
     cancel_url: cancelar,
     expires_at: Math.floor(Date.now() / 1000) + 3600,
-    metadata: { servicio: 'tiqui', plan },
-    payment_intent_data: { metadata: { servicio: 'tiqui', plan }, description: textos.descripcion, statement_descriptor_suffix: 'FEEHUND TIQUI' },
+    metadata: meta,
+    payment_intent_data: { metadata: meta, description: textos.descripcion, statement_descriptor_suffix: 'FEEHUND TIQUI' },
     // [REVISIÓN LEGAL] contenido digital: empieza en cuanto se paga (art. 103 m TRLGDCU)
     custom_text: { submit: { message: textos.renuncia } },
   }, 'tiqui-' + ref);

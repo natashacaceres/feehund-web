@@ -24,6 +24,9 @@
       unPago: "Un solo pago. Sin suscripción", ahoraNo: "Ahora no", momento: "Un momento…", errorPago: "No se ha podido. Prueba otra vez.",
       tuyo: "Tiqui ya es tuyo", copiar: "Copiar", copiado: "Copiado", correo: "Te lo hemos mandado por correo. Con él vuelves desde Tu Tiqui, sin subir nada.",
       hasta: (d) => "Hasta el " + d.getDate() + " de " + ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"][d.getMonth()],
+      invita: "Invita a un amigo", invitaSub: "Tus preguntas nos salen caras. Si tu amigo paga, 30 días gratis para ti.",
+      enlaceCopiado: "Enlace copiado. Pásaselo a quien quieras.", sinHuecos: "Ya te han regalado días 3 amigos. ¡Gracias!",
+      regalo: (d) => "Un amigo ha pagado. Tienes 30 días más, " + d.charAt(0).toLowerCase() + d.slice(1) + ".", compartirTxt: "Mira lo que pagas cada mes sin darte cuenta. Es gratis.",
       topeDia: "Por hoy ya está. Mañana seguimos.", topeTotal: "Has llegado al máximo de este pase.", noAbre: "Ese código no existe o ya caducó.", sinPagar: "Aún no nos ha llegado el pago. Si has pagado, recarga en un momento.",
     },
     ca: {
@@ -36,6 +39,9 @@
       unPago: "Un sol pagament. Sense subscripció", ahoraNo: "Ara no", momento: "Un moment…", errorPago: "No s'ha pogut. Torna-ho a provar.",
       tuyo: "Tiqui ja és teu", copiar: "Copiar", copiado: "Copiat", correo: "T'ho hem enviat per correu. Amb ell tornes des d'El teu Tiqui, sense pujar res.",
       hasta: (d) => "Fins al " + d.getDate() + " " + ["de gener", "de febrer", "de març", "d'abril", "de maig", "de juny", "de juliol", "d'agost", "de setembre", "d'octubre", "de novembre", "de desembre"][d.getMonth()],
+      invita: "Convida un amic", invitaSub: "Les teves preguntes ens surten cares. Si el teu amic paga, 30 dies gratis per a tu.",
+      enlaceCopiado: "Enllaç copiat. Passa'l a qui vulguis.", sinHuecos: "Ja t'han regalat dies 3 amics. Gràcies!",
+      regalo: (d) => "Un amic ha pagat. Tens 30 dies més, " + d.charAt(0).toLowerCase() + d.slice(1) + ".", compartirTxt: "Mira què pagues cada mes sense adonar-te'n. És gratis.",
       topeDia: "Per avui ja està. Demà continuem.", topeTotal: "Has arribat al màxim d'aquest passi.", noAbre: "Aquest codi no existeix o ja ha caducat.", sinPagar: "Encara no ens ha arribat el pagament. Si has pagat, torna a carregar d'aquí a un moment.",
     },
     en: {
@@ -48,6 +54,9 @@
       unPago: "One payment. No subscription", ahoraNo: "Not now", momento: "One moment…", errorPago: "That didn't work. Try again.",
       tuyo: "Tiqui is yours", copiar: "Copy", copiado: "Copied", correo: "We've emailed it to you. Use it to come back from Your Tiqui, without uploading anything.",
       hasta: (d) => "Until " + d.getDate() + " " + ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"][d.getMonth()],
+      invita: "Invite a friend", invitaSub: "Your questions cost us a lot. If your friend pays, you get 30 days free.",
+      enlaceCopiado: "Link copied. Send it to anyone you like.", sinHuecos: "3 friends have already given you days. Thank you!",
+      regalo: (d) => "A friend has paid. You have 30 more days, " + d.charAt(0).toLowerCase() + d.slice(1) + ".", compartirTxt: "See what you pay every month without noticing. It's free.",
       topeDia: "That's it for today. See you tomorrow.", topeTotal: "You've reached the limit of this pass.", noAbre: "That code doesn't exist or has expired.", sinPagar: "We haven't received the payment yet. If you've paid, reload in a moment.",
     },
   }[LANG];
@@ -95,7 +104,7 @@
     return [T.adonde, T.raro, top ? T.llevo(top) : T.mesMas];
   }
 
-  const GRATIS = "fh-tiqui-gratis", PASE = "fh-tiqui-pase", PEND = "fh-tiqui-pend";
+  const GRATIS = "fh-tiqui-gratis", PASE = "fh-tiqui-pase", PEND = "fh-tiqui-pend", AMIGO = "fh-amigo", MIREF = "fh-tiqui-ref";
   const leer = (k) => { try { return JSON.parse(localStorage.getItem(k) || "null"); } catch (e) { return null; } };
   const poner = (k, v) => { try { if (v) localStorage.setItem(k, JSON.stringify(v)); else localStorage.removeItem(k); } catch (e) {} };
   const leerPase = () => { const p = leer(PASE); return p && p.hasta > Date.now() ? p : null; };
@@ -185,7 +194,8 @@
       try {
         const codigo = nuevoCodigo();
         const caja = await cerrarCaja(codigo, { r: ultimoR });
-        const r = await api("pagar", { plan, codigo, caja, idioma: LANG, vuelta: location.pathname });
+        const am = leer(AMIGO), mio = leer(MIREF);
+        const r = await api("pagar", { plan, codigo, caja, idioma: LANG, vuelta: location.pathname, amigo: am && am !== mio ? am : undefined });
         if (!r.ok || !r.d.url) throw new Error("pago");
         poner(PEND, { codigo, plan });
         location.href = r.d.url;
@@ -235,8 +245,12 @@
     const f = mk("form", "tqc-in"); const inp = mk("input"); inp.id = "tqcTxt"; inp.autocomplete = "off"; inp.maxLength = 400; inp.placeholder = T.escribe; inp.setAttribute("aria-label", T.escribe);
     const env = mk("button", null, "→"); env.type = "submit"; env.setAttribute("aria-label", T.enviar);
     f.append(inp, env); f.addEventListener("submit", (e) => { e.preventDefault(); const t = inp.value.trim(); if (t) { inp.value = ""; preguntar(t); } });
-    ch.append(top, msgs, sug, f); caja.appendChild(ch);
+    ch.append(top, msgs, sug, f);
+    if (pase) ch.appendChild(invitar(pase));
+    caja.appendChild(ch);
     historial = [];
+    const viejo = leer(PASE);
+    if (!pase && viejo && viejo.codigo) setTimeout(() => estado(viejo, true), 0);
     if (pase) {
       if (codigoNuevo) {
         const f2 = document.createDocumentFragment(); f2.appendChild(mk("b", null, T.tuyo));
@@ -245,8 +259,51 @@
         f2.append(cod, cp, mk("span", "tqc-cod-t", T.correo)); burbuja("ia", f2).classList.add("tqc-m--cod"); codigoNuevo = null;
       }
       burbuja("ia", T.hola);
+      if (regaloPendiente) { burbuja("ia", T.regalo(T.hasta(new Date(pase.hasta)))); regaloPendiente = 0; } else estado(pase);
     } else if (gratisUsada()) { msgs.textContent = ""; planesEnChat(); } else burbuja("ia", T.hola);
   }
+  // Invita a un amigo: un enlace propio (sin el código); si el amigo paga, 30 días más para ti
+  const RUTA = { es: "/extracto/", ca: "/ca/extracte/", en: "/en/statement/" }[LANG];
+  function invitar(pase) {
+    const w = mk("div", "tqc-inv");
+    const b = mk("button", "tqc-inv-b"); b.type = "button";
+    b.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="8.5" width="17" height="4" rx="1"/><path d="M5 12.5v8h14v-8M12 8.5v12M12 8.5c-1.5-3.5-5.5-4-5.5-1.5S10 8.5 12 8.5zM12 8.5c1.5-3.5 5.5-4 5.5-1.5S14 8.5 12 8.5z"/></svg>';
+    b.appendChild(mk("span", null, T.invita));
+    const s = mk("p", "tqc-inv-s", T.invitaSub);
+    b.addEventListener("click", async () => {
+      b.disabled = true;
+      const r = await api("invitar", { codigo: pase.codigo }); b.disabled = false;
+      if (!r.ok || !r.d.id) { burbuja("ia", T.noPuedo); return; }
+      poner(MIREF, r.d.id);
+      if (!r.d.quedan) { burbuja("ia", T.sinHuecos); return; }
+      const url = location.origin + RUTA + "?amigo=" + r.d.id;
+      try { if (navigator.share) { await navigator.share({ title: "Feehund", text: T.compartirTxt, url }); return; } } catch (e) { if (e && e.name === "AbortError") return; }
+      try { await navigator.clipboard.writeText(T.compartirTxt + " " + url); s.textContent = T.enlaceCopiado; } catch (e) { s.textContent = url; }
+    });
+    w.append(b, s); return w;
+  }
+  // Al abrir: lo que queda del pase (puede haber crecido por un amigo) y el aviso del regalo
+  let regaloPendiente = 0;
+  async function estado(pase, caducado) {
+    const r = await api("estado", { codigo: pase.codigo });
+    if (!r.ok) return;
+    poner(PASE, Object.assign({}, pase, { plan: r.d.plan, hasta: r.d.hasta }));
+    if (caducado) { // aquí ya había caducado, pero un amigo le ha dado más días: se vuelve a montar con el pase
+      if (r.d.hasta > Date.now()) { regaloPendiente = r.d.regalo || 0; if (caja) caja.remove(); montarCaja(); colocar(); }
+      return;
+    }
+    if (sub) sub.textContent = T.hasta(new Date(r.d.hasta));
+    if (r.d.regalo) burbuja("ia", T.regalo(T.hasta(new Date(r.d.hasta))));
+  }
+  // Llega por el enlace de un amigo: se guarda para cuando pague
+  (function () {
+    const q = new URLSearchParams(location.search), a = String(q.get("amigo") || "").toUpperCase();
+    if (!q.has("amigo")) return;
+    if (/^[0-9A-HJKMNP-TV-Z]{8}$/.test(a) && a !== leer(MIREF)) poner(AMIGO, a);
+    q.delete("amigo"); const qs = q.toString();
+    history.replaceState(null, "", location.pathname + (qs ? "?" + qs : "") + location.hash);
+  })();
+
   // Dónde va: en el ordenador, a la derecha del resultado; en el móvil, antes de «Compartir» (o tras las gráficas si están abiertas)
   const ancho = matchMedia("(min-width:1100px)");
   function colocar() {

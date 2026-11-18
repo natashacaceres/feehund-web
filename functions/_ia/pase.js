@@ -10,6 +10,31 @@ export const PLANES = {
   completo: { dias: 90, porDia: 25, total: 120, precio: 299 },  // 2,99 €
 };
 export const PRODUCTO_TIQUI = 'prod_VeGsASLYslzV0Q'; // Stripe (en vivo): «Pregúntale a Tiqui»
+// Invita a un amigo: si paga, quien invitó tiene 30 días más (y 40 preguntas más), hasta 3 amigos.
+export const AMIGO = { dias: 30, preguntas: 40, max: 3 };
+export const refValido = (r) => /^[0-9A-HJKMNP-TV-Z]{8}$/.test(String(r || ''));
+
+/** Si el pago trae el enlace de un amigo, le regala los días a quien invitó. Solo una vez por pago. */
+async function regalarAmigo(env, h, sesion) {
+  const id = sesion.metadata?.amigo;
+  if (!refValido(id)) return;
+  const kRef = 'ia:ref:' + id, ref = JSON.parse((await env.FEEHUND_KV.get(kRef)) || 'null');
+  if (!ref || ref.h === h || (ref.n || 0) >= AMIGO.max) return;
+  const kUsado = 'ia:ref-pago:' + sesion.id;
+  if (await env.FEEHUND_KV.get(kUsado)) return;
+  await env.FEEHUND_KV.put(kUsado, '1', { expirationTtl: 400 * 86400 });
+  const kPase = 'ia:pase:' + ref.h, pase = JSON.parse((await env.FEEHUND_KV.get(kPase)) || 'null');
+  if (!pase) return; // su pase ya no existe (caducó del todo): no hay a quién regalar
+  pase.hasta = Math.max(pase.hasta, Date.now()) + AMIGO.dias * 864e5;
+  pase.extra = (pase.extra || 0) + AMIGO.preguntas;
+  pase.regalo = (pase.regalo || 0) + AMIGO.dias;
+  const ttl = Math.ceil((pase.hasta - Date.now()) / 1000) + 86400;
+  await env.FEEHUND_KV.put(kPase, JSON.stringify(pase), { expirationTtl: ttl });
+  const caja = await env.FEEHUND_KV.get('ia:caja:' + ref.h);
+  if (caja) await env.FEEHUND_KV.put('ia:caja:' + ref.h, caja, { expirationTtl: ttl });
+  ref.n = (ref.n || 0) + 1;
+  await env.FEEHUND_KV.put(kRef, JSON.stringify(ref), { expirationTtl: 400 * 86400 });
+}
 
 const hex = (buf) => [...new Uint8Array(buf)].map((b) => b.toString(16).padStart(2, '0')).join('');
 export const limpiarCodigo = (c) => String(c || '').toUpperCase().replace(/[^0-9A-Z]/g, '').replace(/^FH/, '');
@@ -47,5 +72,6 @@ export async function activarTiqui(env, h, sesion, origen) {
     try { await enviarCorreo(env, { de: { nombre: 'Feehund' }, para: correo, asunto, texto, idem: 'tiqui-' + sesion.id }); } catch (e) { /* el código también se ve en pantalla y en el recibo */ }
   }
   await env.FEEHUND_KV.delete('ia:pend:' + h);
+  try { await regalarAmigo(env, h, sesion); } catch (e) { /* el pase del que paga ya está hecho */ }
   return pase;
 }
