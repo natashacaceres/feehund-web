@@ -19,6 +19,7 @@
   const T = {
     es: {
       titulo: "Pregúntale a Tiqui", gratis: "Tu primera pregunta es gratis", siguePlanes: "Elige cuánto tiempo y sigue preguntando",
+      estado: "Olfateando tu extracto", estadoNeg: "Olfateando tu datáfono", privado: "Privado", pensando: "Olfateando",
       hola: "¿Qué quieres saber de tus gastos?", escribe: "Escribe tu pregunta", enviar: "Enviar",
       adonde: "¿Adónde se va mi dinero?", raro: "¿Hay algo raro en mi cuenta?", llevo: (m) => "¿Cuánto llevo en " + m + "?", mesMas: "¿En qué mes gasté más?",
       seguimos: "¿Seguimos?", verPago: "Ver el pago", verPagos: (n) => "Ver los " + n + " pagos", ocultar: "Ocultar",
@@ -36,6 +37,7 @@
     },
     ca: {
       titulo: "Pregunta-li a Tiqui", gratis: "La teva primera pregunta és gratis", siguePlanes: "Tria quant de temps i continua preguntant",
+      estado: "Ensumant el teu extracte", estadoNeg: "Ensumant el teu datàfon", privado: "Privat", pensando: "Ensumant",
       hola: "Què vols saber de les teves despeses?", escribe: "Escriu la teva pregunta", enviar: "Enviar",
       adonde: "On van els meus diners?", raro: "Hi ha alguna cosa estranya al meu compte?", llevo: (m) => "Quant porto a " + m + "?", mesMas: "Quin mes vaig gastar més?",
       seguimos: "Continuem?", verPago: "Veure el pagament", verPagos: (n) => "Veure els " + n + " pagaments", ocultar: "Amagar",
@@ -53,6 +55,7 @@
     },
     en: {
       titulo: "Ask Tiqui", gratis: "Your first question is free", siguePlanes: "Pick how long and keep asking",
+      estado: "Sniffing your statement", estadoNeg: "Sniffing your card machine", privado: "Private", pensando: "Sniffing",
       hola: "What do you want to know about your spending?", escribe: "Type your question", enviar: "Send",
       adonde: "Where does my money go?", raro: "Is anything odd in my account?", llevo: (m) => "How much have I spent on " + m + "?", mesMas: "Which month did I spend the most?",
       seguimos: "Shall we carry on?", verPago: "See the payment", verPagos: (n) => "See the " + n + " payments", ocultar: "Hide",
@@ -70,7 +73,7 @@
     },
   }[LANG];
 
-  if (NEG) { T.hola = T.holaNeg; T.planes = T.planesNeg; T.unPago = T.unPagoNeg; T.iva = T.ivaNeg; }
+  if (NEG) { T.estado = T.estadoNeg; T.hola = T.holaNeg; T.planes = T.planesNeg; T.unPago = T.unPagoNeg; T.iva = T.ivaNeg; }
 
   // Sectores: solo lo que se sabe seguro (cadena conocida o palabra que no deja dudas). Lo demás, Tiqui lo dice como «sin saber qué es».
   const SECTORES = [
@@ -166,6 +169,12 @@
   // precio de un plan; en negocios lleva «+ IVA» en pequeño (el IVA lo suma Stripe al pagar)
   const precio = (p) => { const x = mk("span", "tqc-plan-p", p); if (T.iva) x.appendChild(mk("small", "tqc-iva", " " + T.iva)); return x; };
   let caja = null, msgs = null, sub = null, sug = null;
+  // Mientras Tiqui piensa: «Olfateando» y tres puntos
+  function olfateando() {
+    const f = document.createDocumentFragment(), d = mk("span", "tqc-dots"); d.append(mk("i"), mk("i"), mk("i"));
+    f.append(mk("span", "tqc-esc", T.pensando), d);
+    const b = burbuja("ia", f); b.classList.add("tqc-m--esc"); return b;
+  }
   function burbuja(quien, nodoOTexto) {
     const m = mk("div", "tqc-m tqc-m--" + quien);
     if (typeof nodoOTexto === "string") m.textContent = nodoOTexto; else m.appendChild(nodoOTexto);
@@ -241,7 +250,7 @@
   }
   async function preguntarPago(p, t) {
     burbuja("tu", t);
-    const pensando = burbuja("ia", mk("span", "tqc-dots")); pensando.firstChild.append(mk("i"), mk("i"), mk("i"));
+    const pensando = olfateando();
     const r = await api("pregunta", Object.assign({ codigo: p.codigo, pregunta: t, idioma: LANG, historial }, datosPregunta()));
     pensando.remove();
     if (!r.ok) {
@@ -257,7 +266,7 @@
     const p = leerPase(); if (p) return preguntarPago(p, t);
     if (gratisUsada()) { burbuja("tu", t); planesEnChat(); return; }
     burbuja("tu", t);
-    const pensando = burbuja("ia", mk("span", "tqc-dots")); pensando.firstChild.append(mk("i"), mk("i"), mk("i"));
+    const pensando = olfateando();
     const r = await api("pregunta-gratis", Object.assign({ pregunta: t, idioma: LANG }, datosPregunta()));
     pensando.remove();
     if (!r.ok) {
@@ -271,14 +280,19 @@
     caja = mk("section", "tqc"); caja.id = "tqcIa"; caja.setAttribute("aria-label", T.titulo);
     const ch = mk("div", "tqc-chat");
     const pase = leerPase();
-    const top = mk("div", "tqc-top"); top.appendChild(mk("h2", "tqc-h", T.titulo)); sub = mk("p", "tqc-sub", pase ? T.hasta(new Date(pase.hasta)) : gratisUsada() ? "" : T.gratis); sub.hidden = !sub.textContent; top.appendChild(sub);
+    // Arriba, Tiqui como un contacto: su cara, su nombre, «Olfateando tu extracto» y «Privado»
+    const top = mk("div", "tqc-top"), cara = mk("img", "tqc-cara"); cara.src = ROOT + "assets/img/tiqui-olfatea.webp"; cara.alt = ""; cara.width = 44; cara.height = 44;
+    const quien = mk("div", "tqc-quien"), h2 = mk("h2", "tqc-h", "Tiqui"); h2.setAttribute("aria-label", T.titulo);
+    const est = mk("p", "tqc-est"); est.append(mk("i"), document.createTextNode(T.estado)); quien.append(h2, est);
+    top.append(cara, quien, mk("span", "tqc-priv", T.privado));
+    sub = mk("p", "tqc-sub", pase ? T.hasta(new Date(pase.hasta)) : gratisUsada() ? "" : T.gratis); sub.hidden = !sub.textContent;
     msgs = mk("div", "tqc-msgs"); msgs.setAttribute("aria-live", "polite");
     sug = mk("div", "tqc-sug");
     sugerencias().forEach((q) => { const b = mk("button", null, q); b.type = "button"; b.addEventListener("click", () => preguntar(q)); sug.appendChild(b); });
     const f = mk("form", "tqc-in"); const inp = mk("input"); inp.id = "tqcTxt"; inp.autocomplete = "off"; inp.maxLength = 400; inp.placeholder = T.escribe; inp.setAttribute("aria-label", T.escribe);
     const env = mk("button", null, "→"); env.type = "submit"; env.setAttribute("aria-label", T.enviar);
     f.append(inp, env); f.addEventListener("submit", (e) => { e.preventDefault(); const t = inp.value.trim(); if (t) { inp.value = ""; preguntar(t); } });
-    ch.append(top, msgs, sug, f);
+    ch.append(top, sub, msgs, sug, f);
     caja.appendChild(ch);
     historial = [];
     const viejo = leer(PASE);

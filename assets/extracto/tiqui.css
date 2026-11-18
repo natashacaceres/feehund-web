@@ -1,16 +1,26 @@
 /* Mi banco: «Pregúntale a Tiqui» (assets/extracto/tiqui.js). El azul oscuro es solo de Tiqui. */
 .tqc{margin:var(--s-6) 0}
-.tqc-chat{background:#14213D;color:#FFF8EC;border-radius:20px;padding:var(--s-5) var(--s-4);display:grid;gap:var(--s-3)}
-.tqc-h{margin:0;font:800 26px/1.15 var(--f-head);color:#FFF8EC}
-.tqc-sub{margin:4px 0 0;font:400 16px/1.3 var(--f-text);color:rgba(255,248,236,.8)}
+.tqc-chat{position:relative;overflow:hidden;background:#14213D;color:#FFF8EC;border-radius:24px;padding:var(--s-4) var(--s-4) var(--s-4);display:grid;gap:var(--s-3)}
+/* una sola huella de Tiqui al fondo, casi invisible */
+.tqc-chat::after{content:"";position:absolute;right:-70px;bottom:-60px;width:300px;height:300px;border-radius:50%;background:url("../img/tiqui-olfatea.webp") center/cover;opacity:.07;filter:grayscale(1);pointer-events:none}
+.tqc-chat>*{position:relative;z-index:1}
+.tqc-top{display:flex;align-items:center;gap:12px;padding-bottom:14px;border-bottom:1px solid rgba(255,248,236,.12)}
+.tqc-cara{width:44px;height:44px;flex:none;border-radius:50%;object-fit:cover;background:#FFF8EC}
+.tqc-quien{min-width:0}
+.tqc-est{margin:3px 0 0;display:flex;align-items:center;gap:6px;font:400 14px/1.2 var(--f-text);color:rgba(255,248,236,.8)}
+.tqc-est i{width:8px;height:8px;flex:none;border-radius:50%;background:var(--amber);animation:tqcDot 1.6s ease-in-out infinite}
+.tqc-priv{margin-left:auto;flex:none;padding:6px 10px;border:1px solid rgba(255,248,236,.45);border-radius:999px;font:600 13px/1 var(--f-text);color:rgba(255,248,236,.85)}
+.tqc-h{margin:0;font:800 20px/1.1 var(--f-head);color:#FFF8EC}
+.tqc-sub{margin:0;font:400 16px/1.3 var(--f-text);color:rgba(255,248,236,.8)}
 .tqc-msgs{display:grid;gap:10px;max-height:min(60vh,520px);overflow-y:auto;padding:4px 0}
 .tqc-msgs:empty{display:none}
-.tqc-m{max-width:88%;padding:12px 14px;border-radius:16px;font:400 16px/1.45 var(--f-text)}
+.tqc-m{max-width:86%;padding:12px 15px;border-radius:18px;font:400 16px/1.45 var(--f-text)}
 .tqc-m b{font-weight:700;white-space:nowrap}
-.tqc-m--tu{justify-self:end;background:var(--amber);color:#14213D;border-bottom-right-radius:4px}
-.tqc-m--ia{position:relative;justify-self:start;margin-left:48px;max-width:calc(88% - 48px);background:#FFF8EC;color:#14213D;border-bottom-left-radius:4px}
-.tqc-m--ia::before{content:"";position:absolute;left:-48px;bottom:0;width:38px;height:38px;border-radius:50%;background:#FFF8EC url("../img/tiqui-olfatea.webp") center/cover}
-.tqc-m--planes{max-width:calc(100% - 48px);display:grid;gap:12px}
+.tqc-m--tu{justify-self:end;background:var(--brand);color:#fff;border-bottom-right-radius:6px}
+.tqc-m--ia{justify-self:start;background:#FFF8EC;color:#14213D;border-bottom-left-radius:6px}
+.tqc-m--esc{display:flex;align-items:center;gap:8px}
+.tqc-esc{font:400 14px/1 var(--f-text);color:#4F5667}
+.tqc-m--planes{max-width:100%;display:grid;gap:12px}
 .tqc-ver{display:block;margin-top:8px;padding:0;border:0;background:none;color:var(--brand);font:700 15px/1.3 var(--f-text);text-decoration:underline;cursor:pointer}
 .tqc-movs{list-style:none;margin:6px 0 0;padding:0;display:grid}
 .tqc-movs[hidden]{display:none}
@@ -18,10 +28,11 @@
 .tqc-mf{color:#4F5667}.tqc-mn{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.tqc-mi{font-weight:700}
 .tqc-sug{display:flex;flex-direction:column;align-items:flex-end;gap:6px}
 .tqc-sug[hidden]{display:none}
-.tqc-sug button{min-height:38px;padding:0 14px;border:1.5px solid var(--amber);border-radius:999px;background:transparent;color:var(--amber);font:400 15px/1.2 var(--f-text);text-align:right;cursor:pointer}
+.tqc-sug button{min-height:38px;padding:0 14px;border:1.5px solid rgba(255,248,236,.4);border-radius:999px;background:transparent;color:#FFF8EC;font:400 15px/1.2 var(--f-text);text-align:right;cursor:pointer}
 .tqc-in{display:flex;gap:8px}
-.tqc-in input{flex:1;min-width:0;min-height:48px;padding:0 16px;border:0;border-radius:999px;background:#FFF8EC;color:#14213D;font:400 16px/1 var(--f-text)}
-.tqc-in button{flex:none;width:48px;height:48px;border:0;border-radius:50%;background:var(--amber);color:#14213D;font:700 20px/1 var(--f-text);cursor:pointer}
+.tqc-in input{flex:1;min-width:0;min-height:48px;padding:0 18px;border:1px solid rgba(255,248,236,.22);border-radius:999px;background:rgba(255,248,236,.08);color:#FFF8EC;font:400 16px/1 var(--f-text)}
+.tqc-in input::placeholder{color:rgba(255,248,236,.65)}
+.tqc-in button{flex:none;width:48px;height:48px;border:0;border-radius:50%;background:#FFF8EC;color:#14213D;font:700 20px/1 var(--f-text);cursor:pointer}
 .tqc-dots{display:inline-flex;gap:4px}
 .tqc-dots i{width:7px;height:7px;border-radius:50%;background:#4F5667;animation:tqcDot 1s infinite}
 .tqc-dots i:nth-child(2){animation-delay:.15s}.tqc-dots i:nth-child(3){animation-delay:.3s}
@@ -54,7 +65,7 @@
   #xRes>#tqcIa .tqc-msgs{flex:0 1 auto;min-height:0;max-height:none}
   #xRes>#tqcIa .tqc-chat>*:not(.tqc-msgs){flex:none}
 }
-@media (prefers-reduced-motion:reduce){.tqc-dots i{animation:none}}
+@media (prefers-reduced-motion:reduce){.tqc-dots i,.tqc-est i{animation:none}}
 /* La tarjeta del código al volver de pagar */
 .tqc-m--cod{display:grid;gap:8px}
 .tqc-cod{display:block;padding:10px 12px;border-radius:10px;background:#F3E6CC;font:700 16px/1.2 ui-monospace,Menlo,monospace;letter-spacing:.02em;white-space:nowrap;overflow-x:auto}

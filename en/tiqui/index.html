@@ -24,7 +24,16 @@
   .tq-img{width:200px;height:auto;border-radius:50%;aspect-ratio:1;object-fit:cover;object-position:50% 30%}
   .tq-h{margin:0;font:800 clamp(30px,8.6vw,44px)/1.05 var(--f-head);color:var(--ink);white-space:nowrap}
   .tq-hasta{margin:0;font:400 17px/1.3 var(--f-text);color:var(--ink-2)}
-  .tq-demo{background:var(--ink);border-radius:24px;padding:var(--s-5) var(--s-4);display:grid;gap:12px}
+  .tq-demo{position:relative;overflow:hidden;background:var(--ink);border-radius:24px;padding:var(--s-4) var(--s-4) var(--s-5);display:grid;gap:12px}
+  .tq-demo::after{content:"";position:absolute;right:-70px;bottom:-60px;width:300px;height:300px;border-radius:50%;background:url("../../assets/img/tiqui-olfatea.webp") center/cover;opacity:.07;filter:grayscale(1);pointer-events:none}
+  .tq-demo>*{position:relative;z-index:1}
+  .tq-top{display:flex;align-items:center;gap:12px;padding-bottom:14px;margin-bottom:4px;border-bottom:1px solid rgba(255,248,236,.12)}
+  .tq-top img{width:44px;height:44px;flex:none;border-radius:50%;object-fit:cover;background:#FFF8EC}
+  .tq-nom{margin:0;font:800 20px/1.1 var(--f-head);color:#FFF8EC}
+  .tq-est{margin:3px 0 0;display:flex;align-items:center;gap:6px;font:400 14px/1.2 var(--f-text);color:rgba(255,248,236,.8)}
+  .tq-est i{width:8px;height:8px;flex:none;border-radius:50%;background:var(--amber);animation:tqLat 1.6s ease-in-out infinite}
+  @keyframes tqLat{50%{opacity:.25}}@media (prefers-reduced-motion:reduce){.tq-est i{animation:none}}
+  .tq-priv{margin-left:auto;flex:none;padding:6px 10px;border:1px solid rgba(255,248,236,.45);border-radius:999px;font:600 13px/1 var(--f-text);color:rgba(255,248,236,.85)}
   .tq-pagos{display:block;margin-top:8px;font:700 15px/1.3 var(--f-text);color:var(--brand);text-decoration:underline}
   .tq-dif{list-style:none;margin:0;padding:0;display:grid;gap:var(--s-4)}
   .tq-dif li{padding-left:36px;background:var(--ico-check-ink) left 2px/24px no-repeat;font:800 24px/1.2 var(--f-head);color:var(--ink)}
@@ -67,11 +76,9 @@
   .tq-sw button[aria-selected="true"]{background:var(--brand);color:var(--bg)}
   [hidden]{display:none!important}
   .tq-cod{display:grid;gap:8px;margin-top:8px}.tq-cod label{font:700 16px/1.2 var(--f-text);color:var(--ink)}.tq-cod .p-in{display:flex;gap:8px}.tq-cod input{flex:1;min-width:0;min-height:48px;padding:0 16px;border:1.5px solid var(--line);border-radius:999px;background:var(--bg);color:var(--ink);font:400 16px/1 ui-monospace,Menlo,monospace;text-transform:uppercase}.tq-cod button{flex:none;width:48px;height:48px;border:0;border-radius:50%;background:var(--ink);color:var(--bg);font:700 20px/1 var(--f-text);cursor:pointer}.tq-err{margin:0;min-height:1em;font:400 15px/1.3 var(--f-text);color:var(--amber-text)}
-  .tq-demo .p-m--ia{position:relative;margin-left:48px;max-width:calc(88% - 48px)}
-  .tq-demo .p-m--ia::before{content:"";position:absolute;left:-48px;bottom:0;width:38px;height:38px;border-radius:50%;background:#FFF8EC url("../../assets/img/tiqui-olfatea.webp") center/cover}
-  .p-m{max-width:88%;padding:12px 14px;border-radius:16px;font:400 16px/1.45 var(--f-text)}
-  .p-m--tu{justify-self:end;background:var(--amber);color:var(--ink);border-bottom-right-radius:4px}
-  .p-m--ia{justify-self:start;background:var(--bg);color:var(--ink);border-bottom-left-radius:4px}
+  .p-m{max-width:86%;padding:12px 15px;border-radius:18px;font:400 16px/1.45 var(--f-text)}
+  .p-m--tu{justify-self:end;background:var(--brand);color:#fff;border-bottom-right-radius:6px}
+  .p-m--ia{justify-self:start;background:var(--bg);color:var(--ink);border-bottom-left-radius:6px}
   .p-m b{font-weight:700}
   .p-m b{white-space:nowrap}
   .p-plan{display:grid;gap:6px;align-content:start;justify-items:start;padding:16px 14px;border:2px solid var(--line);border-radius:16px;background:var(--bg);color:var(--ink);text-align:left;cursor:pointer}
@@ -107,6 +114,7 @@
   </section>
 
     <section class="tq-demo" data-m="neg" hidden>
+    <div class="tq-top"><img src="../../assets/img/tiqui-olfatea.webp" alt="" width="44" height="44"><div><p class="tq-nom">Tiqui</p><p class="tq-est"><i></i>Sniffing your card machine</p></div><span class="tq-priv">Private</span></div>
     <div class="p-m p-m--tu">How much does the bank charge me a month?</div>
     <div class="p-m p-m--ia">In October, 83,42 €. That's 1,04 € out of every 100 you take by card.</div>
     <div class="p-m p-m--tu">Why do some cards cost me more?</div>
@@ -116,6 +124,7 @@
   </section>
 
 <section class="tq-demo" data-m="ti" aria-label="Ask Tiqui">
+    <div class="tq-top"><img src="../../assets/img/tiqui-olfatea.webp" alt="" width="44" height="44"><div><p class="tq-nom">Tiqui</p><p class="tq-est"><i></i>Sniffing your statement</p></div><span class="tq-priv">Private</span></div>
     <div class="p-m p-m--tu">Where does my money go?</div>
     <div class="p-m p-m--ia">Half goes on your home, with rent, electricity and water. Then comes the supermarket, at 312,40 € a month.<span class="tq-pagos">See the payments</span></div>
     <div class="p-m p-m--tu">Is anything odd in my account?</div>

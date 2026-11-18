@@ -752,7 +752,6 @@
   }
   // Marcas que todo el mundo conoce: se colocan solas, no se preguntan
   const CONOCIDAS = [
-    [/HIPOTECA|PRESTAMO HIPOT|ALQUILER/, "vivienda"],
     [/NETFLIX|SPOTIFY|HBO|DISNEY|PRIME VIDEO|AMAZON PRIME|YOUTUBE|DAZN|FILMIN|ATRESPLAYER|APPLE\.COM|ICLOUD|AUDIBLE|KINDLE|CHATGPT|OPENAI|CLAUDE|ANTHROPIC|CANVA|ADOBE|DROPBOX|GOOGLE ONE|DEEZER|TIDAL|PLAYSTATION|XBOX|NINTENDO|DUOLINGO|TINDER|BUMBLE|GYM|FITNESS|BASIC.?FIT|DREAMFIT|ALTAFIT/, "susc"],
     [/VODAFONE|MOVISTAR|TELEFONICA|ORANGE|YOIGO|DIGI|MASMOVIL|LOWI|PEPEPHONE|JAZZTEL|SIMYO|O2 |FINETWORK|ENDESA|IBERDROLA|NATURGY|HOLALUZ|OCTOPUS|REPSOL|TOTALENERGIES|AIGUES|AGUAS|CANAL DE ISABEL|AQUALIA|EMASESA|SECURITAS|PROSEGUR/, "casa"],
     [/MAPFRE|MUTUA|AXA|ALLIANZ|SANITAS|ADESLAS|DKV|ASISA|GENERALI|LINEA DIRECTA|LÍNEA DIRECTA|REALE|CASER|ZURICH|OCASO|SANTALUCIA|SANTA LUCIA|VERTI|PELAYO/, "seg"],
@@ -761,7 +760,8 @@
   const bonito = (k) => k.toLowerCase().replace(/(^|\s)(\S)/g, (a, b, c) => b + c.toUpperCase()).replace(/ (Sl|Slu|Sa|S\.l\.|S\.a\.)$/, (a) => a.toUpperCase());
   function desconocidos(r) {
     const per = (r.lectura && r.lectura.periodo) || {}, dias = per.dias || 365;
-    const enCobro = new Set(); (r.cobros || []).forEach((c) => (c.movimientos || []).forEach((m) => enCobro.add(m.id)));
+    // lo que el motor ya ha reconocido (cobros, gastos fijos como la hipoteca, lo terminado) no se pregunta
+    const enCobro = new Set(); [].concat(r.cobros || [], r.gastos_fijos || [], r.terminados || []).forEach((c) => (c.movimientos || []).forEach((m) => enCobro.add(m.id)));
     const FUERA = /BIZUM|LIQUIDACI|RECOBRO|TRASPASO|IMPUESTO|HACIENDA|A\.E\.A\.T|TRIBUT|CAJERO|REINTEGRO|DEVOLUCI|NOMINA|NÓMINA/i;
     const porClave = {};
     ((r.lectura && r.lectura.movimientos) || []).forEach((m) => {
