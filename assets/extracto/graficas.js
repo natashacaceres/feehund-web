@@ -10,6 +10,8 @@
   const ROOT = (document.currentScript && document.currentScript.dataset.root) || "../";
   const nf0 = new Intl.NumberFormat("es-ES", { maximumFractionDigits: 0, useGrouping: "always" });
   const eur = (x) => nf0.format(Math.round(x)) + " €";
+  const nf2 = new Intl.NumberFormat("es-ES", { minimumFractionDigits: 2, maximumFractionDigits: 2, useGrouping: "always" });
+  const nf4 = new Intl.NumberFormat("es-ES", { minimumFractionDigits: 4, maximumFractionDigits: 4 });
   const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 
   const T = {
@@ -22,6 +24,12 @@
       nada: "No hemos visto pagos que se repitan.", waffle: "Cien cuadritos: cada uno es 1 € de cada 100 que se repiten",
       compartirMi: "Compartir mi tarjeta", compartir: "Compartir", guardar: "Guardar imagen",
       mesAMes: "Mes a mes", media: (x) => "lo habitual " + x, mesTip: (m, x) => m + " · " + x, meses: ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", "nov", "dic"],
+      vivo: "Lo que pagas en recibos, en directo", desde: "desde que abriste la página", escala: ["al día", "a la semana", "al mes", "al año"],
+      cuando: "Cuándo se te va", cuandoQ: "Cada punto es un cobro. Toca uno.", ventana: (a, b) => "sale entre el día " + a + " y el " + b, alMes: "al mes", dia: (d) => "Día " + d, unaVez: "1 vez al año",
+      sube: "Quién te ha subido el precio", subeQ: "Lo que pagas de más al año por cada subida.", subeTot: "al año, sin que nadie te avise", igual: "Igual", alAnoP: "al año",
+      nadieSube: "Nadie te ha subido el precio en este extracto.",
+      sigues: "Si sigues así", siguesQ: "Mueve la barra.", enAnos: (n) => (n === 1 ? "en 1 año" : "en " + n + " años"), anos: "Años",
+      ipc: "Con lo que suben los precios hoy (IPC 4,9 %, INE, octubre 2026).",
     },
     ca: {
       resumen: "Resum", graficas: "Gràfics", pagas: "Pagues l'any en coses que es repeteixen",
@@ -32,6 +40,12 @@
       nada: "No hem vist pagaments que es repeteixin.", waffle: "Cent quadradets: cadascun és 1 € de cada 100 que es repeteixen",
       compartirMi: "Compartir la meva targeta", compartir: "Compartir", guardar: "Desar la imatge",
       mesAMes: "Mes a mes", media: (x) => "l'habitual " + x, mesTip: (m, x) => m + " · " + x, meses: ["gen", "febr", "març", "abr", "maig", "juny", "jul", "ag", "set", "oct", "nov", "des"],
+      vivo: "El que pagues en rebuts, en directe", desde: "des que has obert la pàgina", escala: ["al dia", "a la setmana", "al mes", "l'any"],
+      cuando: "Quan se te'n va", cuandoQ: "Cada punt és un cobrament. Toca'n un.", ventana: (a, b) => "surt entre el dia " + a + " i el " + b, alMes: "al mes", dia: (d) => "Dia " + d, unaVez: "1 cop l'any",
+      sube: "Qui t'ha apujat el preu", subeQ: "El que pagues de més l'any per cada pujada.", subeTot: "l'any, sense que ningú t'avisi", igual: "Igual", alAnoP: "l'any",
+      nadieSube: "Ningú t'ha apujat el preu en aquest extracte.",
+      sigues: "Si continues així", siguesQ: "Mou la barra.", enAnos: (n) => (n === 1 ? "en 1 any" : "en " + n + " anys"), anos: "Anys",
+      ipc: "Amb el que pugen els preus avui (IPC 4,9 %, INE, octubre 2026).",
     },
     en: {
       resumen: "Summary", graficas: "Charts", pagas: "You pay each year in things that repeat",
@@ -42,8 +56,39 @@
       nada: "We didn't see any payments that repeat.", waffle: "A hundred squares: each one is 1 € of every 100 that repeat",
       compartirMi: "Share my card", compartir: "Share", guardar: "Save image",
       mesAMes: "Month by month", media: (x) => "usual " + x, mesTip: (m, x) => m + " · " + x, meses: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+      vivo: "What you pay in bills, live", desde: "since you opened the page", escala: ["a day", "a week", "a month", "a year"],
+      cuando: "When it leaves", cuandoQ: "Each dot is a payment. Tap one.", ventana: (a, b) => "goes out between day " + a + " and day " + b, alMes: "a month", dia: (d) => "Day " + d, unaVez: "once a year",
+      sube: "Who raised your price", subeQ: "What you pay extra each year for each rise.", subeTot: "a year, without anyone telling you", igual: "Same", alAnoP: "a year",
+      nadieSube: "Nobody raised your price in this statement.",
+      sigues: "If you carry on like this", siguesQ: "Move the slider.", enAnos: (n) => (n === 1 ? "in 1 year" : "in " + n + " years"), anos: "Years",
+      ipc: "With today's price rises (CPI 4.9%, INE, October 2026).",
     },
   }[LANG];
+
+  // «Si sigues así»: a qué equivale. Precios medios de España en 2026 (fuentes en el Manual: Oney, idealista, INE,
+  // coches.com, Bodas.net, Ministerio de Vivienda, Carwow, precios públicos de las universidades)
+  const IPC = 0.049; // INE, IPC de octubre de 2026
+  const COSAS = [
+    [922, ["Un curso de universidad pública", "Un curs d'universitat pública", "A year at a state university"], ["60 créditos a 15,37 € de media", "60 crèdits a 15,37 € de mitjana", "60 credits at 15.37 € on average"]],
+    [1100, ["Sacarte el carné de conducir", "Treure't el carnet de conduir", "Getting your driving licence"], ["entre 1.000 y 1.600 € en autoescuela", "entre 1.000 i 1.600 € a l'autoescola", "1,000 to 1,600 € at a driving school"]],
+    [1389, ["Las vacaciones de verano de una persona", "Les vacances d'estiu d'una persona", "One person's summer holiday"], ["gasto medio en España", "despesa mitjana a Espanya", "average spend in Spain"]],
+    [2778, ["Las vacaciones de verano de dos personas", "Les vacances d'estiu de dues persones", "A summer holiday for two"], ["1.389 € por persona", "1.389 € per persona", "1,389 € per person"]],
+    [3672, ["Tres meses de alquiler", "Tres mesos de lloguer", "Three months' rent"], ["piso de 80 m² a 15,3 €/m²", "pis de 80 m² a 15,3 €/m²", "80 m² flat at 15.3 €/m²"]],
+    [5626, ["Toda la comida de tu casa durante un año", "Tot el menjar de casa teva durant un any", "All your household's food for a year"], ["gasto medio por hogar", "despesa mitjana per llar", "average per household"]],
+    [7344, ["Seis meses de alquiler", "Sis mesos de lloguer", "Six months' rent"], ["piso de 80 m² a 15,3 €/m²", "pis de 80 m² a 15,3 €/m²", "80 m² flat at 15.3 €/m²"]],
+    [8404, ["Un año de comida y las vacaciones de dos", "Un any de menjar i les vacances de dos", "A year of food and a holiday for two"], ["5.626 € + 2.778 €", "5.626 € + 2.778 €", "5,626 € + 2,778 €"]],
+    [11252, ["Dos años de comida de tu casa", "Dos anys de menjar de casa teva", "Two years of your household's food"], ["5.626 € al año", "5.626 € l'any", "5,626 € a year"]],
+    [13419, ["Un coche de segunda mano", "Un cotxe de segona mà", "A second-hand car"], ["precio medio en 2026", "preu mitjà el 2026", "average price in 2026"]],
+    [14688, ["Un año entero de alquiler", "Un any sencer de lloguer", "A whole year's rent"], ["piso de 80 m² a 15,3 €/m²", "pis de 80 m² a 15,3 €/m²", "80 m² flat at 15.3 €/m²"]],
+    [16197, ["Un coche de segunda mano y las vacaciones de dos", "Un cotxe de segona mà i les vacances de dos", "A second-hand car and a holiday for two"], ["13.419 € + 2.778 €", "13.419 € + 2.778 €", "13,419 € + 2,778 €"]],
+    [19045, ["Un coche de segunda mano y un año de comida", "Un cotxe de segona mà i un any de menjar", "A second-hand car and a year of food"], ["13.419 € + 5.626 €", "13.419 € + 5.626 €", "13,419 € + 5,626 €"]],
+    [20250, ["Una boda de 90 invitados", "Un casament de 90 convidats", "A wedding for 90 guests"], ["225 € por invitado", "225 € per convidat", "225 € per guest"]],
+    [25183, ["Una boda media en España", "Un casament mitjà a Espanya", "An average Spanish wedding"], ["unos 112 invitados", "uns 112 convidats", "about 112 guests"]],
+    [29376, ["Dos años de alquiler", "Dos anys de lloguer", "Two years' rent"], ["piso de 80 m² a 15,3 €/m²", "pis de 80 m² a 15,3 €/m²", "80 m² flat at 15.3 €/m²"]],
+    [42390, ["La entrada de un piso de 90 m²", "L'entrada d'un pis de 90 m²", "The deposit on a 90 m² flat"], ["el 20 % de 212.000 €", "el 20 % de 212.000 €", "20% of 212,000 €"]],
+    [43557, ["Un coche nuevo", "Un cotxe nou", "A new car"], ["precio medio en concesionario", "preu mitjà al concessionari", "average dealership price"]],
+  ];
+  const LI = { es: 0, ca: 1, en: 2 }[LANG];
 
   // Mismas reglas que la cifra del resumen (assets/extracto.js): seguros (o posibles si no hay ninguno) y comisiones no devueltas
   const SUSC = ["streaming", "musica", "nube_apps", "ia", "prensa", "gimnasios", "citas", "videojuegos", "idiomas", "reparto", "suscripciones", "club_descuentos", "bienestar", "pasarelas"];
@@ -65,7 +110,7 @@
     const periodo = (r.lectura && r.lectura.periodo) || {};
     const dias = periodo.dias || 365, meses = periodo.meses || 12;
     const anualCom = (c) => (c.periodicidad === "puntual" ? (c.coste_anual || c.importe || 0) * 365 / dias : c.coste_anual || 0);
-    const junta = {}, porTipo = {}, porMes = {};
+    const junta = {}, porTipo = {}, porMes = {}, lista2 = [];
     (r.grupos || []).forEach((g) => {
       if (!(g.codigo.indexOf("sector_") === 0 || g.codigo === "recibos" || g.codigo === "comisiones")) return;
       const com = g.codigo === "comisiones";
@@ -77,12 +122,29 @@
         const it = junta[k] || (junta[k] = { n: com ? T.tipos.banco : c.nombre, id: com ? null : c.comercio_id, cat: com ? "comisiones" : c.categoria, v: 0, com });
         it.v += v;
         (c.movimientos || []).forEach((m) => { const k2 = String(m.fecha || "").slice(0, 7); if (k2.length === 7 && m.importe < 0) porMes[k2] = (porMes[k2] || 0) - m.importe; });
+        if (!com && v > 0) lista2.push({ c, v });
       });
     });
     const total = Object.values(porTipo).reduce((t, v) => t + Math.max(0, Math.round(v)), 0); // la misma cifra que el resumen
     // todos los meses del extracto, también los que no tuvieron cargos
     const lista = []; if (periodo.desde && periodo.hasta) { let [y, m] = periodo.desde.slice(0, 7).split("-").map(Number); const fin = periodo.hasta.slice(0, 7); for (let n = 0; n < 40; n++) { const k3 = y + "-" + String(m).padStart(2, "0"); lista.push([k3, porMes[k3] || 0]); if (k3 >= fin) break; m++; if (m > 12) { m = 1; y++; } } }
-    return { total, meses, porMes: lista, items: Object.values(junta).filter((x) => x.v >= 0.5).sort((a, b) => b.v - a.v) };
+    // Para el reloj: cada cobro en su día del mes (el más repetido) con lo que pesa al mes
+    const puntos = [], subidas = [];
+    lista2.forEach(({ c, v }) => {
+      const movs = (c.movimientos || []).filter((m) => m.importe < 0 && /^\d{4}-\d{2}-\d{2}/.test(m.fecha || "")).sort((a, b) => (a.fecha < b.fecha ? -1 : 1));
+      if (!movs.length) return;
+      const cuenta = {}; movs.forEach((m) => { const d = +m.fecha.slice(8, 10); cuenta[d] = (cuenta[d] || 0) + 1; });
+      const dia = +Object.keys(cuenta).sort((a, b) => cuenta[b] - cuenta[a] || a - b)[0];
+      const anual = c.periodicidad === "anual" || movs.length === 1;
+      puntos.push({ d: dia, n: c.nombre, v, imp: -movs[movs.length - 1].importe, anual });
+      // Subida: un precio fijo que da un salto y se queda (los recibos que varían cada mes, como la luz, no cuentan)
+      if (movs.length >= 3) {
+        const a = movs.map((m) => -m.importe), ini = a[0], fin = a[a.length - 1], cerca = (x, y) => Math.abs(x - y) <= Math.max(0.02, y * 0.01);
+        let k = a.findIndex((x) => !cerca(x, ini));
+        if (fin - ini >= 0.5 && k > 0 && a.slice(k).every((x) => cerca(x, fin))) subidas.push({ n: c.nombre, id: c.comercio_id, a: ini, b: fin, extra: v * (fin - ini) / fin });
+      }
+    });
+    return { total, meses, porMes: lista, puntos, subidas: subidas.sort((x, y) => y.extra - x.extra), items: Object.values(junta).filter((x) => x.v >= 0.5).sort((a, b) => b.v - a.v) };
   }
 
   // Aviso que sigue al ratón o al dedo
@@ -154,10 +216,13 @@
     tipos.forEach((t, i) => { t.k = cnt[i]; t.color = COLOR_TIPO[t.tk]; });
 
     gr.innerHTML =
-      '<div class="pg-top"><p class="pg-k">' + esc(T.pagas) + '</p><p class="pg-big">' + eur(repe.total) + "</p>" +
-      (repe.meses < 12 ? '<p class="pg-calc">' + esc(T.calc(repe.meses)) + "</p>" : "") + '<p class="pg-mes">' + esc(T.mes(eur(repe.total / 12))) + "</p></div>" +
+      '<div class="pg-vivo"><p class="pg-vivo-t"><i aria-hidden="true"></i>' + esc(T.vivo) + '</p><p class="pg-vivo-n" aria-hidden="true">0,0000 €</p><p class="pg-vivo-s">' + esc(T.desde) + '</p></div>' +
+      '<ul class="pg-esc"></ul>' +
       '<section class="pg-blq"><h3 class="pg-h">' + esc(T.cada100) + '</h3><div class="pg-wfz"><div class="pg-wf" role="img" aria-label="' + esc(T.waffle) + '"></div><ul class="pg-wl"></ul></div></section>' +
-      (repe.porMes.length > 1 ? '<section class="pg-blq"><h3 class="pg-h">' + esc(T.mesAMes) + '</h3><div class="pg-mm" role="img" aria-label="' + esc(T.mesAMes) + '"></div></section>' : "");
+      (repe.puntos.length > 1 ? '<section class="pg-blq pg-rel"><h3 class="pg-h">' + esc(T.cuando) + '</h3><p class="pg-q">' + esc(T.cuandoQ) + '</p><div class="pg-rel-in"></div></section>' : "") +
+      '<section class="pg-blq pg-sub"><h3 class="pg-h">' + esc(T.sube) + '</h3></section>' +
+      '<section class="pg-blq pg-sig"><h3 class="pg-h">' + esc(T.sigues) + '</h3><p class="pg-q">' + esc(T.siguesQ) + '</p><div class="pg-sig-in"></div></section>';
+    vivo(gr); reloj(gr.querySelector(".pg-rel-in")); subidas(gr.querySelector(".pg-sub")); sigues(gr.querySelector(".pg-sig-in"));
 
     // De cada 100 €
     const wf = gr.querySelector(".pg-wf"), wl = gr.querySelector(".pg-wl");
@@ -181,25 +246,98 @@
     wf.addEventListener("mouseleave", () => marca(null));
     filas.forEach((li) => { li.addEventListener("mousemove", (e) => marca(li.dataset.t, e)); li.addEventListener("mouseleave", () => marca(null)); li.addEventListener("touchstart", (e) => marca(li.dataset.t, e), { passive: true }); });
 
-    // Mes a mes: lo que se pagó en cosas que se repiten cada mes, con la media (se ve si un mes se disparó)
-    const mm = gr.querySelector(".pg-mm");
-    if (mm) {
-      const vals = repe.porMes.map((x) => x[1]), mx = Math.max(...vals, 1), ord = vals.slice().sort((a, b) => a - b);
-      const media = ord.length % 2 ? ord[(ord.length - 1) / 2] : (ord[ord.length / 2 - 1] + ord[ord.length / 2]) / 2; // lo habitual (mediana): un mes raro no lo mueve
-      const linea = document.createElement("div"); linea.className = "pg-mm-media"; linea.style.bottom = Math.round((media / mx) * 100) + "%";
-      linea.appendChild(Object.assign(document.createElement("span"), { textContent: T.media(eur(media)) }));
-      const cols = document.createElement("div"); cols.className = "pg-mm-cols";
-      repe.porMes.forEach(([k, v]) => {
-        const c = document.createElement("div"); c.className = "pg-mm-c"; c.tabIndex = 0;
-        const b = document.createElement("i"); b.style.height = Math.max(2, Math.round((v / mx) * 100)) + "%"; if (v > media + 0.5) b.className = "alto"; // los meses que se pasan de lo habitual, en otro color
-        const et = document.createElement("span"); et.textContent = T.meses[+k.slice(5) - 1];
-        c.append(b, et); cols.appendChild(c);
-        const t = T.mesTip(T.meses[+k.slice(5) - 1] + " " + k.slice(0, 4), eur(v));
-        c.addEventListener("mousemove", (e) => tip(e, t)); c.addEventListener("mouseleave", () => tip(null, "")); c.addEventListener("touchstart", (e) => tip(e, t), { passive: true });
-        c.addEventListener("focus", () => { const r = c.getBoundingClientRect(); tip({ clientX: r.left + r.width / 2, clientY: r.top }, t); }); c.addEventListener("blur", () => tip(null, ""));
-      });
-      mm.append(cols, linea);
-    }
+  }
+
+  // ---------- Lo que pagas en recibos, en directo ----------
+  let reloj0 = null;
+  function vivo(gr) {
+    const n = gr.querySelector(".pg-vivo-n"), es = gr.querySelector(".pg-esc"), T0 = repe.total;
+    [T0 / 365, T0 / 52, T0 / 12, T0].forEach((v, i) => {
+      const li = document.createElement("li"), b = document.createElement("b"), s = document.createElement("span");
+      b.textContent = i === 0 ? nf2.format(v) + " €" : eur(v); s.textContent = T.escala[i]; li.append(b, s); es.appendChild(li);
+    });
+    const t0 = performance.now(), porMs = T0 / (365 * 864e5);
+    if (reloj0) clearInterval(reloj0);
+    reloj0 = setInterval(() => { if (!n.isConnected) { clearInterval(reloj0); return; } n.textContent = nf4.format((performance.now() - t0) * porMs) + " €"; }, 100);
+  }
+
+  // ---------- Cuándo se te va: el mes como un reloj ----------
+  const NS = "http://www.w3.org/2000/svg";
+  const svgEl = (t, a) => { const e = document.createElementNS(NS, t); for (const k in a) e.setAttribute(k, a[k]); return e; };
+  function reloj(box) {
+    if (!box) return;
+    const P = repe.puntos, cx = 180, cy = 180, R = 128, pt = (d, r) => { const a = (d - 1) / 31 * 2 * Math.PI - Math.PI / 2; return [cx + r * Math.cos(a), cy + r * Math.sin(a)]; };
+    // la ventana de 5 días por la que sale más dinero
+    const porDia = {}; P.forEach((p) => { (porDia[p.d] = porDia[p.d] || []).push(p); });
+    const peso = (d) => (porDia[d] || []).reduce((s, p) => s + p.v, 0), tot = P.reduce((s, p) => s + p.v, 0);
+    let mejor = 1, mx = -1; for (let d = 1; d <= 27; d++) { let s = 0; for (let k = 0; k < 5; k++) s += peso(d + k); if (s > mx) { mx = s; mejor = d; } }
+    const pct = Math.round((mx / tot) * 100);
+    const svg = svgEl("svg", { viewBox: "0 0 360 360", role: "img", "aria-label": T.cuando });
+    svg.appendChild(svgEl("circle", { cx, cy, r: R, fill: "none", stroke: "#D9CBB0", "stroke-width": 2 }));
+    const p1 = pt(mejor - 0.4, R), p5 = pt(mejor + 4.6, R);
+    svg.appendChild(svgEl("path", { d: "M" + p1[0] + " " + p1[1] + " A" + R + " " + R + " 0 0 1 " + p5[0] + " " + p5[1], fill: "none", stroke: "#FFB238", "stroke-width": 14, "stroke-linecap": "round", opacity: 0.6 }));
+    for (let d = 1; d <= 31; d++) { const a = pt(d, R - 6), b = pt(d, R + 6); svg.appendChild(svgEl("line", { x1: a[0], y1: a[1], x2: b[0], y2: b[1], stroke: "#B9AC93", "stroke-width": d % 7 === 1 ? 2 : 1 })); }
+    [1, 8, 15, 22, 29].forEach((d) => { const p = pt(d, R + 26), tx = svgEl("text", { x: p[0], y: p[1] + 5, "text-anchor": "middle", fill: "#4F5667", "font-size": 14, "font-weight": 600 }); tx.textContent = d; svg.appendChild(tx); });
+    const info = document.createElement("div"); info.className = "pg-rel-info";
+    info.innerHTML = '<p class="pg-big">' + pct + ' %</p><p class="pg-k">' + esc(T.ventana(mejor, mejor + 4)) + '</p><p class="pg-rel-d"></p><ul class="pg-rel-l"></ul>';
+    const gs = {};
+    const ver = (d) => {
+      info.querySelector(".pg-rel-d").textContent = T.dia(d);
+      const ul = info.querySelector(".pg-rel-l"); ul.textContent = "";
+      porDia[d].forEach((p) => { const li = document.createElement("li"), a = document.createElement("span"), b = document.createElement("b"); a.textContent = p.n + (p.anual ? " (" + T.unaVez + ")" : ""); b.textContent = nf2.format(p.imp) + " €"; li.append(a, b); ul.appendChild(li); });
+      for (const k in gs) gs[k].classList.toggle("sel", +k === d);
+    };
+    Object.keys(porDia).forEach((k) => {
+      const d = +k, v = peso(d), r = Math.min(30, 6 + Math.sqrt(v / 12) * 2.6), p = pt(d, R - r - 8);
+      const g = svgEl("g", { class: "pg-dot", tabindex: 0, role: "button", "aria-label": T.dia(d) + ": " + eur(v / 12) + " " + T.alMes });
+      g.appendChild(svgEl("circle", { cx: p[0], cy: p[1], r, fill: "#0E5E6F" }));
+      g.addEventListener("click", () => ver(d)); g.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); ver(d); } });
+      gs[d] = g; svg.appendChild(g);
+    });
+    const c1 = svgEl("text", { x: cx, y: cy - 2, "text-anchor": "middle", fill: "#14213D", "font-size": 32, "font-weight": 800, class: "pg-rel-c" }); c1.textContent = eur(repe.total / 12); // la misma cifra que «al mes» de arriba svg.appendChild(c1);
+    const c2 = svgEl("text", { x: cx, y: cy + 22, "text-anchor": "middle", fill: "#4F5667", "font-size": 14 }); c2.textContent = T.alMes; svg.appendChild(c2);
+    box.append(svg, info);
+    const primero = Object.keys(porDia).map(Number).filter((d) => d >= mejor && d <= mejor + 4).sort((a, b) => peso(b) - peso(a))[0];
+    ver(primero || +Object.keys(porDia)[0]);
+  }
+
+  // ---------- Quién te ha subido el precio ----------
+  function subidas(sec) {
+    const S = repe.subidas;
+    if (!S.length) { const p = document.createElement("p"); p.className = "pg-q"; p.textContent = T.nadieSube; sec.appendChild(p); return; }
+    const q = document.createElement("p"); q.className = "pg-q"; q.textContent = T.subeQ; sec.appendChild(q);
+    const tot = S.reduce((s, x) => s + x.extra, 0), mxE = S[0].extra;
+    const top = document.createElement("div"); top.className = "pg-sub-tot";
+    top.innerHTML = '<span class="pg-big">+' + esc(eur(tot)) + '</span><span class="pg-k">' + esc(T.subeTot) + "</span>"; sec.appendChild(top);
+    const ul = document.createElement("ul"); ul.className = "pg-sub-l";
+    S.slice(0, 6).forEach((s, i) => {
+      const li = document.createElement("li");
+      const n = document.createElement("span"); n.className = "pg-sub-n"; n.textContent = s.n;
+      const sm = document.createElement("small"); sm.textContent = nf2.format(s.a) + " € → " + nf2.format(s.b) + " €"; n.appendChild(sm);
+      const bar = document.createElement("span"); bar.className = "pg-sub-b"; const m = document.createElement("i"); m.style.width = Math.max(4, (s.extra / mxE) * 100) + "%"; m.style.animationDelay = (0.2 + i * 0.12) + "s"; bar.appendChild(m);
+      const d = document.createElement("span"); d.className = "pg-sub-d"; d.textContent = "+" + eur(s.extra); const al = document.createElement("small"); al.textContent = T.alAnoP; d.appendChild(al);
+      li.append(n, bar, d); ul.appendChild(li);
+    });
+    sec.appendChild(ul);
+  }
+
+  // ---------- Si sigues así: el total sube con el IPC; cada año, una cosa distinta ----------
+  function sigues(box) {
+    const T0 = repe.total, hoy = [0], con = [0];
+    for (let y = 1; y <= 10; y++) { hoy[y] = T0 * y; con[y] = con[y - 1] + T0 * Math.pow(1 + IPC, y); }
+    const usadas = {}, anio = [];
+    for (let y = 1; y <= 10; y++) { let m = null; COSAS.forEach((c, i) => { if (c[0] <= hoy[y] && !usadas[i]) m = i; }); if (m !== null) usadas[m] = 1; anio[y] = m; }
+    box.innerHTML = '<div class="pg-sig-a"><div class="pg-sig-c"><span class="pg-big"></span><span class="pg-k"></span></div><p class="pg-sig-eq"></p></div>' +
+      '<div class="pg-sig-b"><div class="pg-sig-cols" aria-hidden="true"></div><div class="pg-sig-ej" aria-hidden="true"></div><label class="pg-k" for="pgAnos">' + esc(T.anos) + '</label><input type="range" id="pgAnos" min="1" max="10" value="1"><p class="pg-sig-ipc">' + esc(T.ipc) + "</p></div>";
+    const cols = box.querySelector(".pg-sig-cols"), ej = box.querySelector(".pg-sig-ej"), rg = box.querySelector("input");
+    for (let y = 1; y <= 10; y++) { const c = document.createElement("i"); c.style.height = (con[y] / con[10]) * 100 + "%"; cols.appendChild(c); const s = document.createElement("span"); s.textContent = y; ej.appendChild(s); }
+    const pon = () => {
+      const n = +rg.value; box.querySelector(".pg-sig-c .pg-big").textContent = eur(con[n]); box.querySelector(".pg-sig-c .pg-k").textContent = T.enAnos(n);
+      [...cols.children].forEach((c, i) => { c.className = i < n - 1 ? "on" : i === n - 1 ? "yo" : ""; });
+      const q = box.querySelector(".pg-sig-eq"), k = anio[n]; q.textContent = "";
+      if (k != null) { q.textContent = COSAS[k][1][LI]; const sm = document.createElement("small"); sm.textContent = COSAS[k][2][LI]; q.appendChild(sm); }
+    };
+    rg.addEventListener("input", pon); pon();
   }
 
   function montarPestanas() {
