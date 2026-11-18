@@ -186,7 +186,7 @@
     barraCarga.parar();
     if (error || !r) { show("up"); msg($("xErr"), (error && error.message) || TX.bad); return; }
     if (bandeja) bandeja.marcar(r.errores);
-    const cobros = (r.cobros || []).filter((c) => c.estado === "seguro" || c.estado === "posible");
+    let cobros = (r.cobros || []).filter((c) => c.estado === "seguro" || c.estado === "posible");
     if (!cobros.length && !(r.terminados || []).length && !(r.devoluciones || []).length) {
       // sin ningún movimiento leído: ¿es el resumen del datáfono? Entonces se dice y se enlaza «Mi datáfono»
       if (!((r.lectura && r.lectura.movimientos) || []).length && await esResumenDatafono(entrada)) { show("up"); aMiDatafono($("xErr")); return; }
@@ -196,9 +196,12 @@
       return;
     }
     actual = r;
-    setTimeout(() => document.dispatchEvent(new CustomEvent("fh-resultado", { detail: r })), 0); // pestañas y gráficas (assets/extracto/graficas.js), después de pintar el resumen
     await envioP;
     await barraCarga.fin();
+    // Lo grande que se repite y no reconocemos (el alquiler, por ejemplo): se pregunta antes del resumen, como mucho 3
+    await preguntarDesconocidos(r, !(entrada && entrada.deEjemplo)).catch((e) => console.error("Feehund: preguntas", e));
+    cobros = (r.cobros || []).filter((c) => c.estado === "seguro" || c.estado === "posible");
+    setTimeout(() => document.dispatchEvent(new CustomEvent("fh-resultado", { detail: r })), 0); // pestañas y gráficas (assets/extracto/graficas.js), después de pintar el resumen
     render(r, cobros); show("res");
     const bShare = $("xShare"); if (bShare) bShare.hidden = !personalidad();
     propio = !(entrada && entrada.deEjemplo);
@@ -338,6 +341,7 @@
       escVarios: (x, m) => x + " se te escaparon " + (m >= 12 ? "este año" : m <= 1 ? "este mes" : "en estos " + m + " meses"), escNada: "No se te escapa nada",
       suscr: (n, x, r) => n ? "Tienes " + n + (n === 1 ? " suscripción que te cuesta " : " suscripciones que te cuestan ") + x + " al año" + (r ? ", y " + r + (r === 1 ? " recibo más." : " recibos más.") : ".")
         : "Tienes " + r + (r === 1 ? " recibo que se repite" : " recibos que se repiten") + " y ninguna suscripción.",
+      dq: { titulo: "1 minuto y queda perfecto", que: "¿Qué es esto?", de: (i, n) => i + " de " + n, veces: (x, n, p) => x + " · " + n + " veces" + (p ? ", " + p : ""), mes: "cada mes", dosMeses: "cada 2 meses", ops: { vivienda: "Alquiler o hipoteca", casa: "Luz, agua o internet", susc: "Suscripción", seg: "Seguro", otros: "Otra cosa" }, nose: "No lo sé", grupo: "Lo que me has dicho" },
       nada: "No hemos visto cobros que se repitan.", tipos: { casa: "Casa", susc: "Suscripciones", seg: "Seguros", banco: "Comisiones del banco", otros: "Otros pagos" }, otros: "Otros", recibos: "Recibos que varían", devolvieron: (x) => "Te devolvieron " + x, devoluciones: (n) => (n === 1 ? "1 devolución" : n + " devoluciones"),
       verMas: (n) => "Ver " + n + " más", verMenos: "Ver menos", verDetalle: "Ver todo el detalle", ocultarDetalle: "Ocultar el detalle",
       revisar: "Revisar", anadir: "Añadir", ver: "Ver", darme: "Darme de baja", darBaja: "Dar de baja",
@@ -354,6 +358,7 @@
       escVarios: (x, m) => x + " se t'han escapat " + (m >= 12 ? "aquest any" : m <= 1 ? "aquest mes" : "en aquests " + m + " mesos"), escNada: "No se t'escapa res",
       suscr: (n, x, r) => n ? "Tens " + n + (n === 1 ? " subscripció que et costa " : " subscripcions que et costen ") + x + " l'any" + (r ? ", i " + r + (r === 1 ? " rebut més." : " rebuts més.") : ".")
         : "Tens " + r + (r === 1 ? " rebut que es repeteix" : " rebuts que es repeteixen") + " i cap subscripció.",
+      dq: { titulo: "1 minut i queda perfecte", que: "Què és això?", de: (i, n) => i + " de " + n, veces: (x, n, p) => x + " · " + n + " vegades" + (p ? ", " + p : ""), mes: "cada mes", dosMeses: "cada 2 mesos", ops: { vivienda: "Lloguer o hipoteca", casa: "Llum, aigua o internet", susc: "Subscripció", seg: "Assegurança", otros: "Una altra cosa" }, nose: "No ho sé", grupo: "El que m'has dit" },
       nada: "No hem vist cobraments que es repeteixin.", tipos: { casa: "Casa", susc: "Subscripcions", seg: "Assegurances", banco: "Comissions del banc", otros: "Altres pagaments" }, otros: "Altres", recibos: "Rebuts que varien", devolvieron: (x) => "T'han retornat " + x, devoluciones: (n) => (n === 1 ? "1 devolució" : n + " devolucions"),
       verMas: (n) => "Veure'n " + n + " més", verMenos: "Veure'n menys", verDetalle: "Veure tot el detall", ocultarDetalle: "Amagar el detall",
       revisar: "Revisar", anadir: "Afegir", ver: "Veure", darme: "Donar-me de baixa", darBaja: "Donar de baixa",
@@ -370,6 +375,7 @@
       escVarios: (x, m) => x + " slipped away " + (m >= 12 ? "this year" : m <= 1 ? "this month" : "in these " + m + " months"), escNada: "Nothing is slipping away",
       suscr: (n, x, r) => n ? "You have " + n + (n === 1 ? " subscription costing " : " subscriptions costing ") + x + " a year" + (r ? ", and " + r + (r === 1 ? " more bill." : " more bills.") : ".")
         : "You have " + r + (r === 1 ? " bill that repeats" : " bills that repeat") + " and no subscriptions.",
+      dq: { titulo: "1 minute and it's perfect", que: "What is this?", de: (i, n) => i + " of " + n, veces: (x, n, p) => x + " · " + n + " times" + (p ? ", " + p : ""), mes: "every month", dosMeses: "every 2 months", ops: { vivienda: "Rent or mortgage", casa: "Power, water or internet", susc: "Subscription", seg: "Insurance", otros: "Something else" }, nose: "I don't know", grupo: "What you told me" },
       nada: "We have not seen any repeating charges.", tipos: { casa: "Home", susc: "Subscriptions", seg: "Insurance", banco: "Bank fees", otros: "Other payments" }, otros: "Other", recibos: "Bills that vary", devolvieron: (x) => "You got " + x + " back", devoluciones: (n) => (n === 1 ? "1 refund" : n + " refunds"),
       verMas: (n) => "See " + n + " more", verMenos: "See less", verDetalle: "See all the detail", ocultarDetalle: "Hide the detail",
       revisar: "Check", anadir: "Add", ver: "See", darme: "Cancel it for me", darBaja: "Cancel",
@@ -418,7 +424,7 @@
     const cuenta = (c) => c && (c.estado === "seguro" || (c.estado === "posible" && (!haySeguros || (esSusc(c) && (c.num_cargos || 0) >= 2))));
     const anualComision = (c) => (c.periodicidad === "puntual" ? (c.coste_anual || c.importe || 0) * 365 / dias : c.coste_anual || 0);
     // Por tipo de pago, como en «Gráficas»: casa, suscripciones, seguros, comisiones del banco y otros (siempre al final)
-    const CASA = ["telecos", "energia", "agua", "alarmas", "hogar", "gastos_fijos"];
+    const CASA = ["telecos", "energia", "agua", "alarmas", "hogar", "gastos_fijos", "vivienda"];
     const tipoDe = (c) => (c.categoria === "comisiones" || c.categoria === "tarjetas" ? "banco" : esSusc(c) ? "susc" : CASA.indexOf(c.categoria) >= 0 ? "casa" : c.categoria === "seguros" ? "seg" : "otros");
     const porTipo = {};
     for (const g of r.grupos || []) {
@@ -723,6 +729,105 @@
   //   recibo alto: un cargo más de un 20 % por encima de la media de los demás cargos de ese recibo
   //   doble: la del motor (mismo importe en 0 a 3 días)
   const RECIBO_ALTO = 0.2;
+
+  // ---------- Lo que se repite y no reconocemos: 3 preguntas antes del resumen ----------
+  // Pagos del mismo sitio, parecidos, en 2 meses o más, que no están en ningún cobro. Lo que contestas cuenta como un cobro más.
+  const TUYOS = "fh-tuyos"; // { clave: opción } en este móvil
+  const CAT_DE = { vivienda: "vivienda", casa: "gastos_fijos", susc: "suscripciones", seg: "seguros", otros: "otros" };
+  const leerTuyos = () => { try { return JSON.parse(localStorage.getItem(TUYOS) || "{}") || {}; } catch (e) { return {}; } };
+  function claveDe(concepto) {
+    let t = String(concepto || "").toUpperCase();
+    t = t.replace(/N[ºO°]\s*RECIBO[\s\S]*$/, "").replace(/,?\s*CON LA TARJETA[\s\S]*$/, "").replace(/CONCEPTO:[\s\S]*$/, "").replace(/REF\.[\s\S]*$/, "");
+    for (let i = 0; i < 3; i++) t = t.replace(/^(RECIBO|ADEUDO|CARGO|PAGO CON TARJETA|PAGO|COMPRA CON TARJETA|COMPRA EN|COMPRA|CON TARJETA|TARJETA|TRANSFERENCIA A FAVOR DE|TRANSFERENCIA|TRANSF\.?)\s+/, "");
+    return t.replace(/[^A-ZÁÉÍÓÚÑÜÇ.\s]/g, " ").split(/\s+/).filter((w) => w.length > 1).slice(0, 3).join(" ").trim();
+  }
+  // Marcas que todo el mundo conoce: se colocan solas, no se preguntan
+  const CONOCIDAS = [
+    [/NETFLIX|SPOTIFY|HBO|DISNEY|PRIME VIDEO|AMAZON PRIME|YOUTUBE|DAZN|FILMIN|ATRESPLAYER|APPLE\.COM|ICLOUD|AUDIBLE|KINDLE|CHATGPT|OPENAI|CLAUDE|ANTHROPIC|CANVA|ADOBE|DROPBOX|GOOGLE ONE|DEEZER|TIDAL|PLAYSTATION|XBOX|NINTENDO|DUOLINGO|TINDER|BUMBLE|GYM|FITNESS|BASIC.?FIT|DREAMFIT|ALTAFIT/, "susc"],
+    [/VODAFONE|MOVISTAR|TELEFONICA|ORANGE|YOIGO|DIGI|MASMOVIL|LOWI|PEPEPHONE|JAZZTEL|SIMYO|O2 |FINETWORK|ENDESA|IBERDROLA|NATURGY|HOLALUZ|OCTOPUS|REPSOL|TOTALENERGIES|AIGUES|AGUAS|CANAL DE ISABEL|AQUALIA|EMASESA|SECURITAS|PROSEGUR/, "casa"],
+    [/MAPFRE|MUTUA|AXA|ALLIANZ|SANITAS|ADESLAS|DKV|ASISA|GENERALI|LINEA DIRECTA|LÍNEA DIRECTA|REALE|CASER|ZURICH|OCASO|SANTALUCIA|SANTA LUCIA|VERTI|PELAYO/, "seg"],
+  ];
+  const conocida = (k) => { const e = CONOCIDAS.find(([re]) => re.test(k)); return e ? e[1] : null; };
+  const bonito = (k) => k.toLowerCase().replace(/(^|\s)(\S)/g, (a, b, c) => b + c.toUpperCase());
+  function desconocidos(r) {
+    const per = (r.lectura && r.lectura.periodo) || {}, dias = per.dias || 365;
+    const enCobro = new Set(); (r.cobros || []).forEach((c) => (c.movimientos || []).forEach((m) => enCobro.add(m.id)));
+    const FUERA = /BIZUM|LIQUIDACI|RECOBRO|TRASPASO|IMPUESTO|HACIENDA|A\.E\.A\.T|TRIBUT|CAJERO|REINTEGRO|DEVOLUCI|NOMINA|NÓMINA/i;
+    const porClave = {};
+    ((r.lectura && r.lectura.movimientos) || []).forEach((m) => {
+      if (!(m.importe < 0) || enCobro.has(m.id) || FUERA.test(m.concepto || "")) return;
+      const k = claveDe(m.concepto); if (k.length < 3) return;
+      (porClave[k] = porClave[k] || []).push(m);
+    });
+    const out = [];
+    for (const k of Object.keys(porClave)) {
+      const l = porClave[k], imps = l.map((m) => -m.importe), min = Math.min(...imps), max = Math.max(...imps);
+      const meses = new Set(l.map((m) => String(m.fecha).slice(0, 7))).size;
+      if (l.length < 2 || meses < 2 || max > min * 1.35) continue;
+      const total = imps.reduce((a, b) => a + b, 0), fechas = l.map((m) => m.fecha).sort();
+      const gaps = fechas.slice(1).map((f, i) => (new Date(f) - new Date(fechas[i])) / 864e5).sort((a, b) => a - b);
+      const gap = gaps[Math.floor(gaps.length / 2)] || 30, alAnio = gap <= 40 ? 12 : gap <= 75 ? 6 : gap <= 110 ? 4 : 1;
+      // Que se repita de verdad: con 2 pagos, casi iguales y a 1 o 2 meses; con 3 o más, a un ritmo regular (no un bar al que vas a menudo)
+      const regular = gap >= 25 && gap <= 70 || gap >= 80 && gap <= 100 || gap >= 330 && gap <= 400;
+      if (!regular || (l.length === 2 && max > min * 1.03) || gaps[0] < 20) continue;
+      const media = total / l.length;
+      out.push({ k, nombre: bonito(k), l, media, alAnio, anual: Math.max(media * alAnio, total * 365 / dias), primero: fechas[0], ultimo: fechas[fechas.length - 1] });
+    }
+    return out.filter((x) => x.anual >= 150).sort((a, b) => b.anual - a.anual).slice(0, 3);
+  }
+  function anadirTuyos(r, lista) {
+    if (!lista.length) return;
+    const ids = [];
+    lista.forEach((x) => {
+      const id = "tuyo-" + x.k.replace(/[^a-z0-9]+/gi, "-").toLowerCase();
+      if ((r.cobros || []).some((c) => c.id === id)) return;
+      const imps = x.l.map((m) => -m.importe);
+      r.cobros = (r.cobros || []).concat([{ id, nombre: x.nombre, nombre_codigo: null, categoria: CAT_DE[x.op] || "otros", comercio_id: null, tipo: "comercio", pasarela: null,
+        periodicidad: x.alAnio === 12 ? "mensual" : x.alAnio === 6 ? "bimestral" : x.alAnio === 4 ? "trimestral" : "anual", importe: Math.round(x.media * 100) / 100,
+        importe_tipo: Math.max(...imps) - Math.min(...imps) < 0.01 ? "fijo" : "variable", coste_anual: Math.round(x.media * x.alAnio * 100) / 100, estado: "seguro", etiquetas: ["tuyo"],
+        subida_mensual: null, subida: null, bajada_mensual: null, bajada: null, importe_min: Math.min(...imps), importe_max: Math.max(...imps), pagado: Math.round(imps.reduce((a, b) => a + b, 0) * 100) / 100,
+        meses_sin_cargo: 0, baja: null, ayuda: null, calculo: null, motivos: [], primer_cargo: x.primero, ultimo_cargo: x.ultimo, proximo_cargo: null, num_cargos: x.l.length, movimientos: x.l, grupo: "sector_tuyos" }]);
+      ids.push(id);
+    });
+    if (!ids.length) return;
+    const g = (r.grupos || []).find((y) => y.codigo === "sector_tuyos");
+    if (g) g.ids = g.ids.concat(ids); else r.grupos = (r.grupos || []).concat([{ codigo: "sector_tuyos", titulo: T3.dq.grupo, ids, total: 0 }]);
+  }
+  function preguntarDesconocidos(r, guardar) {
+    const T = T3 && T3.dq; if (!T) return Promise.resolve();
+    const lista = desconocidos(r), mios = leerTuyos();
+    lista.forEach((x) => { if (!mios[x.k] && conocida(x.k)) x.auto = conocida(x.k); });
+    const yaSe = lista.filter((x) => x.auto || (mios[x.k] && mios[x.k] !== "nose")).map((x) => Object.assign(x, { op: x.auto || mios[x.k] }));
+    const faltan = lista.filter((x) => !x.auto && !mios[x.k]);
+    if (!faltan.length) { anadirTuyos(r, yaSe); return Promise.resolve(); }
+    return new Promise((fin) => {
+      const ov = el("div", "dq"); ov.setAttribute("role", "dialog"); ov.setAttribute("aria-modal", "true");
+      const c = el("div", "dq-c"); ov.appendChild(c); document.body.appendChild(ov); document.body.classList.add("dq-abierta");
+      const contestadas = [];
+      const paso = (i) => {
+        if (i >= faltan.length) {
+          if (guardar) { const m = leerTuyos(); contestadas.forEach((x) => { m[x.k] = x.op; }); try { localStorage.setItem(TUYOS, JSON.stringify(m)); } catch (e) {} }
+          anadirTuyos(r, yaSe.concat(contestadas.filter((x) => x.op !== "nose")));
+          ov.remove(); document.body.classList.remove("dq-abierta"); fin(); return;
+        }
+        const x = faltan[i]; c.textContent = "";
+        const top = el("div", "dq-top"); const img = el("img", "dq-tiqui"); img.src = ROOT + "assets/img/tiqui-olfatea.webp"; img.alt = ""; img.width = 56; img.height = 56;
+        top.appendChild(img); top.appendChild(el("p", "dq-t", T.titulo)); c.appendChild(top);
+        const barra = el("div", "dq-bar"); const lleno = el("i"); lleno.style.width = Math.round((i / faltan.length) * 100) + "%"; barra.appendChild(lleno); c.appendChild(barra);
+        setTimeout(() => { lleno.style.width = Math.round(((i + 0.5) / faltan.length) * 100) + "%"; }, 30);
+        c.appendChild(el("p", "dq-n", T.de(i + 1, faltan.length)));
+        c.appendChild(el("p", "dq-q", T.que));
+        c.appendChild(el("p", "dq-nom", x.nombre));
+        c.appendChild(el("p", "dq-imp", T.veces(eur(x.media), x.l.length, x.alAnio === 12 ? T.mes : x.alAnio === 6 ? T.dosMeses : "")));
+        const ops = el("div", "dq-ops");
+        Object.keys(T.ops).forEach((k) => { const b = el("button", "dq-op", T.ops[k]); b.type = "button"; b.addEventListener("click", () => { x.op = k; contestadas.push(x); paso(i + 1); }); ops.appendChild(b); });
+        c.appendChild(ops);
+        const no = el("button", "dq-nose", T.nose); no.type = "button"; no.addEventListener("click", () => { x.op = "nose"; contestadas.push(x); paso(i + 1); }); c.appendChild(no);
+        const b0 = ops.querySelector("button"); if (b0) b0.focus({ preventScroll: true });
+      };
+      paso(0);
+    });
+  }
   const ICONOS = {
     doble: "M3 9h13v10H3zM8 5h13v10",
     subida: "M4 17l6-6 4 4 6-7M14 8h6v6",

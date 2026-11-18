@@ -45,7 +45,7 @@
   // Mismas reglas que la cifra del resumen (assets/extracto.js): seguros (o posibles si no hay ninguno) y comisiones no devueltas
   const SUSC = ["streaming", "musica", "nube_apps", "ia", "prensa", "gimnasios", "citas", "videojuegos", "idiomas", "reparto", "suscripciones", "club_descuentos", "bienestar", "pasarelas"];
   const TIPOS = [
-    { k: "casa", cats: ["telecos", "energia", "agua", "alarmas", "hogar", "gastos_fijos"] },
+    { k: "casa", cats: ["telecos", "energia", "agua", "alarmas", "hogar", "gastos_fijos", "vivienda"] },
     { k: "susc", cats: SUSC },
     { k: "seg", cats: ["seguros"] },
     { k: "banco", cats: ["comisiones", "tarjetas"] },

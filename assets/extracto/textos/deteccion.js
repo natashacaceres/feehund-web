@@ -32,6 +32,7 @@ export default {
   categoria_tpv: t('Datáfono y cobros', 'Datàfon i cobraments', 'Card terminals'),
   categoria_cuotas: t('Cuotas y donativos', 'Quotes i donatius', 'Memberships and donations'),
   categoria_hogar: t('Mantenimiento de casa', 'Manteniment de casa', 'Home maintenance'),
+  categoria_vivienda: t('Alquiler o hipoteca', 'Lloguer o hipoteca', 'Rent or mortgage'),
   categoria_impuestos: t('Impuestos y tasas', 'Impostos i taxes', 'Taxes and fees'),
   categoria_tarjetas: t('Tarjetas y créditos', 'Targetes i crèdits', 'Cards and loans'),
   categoria_otros: t('Otros', 'Altres', 'Other'),

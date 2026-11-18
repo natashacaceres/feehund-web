@@ -1,0 +1,62 @@
+/* Mi banco: «Pregúntale a Tiqui» (assets/extracto/tiqui.js). El azul oscuro es solo de Tiqui. */
+.tqc{margin:var(--s-6) 0}
+.tqc-chat{background:#14213D;color:#FFF8EC;border-radius:20px;padding:var(--s-5) var(--s-4);display:grid;gap:var(--s-3)}
+.tqc-h{margin:0;font:800 26px/1.15 var(--f-head);color:#FFF8EC}
+.tqc-sub{margin:4px 0 0;font:400 16px/1.3 var(--f-text);color:rgba(255,248,236,.8)}
+.tqc-msgs{display:grid;gap:10px;max-height:min(60vh,520px);overflow-y:auto;padding:4px 0}
+.tqc-msgs:empty{display:none}
+.tqc-m{max-width:88%;padding:12px 14px;border-radius:16px;font:400 16px/1.45 var(--f-text)}
+.tqc-m b{font-weight:700;white-space:nowrap}
+.tqc-m--tu{justify-self:end;background:var(--amber);color:#14213D;border-bottom-right-radius:4px}
+.tqc-m--ia{position:relative;justify-self:start;margin-left:48px;max-width:calc(88% - 48px);background:#FFF8EC;color:#14213D;border-bottom-left-radius:4px}
+.tqc-m--ia::before{content:"";position:absolute;left:-48px;bottom:0;width:38px;height:38px;border-radius:50%;background:#FFF8EC url("../img/tiqui-olfatea.webp") center/cover}
+.tqc-m--planes{max-width:calc(100% - 48px);display:grid;gap:12px}
+.tqc-ver{display:block;margin-top:8px;padding:0;border:0;background:none;color:var(--brand);font:700 15px/1.3 var(--f-text);text-decoration:underline;cursor:pointer}
+.tqc-movs{list-style:none;margin:6px 0 0;padding:0;display:grid}
+.tqc-movs[hidden]{display:none}
+.tqc-movs li{display:grid;grid-template-columns:52px minmax(0,1fr) auto;gap:8px;padding:6px 0;border-top:1px solid #E9DFCC;font:400 14px/1.3 var(--f-text)}
+.tqc-mf{color:#4F5667}.tqc-mn{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.tqc-mi{font-weight:700}
+.tqc-sug{display:flex;flex-direction:column;align-items:flex-end;gap:6px}
+.tqc-sug[hidden]{display:none}
+.tqc-sug button{min-height:38px;padding:0 14px;border:1.5px solid var(--amber);border-radius:999px;background:transparent;color:var(--amber);font:400 15px/1.2 var(--f-text);text-align:right;cursor:pointer}
+.tqc-in{display:flex;gap:8px}
+.tqc-in input{flex:1;min-width:0;min-height:48px;padding:0 16px;border:0;border-radius:999px;background:#FFF8EC;color:#14213D;font:400 16px/1 var(--f-text)}
+.tqc-in button{flex:none;width:48px;height:48px;border:0;border-radius:50%;background:var(--amber);color:#14213D;font:700 20px/1 var(--f-text);cursor:pointer}
+.tqc-dots{display:inline-flex;gap:4px}
+.tqc-dots i{width:7px;height:7px;border-radius:50%;background:#4F5667;animation:tqcDot 1s infinite}
+.tqc-dots i:nth-child(2){animation-delay:.15s}.tqc-dots i:nth-child(3){animation-delay:.3s}
+@keyframes tqcDot{50%{opacity:.25}}
+.tqc-planes{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.tqc-plan{display:grid;gap:6px;align-content:start;justify-items:start;padding:16px 14px;border:2px solid var(--line);border-radius:16px;background:#FFF8EC;color:#14213D;text-align:left;cursor:pointer}
+.tqc-plan--top{background:#FFF1D6}
+.tqc-plan[aria-checked="true"],.tqc-plan:hover{border-color:#14213D}
+.tqc-plan[aria-checked="true"]{box-shadow:0 0 0 1px #14213D}
+.tqc-plan-p{font:800 28px/1 var(--f-head)}
+.tqc-plan-d{font:700 16px/1.2 var(--f-text)}
+.tqc-plan-m{font:400 15px/1.3 var(--f-text);color:#4F5667}
+.tqc-pago{position:fixed;inset:0;z-index:2147483000;background:rgba(20,33,61,.5);display:flex;align-items:flex-end;justify-content:center}
+.tqc-pago-c{width:100%;max-width:520px;background:var(--bg);border-radius:20px 20px 0 0;padding:var(--s-5) var(--s-4) calc(var(--s-5) + env(safe-area-inset-bottom,0px));display:grid;gap:var(--s-3)}
+.tqc-pago-t{margin:0;font:800 30px/1.1 var(--f-head);color:var(--ink)}
+.tqc-cta{min-height:52px;border:0;border-radius:999px;background:var(--amber);color:#14213D;font:700 17px/1 var(--f-text);cursor:pointer}
+.tqc-pronto{margin:0;text-align:center;font:700 16px/1.3 var(--f-text);color:var(--brand)}
+.tqc-pronto[hidden]{display:none}
+.tqc-unpago{margin:0;text-align:center;font:400 15px/1.3 var(--f-text);color:var(--ink-2)}
+.tqc-no{min-height:44px;border:0;background:none;color:var(--ink-2);font:700 15px/1 var(--f-text);cursor:pointer}
+@media (min-width:760px){.tqc-pago{align-items:center;padding:var(--s-5)}.tqc-pago-c{border-radius:24px;padding:var(--s-6)}}
+
+/* Cabecera: «Tu Tiqui» (en el móvil, solo su cara) */
+.hdr-tiqui{position:relative;display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:0 12px 0 4px;border-radius:999px;background:#F3E6CC;font:700 16px/1 var(--f-text);color:var(--ink);text-decoration:none;white-space:nowrap}
+.hdr-tiqui img{width:32px;height:32px;border-radius:50%;object-fit:cover;background:var(--bg)}
+@media (max-width:480px){.hdr .brand img{width:132px;height:auto}.hdr-tiqui{width:44px;padding:0;justify-content:center;font-size:0;gap:0}.hdr-tiqui img{width:36px;height:36px}}
+
+/* Ordenador ancho: el resultado a la izquierda y Tiqui fijo a la derecha */
+@media (min-width:1100px){
+  body:has(#tqcIa) .ext-in{max-width:calc(1180px + var(--side) * 2)}
+  #xRes:has(#tqcIa){display:grid;grid-template-columns:minmax(0,1fr) 420px;column-gap:56px;align-items:start}
+  #xRes:has(#tqcIa)>*{grid-column:1}
+  #xRes>#tqcIa{grid-column:2;grid-row:1 / span 40;position:sticky;top:calc(var(--hdr) + 16px);margin:0}
+  #xRes>#tqcIa .tqc-chat{max-height:calc(100vh - var(--hdr) - 32px);display:flex;flex-direction:column}
+  #xRes>#tqcIa .tqc-msgs{flex:0 1 auto;min-height:0;max-height:none}
+  #xRes>#tqcIa .tqc-chat>*:not(.tqc-msgs){flex:none}
+}
+@media (prefers-reduced-motion:reduce){.tqc-dots i{animation:none}}
