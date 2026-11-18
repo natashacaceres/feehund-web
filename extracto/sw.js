@@ -24,8 +24,12 @@ const SIMD = [0, 97, 115, 109, 1, 0, 0, 0, 1, 5, 1, 96, 0, 1, 123, 3, 2, 1, 0, 1
 const SIMD_RELAJADO = [0, 97, 115, 109, 1, 0, 0, 0, 1, 5, 1, 96, 0, 1, 123, 3, 2, 1, 0, 10, 15, 1, 13, 0, 65, 1, 253, 15, 65, 2, 253, 15, 253, 128, 2, 11];
 
 let deScript = null;
+// LISTA = la versión de recursos.js (la escribe el mismo paso que genera recursos.js). Va en la dirección del import
+// para que el navegador no use una copia vieja guardada en su caché (Cloudflare la manda con 4 horas de caché)
+// y para que este archivo cambie en cuanto cambia la lista: así el navegador instala la versión nueva al momento.
+const LISTA = 'af530592e813';
 try {
-  importScripts(RECURSOS_JS);
+  importScripts(RECURSOS_JS + '?l=' + LISTA);
   deScript = self.RECURSOS_EXTRACTO || null;
 } catch { /* no existe o no es un script clásico: al instalar se prueba recursos.json */ }
 
