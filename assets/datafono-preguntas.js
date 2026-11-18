@@ -41,7 +41,9 @@
     caja.appendChild(c); document.body.appendChild(caja);
     return c;
   }
+  let antes = 0; // 1 cuando se viene de «Escríbelo a mano»: ese fue el paso 1
   function paso(n, total, pregunta) {
+    n += antes; total += antes;
     const c = caja.querySelector(".dp-c");
     c.querySelector(".dp-bar i").style.width = Math.round(n / total * 100) + "%";
     c.querySelector(".dp-n").textContent = TX.de(n, total);
@@ -58,9 +60,22 @@
   const deChips = (sel) => [...document.querySelectorAll(sel + " .chip")].map((b) => [b.textContent.trim(), b.dataset.v, b.innerHTML]);
 
   // ---------- las 3 preguntas
-  async function empezar() {
+  async function empezar(ejemplo) {
     const up = $("dUp"); if (up) up.hidden = true;
     const rev = $("dRev"); if (rev) rev.hidden = true;
+    // el ejemplo es una cafetería sin permanencia: sin preguntas, directo al resultado
+    if (ejemplo) {
+      const ch = pulsado("#pProvChips");
+      if (!ch || (ch.dataset.v === "OTRO" && !$("pProv").value)) pulsar("#pProvChips", "CONTRATO");
+      if (!$("pPlanChips").hidden && !pulsado("#pPlanChips")) { const b = document.querySelector("#pPlanChips .chip"); if (b) b.click(); }
+      pulsar("#pSectorChips", "Bar o restaurante"); pulsar(grupo("pPermS"), "No");
+      await porDefecto();
+      const ok = await conducir();
+      const l = $("dLoad"); if (l) l.hidden = true; // «Leyendo…» se queda hasta que el resultado está listo
+      const d = $("dCalc"); if (d) d.hidden = false;
+      if (!ok) calculadora(); else scrollTo(0, 0);
+      return;
+    }
     ventana();
     const preguntas = [];
     // con quién cobras: solo si el resumen no lo ha dicho ya (o falta elegir el plan)
@@ -163,7 +178,9 @@
     if (!sec) {
       sec = el("section", "ext-s dl-rev dp-mano"); sec.id = "dMano";
       const h = el("h2", null, TX.mano); h.tabIndex = -1;
-      sec.append(h, el("p", "dl-per", TX.manoQ));
+      // la misma barrita que las preguntas que vienen después: esto es el paso 1 de 4
+      const barra = el("div", "dp-bar dp-mano-bar"), relleno = el("i"); relleno.style.width = "25%"; barra.appendChild(relleno);
+      sec.append(barra, el("p", "dp-n dp-mano-n", TX.de(1, 4)), h, el("p", "dl-per", TX.manoQ));
       const f = el("form", "dl-form"); f.noValidate = true;
       const campos = el("div", "dl-campos");
       [["dmV", TX.vendido, "€"], ["dmN", TX.cobros, ""], ["dmP", TX.pagado, "€"]].forEach(([id, lab, u]) => {
@@ -187,7 +204,7 @@
         escribe("pPart", fmt(v, 2)); ["pEmp", "pNoe", "pAmex", "pBiz"].forEach((id) => escribe(id, ""));
         escribe("pOps", String(Math.round(n)));
         if (p > 0) escribe("pPaid", fmt(p, 2)); else { const no = document.querySelector("#calc [data-paid-no]"); if (no) no.click(); }
-        sec.hidden = true; empezar();
+        sec.hidden = true; antes = 1; empezar().finally(() => { antes = 0; });
       });
       const lector = $("dLector"), rev = $("dRev");
       (rev && rev.parentNode ? rev.parentNode : lector).insertBefore(sec, rev || null);
@@ -196,5 +213,5 @@
     const i = $("dmV"); if (i) i.focus({ preventScroll: true });
   }
 
-  window.FeehundPreguntas = { empezar: () => empezar().catch(() => { cerrar(); calculadora(); }), aMano };
+  window.FeehundPreguntas = { empezar: (ej) => empezar(ej).catch(() => { cerrar(); calculadora(); }), aMano };
 })();

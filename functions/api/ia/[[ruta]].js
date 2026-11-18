@@ -14,7 +14,7 @@
 
 import { PLANES, PRODUCTO_TIQUI, AMIGO, GUARDA_PASE, activarTiqui, codigoValido, refValido } from '../../_ia/pase.js';
 import { crearPagoTiqui, leerPago } from '../../_baja/servicios.js';
-import { limpiarNegocio, HERRAMIENTAS_NEGOCIO, ejecutarNegocio, instruccionesNegocio } from '../../_ia/negocio.js';
+import { limpiarNegocio, HERRAMIENTAS_NEGOCIO, ejecutarNegocio, instruccionesNegocio, ESTILO_TIQUI } from '../../_ia/negocio.js';
 
 const MODELO = 'claude-opus-5-5';
 // La primera pregunta es gratis: 1 por persona (IP) y día, y un tope global al día.
@@ -129,6 +129,9 @@ function ejecutar(nombre, a, movs, permitidas) {
   return { error: 'herramienta desconocida' };
 }
 
+// Red de seguridad: Tiqui no escribe como una máquina (sin negritas, almohadillas ni viñetas)
+const sinMarcas = (t) => String(t || '').replace(/\*\*|__|`/g, '').replace(/^\s*(#+|[-*•]|\d+[.)])\s+/gm, '').replace(/\s*\n+\s*/g, ' ').replace(/\s—\s/g, ', ').replace(/\s*[\p{Extended_Pictographic}\u{FE0F}]+/gu, '').trim();
+
 // Cifras en euros que aparecen en el texto, en céntimos
 function cifrasEnEuros(t) {
   const out = [];
@@ -143,11 +146,11 @@ function instrucciones(movs, hoy) {
   const cat = {};
   movs.forEach((m) => { const k = m.k + '|' + (m.s || 'sin_saber') + '|' + (m.i < 0 ? 'gasto' : 'ingreso'); cat[k] = (cat[k] || 0) + 1; });
   const catalogo = Object.entries(cat).sort((a, b) => b[1] - a[1]).map(([k, n]) => k + '|' + n).join('\n');
-  return `Eres el asistente de Feehund. Hablas con una persona sobre el extracto bancario que ha subido ella misma. Solo respondes sobre ese extracto.
+  return `Eres Tiqui, el perro de Feehund. Hablas con una persona sobre el extracto bancario que ha subido ella misma. Solo respondes sobre ese extracto.
 
 Reglas que no se rompen nunca:
 1. Toda cifra en euros que digas tiene que venir tal cual de una herramienta. No sumes, restes ni redondees de cabeza: para las cuentas usa la herramienta calcular. Si no tienes la cifra de una herramienta, no la digas.
-2. No adivines. Si los datos no dan para responder, dilo con sencillez y di qué sí puedes contar.
+2. No adivines. Si los datos no dan para responder, dilo con sencillez y di qué sí puedes contar. Si la pregunta se puede entender de dos maneras, pregunta cuál antes de responder.
 3. Los sectores los pone Feehund o la propia persona. No cambies el sector de nada. Lo que está en «sin_saber» no lo metas en ningún sector; si viene al caso, puedes decir que hay pagos que no sabes qué son y cuánto suman.
 4. Un supermercado no es «comida»: lo que se compra dentro no sale en el banco. Si preguntan por comida, separa supermercado, bares y restaurantes y comida a domicilio, y dilo así.
 5. Di siempre de qué fechas hablas. El extracto va del ${fechas[0]} al ${fechas[fechas.length - 1]}; el primer y el último mes pueden estar incompletos. Hoy es ${hoy}.
@@ -155,7 +158,7 @@ Reglas que no se rompen nunca:
 7. Si preguntan algo que no es de su extracto, di con amabilidad que aquí solo puedes hablar de su extracto. No das consejos de inversión.
 8. Nombra los comercios como lo haría una persona (Mercadona, no «MERCADONA CAN BATLLO»).
 
-Cómo escribes: español de España, de tú, cálido y claro, como una amiga que sabe de cuentas. De una a tres frases. Sin listas, sin rayas, sin emojis, sin dos puntos para enumerar. Cifras con formato español: 1.234,56 €.
+${ESTILO_TIQUI}
 
 Tu respuesta final es un JSON con «texto» (lo que lee la persona) y «pagos» (los id de los movimientos en los que se basa la respuesta, para que pueda comprobarlos; vacío si no aplica).
 
@@ -208,7 +211,7 @@ async function preguntar(env, movs, pregunta, historial, neg) {
     const malas = cifrasEnEuros(res.texto).filter((c) => !permitidas.has(c.cent));
     if (!malas.length) {
       const ids = new Set(movs.map((m) => m.id));
-      return { texto: res.texto, pagos: (res.pagos || []).filter((id) => ids.has(id)), uso, comprobado: true };
+      return { texto: sinMarcas(res.texto), pagos: (res.pagos || []).filter((id) => ids.has(id)), uso, comprobado: true };
     }
     if (++avisos > 2) return { error: 'no_comprobado', uso };
     mensajes.push({ role: 'user', content: 'Revisión automática: estas cifras no salen de ninguna herramienta: ' + malas.map((c) => c.txt).join(', ') + '. Vuelve a responder usando solo cifras que te hayan dado las herramientas (usa calcular si necesitas una cuenta).' });

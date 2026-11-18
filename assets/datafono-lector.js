@@ -155,6 +155,8 @@
     }
     actual = r;
     try { await pintar(r); } catch (e) { show("up"); msg($("dErr"), TX.bad); return; }
+    // el ejemplo va directo al resultado (resumen y gráficas), como en Mi banco: sin revisar cifras ni preguntas
+    if (esEjemplo) { esEjemplo = false; show("load"); return confirmar(true); }
     show("rev");
     const h = $("dRevH"); if (h) h.focus({ preventScroll: true });
   }
@@ -252,7 +254,7 @@
   }
 
   // ---------- confirmar y pasar a la calculadora
-  async function confirmar() {
+  async function confirmar(ejemplo) {
     if (!actual) return;
     const [, , conf, rellenar] = await piezas();
     const correcciones = {};
@@ -269,7 +271,7 @@
     const hecho = rellenar.rellenarCalculadora(ok, { documento: document, idioma: LANG });
     $("dLector").dataset.rellenado = hecho.rellenados.join(" ");
     // el camino corto: 3 preguntas en la ventana de Tiqui (assets/datafono-preguntas.js); si no está, la calculadora entera
-    if (window.FeehundPreguntas) { $("dLector").dataset.rellenado = hecho.rellenados.join(" "); window.FeehundPreguntas.empezar(); return; }
+    if (window.FeehundPreguntas) { $("dLector").dataset.rellenado = hecho.rellenados.join(" "); window.FeehundPreguntas.empezar(ejemplo); return; }
     irACalculadora(TX.listo(hecho.rellenados.length));
   }
 
@@ -293,6 +295,7 @@
   }
 
   // ---------- ejemplo: el resumen inventado de /data/ejemplo-datafono.csv, leído igual que un archivo de verdad
+  let esEjemplo = false;
   async function ejemplo() {
     const r = await fetch(ROOT + "data/ejemplo-datafono.csv");
     if (!r.ok) throw new Error(TX.bad);
@@ -332,7 +335,7 @@
     const t = e.clipboardData && e.clipboardData.getData("text");
     if (t && t.split("\n").length > 2) anadir(t);
   });
-  $("dDemo").addEventListener("click", () => { contrasenas = {}; ejemplo().then(analyze, () => msg($("dErr"), TX.bad)); });
+  $("dDemo").addEventListener("click", () => { contrasenas = {}; esEjemplo = true; ejemplo().then(analyze, () => msg($("dErr"), TX.bad)); });
   $("dHand").addEventListener("click", (e) => { e.preventDefault(); if (window.FeehundPreguntas) window.FeehundPreguntas.aMano(); else irACalculadora(""); });
   $("dForm").addEventListener("submit", (e) => { e.preventDefault(); confirmar().catch(() => {}); });
   // «Te damos de baja» en el resultado de la calculadora: solo cuando dice que compensa cambiar (app.js enseña #pay),

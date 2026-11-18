@@ -120,3 +120,4 @@ body.dr-g :is(#pay,#rBaja,#informe){display:none!important}
 .dp-lab{font:700 15px/1.3 var(--f-text);color:var(--ink)}
 .dp-ok{min-height:54px;border:0;border-radius:999px;background:var(--brand);color:var(--bg);font:800 17px/1 var(--f-text);cursor:pointer}
 @media (max-width:420px){.dp-ops{grid-template-columns:1fr}}
+.dp-mano-bar{margin:0 0 10px}.dp-mano-n{margin:0 0 18px}
