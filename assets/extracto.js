@@ -196,6 +196,7 @@
       return;
     }
     actual = r;
+    setTimeout(() => document.dispatchEvent(new CustomEvent("fh-resultado", { detail: r })), 0); // pestañas y gráficas (assets/extracto/graficas.js), después de pintar el resumen
     await envioP;
     await barraCarga.fin();
     render(r, cobros); show("res");
@@ -334,6 +335,8 @@
       escDoble: (x, n) => x + " se te escaparon en " + (n === 1 ? "un posible cobro repetido" : n + " posibles cobros repetidos"),
       escComision: (x) => x + " se te escaparon en comisiones del banco",
       escVarios: (x, m) => x + " se te escaparon " + (m >= 12 ? "este año" : m <= 1 ? "este mes" : "en estos " + m + " meses"), escNada: "No se te escapa nada",
+      suscr: (n, x, r) => n ? "Tienes " + n + (n === 1 ? " suscripción que te cuesta " : " suscripciones que te cuestan ") + x + " al año" + (r ? ", y " + r + (r === 1 ? " recibo más." : " recibos más.") : ".")
+        : "Tienes " + r + (r === 1 ? " recibo que se repite" : " recibos que se repiten") + " y ninguna suscripción.",
       nada: "No hemos visto cobros que se repitan.", otros: "Otros", recibos: "Recibos que varían", devolvieron: (x) => "Te devolvieron " + x, devoluciones: (n) => (n === 1 ? "1 devolución" : n + " devoluciones"),
       verMas: (n) => "Ver " + n + " más", verMenos: "Ver menos", verDetalle: "Ver todo el detalle", ocultarDetalle: "Ocultar el detalle",
       revisar: "Revisar", anadir: "Añadir", ver: "Ver", darme: "Darme de baja", darBaja: "Dar de baja",
@@ -347,6 +350,8 @@
       escDoble: (x, n) => x + " se t'han escapat en " + (n === 1 ? "un possible cobrament repetit" : n + " possibles cobraments repetits"),
       escComision: (x) => x + " se t'han escapat en comissions del banc",
       escVarios: (x, m) => x + " se t'han escapat " + (m >= 12 ? "aquest any" : m <= 1 ? "aquest mes" : "en aquests " + m + " mesos"), escNada: "No se t'escapa res",
+      suscr: (n, x, r) => n ? "Tens " + n + (n === 1 ? " subscripció que et costa " : " subscripcions que et costen ") + x + " l'any" + (r ? ", i " + r + (r === 1 ? " rebut més." : " rebuts més.") : ".")
+        : "Tens " + r + (r === 1 ? " rebut que es repeteix" : " rebuts que es repeteixen") + " i cap subscripció.",
       nada: "No hem vist cobraments que es repeteixin.", otros: "Altres", recibos: "Rebuts que varien", devolvieron: (x) => "T'han retornat " + x, devoluciones: (n) => (n === 1 ? "1 devolució" : n + " devolucions"),
       verMas: (n) => "Veure'n " + n + " més", verMenos: "Veure'n menys", verDetalle: "Veure tot el detall", ocultarDetalle: "Amagar el detall",
       revisar: "Revisar", anadir: "Afegir", ver: "Veure", darme: "Donar-me de baixa", darBaja: "Donar de baixa",
@@ -360,6 +365,8 @@
       escDoble: (x, n) => x + " slipped away on " + (n === 1 ? "a possible repeat charge" : n + " possible repeat charges"),
       escComision: (x) => x + " slipped away on bank fees",
       escVarios: (x, m) => x + " slipped away " + (m >= 12 ? "this year" : m <= 1 ? "this month" : "in these " + m + " months"), escNada: "Nothing is slipping away",
+      suscr: (n, x, r) => n ? "You have " + n + (n === 1 ? " subscription costing " : " subscriptions costing ") + x + " a year" + (r ? ", and " + r + (r === 1 ? " more bill." : " more bills.") : ".")
+        : "You have " + r + (r === 1 ? " bill that repeats" : " bills that repeat") + " and no subscriptions.",
       nada: "We have not seen any repeating charges.", otros: "Other", recibos: "Bills that vary", devolvieron: (x) => "You got " + x + " back", devoluciones: (n) => (n === 1 ? "1 refund" : n + " refunds"),
       verMas: (n) => "See " + n + " more", verMenos: "See less", verDetalle: "See all the detail", ocultarDetalle: "Hide the detail",
       revisar: "Check", anadir: "Add", ver: "See", darme: "Cancel it for me", darBaja: "Cancel",
@@ -467,13 +474,14 @@
     $("xCifraL").hidden = false;
     const calc = $("xCalc"); calc.textContent = meses < 12 ? T3.calc(meses) : ""; calc.hidden = meses >= 12;
     const sr = $("xTotal"); if (sr) sr.textContent = $("xCifraL").textContent + " " + eur(total) + (meses < 12 ? ", " + T3.calc(meses) : "");
+    // Lo que la gente busca primero: cuántas suscripciones tiene, cuánto le cuestan y cuántos recibos más
     const esc = $("xEscapo");
-    const tipos = Object.keys(escTipos);
-    esc.dataset.ok = escapo > 0 ? "no" : "si";
-    esc.textContent = escapo <= 0 ? T3.escNada
-      : tipos.length > 1 ? T3.escVarios(eur(escapo), meses)
-      : tipos[0] === "recibo" ? T3.escRecibo(eur(escapo), escTipos.recibo)
-      : tipos[0] === "doble" ? T3.escDoble(eur(escapo), escTipos.doble) : T3.escComision(eur(escapo));
+    const contados = cobros.filter((c) => cuenta(c) && c.tipo !== "comision" && c.categoria !== "comisiones");
+    const subs = contados.filter((c) => SUSCRIPCIONES.indexOf(c.categoria) >= 0);
+    const recs = contados.length - subs.length;
+    esc.hidden = !contados.length;
+    esc.dataset.ok = subs.length ? "no" : "si";
+    esc.textContent = T3.suscr(subs.length, eur(Math.round(subs.reduce((t, c) => t + (c.coste_anual || 0), 0))), recs);
 
     // ---- 2. pintar las acciones: tres a la vista y el resto detrás de «Ver X más» ----
     const ul = $("xAcciones"); ul.textContent = "";

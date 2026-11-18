@@ -1,0 +1,56 @@
+/* Mi banco: pestañas «Resumen / Gráficas», gráficas de lo que se repite y tarjeta de compartir plegada (assets/extracto/graficas.js) */
+.pg-tabs{display:grid;grid-template-columns:1fr 1fr;gap:4px;padding:4px;margin:0 0 var(--s-4);background:#F3E6CC;border-radius:999px}
+.pg-tabs button{min-height:44px;border:0;border-radius:999px;background:transparent;color:var(--ink-2);font:700 16px/1 var(--f-text);cursor:pointer;transition:background .18s,color .18s}
+.pg-tabs button[aria-selected="true"]{background:var(--brand);color:#fff}
+.pg[hidden]{display:none}
+.pg{display:grid;gap:36px}
+.pg-k{margin:0;font:400 16px/1.3 var(--f-text);color:var(--ink-2)}
+.pg-big{margin:6px 0 0;font:800 48px/1 var(--f-head);color:var(--ink);font-variant-numeric:tabular-nums}
+.pg-calc{margin:6px 0 0;font:400 16px/1.3 var(--f-text);color:var(--ink-2)}
+.pg-mes{margin:8px 0 0;font:700 18px/1.2 var(--f-text);color:var(--brand)}
+.pg-blq{display:grid;gap:14px}
+.pg-h{margin:0;font:800 20px/1.2 var(--f-head);color:var(--ink)}
+.pg-rk{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.pg-rk li{display:grid;grid-template-columns:40px minmax(0,1fr) auto;gap:6px 12px;align-items:center;padding:8px 6px;border-radius:12px;transition:background .15s;outline:none}
+.pg-rk li.on,.pg-rk li:focus-visible{background:#F3E6CC}
+.pg-logo{grid-row:1 / span 2;width:40px;height:40px;border-radius:50%;overflow:hidden;display:grid;place-items:center;background:var(--bg);font:800 17px/1 var(--f-head);color:#fff}
+.pg-logo img{width:100%;height:100%;object-fit:contain}
+.pg-logo--ini{background:var(--brand)}
+.pg-logo--com{background:#8A5300}
+.pg-nom{font:700 16px/1.25 var(--f-text);color:var(--ink);min-width:0}
+.pg-tag{display:inline-block;margin-left:8px;font:700 13px/1 var(--f-text);color:var(--amber-text);background:var(--over-bg);padding:4px 8px;border-radius:99px;vertical-align:2px}
+.pg-val{font:700 16px/1 var(--f-text);font-variant-numeric:tabular-nums;color:var(--ink);text-align:right}
+.pg-bar{grid-column:2 / span 2;height:12px;border-radius:99px;background:#EFE4CF;overflow:hidden}
+.pg-bar i{display:block;height:100%;border-radius:99px;background:var(--brand)}
+.pg-ambar .pg-bar i{background:var(--amber)}
+.pg-nota{margin:0;font:400 16px/1.3 var(--f-text);color:var(--ink-2)}
+.pg-wfz{display:grid;gap:20px}
+@media (min-width:760px){.pg-wfz{grid-template-columns:minmax(0,300px) minmax(0,1fr);gap:40px;align-items:center}.pg-big{font-size:56px}}
+.pg-wf{display:grid;grid-template-columns:repeat(10,1fr);gap:4px;max-width:320px}
+.pg-wf i{aspect-ratio:1;border-radius:4px;transition:opacity .15s,transform .15s;cursor:pointer}
+.pg-wf.foco i{opacity:.25}.pg-wf i.on{opacity:1;transform:scale(1.08)}
+.pg-wl{list-style:none;margin:0;padding:0;display:grid;gap:6px}
+.pg-wl li{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:12px;align-items:center;padding:8px 6px;border-radius:10px;outline:none}
+.pg-wl li.on,.pg-wl li:focus-visible{background:#F3E6CC}
+.pg-cnt{font:800 24px/1 var(--f-head);min-width:56px;color:var(--ink);font-variant-numeric:tabular-nums}
+.pg-tn{font:700 16px/1.25 var(--f-text);color:var(--ink)}
+.pg-tn i{display:inline-block;width:14px;height:14px;border-radius:4px;margin-right:8px;vertical-align:-1px}
+.pg-tip{position:fixed;left:0;top:0;pointer-events:none;background:var(--brand);color:#fff;font:700 15px/1.25 var(--f-text);padding:9px 12px;border-radius:10px;opacity:0;transition:opacity .12s;z-index:60;max-width:280px}
+.pg-tip.on{opacity:1}
+@media (hover:none){.pg-tip{transition:none}}
+
+/* Compartir: la barra fija de abajo se quita; la tarjeta baja al tocar el botón y todo queda en un bloque */
+#xBarra{display:none!important}
+.pg-ico{width:22px;height:22px;flex:none;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+#xTarjeta.pg-plegada,#xTarjeta.pg-abierta{display:flex;flex-direction:column;align-items:center;transition:background .3s ease,padding .3s ease}
+#xTarjeta #xShare{align-self:stretch;display:inline-flex;align-items:center;justify-content:center;gap:10px}
+#xTarjeta.pg-plegada #xShare{order:-1}
+#xTarjeta.pg-abierta{background:#F3E6CC;border-radius:24px;padding:20px 16px 16px}
+#xTarjeta.pg-abierta #xShare{order:2;margin-top:16px}
+#xTarjeta .r3-tarjeta-v{position:relative;overflow:hidden;transition:max-height .6s ease,opacity .45s ease .1s,margin .6s ease}
+#xTarjeta.pg-plegada .r3-tarjeta-v{max-height:0;opacity:0;margin-top:0;margin-bottom:0}
+#xTarjeta.pg-abierta .r3-tarjeta-v{max-height:1100px;opacity:1}
+.pg-guardar{position:absolute;bottom:10px;right:10px;display:none;align-items:center;justify-content:center;width:44px;height:44px;padding:0;border:0;border-radius:50%;background:var(--amber);color:var(--ink);cursor:pointer;box-shadow:0 2px 10px rgba(0,0,0,.3)}
+#xTarjeta.pg-abierta .pg-guardar{display:inline-flex}
+#xTarjeta.pg-abierta #xTarjetaImg{cursor:pointer}
+@media (prefers-reduced-motion:reduce){.pg-tabs button,.pg-wf i,#xTarjeta .r3-tarjeta-v,#xTarjeta{transition:none}}
