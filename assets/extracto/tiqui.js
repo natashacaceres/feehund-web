@@ -26,7 +26,7 @@
       planes: { basico: ["0,99 €", "7 días"], completo: ["2,99 €", "3 meses"] }, pagar: (p) => "Pagar " + p,
       unPago: "Un solo pago. Sin suscripción", ahoraNo: "Ahora no", momento: "Un momento…", errorPago: "No se ha podido. Prueba otra vez.",
       holaNeg: "¿Qué quieres saber de tu datáfono?", sugNeg: ["¿Cuánto me cobra el banco al mes?", "¿Por qué unas tarjetas me cobran más?", "¿A quién me cambio?"],
-      planesNeg: { negocio_mes: ["4,99 €", "1 mes"], negocio_3m: ["9,99 €", "3 meses"] }, unPagoNeg: "Un solo pago. Sin suscripción. Con factura",
+      planesNeg: { negocio_mes: ["4,99 €", "1 mes"], negocio_3m: ["9,99 €", "3 meses"] }, unPagoNeg: "Un solo pago. Sin suscripción. Con factura", ivaNeg: "+ IVA",
       tuyo: "Tiqui ya es tuyo", copiar: "Copiar", copiado: "Copiado", correo: "Te lo hemos mandado por correo. Con él vuelves desde Tu Tiqui, sin subir nada.",
       hasta: (d) => "Hasta el " + d.getDate() + " de " + ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"][d.getMonth()],
       invita: "Invitar a un amigo", invitaYo: "Tus preguntas me salen caras, jeje. Invita a un amigo: si paga, te regalo 30 días.", fin: "Se nos acabó el tiempo.",
@@ -43,7 +43,7 @@
       planes: { basico: ["0,99 €", "7 dies"], completo: ["2,99 €", "3 mesos"] }, pagar: (p) => "Pagar " + p,
       unPago: "Un sol pagament. Sense subscripció", ahoraNo: "Ara no", momento: "Un moment…", errorPago: "No s'ha pogut. Torna-ho a provar.",
       holaNeg: "Què vols saber del teu datàfon?", sugNeg: ["Quant em cobra el banc al mes?", "Per què unes targetes em cobren més?", "A qui em canvio?"],
-      planesNeg: { negocio_mes: ["4,99 €", "1 mes"], negocio_3m: ["9,99 €", "3 mesos"] }, unPagoNeg: "Un sol pagament. Sense subscripció. Amb factura",
+      planesNeg: { negocio_mes: ["4,99 €", "1 mes"], negocio_3m: ["9,99 €", "3 mesos"] }, unPagoNeg: "Un sol pagament. Sense subscripció. Amb factura", ivaNeg: "+ IVA",
       tuyo: "Tiqui ja és teu", copiar: "Copiar", copiado: "Copiat", correo: "T'ho hem enviat per correu. Amb ell tornes des d'El teu Tiqui, sense pujar res.",
       hasta: (d) => "Fins al " + d.getDate() + " " + ["de gener", "de febrer", "de març", "d'abril", "de maig", "de juny", "de juliol", "d'agost", "de setembre", "d'octubre", "de novembre", "de desembre"][d.getMonth()],
       invita: "Convidar un amic", invitaYo: "Les teves preguntes em surten cares, jeje. Convida un amic: si paga, et regalo 30 dies.", fin: "Se'ns ha acabat el temps.",
@@ -60,7 +60,7 @@
       planes: { basico: ["0,99 €", "7 days"], completo: ["2,99 €", "3 months"] }, pagar: (p) => "Pay " + p,
       unPago: "One payment. No subscription", ahoraNo: "Not now", momento: "One moment…", errorPago: "That didn't work. Try again.",
       holaNeg: "What do you want to know about your card machine?", sugNeg: ["How much does the bank charge me a month?", "Why do some cards cost me more?", "Who should I switch to?"],
-      planesNeg: { negocio_mes: ["4,99 €", "1 month"], negocio_3m: ["9,99 €", "3 months"] }, unPagoNeg: "One payment. No subscription. With invoice",
+      planesNeg: { negocio_mes: ["4,99 €", "1 month"], negocio_3m: ["9,99 €", "3 months"] }, unPagoNeg: "One payment. No subscription. With invoice", ivaNeg: "+ VAT",
       tuyo: "Tiqui is yours", copiar: "Copy", copiado: "Copied", correo: "We've emailed it to you. Use it to come back from Your Tiqui, without uploading anything.",
       hasta: (d) => "Until " + d.getDate() + " " + ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"][d.getMonth()],
       invita: "Invite a friend", invitaYo: "Your questions cost me a fortune, hehe. Invite a friend: if they pay, I'll give you 30 days.", fin: "Our time is up.",
@@ -70,7 +70,7 @@
     },
   }[LANG];
 
-  if (NEG) { T.hola = T.holaNeg; T.planes = T.planesNeg; T.unPago = T.unPagoNeg; }
+  if (NEG) { T.hola = T.holaNeg; T.planes = T.planesNeg; T.unPago = T.unPagoNeg; T.iva = T.ivaNeg; }
 
   // Sectores: solo lo que se sabe seguro (cadena conocida o palabra que no deja dudas). Lo demás, Tiqui lo dice como «sin saber qué es».
   const SECTORES = [
@@ -148,6 +148,8 @@
   };
 
   const mk = (tag, clase, texto) => { const x = document.createElement(tag); if (clase) x.className = clase; if (texto !== undefined) x.textContent = texto; return x; };
+  // precio de un plan; en negocios lleva «+ IVA» en pequeño (el IVA lo suma Stripe al pagar)
+  const precio = (p) => { const x = mk("span", "tqc-plan-p", p); if (T.iva) x.appendChild(mk("small", "tqc-iva", " " + T.iva)); return x; };
   let caja = null, msgs = null, sub = null, sug = null;
   function burbuja(quien, nodoOTexto) {
     const m = mk("div", "tqc-m tqc-m--" + quien);
@@ -183,7 +185,7 @@
     const pl = mk("div", "tqc-planes"); pl.id = "tqcPlanes";
     Object.keys(T.planes).forEach((k) => {
       const [p, d, mas] = T.planes[k]; const b = mk("button", "tqc-plan" + (k === "completo" || k === "negocio_3m" ? " tqc-plan--top" : "")); b.type = "button";
-      b.append(mk("span", "tqc-plan-p", p), mk("span", "tqc-plan-d", d)); if (mas) b.appendChild(mk("span", "tqc-plan-m", mas));
+      b.append(precio(p), mk("span", "tqc-plan-d", d)); if (mas) b.appendChild(mk("span", "tqc-plan-m", mas));
       b.addEventListener("click", () => abrirPago(k)); pl.appendChild(b);
     });
     f.appendChild(pl);
@@ -196,10 +198,10 @@
     const pl = mk("div", "tqc-planes"); pl.setAttribute("role", "radiogroup");
     const ok = mk("button", "tqc-cta"); ok.type = "button";
     const msg = mk("p", "tqc-pronto"); msg.hidden = true; msg.setAttribute("role", "status");
-    const pintar = () => { pl.querySelectorAll("button").forEach((x) => x.setAttribute("aria-checked", String(x.dataset.plan === plan))); ok.textContent = T.pagar(T.planes[plan][0]); };
+    const pintar = () => { pl.querySelectorAll("button").forEach((x) => x.setAttribute("aria-checked", String(x.dataset.plan === plan))); ok.textContent = T.pagar(T.planes[plan][0]); if (T.iva) ok.appendChild(mk("small", "tqc-iva", " " + T.iva)); };
     Object.keys(T.planes).forEach((k) => {
       const [p, du, mas] = T.planes[k]; const b = mk("button", "tqc-plan" + (k === "completo" || k === "negocio_3m" ? " tqc-plan--top" : "")); b.type = "button"; b.setAttribute("role", "radio"); b.dataset.plan = k;
-      b.append(mk("span", "tqc-plan-p", p), mk("span", "tqc-plan-d", du)); if (mas) b.appendChild(mk("span", "tqc-plan-m", mas));
+      b.append(precio(p), mk("span", "tqc-plan-d", du)); if (mas) b.appendChild(mk("span", "tqc-plan-m", mas));
       b.addEventListener("click", () => { plan = k; pintar(); }); pl.appendChild(b);
     });
     ok.addEventListener("click", async () => {
