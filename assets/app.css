@@ -1647,15 +1647,45 @@ body.con-barra{padding-bottom:calc(88px + env(safe-area-inset-bottom))}
 #res .r3-link{color:var(--brand);font:700 16px/1.2 var(--f-text)}
 #res .r3-compartir{color:var(--ink)}
 #res .r3-bar{cursor:default}
-/* «Tu Tiqui» en la cabecera de todas las páginas (en el móvil, solo su cara) */
-.hdr-tiqui{position:relative;display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:0 12px 0 4px;border-radius:999px;background:#F3E6CC;font:700 16px/1 var(--f-text);color:var(--ink);text-decoration:none;white-space:nowrap}
-.hdr-tiqui img{width:32px;height:32px;border-radius:50%;object-fit:cover;background:var(--bg)}
-.hdr-tiqui[aria-current="page"]{box-shadow:inset 0 0 0 2px var(--brand)}
-@media (max-width:480px){.hdr .brand img{width:132px;height:auto}.hdr-tiqui{width:44px;padding:0;justify-content:center;font-size:0;gap:0}.hdr-tiqui img{width:36px;height:36px}}
+/* «Tu Tiqui» en la cabecera: igual que «Dar de baja», sin cara ni fondo */
+.hdr-tiqui{display:inline-flex;align-items:center;min-height:44px;padding:0 8px;border-radius:var(--r);font:700 16px/1 var(--f-text);color:var(--ink);text-decoration:none;white-space:nowrap}
+.hdr-tiqui:hover,.hdr-tiqui[aria-current="page"]{color:var(--brand)}
+.hdr-tiqui:focus-visible{outline:2px solid var(--brand);outline-offset:2px}
 /* Portada: si el nombre no cabe (catalán, inglés), baja a una segunda línea en vez de montarse sobre la flecha */
 .cubo-t,.cubo-s{white-space:normal;overflow-wrap:normal;text-wrap:balance;min-width:0;max-width:100%}
 /* Cabecera en móvil: cabe igual en los tres idiomas («Donar de baixa» es más largo) */
 @media (max-width:480px){.hdr .wrap{gap:8px}.hdr-r{gap:2px}.hdr-baja{padding:0 4px;font-size:15px}.hdr .brand img{width:124px;height:auto}}
 @media (max-width:360px){.hdr .brand img{width:104px}.hdr-baja{font-size:14px}}
-/* Portada en el móvil: las cuatro ventajas, una por línea, ordenadas */
-@media (max-width:600px){.home-ok{display:grid!important;grid-template-columns:auto;justify-content:center;justify-items:start;gap:8px!important}.home-ok li{white-space:nowrap}}
+
+/* Portada en el móvil: las cuatro ventajas en dos columnas, del mismo ancho que las tarjetas */
+@media (max-width:600px){
+  .home-ok{display:grid!important;grid-template-columns:1fr 1fr;width:100%;justify-items:center;gap:14px 12px!important;margin-top:4px}
+  .home-ok li{display:inline-flex;align-items:center;white-space:nowrap}
+}
+/* Menú del móvil: el logo a la izquierda y las tres rayas a la derecha; dentro, Tu Tiqui, Dar de baja y el idioma.
+   Lo monta assets/app.js (si no hay JavaScript, se queda la cabecera de siempre). */
+.hdr-menu,.hdr-idiomas{display:none}
+@media (max-width:760px){
+  .hdr--menu .hdr-menu{display:inline-flex;flex-direction:column;justify-content:center;align-items:center;gap:5px;flex:none;width:44px;height:44px;margin-right:-10px;padding:0;border:0;border-radius:12px;background:none;cursor:pointer}
+  .hdr-menu i{display:block;width:22px;height:2px;border-radius:2px;background:var(--ink);transition:transform .18s,opacity .18s}
+  .hdr--menu.abierto .hdr-menu i:nth-child(1){transform:translateY(7px) rotate(45deg)}
+  .hdr--menu.abierto .hdr-menu i:nth-child(2){opacity:0}
+  .hdr--menu.abierto .hdr-menu i:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
+  .hdr--menu .hdr-r{display:none;position:absolute;left:0;right:0;top:100%;flex-direction:column;align-items:center;gap:4px;padding:12px var(--side) 28px;background:var(--bg);box-shadow:0 18px 30px -18px rgba(20,33,61,.35)}
+  .hdr--menu.abierto .hdr-r{display:flex}
+  .hdr--menu .hdr-r .hdr-tiqui,.hdr--menu .hdr-r .hdr-baja{min-height:56px;padding:0 12px;font-size:22px}
+  .hdr--menu .hdr-r .langdd{display:none}
+  .hdr--menu .hdr-idiomas{display:flex;justify-content:center;gap:8px;margin-top:8px}
+  .hdr-idiomas a{display:inline-flex;align-items:center;min-height:44px;padding:0 10px;font:600 17px/1 var(--f-text);color:var(--ink-2);text-decoration:none}
+  .hdr-idiomas a[aria-current="page"]{font-weight:800;color:var(--brand)}
+}
+/* Pie: © en su propia línea, abajo y más pequeño */
+.ftr-copy{width:100%;margin:var(--s-3) 0 0;font:400 13px/1.4 var(--f-text);color:var(--ink-2);text-align:center}
+body:has(> main.home,> main.ext) .ftr-copy{font-size:13px}
+/* Pie en el móvil: simétrico, en dos columnas centradas (el último enlace suelto, en el centro) */
+@media (max-width:760px){
+  .ftr-in{gap:var(--s-3)}
+  .ftr-links,.ftr-legal{display:grid!important;grid-template-columns:1fr 1fr;width:100%;max-width:400px;margin:0 auto;justify-items:center;column-gap:12px}
+  .ftr-links li,.ftr-legal li{justify-content:center;text-align:center;white-space:normal}
+  .ftr-links li:last-child:nth-child(odd),.ftr-legal li:last-child:nth-child(odd){grid-column:1 / -1}
+}

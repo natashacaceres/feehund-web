@@ -1013,3 +1013,29 @@ const PAISES = [{codigo:"ES", nombre:"España", ruta:"/datafono/", idiomas:"Espa
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", ya); else ya();
   let t0; addEventListener("resize", () => { clearTimeout(t0); t0 = setTimeout(ajustar, 120); });
 })();
+
+// Menú del móvil: a la derecha, las tres rayas; al pulsarlas se abre Tu Tiqui, Dar de baja y el idioma.
+(function menuMovil(){
+  const hdr = document.querySelector(".hdr"), r = hdr && hdr.querySelector(".hdr-r");
+  if (!r || hdr.querySelector(".hdr-menu")) return;
+  const L = document.documentElement.lang;
+  const b = document.createElement("button");
+  b.type = "button"; b.className = "hdr-menu"; r.id = r.id || "hdrMenu";
+  b.setAttribute("aria-label", L === "en" ? "Menu" : "Menú");
+  b.setAttribute("aria-controls", r.id); b.setAttribute("aria-expanded", "false");
+  for (let i = 0; i < 3; i++) b.appendChild(document.createElement("i"));
+  // los idiomas, a la vista dentro del menú (en el ordenador siguen en su desplegable)
+  const ul = r.querySelector(".langdd ul");
+  if (ul) {
+    const fila = document.createElement("div"); fila.className = "hdr-idiomas";
+    ul.querySelectorAll("a").forEach((a) => { const c = a.cloneNode(true); c.textContent = (a.getAttribute("hreflang") || a.textContent).toUpperCase(); c.setAttribute("aria-label", a.textContent); fila.appendChild(c); });
+    r.appendChild(fila);
+  }
+  r.after(b); hdr.classList.add("hdr--menu");
+  const poner = (si) => { hdr.classList.toggle("abierto", si); b.setAttribute("aria-expanded", si ? "true" : "false"); };
+  b.addEventListener("click", (e) => { e.stopPropagation(); poner(!hdr.classList.contains("abierto")); });
+  document.addEventListener("click", (e) => { if (hdr.classList.contains("abierto") && !r.contains(e.target)) poner(false); });
+  r.addEventListener("click", (e) => { if (e.target.closest("a")) poner(false); });
+  document.addEventListener("keydown", (e) => { if (e.key === "Escape" && hdr.classList.contains("abierto")) { poner(false); b.focus(); } });
+  addEventListener("resize", () => { if (innerWidth > 760) poner(false); });
+})();
