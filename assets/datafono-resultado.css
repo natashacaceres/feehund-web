@@ -98,3 +98,25 @@ body.dr-g :is(#pay,#rBaja,#informe){display:none!important}
   #res.dr>#tqcIa .tqc-msgs{flex:1 1 auto;min-height:0;max-height:none;align-content:start}
   #res.dr>#tqcIa .tqc-chat>*:not(.tqc-msgs){flex:none}
 }
+/* Las 3 preguntas (assets/datafono-preguntas.js): la misma ventana que en Mi banco */
+.dp{position:fixed;inset:0;z-index:2147483000;display:grid;place-items:center;overflow-y:auto;padding:24px max(20px,env(safe-area-inset-left,0px));background:var(--bg)}
+.dp-c{width:100%;max-width:560px;display:grid;gap:14px}
+.dp-t{display:flex;align-items:center;gap:12px}
+.dp-t img{width:44px;height:44px;border-radius:50%;object-fit:cover}
+.dp-t p{margin:0;font:800 22px/1.2 var(--f-head);color:var(--ink)}
+.dp-bar{height:8px;border-radius:4px;background:#F3E6CC;overflow:hidden}
+.dp-bar i{display:block;height:100%;border-radius:4px;background:var(--brand);transition:width .3s}
+.dp-n{margin:0;font:700 14px/1 var(--f-text);color:var(--ink)}
+.dp-cuerpo{display:grid;gap:14px;margin-top:8px}
+.dp-q{margin:0;font:800 clamp(28px,6vw,36px)/1.1 var(--f-head);color:var(--ink)}
+.dp-ops{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.dp-ops button{min-height:56px;padding:10px 14px;border:2px solid #E9DFCC;border-radius:16px;background:var(--bg);font:700 16px/1.25 var(--f-text);color:var(--ink);text-align:left;cursor:pointer}
+.dp-ops button:hover,.dp-ops button:focus-visible{border-color:var(--brand)}
+.dp-lista{grid-template-columns:1fr;max-height:52vh;overflow-y:auto}
+.dp-nose{justify-self:center;min-height:44px;border:0;background:none;font:700 16px/1 var(--f-text);color:var(--ink-2);text-decoration:underline;cursor:pointer}
+.dp-fila{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.dp-fila select,.dp-campo input{min-height:52px;padding:0 14px;border:2px solid #E9DFCC;border-radius:14px;background:var(--bg);font:600 17px/1 var(--f-text);color:var(--ink)}
+.dp-campo{display:grid;gap:6px}
+.dp-lab{font:700 15px/1.3 var(--f-text);color:var(--ink)}
+.dp-ok{min-height:54px;border:0;border-radius:999px;background:var(--brand);color:var(--bg);font:800 17px/1 var(--f-text);cursor:pointer}
+@media (max-width:420px){.dp-ops{grid-template-columns:1fr}}

@@ -62,6 +62,9 @@
   .tq-inv-b{grid-column:2;justify-self:start;display:inline-flex;align-items:center;gap:8px;min-height:48px;padding:0 20px;border:0;border-radius:999px;background:var(--ink);color:var(--bg);font:700 16px/1 var(--f-text);cursor:pointer}
   .tq-inv-b svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
   .tq-inv-s{grid-column:2;font-size:15px!important;color:var(--ink-2)!important;word-break:break-all}
+  .tq-sw{display:grid;grid-template-columns:1fr 1fr;width:100%;max-width:420px;background:#F3E6CC;border-radius:999px;padding:5px;margin-top:var(--s-2)}
+  .tq-sw button{min-height:46px;border:0;border-radius:999px;background:none;font:800 16px/1 var(--f-text);color:var(--ink-2);cursor:pointer}
+  .tq-sw button[aria-selected="true"]{background:var(--brand);color:var(--bg)}
   [hidden]{display:none!important}
   .tq-cod{display:grid;gap:8px;margin-top:8px}.tq-cod label{font:700 16px/1.2 var(--f-text);color:var(--ink)}.tq-cod .p-in{display:flex;gap:8px}.tq-cod input{flex:1;min-width:0;min-height:48px;padding:0 16px;border:1.5px solid var(--line);border-radius:999px;background:var(--bg);color:var(--ink);font:400 16px/1 ui-monospace,Menlo,monospace;text-transform:uppercase}.tq-cod button{flex:none;width:48px;height:48px;border:0;border-radius:50%;background:var(--ink);color:var(--bg);font:700 20px/1 var(--f-text);cursor:pointer}.tq-err{margin:0;min-height:1em;font:400 15px/1.3 var(--f-text);color:var(--amber-text)}
   .tq-demo .p-m--ia{position:relative;margin-left:48px;max-width:calc(88% - 48px)}
@@ -98,10 +101,20 @@
 <div class="tq-g">
   <section class="tq-hero">
     <img class="tq-img" src="../assets/img/tiqui-olfatea.webp" alt="Tiqui" width="320" height="320">
-    <h1 class="tq-h">Pregúntale a Tiqui</h1>
+     <h1 class="tq-h">Pregúntale a Tiqui</h1>
+      <div class="tq-sw" id="tqModo" role="tablist"><button type="button" role="tab" data-m="ti" aria-selected="true">Para ti</button><button type="button" role="tab" data-m="neg" aria-selected="false">Para tu negocio</button></div>
   </section>
 
-  <section class="tq-demo" aria-label="Así se pregunta">
+    <section class="tq-demo" data-m="neg" hidden>
+    <div class="p-m p-m--tu">¿Cuánto me cobra el banco al mes?</div>
+    <div class="p-m p-m--ia">En octubre, <b>83,42 €</b>. Son <b>1,04 €</b> de cada 100 que cobras con tarjeta.</div>
+    <div class="p-m p-m--tu">¿Por qué unas tarjetas me cobran más?</div>
+    <div class="p-m p-m--ia">Las de turistas y las de empresa no tienen máximo por ley. Este mes te costaron <b>17,55 €</b>.</div>
+    <div class="p-m p-m--tu">¿A quién me cambio?</div>
+    <div class="p-m p-m--ia">Con tus ventas, hay quien te cobraría <b>0,63 €</b>. Te digo quién y con qué condiciones.</div>
+  </section>
+
+<section class="tq-demo" data-m="ti" aria-label="Así se pregunta">
     <div class="p-m p-m--tu">¿Adónde se va mi dinero?</div>
     <div class="p-m p-m--ia">La mitad se va en <b>casa</b>, con el alquiler, la luz y el agua. Después va el súper, con <b>312,40 €</b> al mes.<span class="tq-pagos">Ver los pagos</span></div>
     <div class="p-m p-m--tu">¿Hay algo raro en mi cuenta?</div>
@@ -110,13 +123,24 @@
     <div class="p-m p-m--ia"><b>186,40 €</b> desde marzo, en 14 pedidos.</div>
   </section>
 
-  <ul class="tq-dif">
+    <ul class="tq-dif" data-m="neg" hidden>
+    <li>Lee el resumen de tu datáfono</li>
+    <li>Lo compara con 23 tarifas</li>
+    <li>Con factura</li>
+  </ul>
+
+<ul class="tq-dif" data-m="ti">
     <li>Todos tus bancos, juntos</li>
     <li>Cada cifra, con sus pagos</li>
     <li>Sin conectar tu banco</li>
   </ul>
 
-  <section class="tq-planes" aria-label="Precio">
+    <section class="tq-planes" data-m="neg" hidden>
+    <div class="p-plan"><span class="p-plan-p">4,99 €</span><span class="p-plan-d">1 mes</span></div>
+    <div class="p-plan p-plan--top"><span class="p-plan-p">9,99 €</span><span class="p-plan-d">3 meses</span></div>
+  </section>
+
+<section class="tq-planes" data-m="ti" aria-label="Precio">
     <div class="p-plan"><span class="p-plan-p">0,99 €</span><span class="p-plan-d">7 días</span></div>
     <div class="p-plan p-plan--top"><span class="p-plan-p">2,99 €</span><span class="p-plan-d">3 meses</span></div>
   </section>
@@ -169,6 +193,23 @@
         }, function () { b.disabled = false; di("Ahora no puedo. Prueba en un momento."); });
     });
   }
+  // Para ti / Para tu negocio: cambian el ejemplo, los precios y adónde lleva el botón
+  var pn = null; try { pn = JSON.parse(localStorage.getItem("fh-tiqui-pase-negocio") || "null"); } catch (e) {}
+  var ctaTi = { t: $("tqAbrir").textContent, h: $("tqAbrir").getAttribute("href"), s: $("tqSin").textContent };
+  var mesesN = ["enero","febrero","marzo","abril","mayo","junio","julio","agosto","septiembre","octubre","noviembre","diciembre"];
+  function modo(m) {
+    [].forEach.call(document.querySelectorAll("#tqModo button"), function (b) { b.setAttribute("aria-selected", String(b.dataset.m === m)); });
+    [].forEach.call(document.querySelectorAll("[data-m]:not(button)"), function (e) { e.hidden = e.dataset.m !== m; });
+    if (m === "neg") {
+      var vivo = pn && pn.hasta > Date.now();
+      $("tqAbrir").textContent = vivo ? 'Abrir mi datáfono' : 'Subir mi resumen del datáfono'; $("tqAbrir").href = '../datafono/' + (vivo ? "?vuelta" : "");
+      $("tqSin").textContent = vivo ? 'Hasta el ' + new Date(pn.hasta).getDate() + ' de ' + mesesN[new Date(pn.hasta).getMonth()] : 'Un solo pago. Sin suscripción. Con factura';
+      $("tqInv").hidden = true;
+    } else { $("tqAbrir").textContent = ctaTi.t; $("tqAbrir").href = ctaTi.h; $("tqSin").textContent = ctaTi.s; $("tqInv").hidden = !(p && p.codigo); }
+    try { history.replaceState(null, "", m === "neg" ? "#negocio" : location.pathname); } catch (e) {}
+  }
+  $("tqModo").addEventListener("click", function (e) { var b = e.target.closest("button"); if (b) modo(b.dataset.m); });
+  if (location.hash === "#negocio" || (pn && pn.codigo && !(p && p.codigo))) modo("neg");
   $("tqForm").addEventListener("submit", function (e) {
     e.preventDefault();
     var c = $("tqCod").value.trim().toUpperCase();
