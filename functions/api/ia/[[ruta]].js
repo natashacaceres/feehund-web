@@ -1,5 +1,8 @@
-// «Pregúntale a tu extracto» (PROTOTIPO, sin publicar).
+// «Pregúntale a Tiqui» (Mi banco).
 // Rutas:
+//   POST /api/ia/pregunta-gratis {pregunta, idioma, movimientos}          → la primera pregunta (1 por persona y día)
+//   POST /api/ia/pagar       {plan, codigo, caja, idioma, vuelta}          → guarda la caja cifrada y devuelve el pago de Stripe
+//   POST /api/ia/canjear     {codigo, sesion}                              → al volver de Stripe: activa el pase si está pagado
 //   POST /api/ia/pregunta    {codigo, pregunta, historial, movimientos}  → respuesta de Claude, cerrada a los datos
 //   POST /api/ia/pase-prueba {}                                          → crea un pase de prueba (solo con IA_PRUEBAS=1)
 //   POST /api/ia/caja        {codigo, caja}                              → guarda la caja cifrada (Feehund no tiene la llave)
@@ -7,12 +10,10 @@
 // Cerrada: Claude no tiene internet ni más herramientas que las de abajo, y TODA cifra en euros de su respuesta
 // tiene que haber salido de una herramienta. Si no, se le devuelve para que lo corrija; si sigue igual, no se enseña.
 
+import { PLANES, PRODUCTO_TIQUI, activarTiqui, codigoValido } from '../../_ia/pase.js';
+import { crearPagoTiqui, leerPago } from '../../_baja/servicios.js';
+
 const MODELO = 'claude-opus-5-5';
-// Sin contador a la vista. Topes que nadie ve, para que ningún pase dé pérdidas (~2,5 céntimos por pregunta).
-const PLANES = {
-  basico: { dias: 7, porDia: 20, total: 40 },     // 0,99 €
-  completo: { dias: 90, porDia: 25, total: 120 }, // 2,99 €
-};
 // La primera pregunta es gratis: 1 por persona (IP) y día, y un tope global al día.
 const GRATIS = { porIp: 1, porDia: 300 };
 function limpiarMovs(b) {
@@ -226,6 +227,36 @@ export async function onRequestPost({ request, env, params }) {
     return json({ codigo, plan, hasta });
   }
 
+  if (ruta === 'pagar') {
+    const plan = PLANES[b.plan] ? b.plan : 'basico', P = PLANES[plan];
+    if (!codigoValido(b.codigo)) return json({ error: 'codigo' }, 400);
+    const caja = b.caja;
+    if (!caja || typeof caja.datos !== 'string' || caja.datos.length > 4e6) return json({ error: 'caja' }, 400);
+    const vuelta = ['/extracto/', '/ca/extracte/', '/en/statement/'].includes(b.vuelta) ? b.vuelta : '/extracto/';
+    const idioma = ['ca', 'en'].includes(b.idioma) ? b.idioma : 'es';
+    const h = await huella(b.codigo), base = new URL(request.url).origin;
+    await env.FEEHUND_KV.put('ia:caja:' + h, JSON.stringify({ sal: caja.sal, iv: caja.iv, datos: caja.datos }), { expirationTtl: 2 * 86400 });
+    await env.FEEHUND_KV.put('ia:pend:' + h, JSON.stringify({ plan, codigo: String(b.codigo).toUpperCase(), idioma, creado: Date.now() }), { expirationTtl: 2 * 86400 });
+    const dura = { es: plan === 'basico' ? '7 días' : '3 meses', ca: plan === 'basico' ? '7 dies' : '3 mesos', en: plan === 'basico' ? '7 days' : '3 months' }[idioma];
+    const textos = {
+      descripcion: { es: 'Pregúntale a Tiqui · ' + dura + ' · Tu código ', ca: 'Pregunta-li a Tiqui · ' + dura + ' · El teu codi ', en: 'Ask Tiqui · ' + dura + ' · Your code ' }[idioma] + String(b.codigo).toUpperCase(),
+      renuncia: { es: 'Empieza en cuanto pagas. Al pagar aceptas que es contenido digital y que no hay periodo de devolución.', ca: 'Comença tan bon punt pagues. En pagar acceptes que és contingut digital i que no hi ha període de devolució.', en: 'It starts as soon as you pay. By paying you accept it is digital content with no cancellation period.' }[idioma],
+    };
+    try {
+      const s2 = await crearPagoTiqui(env, { ref: h, plan, importe: P.precio, producto: env.STRIPE_PRODUCT_TIQUI || PRODUCTO_TIQUI, idioma, textos,
+        vuelta: base + vuelta + '?tiqui=ok&s={CHECKOUT_SESSION_ID}', cancelar: base + vuelta + '?tiqui=no' });
+      return json({ url: s2.url });
+    } catch (e) { return json({ error: 'pago', detalle: env.IA_PRUEBAS === '1' ? String(e.message) : undefined }, 502); }
+  }
+  if (ruta === 'canjear') {
+    if (!codigoValido(b.codigo) || !/^cs_[A-Za-z0-9_]+$/.test(String(b.sesion || ''))) return json({ error: 'datos' }, 400);
+    const h = await huella(b.codigo);
+    let sesion; try { sesion = await leerPago(env, b.sesion); } catch (e) { return json({ error: 'stripe' }, 502); }
+    const pase = await activarTiqui(env, h, sesion, new URL(request.url).origin);
+    if (!pase) return json({ error: 'sin_pagar' }, 402);
+    return json({ plan: pase.plan, hasta: pase.hasta });
+  }
+
   if (ruta === 'pregunta-gratis') {
     if (!env.ANTHROPIC_API_KEY) return json({ error: 'sin_clave' }, 503);
     const hoyEs = new Date().toISOString().slice(0, 10);
@@ -247,6 +278,9 @@ export async function onRequestPost({ request, env, params }) {
 
   const h = await huella(b.codigo);
   const pase = JSON.parse((await env.FEEHUND_KV.get('ia:pase:' + h)) || 'null');
+  if (ruta === 'abrir' && !pase && (await env.FEEHUND_KV.get('ia:pend:' + h))) {
+    return json({ caja: JSON.parse((await env.FEEHUND_KV.get('ia:caja:' + h)) || 'null'), pendiente: true });
+  }
   if (!pase || pase.hasta < Date.now()) return json({ error: 'codigo' }, 402);
   const ttl = Math.max(120, Math.ceil((pase.hasta - Date.now()) / 1000) + 86400);
 

@@ -57,6 +57,7 @@
     .tq-g--dentro .tq-img{width:200px}
   }
   [hidden]{display:none!important}
+  .tq-cod{display:grid;gap:8px;margin-top:8px}.tq-cod label{font:700 16px/1.2 var(--f-text);color:var(--ink)}.tq-cod .p-in{display:flex;gap:8px}.tq-cod input{flex:1;min-width:0;min-height:48px;padding:0 16px;border:1.5px solid var(--line);border-radius:999px;background:var(--bg);color:var(--ink);font:400 16px/1 ui-monospace,Menlo,monospace;text-transform:uppercase}.tq-cod button{flex:none;width:48px;height:48px;border:0;border-radius:50%;background:var(--ink);color:var(--bg);font:700 20px/1 var(--f-text);cursor:pointer}.tq-err{margin:0;min-height:1em;font:400 15px/1.3 var(--f-text);color:var(--amber-text)}
   .tq-demo .p-m--ia{position:relative;margin-left:48px;max-width:calc(88% - 48px)}
   .tq-demo .p-m--ia::before{content:"";position:absolute;left:-48px;bottom:0;width:38px;height:38px;border-radius:50%;background:#FFF8EC url("../assets/img/tiqui-olfatea.webp") center/cover}
   .p-m{max-width:88%;padding:12px 14px;border-radius:16px;font:400 16px/1.45 var(--f-text)}
@@ -115,15 +116,40 @@
 
   <section class="tq-planes" aria-label="Precio">
     <div class="p-plan"><span class="p-plan-p">0,99 €</span><span class="p-plan-d">7 días</span></div>
-    <div class="p-plan p-plan--top"><span class="p-plan-p">2,99 €</span><span class="p-plan-d">3 meses</span><span class="p-plan-m">Añade más extractos</span></div>
+    <div class="p-plan p-plan--top"><span class="p-plan-p">2,99 €</span><span class="p-plan-d">3 meses</span></div>
   </section>
 
   <div class="tq-acc">
-    <a class="tq-cta" href="../extracto/">Subir mi extracto</a>
-    <p class="tq-sin">Un solo pago. Sin suscripción</p>
+    <a class="tq-cta" id="tqAbrir" href="../extracto/">Subir mi extracto</a>
+    <p class="tq-sin" id="tqSin">Un solo pago. Sin suscripción</p>
+    <form class="tq-cod" id="tqForm">
+      <label for="tqCod">¿Ya tienes tu código?</label>
+      <div class="p-in"><input id="tqCod" autocomplete="off" autocapitalize="characters" placeholder="FH-XXXX-XXXX-XXXX-XXXX"><button type="submit" aria-label="Entrar">→</button></div>
+      <p class="tq-err" id="tqErr" role="status"></p>
+    </form>
   </div>
 </div>
 </main>
+<script>
+(function () {
+  var $ = function (id) { return document.getElementById(id); };
+  // Enlace del correo: /tiqui/#CÓDIGO abre tus gastos directamente
+  var h = decodeURIComponent(location.hash.slice(1)).trim().toUpperCase();
+  if (/^FH-?[0-9A-Z]{4}/.test(h)) { location.replace("../extracto/?vuelta#" + encodeURIComponent(h)); return; }
+  var p = null; try { p = JSON.parse(localStorage.getItem("fh-tiqui-pase") || "null"); } catch (e) {}
+  if (p && p.hasta > Date.now()) {
+    var meses = ["enero","febrero","marzo","abril","mayo","junio","julio","agosto","septiembre","octubre","noviembre","diciembre"], d = new Date(p.hasta);
+    $("tqAbrir").textContent = "Abrir mis gastos"; $("tqAbrir").href = "../extracto/?vuelta";
+    $("tqSin").textContent = "Hasta el " + d.getDate() + " de " + meses[d.getMonth()];
+  }
+  $("tqForm").addEventListener("submit", function (e) {
+    e.preventDefault();
+    var c = $("tqCod").value.trim().toUpperCase();
+    if (!/^FH-?[0-9A-Z]{4}/.test(c)) { $("tqErr").textContent = "Revisa el código. Empieza por FH."; return; }
+    location.href = "../extracto/?vuelta#" + encodeURIComponent(c);
+  });
+})();
+</script>
 <footer class="ftr"><div class="wrap ftr-in">
   <p class="ftr-indep">Ningún banco ni empresa de pago paga por aparecer en Feehund.</p>
   <ul class="ftr-links">

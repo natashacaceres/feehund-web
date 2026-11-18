@@ -1,5 +1,6 @@
 // Mi banco: «Pregúntale a Tiqui». La primera pregunta es gratis (functions/api/ia/[[ruta]].js, ruta pregunta-gratis);
-// después salen los dos planes. El pago todavía no está conectado: el botón dice «Muy pronto».
+// después salen los dos planes y se paga en Stripe (/api/ia/pagar). El extracto viaja cifrado con el código, que se crea
+// aquí y solo tiene quien paga (también le llega por correo y sale en el recibo). Al volver (?tiqui=ok) se activa el pase.
 // Va antes de «Compartir» en el móvil y fijo a la derecha en el ordenador. Sin estilos ni scripts en línea (CSP).
 (function () {
   "use strict";
@@ -19,8 +20,11 @@
       adonde: "¿Adónde se va mi dinero?", raro: "¿Hay algo raro en mi cuenta?", llevo: (m) => "¿Cuánto llevo en " + m + "?", mesMas: "¿En qué mes gasté más?",
       seguimos: "¿Seguimos?", verPago: "Ver el pago", verPagos: (n) => "Ver los " + n + " pagos", ocultar: "Ocultar",
       noComprobado: "No he podido comprobar las cifras, así que prefiero no dártelas. Prueba a preguntarlo de otra forma.", noPuedo: "Ahora no puedo responder. Prueba en un momento.",
-      planes: { basico: ["0,99 €", "7 días"], completo: ["2,99 €", "3 meses", "Añade más extractos"] }, pagar: (p) => "Pagar " + p,
-      unPago: "Un solo pago. Sin suscripción", ahoraNo: "Ahora no", pronto: "Muy pronto. Todavía no se puede pagar.",
+      planes: { basico: ["0,99 €", "7 días"], completo: ["2,99 €", "3 meses"] }, pagar: (p) => "Pagar " + p,
+      unPago: "Un solo pago. Sin suscripción", ahoraNo: "Ahora no", momento: "Un momento…", errorPago: "No se ha podido. Prueba otra vez.",
+      tuyo: "Tiqui ya es tuyo", copiar: "Copiar", copiado: "Copiado", correo: "Te lo hemos mandado por correo. Con él vuelves desde Tu Tiqui, sin subir nada.",
+      hasta: (d) => "Hasta el " + d.getDate() + " de " + ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"][d.getMonth()],
+      topeDia: "Por hoy ya está. Mañana seguimos.", topeTotal: "Has llegado al máximo de este pase.", noAbre: "Ese código no existe o ya caducó.", sinPagar: "Aún no nos ha llegado el pago. Si has pagado, recarga en un momento.",
     },
     ca: {
       titulo: "Pregunta-li a Tiqui", gratis: "La teva primera pregunta és gratis", siguePlanes: "Tria quant de temps i continua preguntant",
@@ -28,8 +32,11 @@
       adonde: "On van els meus diners?", raro: "Hi ha alguna cosa estranya al meu compte?", llevo: (m) => "Quant porto a " + m + "?", mesMas: "Quin mes vaig gastar més?",
       seguimos: "Continuem?", verPago: "Veure el pagament", verPagos: (n) => "Veure els " + n + " pagaments", ocultar: "Amagar",
       noComprobado: "No he pogut comprovar les xifres, així que prefereixo no donar-te-les. Prova de preguntar-ho d'una altra manera.", noPuedo: "Ara no puc respondre. Prova-ho d'aquí a un moment.",
-      planes: { basico: ["0,99 €", "7 dies"], completo: ["2,99 €", "3 mesos", "Afegeix més extractes"] }, pagar: (p) => "Pagar " + p,
-      unPago: "Un sol pagament. Sense subscripció", ahoraNo: "Ara no", pronto: "Molt aviat. Encara no es pot pagar.",
+      planes: { basico: ["0,99 €", "7 dies"], completo: ["2,99 €", "3 mesos"] }, pagar: (p) => "Pagar " + p,
+      unPago: "Un sol pagament. Sense subscripció", ahoraNo: "Ara no", momento: "Un moment…", errorPago: "No s'ha pogut. Torna-ho a provar.",
+      tuyo: "Tiqui ja és teu", copiar: "Copiar", copiado: "Copiat", correo: "T'ho hem enviat per correu. Amb ell tornes des d'El teu Tiqui, sense pujar res.",
+      hasta: (d) => "Fins al " + d.getDate() + " " + ["de gener", "de febrer", "de març", "d'abril", "de maig", "de juny", "de juliol", "d'agost", "de setembre", "d'octubre", "de novembre", "de desembre"][d.getMonth()],
+      topeDia: "Per avui ja està. Demà continuem.", topeTotal: "Has arribat al màxim d'aquest passi.", noAbre: "Aquest codi no existeix o ja ha caducat.", sinPagar: "Encara no ens ha arribat el pagament. Si has pagat, torna a carregar d'aquí a un moment.",
     },
     en: {
       titulo: "Ask Tiqui", gratis: "Your first question is free", siguePlanes: "Pick how long and keep asking",
@@ -37,8 +44,11 @@
       adonde: "Where does my money go?", raro: "Is anything odd in my account?", llevo: (m) => "How much have I spent on " + m + "?", mesMas: "Which month did I spend the most?",
       seguimos: "Shall we carry on?", verPago: "See the payment", verPagos: (n) => "See the " + n + " payments", ocultar: "Hide",
       noComprobado: "I couldn't check the figures, so I'd rather not give them to you. Try asking another way.", noPuedo: "I can't answer right now. Try again in a moment.",
-      planes: { basico: ["0,99 €", "7 days"], completo: ["2,99 €", "3 months", "Add more statements"] }, pagar: (p) => "Pay " + p,
-      unPago: "One payment. No subscription", ahoraNo: "Not now", pronto: "Coming very soon. You can't pay yet.",
+      planes: { basico: ["0,99 €", "7 days"], completo: ["2,99 €", "3 months"] }, pagar: (p) => "Pay " + p,
+      unPago: "One payment. No subscription", ahoraNo: "Not now", momento: "One moment…", errorPago: "That didn't work. Try again.",
+      tuyo: "Tiqui is yours", copiar: "Copy", copiado: "Copied", correo: "We've emailed it to you. Use it to come back from Your Tiqui, without uploading anything.",
+      hasta: (d) => "Until " + d.getDate() + " " + ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"][d.getMonth()],
+      topeDia: "That's it for today. See you tomorrow.", topeTotal: "You've reached the limit of this pass.", noAbre: "That code doesn't exist or has expired.", sinPagar: "We haven't received the payment yet. If you've paid, reload in a moment.",
     },
   }[LANG];
 
@@ -85,7 +95,29 @@
     return [T.adonde, T.raro, top ? T.llevo(top) : T.mesMas];
   }
 
-  const GRATIS = "fh-tiqui-gratis";
+  const GRATIS = "fh-tiqui-gratis", PASE = "fh-tiqui-pase", PEND = "fh-tiqui-pend";
+  const leer = (k) => { try { return JSON.parse(localStorage.getItem(k) || "null"); } catch (e) { return null; } };
+  const poner = (k, v) => { try { if (v) localStorage.setItem(k, JSON.stringify(v)); else localStorage.removeItem(k); } catch (e) {} };
+  const leerPase = () => { const p = leer(PASE); return p && p.hasta > Date.now() ? p : null; };
+  const ALF = "0123456789ABCDEFGHJKMNPQRSTVWXYZ"; // sin I, L, O, U
+  const nuevoCodigo = () => "FH-" + [...crypto.getRandomValues(new Uint8Array(16))].map((x) => ALF[x & 31]).join("").match(/.{4}/g).join("-");
+  // Cifrado en el navegador: la llave sale del código (PBKDF2 → AES-GCM). Al servidor solo llega la caja cerrada.
+  const b64 = (u8) => { let s = ""; for (let i = 0; i < u8.length; i += 8192) s += String.fromCharCode(...u8.subarray(i, i + 8192)); return btoa(s); };
+  const deB64 = (s) => Uint8Array.from(atob(s), (c) => c.charCodeAt(0));
+  async function llave(codigo, sal) {
+    const base = await crypto.subtle.importKey("raw", new TextEncoder().encode(String(codigo).toUpperCase().replace(/[^0-9A-Z]/g, "")), "PBKDF2", false, ["deriveKey"]);
+    return crypto.subtle.deriveKey({ name: "PBKDF2", salt: sal, iterations: 310000, hash: "SHA-256" }, base, { name: "AES-GCM", length: 256 }, false, ["encrypt", "decrypt"]);
+  }
+  async function cerrarCaja(codigo, datos) {
+    const sal = crypto.getRandomValues(new Uint8Array(16)), iv = crypto.getRandomValues(new Uint8Array(12));
+    const cif = new Uint8Array(await crypto.subtle.encrypt({ name: "AES-GCM", iv }, await llave(codigo, sal), new TextEncoder().encode(JSON.stringify(datos))));
+    return { sal: b64(sal), iv: b64(iv), datos: b64(cif) };
+  }
+  async function abrirCaja(codigo, caja) {
+    const claro = await crypto.subtle.decrypt({ name: "AES-GCM", iv: deB64(caja.iv) }, await llave(codigo, deB64(caja.sal)), deB64(caja.datos));
+    return JSON.parse(new TextDecoder().decode(claro));
+  }
+  let ultimoR = null, historial = [], codigoNuevo = null;
   const gratisUsada = () => { try { return !!localStorage.getItem(GRATIS); } catch (e) { return false; } };
   const api = async (ruta, cuerpo) => {
     try { const r = await fetch(ROOT + "api/ia/" + ruta, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(cuerpo) }); return { ok: r.ok, d: await r.json().catch(() => ({})) }; }
@@ -147,7 +179,18 @@
       b.append(mk("span", "tqc-plan-p", p), mk("span", "tqc-plan-d", du)); if (mas) b.appendChild(mk("span", "tqc-plan-m", mas));
       b.addEventListener("click", () => { plan = k; pintar(); }); pl.appendChild(b);
     });
-    ok.addEventListener("click", () => { msg.textContent = T.pronto; msg.hidden = false; });
+    ok.addEventListener("click", async () => {
+      if (!ultimoR) return;
+      ok.disabled = true; ok.textContent = T.momento; msg.hidden = true;
+      try {
+        const codigo = nuevoCodigo();
+        const caja = await cerrarCaja(codigo, { r: ultimoR });
+        const r = await api("pagar", { plan, codigo, caja, idioma: LANG, vuelta: location.pathname });
+        if (!r.ok || !r.d.url) throw new Error("pago");
+        poner(PEND, { codigo, plan });
+        location.href = r.d.url;
+      } catch (e) { ok.disabled = false; pintar(); msg.textContent = T.errorPago; msg.hidden = false; }
+    });
     const no = mk("button", "tqc-no", T.ahoraNo); no.type = "button";
     c.append(pl, ok, msg, mk("p", "tqc-unpago", T.unPago), no); d.appendChild(c); document.body.appendChild(d); pintar();
     const cerrar = () => { d.remove(); removeEventListener("keydown", tecla); };
@@ -155,7 +198,20 @@
     addEventListener("keydown", tecla); d.addEventListener("click", (e) => { if (e.target === d) cerrar(); }); no.addEventListener("click", cerrar);
     ok.focus({ preventScroll: true });
   }
+  async function preguntarPago(p, t) {
+    burbuja("tu", t);
+    const pensando = burbuja("ia", mk("span", "tqc-dots")); pensando.firstChild.append(mk("i"), mk("i"), mk("i"));
+    const r = await api("pregunta", { codigo: p.codigo, pregunta: t, idioma: LANG, historial, movimientos: envio() });
+    pensando.remove();
+    if (!r.ok) {
+      if (r.d.error === "codigo") { poner(PASE, null); burbuja("ia", T.noAbre); return; }
+      burbuja("ia", r.d.error === "tope_dia" ? T.topeDia : r.d.error === "tope_total" ? T.topeTotal : r.d.error === "no_comprobado" ? T.noComprobado : T.noPuedo); return;
+    }
+    respuesta(r.d.texto, r.d.pagos);
+    historial.push({ rol: "tu", texto: t }, { rol: "ia", texto: r.d.texto }); historial = historial.slice(-8);
+  }
   async function preguntar(t) {
+    const p = leerPase(); if (p) return preguntarPago(p, t);
     if (gratisUsada()) { abrirPago("basico"); return; }
     burbuja("tu", t);
     const pensando = burbuja("ia", mk("span", "tqc-dots")); pensando.firstChild.append(mk("i"), mk("i"), mk("i"));
@@ -171,7 +227,8 @@
   function montarCaja() {
     caja = mk("section", "tqc"); caja.id = "tqcIa"; caja.setAttribute("aria-label", T.titulo);
     const ch = mk("div", "tqc-chat");
-    const top = mk("div", "tqc-top"); top.appendChild(mk("h2", "tqc-h", T.titulo)); sub = mk("p", "tqc-sub", gratisUsada() ? T.siguePlanes : T.gratis); top.appendChild(sub);
+    const pase = leerPase();
+    const top = mk("div", "tqc-top"); top.appendChild(mk("h2", "tqc-h", T.titulo)); sub = mk("p", "tqc-sub", pase ? T.hasta(new Date(pase.hasta)) : gratisUsada() ? T.siguePlanes : T.gratis); top.appendChild(sub);
     msgs = mk("div", "tqc-msgs"); msgs.setAttribute("aria-live", "polite");
     sug = mk("div", "tqc-sug");
     sugerencias().forEach((q) => { const b = mk("button", null, q); b.type = "button"; b.addEventListener("click", () => preguntar(q)); sug.appendChild(b); });
@@ -179,7 +236,16 @@
     const env = mk("button", null, "→"); env.type = "submit"; env.setAttribute("aria-label", T.enviar);
     f.append(inp, env); f.addEventListener("submit", (e) => { e.preventDefault(); const t = inp.value.trim(); if (t) { inp.value = ""; preguntar(t); } });
     ch.append(top, msgs, sug, f); caja.appendChild(ch);
-    if (gratisUsada()) { msgs.textContent = ""; planesEnChat(); } else burbuja("ia", T.hola);
+    historial = [];
+    if (pase) {
+      if (codigoNuevo) {
+        const f2 = document.createDocumentFragment(); f2.appendChild(mk("b", null, T.tuyo));
+        const cod = mk("span", "tqc-cod", codigoNuevo); const cp = mk("button", "tqc-ver", T.copiar); cp.type = "button";
+        cp.addEventListener("click", () => { try { navigator.clipboard.writeText(codigoNuevo).then(() => { cp.textContent = T.copiado; }, () => {}); } catch (e) {} });
+        f2.append(cod, cp, mk("span", "tqc-cod-t", T.correo)); burbuja("ia", f2).classList.add("tqc-m--cod"); codigoNuevo = null;
+      }
+      burbuja("ia", T.hola);
+    } else if (gratisUsada()) { msgs.textContent = ""; planesEnChat(); } else burbuja("ia", T.hola);
   }
   // Dónde va: en el ordenador, a la derecha del resultado; en el móvil, antes de «Compartir» (o tras las gráficas si están abiertas)
   const ancho = matchMedia("(min-width:1100px)");
@@ -198,9 +264,51 @@
   document.addEventListener("fh-resultado", (e) => {
     const r = e.detail; if (!r) return;
     try {
-      todos = ((r.lectura && r.lectura.movimientos) || []).map((m, n) => Object.assign({}, m, { id: "m" + n, c: clasificar(m) }));
+      ultimoR = r;
+      // Lo que Feehund ya sabe (sus cobros) y lo que contestaste en las preguntas manda sobre las reglas de arriba
+      const CASA = ["telecos", "energia", "agua", "alarmas", "hogar", "gastos_fijos", "vivienda"], SUSC = ["streaming", "musica", "nube_apps", "ia", "prensa", "gimnasios", "citas", "videojuegos", "idiomas", "reparto", "suscripciones", "club_descuentos", "bienestar", "pasarelas"];
+      const sabe = {};
+      (r.cobros || []).forEach((c) => {
+        const s2 = CASA.indexOf(c.categoria) >= 0 ? "casa" : SUSC.indexOf(c.categoria) >= 0 ? "suscr" : c.categoria === "comisiones" ? "comisiones" : null;
+        if (s2) (c.movimientos || []).forEach((m) => { sabe[m.fecha + "|" + m.importe + "|" + m.concepto] = s2; });
+      });
+      todos = ((r.lectura && r.lectura.movimientos) || []).map((m, n) => {
+        const c = clasificar(m), k = sabe[m.fecha + "|" + m.importe + "|" + m.concepto];
+        return Object.assign({}, m, { id: "m" + n, c: k ? { k: c.k, s: k } : c });
+      });
       if (caja) caja.remove();
       montarCaja(); setTimeout(colocar, 0);
     } catch (err) { /* si algo falla, el resumen sigue como siempre */ }
   });
+
+  // ---------- Al abrir la página: volver de Stripe (?tiqui=ok / ?tiqui=no) o con el código (?vuelta#CÓDIGO) ----------
+  const aviso = (t) => { const e = $("xErr"); if (e) { e.textContent = t; e.hidden = false; } };
+  async function abrirYMostrar(codigo) {
+    const r = await api("abrir", { codigo });
+    if (!r.ok || !r.d.caja) { aviso(T.noAbre); return false; }
+    if (r.d.plan && r.d.hasta) poner(PASE, { codigo, plan: r.d.plan, hasta: r.d.hasta });
+    let datos; try { datos = await abrirCaja(codigo, r.d.caja); } catch (e) { aviso(T.noAbre); return false; }
+    return !!(window.FeehundMostrar && datos && window.FeehundMostrar(datos.r));
+  }
+  async function inicio() {
+    const q = new URLSearchParams(location.search), limpia = () => history.replaceState(null, "", location.pathname);
+    if (q.get("tiqui") === "ok") {
+      const pend = leer(PEND), sesion = q.get("s") || ""; limpia();
+      if (!pend) return;
+      let r = await api("canjear", { codigo: pend.codigo, sesion });
+      if (!r.ok && r.d.error === "sin_pagar") { await new Promise((x) => setTimeout(x, 3000)); r = await api("canjear", { codigo: pend.codigo, sesion }); }
+      if (!r.ok) { aviso(T.sinPagar); return; }
+      poner(PASE, { codigo: pend.codigo, plan: r.d.plan, hasta: r.d.hasta }); poner(PEND, null);
+      codigoNuevo = pend.codigo;
+      await abrirYMostrar(pend.codigo);
+    } else if (q.get("tiqui") === "no") {
+      const pend = leer(PEND); limpia(); poner(PEND, null);
+      if (pend) await abrirYMostrar(pend.codigo); // vuelve a ver lo suyo, sin subir nada
+    } else if (q.has("vuelta")) {
+      const h = decodeURIComponent(location.hash.slice(1)).trim().toUpperCase(), p = leerPase();
+      const codigo = /^FH-?[0-9A-Z]/.test(h) ? h : p && p.codigo; limpia();
+      if (codigo) await abrirYMostrar(codigo);
+    }
+  }
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", () => inicio().catch(() => {})); else inicio().catch(() => {});
 })();

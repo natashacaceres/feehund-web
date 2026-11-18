@@ -60,3 +60,8 @@
   #xRes>#tqcIa .tqc-chat>*:not(.tqc-msgs){flex:none}
 }
 @media (prefers-reduced-motion:reduce){.tqc-dots i{animation:none}}
+/* La tarjeta del código al volver de pagar */
+.tqc-m--cod{display:grid;gap:8px}
+.tqc-cod{display:block;padding:10px 12px;border-radius:10px;background:#F3E6CC;font:700 16px/1.2 ui-monospace,Menlo,monospace;letter-spacing:.02em;white-space:nowrap;overflow-x:auto}
+.tqc-cod-t{display:block;font:400 15px/1.4 var(--f-text);color:#4F5667}
+.tqc-cta:disabled{opacity:.7;cursor:default}

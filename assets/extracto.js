@@ -211,6 +211,18 @@
     const h = $("xResH"); if (h) h.focus({ preventScroll: true });
   }
 
+  // Volver con el código de Tiqui (o de pagar): pinta un resultado guardado, sin leer nada ni volver a preguntar
+  window.FeehundMostrar = (r) => {
+    if (!r || !r.cobros) return false;
+    actual = r; propio = true;
+    const cobros = (r.cobros || []).filter((c) => c.estado === "seguro" || c.estado === "posible");
+    setTimeout(() => document.dispatchEvent(new CustomEvent("fh-resultado", { detail: r })), 0);
+    render(r, cobros); show("res");
+    const bShare = $("xShare"); if (bShare) bShare.hidden = !personalidad();
+    const ej = $("xEjemplo"); if (ej) ej.hidden = true;
+    return true;
+  };
+
   // ---------- Lectura con IA (Claude) cuando el dispositivo no puede leerlo entero ----------
   // El archivo va a /api/leer (Cloudflare), que se lo pasa a Claude y devuelve los movimientos sin guardar nada.
   // Los movimientos vuelven a pasar por el motor de siempre como un CSV: el mismo análisis y la misma comprobación de saldos.
@@ -492,12 +504,6 @@
     esc.hidden = !contados.length;
     esc.dataset.ok = subs.length ? "no" : "si";
     esc.textContent = T3.suscr(subs.length, eur(Math.round(subs.reduce((t, c) => t + (c.coste_anual || 0), 0))), recs);
-    if (subs.length && recs) {
-      const q = el("button", "r3-dif-b", "?"); q.type = "button"; q.setAttribute("aria-label", T3.difT); q.setAttribute("aria-expanded", "false");
-      const ex = el("span", "r3-dif", T3.dif); ex.hidden = true;
-      q.addEventListener("click", () => { ex.hidden = !ex.hidden; q.setAttribute("aria-expanded", String(!ex.hidden)); });
-      esc.appendChild(document.createTextNode(" ")); esc.appendChild(q); esc.appendChild(ex);
-    }
 
     // ---- 2. pintar las acciones: tres a la vista y el resto detrás de «Ver X más» ----
     const ul = $("xAcciones"); ul.textContent = "";
