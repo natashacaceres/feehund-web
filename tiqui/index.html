@@ -27,6 +27,7 @@
   .tq-demo{position:relative;overflow:hidden;background:var(--ink);border-radius:24px;padding:var(--s-4) var(--s-4) var(--s-5);display:grid;gap:12px}
   .tq-demo::after{content:"";position:absolute;right:-70px;bottom:-60px;width:300px;height:300px;border-radius:50%;background:url("../assets/img/tiqui-olfatea.webp") center/cover;opacity:.07;filter:grayscale(1);pointer-events:none}
   .tq-demo>*{position:relative;z-index:1}
+  .tq-msgs{display:grid;gap:12px}
   .tq-in{display:flex;gap:8px;margin-top:4px}
   .tq-in span{flex:1;min-height:48px;display:flex;align-items:center;padding:0 18px;border:1px solid rgba(255,248,236,.22);border-radius:999px;background:rgba(255,248,236,.08);color:rgba(255,248,236,.65);font:400 16px/1 var(--f-text)}
   .tq-in i{flex:none;width:48px;height:48px;border-radius:50%;display:grid;place-items:center;background:#FFF8EC;color:#14213D;font:700 20px/1 var(--f-text);font-style:normal}
@@ -54,11 +55,21 @@
   .tq-salir{justify-self:center;min-height:44px;border:0;background:none;color:var(--ink-2);font:700 16px/1 var(--f-text);text-decoration:underline;cursor:pointer}
   @media (min-width:960px){
     .tq{padding-top:var(--s-5);padding-bottom:var(--s-5)}
-    .tq-g{max-width:none;grid-template-columns:minmax(0,1fr) minmax(0,1fr);grid-template-areas:"hero demo" "dif demo" "planes demo" "acc demo";grid-template-rows:auto auto auto 1fr;column-gap:clamp(40px,6vw,96px);row-gap:var(--s-4);align-items:start}
-    .tq-hero{grid-area:hero;justify-items:start;text-align:left}
+    .tq-g{max-width:none;grid-template-columns:minmax(0,1fr) minmax(0,1fr);grid-template-areas:"titulo ." "sw demo" "dif demo" "planes demo" "acc demo";grid-template-rows:auto auto auto auto 1fr;column-gap:clamp(40px,6vw,96px);row-gap:var(--s-4);align-items:start}
+    .tq-hero{display:contents;text-align:left}
+    .tq-hero .tq-h{justify-self:start}
+    .tq-err:empty{display:none}
+    .tq-hero .tq-h{grid-area:titulo}
+    .tq-hero .tq-sw{grid-area:sw;margin-top:0}
     .tq-img{width:140px}
     .tq-h{font-size:clamp(40px,3.9vw,56px);white-space:nowrap}
-    .tq-demo{grid-area:demo}
+    /* el chat empieza a la altura de «Para ti» y acaba a la altura del código: no cuenta para el alto (contain), se estira */
+    .tq-demo{grid-area:demo;align-self:stretch;contain:size;display:flex;flex-direction:column}
+    .tq-msgs{flex:1 1 auto;min-height:0;overflow:hidden;display:flex;flex-direction:column;justify-content:flex-end;gap:12px}
+    .tq-msgs>.p-m:nth-child(-n+2){display:none}
+    .tq-acc{align-self:end}
+    .tq-msgs .p-m--tu{align-self:flex-end}
+    .tq-msgs .p-m--ia{align-self:flex-start}
     .tq-dif{grid-area:dif}
     .tq-dif{gap:var(--s-2)}
     .tq-dif li{font-size:26px;padding-left:40px;background-size:26px}
@@ -121,22 +132,26 @@
 
     <section class="tq-demo" data-m="neg" hidden>
     <div class="tq-top"><img src="../assets/img/tiqui-olfatea.webp" alt="" width="44" height="44"><div><p class="tq-nom">Tiqui</p><p class="tq-est"><i></i>Olfateando tu datáfono</p></div><span class="tq-priv">Privado</span></div>
+    <div class="tq-msgs">
     <div class="p-m p-m--tu">¿Cuánto me cobra el banco al mes?</div>
     <div class="p-m p-m--ia">En octubre, 83,42&nbsp;€. Son 1,04&nbsp;€ de cada 100 que cobras con tarjeta.</div>
     <div class="p-m p-m--tu">¿Por qué unas tarjetas me cobran más?</div>
     <div class="p-m p-m--ia">Las de turistas y las de empresa no tienen máximo por ley. Este mes te costaron 17,55&nbsp;€.</div>
     <div class="p-m p-m--tu">¿A quién me cambio?</div>
     <div class="p-m p-m--ia">Con tus ventas, hay quien te cobraría 0,63&nbsp;€. Te digo quién y con qué condiciones.</div>
+    </div>
     <div class="tq-in" aria-hidden="true"><span>Escribe tu pregunta</span><i>→</i></div>  </section>
 
 <section class="tq-demo" data-m="ti" aria-label="Así se pregunta">
     <div class="tq-top"><img src="../assets/img/tiqui-olfatea.webp" alt="" width="44" height="44"><div><p class="tq-nom">Tiqui</p><p class="tq-est"><i></i>Olfateando tu extracto</p></div><span class="tq-priv">Privado</span></div>
+    <div class="tq-msgs">
     <div class="p-m p-m--tu">¿Adónde se va mi dinero?</div>
     <div class="p-m p-m--ia">La mitad se va en casa, con el alquiler, la luz y el agua. Después va el súper, con 312,40&nbsp;€ al mes.<span class="tq-pagos">Ver los pagos</span></div>
     <div class="p-m p-m--tu">¿Hay algo raro en mi cuenta?</div>
     <div class="p-m p-m--ia">Spotify te cobró dos veces el 13 de marzo. Son 11,99&nbsp;€ de más.</div>
     <div class="p-m p-m--tu">¿Cuánto llevo en Glovo?</div>
     <div class="p-m p-m--ia">186,40&nbsp;€ desde marzo, en 14 pedidos.</div>
+    </div>
     <div class="tq-in" aria-hidden="true"><span>Escribe tu pregunta</span><i>→</i></div>  </section>
 
     <ul class="tq-dif" data-m="neg" hidden>
