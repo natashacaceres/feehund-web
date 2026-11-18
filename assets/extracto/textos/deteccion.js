@@ -7,7 +7,7 @@ export default {
   categoria_streaming: t('Series y películas', 'Sèries i pel·lícules', 'Films and series'),
   categoria_musica: t('Música y audio', 'Música i àudio', 'Music and audio'),
   categoria_nube_apps: t('Nube y apps', 'Núvol i aplicacions', 'Cloud and apps'),
-  categoria_ia: t('Inteligencia artificial', 'Intel·ligència artificial', 'AI tools'),
+  categoria_ia: t('Asistentes y herramientas', 'Assistents i eines', 'Assistants and tools'),
   categoria_suscripciones: t('Otras suscripciones', 'Altres subscripcions', 'Other subscriptions'),
   categoria_prensa: t('Prensa y lectura', 'Premsa i lectura', 'News and reading'),
   categoria_telecos: t('Teléfono e internet', 'Telèfon i internet', 'Phone and internet'),

@@ -54,3 +54,9 @@
 #xTarjeta.pg-abierta .pg-guardar{display:inline-flex}
 #xTarjeta.pg-abierta #xTarjetaImg{cursor:pointer}
 @media (prefers-reduced-motion:reduce){.pg-tabs button,.pg-wf i,#xTarjeta .r3-tarjeta-v,#xTarjeta{transition:none}}
+
+/* «?» al lado de la frase de suscripciones y recibos */
+.r3-dif-b{display:inline-grid;place-items:center;width:24px;height:24px;margin-left:2px;padding:0;border:1.5px solid currentColor;border-radius:50%;background:none;color:inherit;font:700 14px/1 var(--f-text);vertical-align:2px;cursor:pointer}
+.r3-dif{display:block;margin-top:10px;font:400 15px/1.4 var(--f-text)}
+.r3-dif[hidden]{display:none}
+#xShare[aria-disabled="true"]{cursor:default}

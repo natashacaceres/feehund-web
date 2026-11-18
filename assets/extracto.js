@@ -40,7 +40,7 @@
       veces: (n) => (n === 1 ? "Cobrada 1 vez" : "Cobrada " + n + " veces"), de: (a, b, c) => "De " + a + " a " + b + " € " + c, repetido: (f) => "Repetido el " + f,
       devol: (n, f) => (n === 1 ? "Una devolución, el " + f : n + " devoluciones, la última el " + f), ultimo: (f, x, c) => "Último cargo el " + f + " · " + x + " € " + c,
       tarjeta: "Puede que ahora lo pagues con la tarjeta de crédito.", darBaja: "Dar de baja", darme: "Darme de baja",
-      aDuplicado: ["Pagas dos servicios para lo mismo", (a, b) => a + " y " + b + " hacen lo mismo. Puedes quedarte con uno."], priv: "Se lee en tu dispositivo. Si no puede, lo lee la IA de Claude sin guardarlo.",
+      aDuplicado: ["Pagas dos servicios para lo mismo", (a, b) => a + " y " + b + " hacen lo mismo. Puedes quedarte con uno."], priv: "Privado. No se guarda.",
       none: "No ha encontrado cobros que se repitan. Prueba con más meses.", bad: "No se ha podido leer. Prueba con Excel o CSV.", mapeo: "No reconocemos las columnas de este archivo. Prueba a descargarlo en Excel o CSV.",
       dl: "Imagen descargada.", ics: "Archivo de avisos descargado.", sinIcs: "No hay cobros para avisar.", share: (x) => x + " €/año en cobros que se repiten · feehund.com", lista: "Cobros que se repiten" },
     ca: { datafono: "Això és el resum del teu datàfon, no l'extracte del teu compte. Es llegeix a El meu datàfon.", irDatafono: "Anar a El meu datàfon", year: "€/any", menos: " menys/any",
@@ -68,7 +68,7 @@
       veces: (n) => (n === 1 ? "Cobrada 1 vegada" : "Cobrada " + n + " vegades"), de: (a, b, c) => "De " + a + " a " + b + " € " + c, repetido: (f) => "Repetit el " + f,
       devol: (n, f) => (n === 1 ? "Una devolució, el " + f : n + " devolucions, l'última el " + f), ultimo: (f, x, c) => "Últim càrrec el " + f + " · " + x + " € " + c,
       tarjeta: "Potser ara el pagues amb la targeta de crèdit.", darBaja: "Donar de baixa", darme: "Donar-me de baixa",
-      aDuplicado: ["Pagues dos serveis per al mateix", (a, b) => a + " i " + b + " fan el mateix. Pots quedar-te amb un."], priv: "Es llegeix al teu dispositiu. Si no pot, el llegeix la IA de Claude sense desar-lo.",
+      aDuplicado: ["Pagues dos serveis per al mateix", (a, b) => a + " i " + b + " fan el mateix. Pots quedar-te amb un."], priv: "Privat. No es desa.",
       none: "No ha trobat cobraments que es repeteixin. Prova amb més mesos.", bad: "No s'ha pogut llegir. Prova amb Excel o CSV.", mapeo: "No reconeixem les columnes d'aquest fitxer. Prova de descarregar-lo en Excel o CSV.",
       dl: "Imatge descarregada.", ics: "Fitxer d'avisos descarregat.", sinIcs: "No hi ha cobraments per avisar.", share: (x) => x + " €/any en cobraments que es repeteixen · feehund.com", lista: "Cobraments que es repeteixen" },
     en: { datafono: "This is your card machine summary, not your bank statement. It goes in My card machine.", irDatafono: "Go to My card machine", year: "€/year", menos: " less/year",
@@ -96,7 +96,7 @@
       veces: (n) => (n === 1 ? "Charged once" : "Charged " + n + " times"), de: (a, b, c) => "From " + a + " to " + b + " € " + c, repetido: (f) => "Repeated on " + f,
       devol: (n, f) => (n === 1 ? "One refund, on " + f : n + " refunds, the last on " + f), ultimo: (f, x, c) => "Last charge on " + f + " · " + x + " € " + c,
       tarjeta: "You may now be paying it with your credit card.", darBaja: "Cancel", darme: "Cancel it for me",
-      aDuplicado: ["Two services for the same thing", (a, b) => a + " and " + b + " do the same. You could keep just one."], priv: "It's read on your device. If it can't be, Claude's AI reads it without storing it.",
+      aDuplicado: ["Two services for the same thing", (a, b) => a + " and " + b + " do the same. You could keep just one."], priv: "Private. Never stored.",
       none: "No recurring charges found. Try with more months.", bad: "The file could not be read. Try Excel or CSV.", mapeo: "We do not recognise the columns in this file. Try downloading it as Excel or CSV.",
       dl: "Image downloaded.", ics: "Reminder file downloaded.", sinIcs: "There are no charges to remind you about.", share: (x) => "€" + x + "/year in recurring charges · feehund.com", lista: "Recurring charges" },
   }[LANG];
@@ -330,14 +330,15 @@
   const TRES = Boolean($("xHacer"));
   const T3 = {
     es: { meses: (n) => (n === 1 ? "1 mes leído" : n + " meses leídos"), calc: (n) => "al año, calculado con " + (n === 1 ? "1 mes" : n + " meses"),
-      fRevisar: "Lo he revisado todo. Te cuento solo lo importante.", fNada: "Nada que reclamar. Lo he mirado dos veces, por si acaso.", fPoco: "Me has dado poco, pero esto es lo que veo.",
+      fRevisar: "Lo he revisado todo.", fNada: "Nada que reclamar. Lo he mirado dos veces, por si acaso.", fPoco: (n) => "Con " + (n === 1 ? "1 mes" : n + " meses") + " veo poco. Con 6 o más, lo veo todo.",
+      difT: "Suscripción o recibo", dif: "Suscripción: la eliges y te das de baja cuando quieras, como Netflix o el gimnasio. Recibo: luz, agua, teléfono o internet; cambia según lo que gastas.",
       escRecibo: (x, n) => x + " se te escaparon en " + n + (n === 1 ? " recibo más alto de lo normal" : " recibos más altos de lo normal"),
       escDoble: (x, n) => x + " se te escaparon en " + (n === 1 ? "un posible cobro repetido" : n + " posibles cobros repetidos"),
       escComision: (x) => x + " se te escaparon en comisiones del banco",
       escVarios: (x, m) => x + " se te escaparon " + (m >= 12 ? "este año" : m <= 1 ? "este mes" : "en estos " + m + " meses"), escNada: "No se te escapa nada",
       suscr: (n, x, r) => n ? "Tienes " + n + (n === 1 ? " suscripción que te cuesta " : " suscripciones que te cuestan ") + x + " al año" + (r ? ", y " + r + (r === 1 ? " recibo más." : " recibos más.") : ".")
         : "Tienes " + r + (r === 1 ? " recibo que se repite" : " recibos que se repiten") + " y ninguna suscripción.",
-      nada: "No hemos visto cobros que se repitan.", otros: "Otros", recibos: "Recibos que varían", devolvieron: (x) => "Te devolvieron " + x, devoluciones: (n) => (n === 1 ? "1 devolución" : n + " devoluciones"),
+      nada: "No hemos visto cobros que se repitan.", tipos: { casa: "Casa", susc: "Suscripciones", seg: "Seguros", banco: "Comisiones del banco", otros: "Otros pagos" }, otros: "Otros", recibos: "Recibos que varían", devolvieron: (x) => "Te devolvieron " + x, devoluciones: (n) => (n === 1 ? "1 devolución" : n + " devoluciones"),
       verMas: (n) => "Ver " + n + " más", verMenos: "Ver menos", verDetalle: "Ver todo el detalle", ocultarDetalle: "Ocultar el detalle",
       revisar: "Revisar", anadir: "Añadir", ver: "Ver", darme: "Darme de baja", darBaja: "Dar de baja",
       dobleT: (x) => x + ": posible cobro repetido", dobleL: (i, f) => i + " dos veces, el " + f,
@@ -345,14 +346,15 @@
       comT: (x) => "Comisiones del banco: " + x, comL: "Cobradas en este extracto", comLR: "Puedes pedir que te la devuelvan",
       subT: (x, a) => x + ": " + a + " al año", subL: "Tu suscripción más cara" },
     ca: { meses: (n) => (n === 1 ? "1 mes llegit" : n + " mesos llegits"), calc: (n) => "a l'any, calculat amb " + (n === 1 ? "1 mes" : n + " mesos"),
-      fRevisar: "Ho he revisat tot. T'explico només el que importa.", fNada: "Res a reclamar. Ho he mirat dues vegades, per si de cas.", fPoco: "M'has donat poc, però això és el que veig.",
+      fRevisar: "Ho he revisat tot.", fNada: "Res a reclamar. Ho he mirat dues vegades, per si de cas.", fPoco: (n) => "Amb " + (n === 1 ? "1 mes" : n + " mesos") + " veig poc. Amb 6 o més, ho veig tot.",
+      difT: "Subscripció o rebut", dif: "Subscripció: la tries i et dones de baixa quan vulguis, com Netflix o el gimnàs. Rebut: llum, aigua, telèfon o internet; canvia segons el que gastes.",
       escRecibo: (x, n) => x + " se t'han escapat en " + n + (n === 1 ? " rebut més alt del normal" : " rebuts més alts del normal"),
       escDoble: (x, n) => x + " se t'han escapat en " + (n === 1 ? "un possible cobrament repetit" : n + " possibles cobraments repetits"),
       escComision: (x) => x + " se t'han escapat en comissions del banc",
       escVarios: (x, m) => x + " se t'han escapat " + (m >= 12 ? "aquest any" : m <= 1 ? "aquest mes" : "en aquests " + m + " mesos"), escNada: "No se t'escapa res",
       suscr: (n, x, r) => n ? "Tens " + n + (n === 1 ? " subscripció que et costa " : " subscripcions que et costen ") + x + " l'any" + (r ? ", i " + r + (r === 1 ? " rebut més." : " rebuts més.") : ".")
         : "Tens " + r + (r === 1 ? " rebut que es repeteix" : " rebuts que es repeteixen") + " i cap subscripció.",
-      nada: "No hem vist cobraments que es repeteixin.", otros: "Altres", recibos: "Rebuts que varien", devolvieron: (x) => "T'han retornat " + x, devoluciones: (n) => (n === 1 ? "1 devolució" : n + " devolucions"),
+      nada: "No hem vist cobraments que es repeteixin.", tipos: { casa: "Casa", susc: "Subscripcions", seg: "Assegurances", banco: "Comissions del banc", otros: "Altres pagaments" }, otros: "Altres", recibos: "Rebuts que varien", devolvieron: (x) => "T'han retornat " + x, devoluciones: (n) => (n === 1 ? "1 devolució" : n + " devolucions"),
       verMas: (n) => "Veure'n " + n + " més", verMenos: "Veure'n menys", verDetalle: "Veure tot el detall", ocultarDetalle: "Amagar el detall",
       revisar: "Revisar", anadir: "Afegir", ver: "Veure", darme: "Donar-me de baixa", darBaja: "Donar de baixa",
       dobleT: (x) => x + ": possible cobrament repetit", dobleL: (i, f) => i + " dues vegades, el " + f,
@@ -360,14 +362,15 @@
       comT: (x) => "Comissions del banc: " + x, comL: "Cobrades en aquest extracte", comLR: "Pots demanar que te la retornin",
       subT: (x, a) => x + ": " + a + " l'any", subL: "La teva subscripció més cara" },
     en: { meses: (n) => (n === 1 ? "1 month read" : n + " months read"), calc: (n) => "a year, worked out from " + (n === 1 ? "1 month" : n + " months"),
-      fRevisar: "I've checked everything. Here's only what matters.", fNada: "Nothing to claim. I checked twice, just in case.", fPoco: "You didn't give me much, but this is what I see.",
+      fRevisar: "I've checked everything.", fNada: "Nothing to claim. I checked twice, just in case.", fPoco: (n) => "With " + (n === 1 ? "1 month" : n + " months") + " I see little. With 6 or more, I see it all.",
+      difT: "Subscription or bill", dif: "Subscription: you choose it and can cancel any time, like Netflix or the gym. Bill: electricity, water, phone or internet; it changes with what you use.",
       escRecibo: (x, n) => x + " slipped away on " + n + (n === 1 ? " bill higher than usual" : " bills higher than usual"),
       escDoble: (x, n) => x + " slipped away on " + (n === 1 ? "a possible repeat charge" : n + " possible repeat charges"),
       escComision: (x) => x + " slipped away on bank fees",
       escVarios: (x, m) => x + " slipped away " + (m >= 12 ? "this year" : m <= 1 ? "this month" : "in these " + m + " months"), escNada: "Nothing is slipping away",
       suscr: (n, x, r) => n ? "You have " + n + (n === 1 ? " subscription costing " : " subscriptions costing ") + x + " a year" + (r ? ", and " + r + (r === 1 ? " more bill." : " more bills.") : ".")
         : "You have " + r + (r === 1 ? " bill that repeats" : " bills that repeat") + " and no subscriptions.",
-      nada: "We have not seen any repeating charges.", otros: "Other", recibos: "Bills that vary", devolvieron: (x) => "You got " + x + " back", devoluciones: (n) => (n === 1 ? "1 refund" : n + " refunds"),
+      nada: "We have not seen any repeating charges.", tipos: { casa: "Home", susc: "Subscriptions", seg: "Insurance", banco: "Bank fees", otros: "Other payments" }, otros: "Other", recibos: "Bills that vary", devolvieron: (x) => "You got " + x + " back", devoluciones: (n) => (n === 1 ? "1 refund" : n + " refunds"),
       verMas: (n) => "See " + n + " more", verMenos: "See less", verDetalle: "See all the detail", ocultarDetalle: "Hide the detail",
       revisar: "Check", anadir: "Add", ver: "See", darme: "Cancel it for me", darBaja: "Cancel",
       dobleT: (x) => x + ": possible repeat charge", dobleL: (i, f) => i + " twice, on " + f,
@@ -409,25 +412,26 @@
     const movsMes = (((r.lectura && r.lectura.movimientos) || []).length) / Math.max(1, dias / 30.44);
 
     // ---- 3. En qué se te va: lo mismo que suma la cifra, en € al año (también las comisiones) ----
+    // Una suscripción vista al menos dos veces cuenta aunque el motor la dé como «posible» (Apple a 2,99 € al mes también es una suscripción)
+    const esSusc = (c) => SUSCRIPCIONES.indexOf(c.categoria) >= 0 || c.categoria === "pasarelas";
     const haySeguros = cobros.some((c) => c.estado === "seguro");
-    const cuenta = (c) => c && (haySeguros ? c.estado === "seguro" : c.estado === "seguro" || c.estado === "posible");
+    const cuenta = (c) => c && (c.estado === "seguro" || (c.estado === "posible" && (!haySeguros || (esSusc(c) && (c.num_cargos || 0) >= 2))));
     const anualComision = (c) => (c.periodicidad === "puntual" ? (c.coste_anual || c.importe || 0) * 365 / dias : c.coste_anual || 0);
-    let barras = [];
+    // Por tipo de pago, como en «Gráficas»: casa, suscripciones, seguros, comisiones del banco y otros (siempre al final)
+    const CASA = ["telecos", "energia", "agua", "alarmas", "hogar", "gastos_fijos"];
+    const tipoDe = (c) => (c.categoria === "comisiones" || c.categoria === "tarjetas" ? "banco" : esSusc(c) ? "susc" : CASA.indexOf(c.categoria) >= 0 ? "casa" : c.categoria === "seguros" ? "seg" : "otros");
+    const porTipo = {};
     for (const g of r.grupos || []) {
       if (!(g.codigo.indexOf("sector_") === 0 || g.codigo === "recibos" || g.codigo === "comisiones")) continue;
       const items = (g.ids || []).map((id) => porId[id]).filter(Boolean);
-      const v = g.codigo === "comisiones"
-        ? items.filter((c) => (c.etiquetas || []).indexOf("devuelto") < 0).reduce((t, c) => t + anualComision(c), 0)
-        : items.filter(cuenta).reduce((t, c) => t + (c.coste_anual || 0), 0);
-      const redondo = Math.round(v);
-      if (redondo > 0) barras.push({ codigo: g.codigo, titulo: g.codigo === "recibos" ? T3.recibos : g.titulo, v: redondo });
+      const com = g.codigo === "comisiones";
+      for (const c of com ? items.filter((x) => (x.etiquetas || []).indexOf("devuelto") < 0) : items.filter(cuenta)) {
+        const k = com ? "banco" : tipoDe(c);
+        porTipo[k] = (porTipo[k] || 0) + (com ? anualComision(c) : c.coste_anual || 0);
+      }
     }
-    // como mucho 5 barras de mayor a menor; lo que sobra (y el grupo «otros» del motor) va en una sola «Otros», al final
-    const otrosMotor = barras.filter((b) => b.codigo === "sector_otros");
-    barras = barras.filter((b) => b.codigo !== "sector_otros").sort((a, b) => b.v - a.v);
-    let resto = otrosMotor;
-    if (barras.length + (otrosMotor.length ? 1 : 0) > 5) { resto = resto.concat(barras.slice(4)); barras = barras.slice(0, 4); }
-    if (resto.length) barras.push({ codigo: resto.length === 1 ? resto[0].codigo : "otros", titulo: T3.otros, v: resto.reduce((t, b) => t + b.v, 0) });
+    let barras = Object.keys(porTipo).map((k) => ({ codigo: "tipo_" + k, titulo: T3.tipos[k], v: Math.round(porTipo[k]) })).filter((b) => b.v > 0).sort((a, b) => b.v - a.v);
+    barras = barras.filter((b) => b.codigo !== "tipo_otros").concat(barras.filter((b) => b.codigo === "tipo_otros"));
     const total = barras.reduce((t, b) => t + b.v, 0); // la cifra principal es exactamente la suma de las barras
 
     // ---- 2. Qué hacer ahora ----
@@ -467,7 +471,7 @@
     // ---- 1. La respuesta ----
     $("xMeses").textContent = T3.meses(meses);
     // «algo que revisar»: lo que se escapó o falta el extracto de la tarjeta (la suscripción más cara es solo una idea)
-    const frase = movsMes < 40 ? T3.fPoco : escapo > 0 || acciones.some((a) => a.p < 5) ? T3.fRevisar : T3.fNada;
+    const frase = meses < 3 ? T3.fPoco(meses) : escapo > 0 || acciones.some((a) => a.p < 5) ? T3.fRevisar : T3.fNada;
     $("xFrase").textContent = frase;
     const cifra = $("xCifra");
     if (total > 0) { cifra.textContent = eur(total); subirCifra(cifra, total); } else cifra.textContent = "0 €";
@@ -477,11 +481,17 @@
     // Lo que la gente busca primero: cuántas suscripciones tiene, cuánto le cuestan y cuántos recibos más
     const esc = $("xEscapo");
     const contados = cobros.filter((c) => cuenta(c) && c.tipo !== "comision" && c.categoria !== "comisiones");
-    const subs = contados.filter((c) => SUSCRIPCIONES.indexOf(c.categoria) >= 0);
+    const subs = contados.filter(esSusc);
     const recs = contados.length - subs.length;
     esc.hidden = !contados.length;
     esc.dataset.ok = subs.length ? "no" : "si";
     esc.textContent = T3.suscr(subs.length, eur(Math.round(subs.reduce((t, c) => t + (c.coste_anual || 0), 0))), recs);
+    if (subs.length && recs) {
+      const q = el("button", "r3-dif-b", "?"); q.type = "button"; q.setAttribute("aria-label", T3.difT); q.setAttribute("aria-expanded", "false");
+      const ex = el("span", "r3-dif", T3.dif); ex.hidden = true;
+      q.addEventListener("click", () => { ex.hidden = !ex.hidden; q.setAttribute("aria-expanded", String(!ex.hidden)); });
+      esc.appendChild(document.createTextNode(" ")); esc.appendChild(q); esc.appendChild(ex);
+    }
 
     // ---- 2. pintar las acciones: tres a la vista y el resto detrás de «Ver X más» ----
     const ul = $("xAcciones"); ul.textContent = "";
@@ -516,7 +526,7 @@
       const pista = el("span", "r3-bar-p"), lleno = el("span", "r3-bar-l");
       lleno.style.width = Math.max(2, Math.round(b.v / maximo * 100)) + "%";
       pista.appendChild(lleno); btn.appendChild(fila); btn.appendChild(pista);
-      btn.addEventListener("click", () => abrirDetalle(b.codigo === "otros" ? $("xTodo") : document.querySelector('#xTodo [data-codigo="' + b.codigo + '"]')));
+      btn.addEventListener("click", () => abrirDetalle($("xTodo")));
       li.appendChild(btn); lb.appendChild(li);
     }
     $("xVa").hidden = !barras.length;

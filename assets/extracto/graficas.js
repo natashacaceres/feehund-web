@@ -56,24 +56,26 @@
   function calcRepe(r) {
     const cobros = r.cobros || [], porId = {}; cobros.forEach((c) => { porId[c.id] = c; });
     const hay = cobros.some((c) => c.estado === "seguro");
-    const cuenta = (c) => (hay ? c.estado === "seguro" : c.estado === "seguro" || c.estado === "posible");
+    const esSusc = (c) => SUSC.indexOf(c.categoria) >= 0;
+    // igual que assets/extracto.js: una suscripción vista 2 o más veces cuenta aunque sea «posible»
+    const cuenta = (c) => c.estado === "seguro" || (c.estado === "posible" && (!hay || (esSusc(c) && (c.num_cargos || 0) >= 2)));
     const periodo = (r.lectura && r.lectura.periodo) || {};
     const dias = periodo.dias || 365, meses = periodo.meses || 12;
     const anualCom = (c) => (c.periodicidad === "puntual" ? (c.coste_anual || c.importe || 0) * 365 / dias : c.coste_anual || 0);
-    let total = 0; const junta = {};
+    const junta = {}, porTipo = {};
     (r.grupos || []).forEach((g) => {
       if (!(g.codigo.indexOf("sector_") === 0 || g.codigo === "recibos" || g.codigo === "comisiones")) return;
       const com = g.codigo === "comisiones";
       const sel = (g.ids || []).map((id) => porId[id]).filter(Boolean).filter((c) => (com ? (c.etiquetas || []).indexOf("devuelto") < 0 : cuenta(c)));
-      let gv = 0;
       sel.forEach((c) => {
-        const v = com ? anualCom(c) : c.coste_anual || 0; gv += v;
+        const v = com ? anualCom(c) : c.coste_anual || 0;
+        const tk = com ? "banco" : tipoDe(c.categoria); porTipo[tk] = (porTipo[tk] || 0) + v;
         const k = com ? "_comisiones" : c.comercio_id || c.nombre;
         const it = junta[k] || (junta[k] = { n: com ? T.tipos.banco : c.nombre, id: com ? null : c.comercio_id, cat: com ? "comisiones" : c.categoria, v: 0, com });
         it.v += v;
       });
-      if (Math.round(gv) > 0) total += Math.round(gv);
     });
+    const total = Object.values(porTipo).reduce((t, v) => t + Math.max(0, Math.round(v)), 0); // la misma cifra que el resumen
     return { total, meses, items: Object.values(junta).filter((x) => x.v >= 0.5).sort((a, b) => b.v - a.v) };
   }
 
@@ -184,6 +186,9 @@
   function plegarTarjeta() {
     const tj = $("xTarjeta"), sh = $("xShare"); if (!tj || !sh) return;
     tj.classList.remove("pg-abierta"); tj.classList.add("pg-plegada");
+    // En el ejemplo solo se ve el botón: no se abre ni se comparte (no es la tarjeta de nadie)
+    const ej = $("xEjemplo"); tj.dataset.ejemplo = ej && !ej.hidden ? "1" : "";
+    if (tj.dataset.ejemplo) sh.setAttribute("aria-disabled", "true"); else sh.removeAttribute("aria-disabled");
     sh.innerHTML = ICO_SHARE; const sp = document.createElement("span"); sp.textContent = T.compartirMi; sh.appendChild(sp);
     if (tj.dataset.pgPlegable) return;
     tj.dataset.pgPlegable = "1";
@@ -196,6 +201,7 @@
     gu.addEventListener("click", guardar);
     const img = $("xTarjetaImg"); if (img) { img.addEventListener("click", () => { if (tj.classList.contains("pg-abierta")) guardar(); }); img.title = T.guardar; }
     sh.addEventListener("click", (e) => {
+      const ej2 = $("xEjemplo"); if (tj.dataset.ejemplo || (ej2 && !ej2.hidden)) { e.preventDefault(); e.stopImmediatePropagation(); sh.setAttribute("aria-disabled", "true"); return; }
       if (!tj.classList.contains("pg-plegada")) return; // ya abierta: comparte como siempre (WhatsApp, Instagram…)
       e.preventDefault(); e.stopImmediatePropagation();
       tj.classList.remove("pg-plegada"); tj.classList.add("pg-abierta");
