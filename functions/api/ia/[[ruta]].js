@@ -9,13 +9,14 @@
 //   POST /api/ia/abrir       {codigo}                                    → devuelve la caja cifrada y lo que queda del pase
 //   POST /api/ia/estado      {codigo}                                    → lo que queda del pase y los días regalados por amigos
 //   POST /api/ia/invitar     {codigo}                                    → el enlace para invitar a un amigo (si paga, +30 días)
+//   POST /api/ia/voto        {comercio, sector}                          → «¿Qué es…?»: lo que dice la persona de un comercio
 //   GET  /api/ia/aprende                                                 → el diccionario compartido de comercios aprendidos (_ia/aprende.js)
 // Cerrada: Claude no tiene internet ni más herramientas que las de abajo (que_es busca solo el NOMBRE de un comercio, nunca importes), y TODA cifra en euros de su respuesta
 // tiene que haber salido de una herramienta. Si no, se le devuelve para que lo corrija; si sigue igual, no se enseña.
 
 import { PLANES, PRODUCTO_TIQUI, AMIGO, GUARDA_PASE, activarTiqui, codigoValido, refValido } from '../../_ia/pase.js';
 import { crearPagoTiqui, leerPago } from '../../_baja/servicios.js';
-import { queEs, diccionario, normal } from '../../_ia/aprende.js';
+import { queEs, diccionario, normal, votar } from '../../_ia/aprende.js';
 import { limpiarNegocio, HERRAMIENTAS_NEGOCIO, ejecutarNegocio, instruccionesNegocio, ESTILO_TIQUI } from '../../_ia/negocio.js';
 
 const MODELO = 'claude-opus-5-5';
@@ -303,6 +304,11 @@ export async function onRequestPost({ request, env, params }) {
     await env.FEEHUND_KV.put(kIp, String(nIp + 1), { expirationTtl: 2 * 86400 });
     await env.FEEHUND_KV.put(kDia, String(nDia + 1), { expirationTtl: 2 * 86400 });
     return json({ texto: res.texto, pagos: res.pagos, uso: env.IA_PRUEBAS === '1' ? res.uso : undefined });
+  }
+
+  if (ruta === 'voto') {
+    const quien = (await huella('apr' + (request.headers.get('CF-Connecting-IP') || 'local'))).slice(0, 8);
+    return json(await votar(env, String(b.comercio || '').slice(0, 80), String(b.sector || ''), quien));
   }
 
   const h = await huella(b.codigo);

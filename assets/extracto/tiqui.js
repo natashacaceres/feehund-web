@@ -21,7 +21,9 @@
       titulo: "Pregúntale a Tiqui", gratis: "Tu primera pregunta es gratis", siguePlanes: "Elige cuánto tiempo y sigue preguntando",
       hola: "¿Qué quieres saber de tus gastos?", escribe: "Escribe tu pregunta", enviar: "Enviar",
       adonde: "¿Adónde se va mi dinero?", raro: "¿Hay algo raro en mi cuenta?", llevo: (m) => "¿Cuánto llevo en " + m + "?", mesMas: "¿En qué mes gasté más?",
-      seguimos: "¿Seguimos?", verPago: "Ver el pago", verPagos: (n) => "Ver los " + n + " pagos", ocultar: "Ocultar",
+      seguimos: "¿Seguimos?", queEs: (n) => "¿Qué es " + n + "?", gracias: "¡Gracias! Me lo apunto.", nose: "No lo sé",
+      queOps: [["fuera", "Bar o restaurante"], ["super", "Súper"], ["otro", "Tienda"], ["transporte", "Transporte"], ["salud", "Salud"], ["persona", "Una persona"]],
+      verPago: "Ver el pago", verPagos: (n) => "Ver los " + n + " pagos", ocultar: "Ocultar",
       noComprobado: "No he podido comprobar las cifras, así que prefiero no dártelas. Prueba a preguntarlo de otra forma.", noPuedo: "Ahora no puedo responder. Prueba en un momento.",
       planes: { basico: ["0,99 €", "7 días"], completo: ["2,99 €", "3 meses"] }, pagar: (p) => "Pagar " + p,
       unPago: "Un solo pago. Sin suscripción", ahoraNo: "Ahora no", momento: "Un momento…", errorPago: "No se ha podido. Prueba otra vez.",
@@ -38,7 +40,9 @@
       titulo: "Pregunta-li a Tiqui", gratis: "La teva primera pregunta és gratis", siguePlanes: "Tria quant de temps i continua preguntant",
       hola: "Què vols saber de les teves despeses?", escribe: "Escriu la teva pregunta", enviar: "Enviar",
       adonde: "On van els meus diners?", raro: "Hi ha alguna cosa estranya al meu compte?", llevo: (m) => "Quant porto a " + m + "?", mesMas: "Quin mes vaig gastar més?",
-      seguimos: "Continuem?", verPago: "Veure el pagament", verPagos: (n) => "Veure els " + n + " pagaments", ocultar: "Amagar",
+      seguimos: "Continuem?", queEs: (n) => "Què és " + n + "?", gracias: "Gràcies! M'ho apunto.", nose: "No ho sé",
+      queOps: [["fuera", "Bar o restaurant"], ["super", "Súper"], ["otro", "Botiga"], ["transporte", "Transport"], ["salud", "Salut"], ["persona", "Una persona"]],
+      verPago: "Veure el pagament", verPagos: (n) => "Veure els " + n + " pagaments", ocultar: "Amagar",
       noComprobado: "No he pogut comprovar les xifres, així que prefereixo no donar-te-les. Prova de preguntar-ho d'una altra manera.", noPuedo: "Ara no puc respondre. Prova-ho d'aquí a un moment.",
       planes: { basico: ["0,99 €", "7 dies"], completo: ["2,99 €", "3 mesos"] }, pagar: (p) => "Pagar " + p,
       unPago: "Un sol pagament. Sense subscripció", ahoraNo: "Ara no", momento: "Un moment…", errorPago: "No s'ha pogut. Torna-ho a provar.",
@@ -55,7 +59,9 @@
       titulo: "Ask Tiqui", gratis: "Your first question is free", siguePlanes: "Pick how long and keep asking",
       hola: "What do you want to know about your spending?", escribe: "Type your question", enviar: "Send",
       adonde: "Where does my money go?", raro: "Is anything odd in my account?", llevo: (m) => "How much have I spent on " + m + "?", mesMas: "Which month did I spend the most?",
-      seguimos: "Shall we carry on?", verPago: "See the payment", verPagos: (n) => "See the " + n + " payments", ocultar: "Hide",
+      seguimos: "Shall we carry on?", queEs: (n) => "What is " + n + "?", gracias: "Thanks! I'll remember that.", nose: "I don't know",
+      queOps: [["fuera", "Bar or restaurant"], ["super", "Supermarket"], ["otro", "Shop"], ["transporte", "Transport"], ["salud", "Health"], ["persona", "A person"]],
+      verPago: "See the payment", verPagos: (n) => "See the " + n + " payments", ocultar: "Hide",
       noComprobado: "I couldn't check the figures, so I'd rather not give them to you. Try asking another way.", noPuedo: "I can't answer right now. Try again in a moment.",
       planes: { basico: ["0,99 €", "7 days"], completo: ["2,99 €", "3 months"] }, pagar: (p) => "Pay " + p,
       unPago: "One payment. No subscription", ahoraNo: "Not now", momento: "One moment…", errorPago: "That didn't work. Try again.",
@@ -74,9 +80,9 @@
 
   // Sectores: solo lo que se sabe seguro (cadena conocida o palabra que no deja dudas). Lo demás, Tiqui lo dice como «sin saber qué es».
   const SECTORES = [
-    ["casa", /OCTOPUS|ENDESA|IBERDROLA|NATURGY|AIGUES|AGUAS DE|VODAFONE|MOVISTAR|ORANGE|DIGI|HOLALUZ|REPSOL|YOIGO|MASMOVIL|LOWI|PEPEPHONE|JAZZTEL/],
+    ["casa", /HIPOTECA|ALQUILER|COMUNIDAD DE PROP|OCTOPUS|ENDESA|IBERDROLA|NATURGY|AIGUES|AGUAS DE|VODAFONE|MOVISTAR|ORANGE|DIGI|HOLALUZ|REPSOL|YOIGO|MASMOVIL|LOWI|PEPEPHONE|JAZZTEL/],
     ["super", /MERCADONA|ALDI|LIDL|CONDIS|BON PREU|ESCLAT|GUISSONA|CARREFOUR|CAPRABO|EROSKI|CONSUM|DIA %|SUPERMERCA|SUPERMARKET|HIPERMERCA|\bSUPER\b|ALIMENTACI|AHORRAMAS|HIPERCOR|ALCAMPO/],
-    ["fuera", /RESTAURANT|\bBAR\b|TAPAS|TASCA|TAPERIA|ASADOR|PIZZERIA|KEBAB|KFC|SUBWAY|BURGER|MCDONALD|TELEPIZZA|COFFEE|CAFE|BAKERY|WAFFLE|\bFORN\b|STARBUCKS|VIPS|GOIKO|TGTG|TOO GOOD/],
+    ["fuera", /RESTAURANT|\bBAR\b|TAPAS|TASCA|TABERNA|CERVECERIA|MESON|BRASERIA|CHURRERIA|HELADERIA|PASTELERIA|PANADERIA|CAFETERIA|TAPERIA|ASADOR|PIZZERIA|KEBAB|KFC|SUBWAY|BURGER|MCDONALD|TELEPIZZA|COFFEE|CAFE|BAKERY|WAFFLE|\bFORN\b|STARBUCKS|VIPS|GOIKO|TGTG|TOO GOOD/],
     ["domicilio", /UBER \*?EATS|GLOVO|JUST ?EAT|DELIVEROO/],
     ["transporte", /TMB|T MOBILITAT|TAXI|YEGO|UBER \*TRIP|UBER BV|CABIFY|BOLT|RYANAIR|VUELING|RENFE|IBERIA|BICING|EMT |METRO |GASOLINERA|CEPSA|GALP|SHELL|BP /],
     ["ropa", /ZARA|CALZEDONIA|MANGO|PRIMARK|H&M|BERSHKA|PULL&BEAR|STRADIVARIUS|LEFTIES|DECATHLON|TREATWELL|BEAUTY|PELUQUER/],
@@ -97,7 +103,7 @@
     m = u.match(/A FAVOR DE (.*)/); if (m) return m[1].trim();
     if (/^BIZUM/.test(u)) return "BIZUM";
     if (/IMPUESTO|A\.E\.A\.T/.test(u)) return "HACIENDA";
-    return u.replace(/ \d{4} \d{4}.*$/, "").slice(0, 40);
+    return u.replace(/^(COMPRA|PAGO)( CON)? (TARJETA|TARJ\.?|TJ\.?)( DEBITO| CREDITO)?\s+|^(RECIBO|ADEUDO|CARGO)( SEPA)?\s+/, "").replace(/ \d{4} \d{4}.*$/, "").slice(0, 40);
   }
   // Lo que Tiqui ha aprendido con otras personas (GET /api/ia/aprende): solo se descarga, no se manda nada
   let aprendido = {};
@@ -181,6 +187,31 @@
     }
     return burbuja("ia", f);
   }
+  // «¿Qué es…?»: tras una respuesta, Tiqui pregunta por UN comercio que no sabe qué es (el de más dinero entre los
+  // pagos de la respuesta, o de todo el extracto). Lo que contesta la persona vale ya en su chat y, con 3 personas
+  // que digan lo mismo, para todos (POST /api/ia/voto, solo el nombre del comercio y lo elegido).
+  const YA = "fh-tiqui-quees";
+  const bonito = (k) => String(k).toLowerCase().replace(/(^|[\s.'&-])([a-zà-ÿ])/g, (x, a, b) => a + b.toUpperCase()).replace(/\b(S\.?l\.?u?|S\.?a\.?)\b\.?$/i, (x) => x.toUpperCase());
+  function queEs(pagos) {
+    const ya = leer(YA) || [];
+    const raro = (m) => m.importe < 0 && !m.c.s && !m.conocido && m.c.k && m.c.k.length >= 3 && /[A-Z]{3}/.test(m.c.k) && ya.indexOf(m.c.k) < 0 && !/BIZUM|TRANSFER|TRASPASO|CAJERO|REINTEGRO|HIPOTECA|PRESTAMO|NOMINA|IMPUESTO/.test(m.c.k);
+    const suma = (l) => { const t = {}; l.forEach((m) => { t[m.c.k] = (t[m.c.k] || 0) - m.importe; }); return Object.entries(t).sort((a, b) => b[1] - a[1]); };
+    const deEsta = suma(todos.filter((m) => (pagos || []).indexOf(m.id) >= 0 && raro(m)));
+    const k = (deEsta[0] || suma(todos.filter(raro))[0] || [])[0];
+    if (!k) return;
+    const f = document.createDocumentFragment(); f.appendChild(document.createTextNode(T.queEs(bonito(k))));
+    const ops = mk("div", "tqc-que");
+    const elegir = (v) => {
+      poner(YA, ya.concat(k).slice(-200));
+      if (v && v !== "persona") todos.forEach((m) => { if (m.c.k === k && !m.c.s) m.c = { k, s: v }; });
+      if (v) api("voto", { comercio: k, sector: v });
+      b.textContent = ""; b.appendChild(document.createTextNode(T.gracias));
+    };
+    T.queOps.forEach(([v, lab]) => { const o = mk("button", null, lab); o.type = "button"; o.addEventListener("click", () => elegir(v)); ops.appendChild(o); });
+    const no = mk("button", "tqc-que-no", T.nose); no.type = "button"; no.addEventListener("click", () => elegir(null));
+    f.append(ops, no);
+    const b = burbuja("ia", f); b.classList.add("tqc-m--que");
+  }
   function planesEnChat() {
     if ($("tqcPlanes")) return;
     if (sug) sug.hidden = true;
@@ -239,7 +270,7 @@
       if (r.d.error === "tope_total") invitar(p);
       return;
     }
-    respuesta(r.d.texto, r.d.pagos);
+    respuesta(r.d.texto, r.d.pagos); queEs(r.d.pagos);
     historial.push({ rol: "tu", texto: t }, { rol: "ia", texto: r.d.texto }); historial = historial.slice(-8);
   }
   async function preguntar(t) {
@@ -254,7 +285,7 @@
       burbuja("ia", r.d.error === "no_comprobado" ? T.noComprobado : T.noPuedo); return;
     }
     try { localStorage.setItem(GRATIS, "1"); } catch (e) {}
-    respuesta(r.d.texto, r.d.pagos); planesEnChat();
+    respuesta(r.d.texto, r.d.pagos); queEs(r.d.pagos); planesEnChat();
   }
   function montarCaja() {
     caja = mk("section", "tqc"); caja.id = "tqcIa"; caja.setAttribute("aria-label", T.titulo);
@@ -367,14 +398,16 @@
       ultimoR = r;
       // Lo que Feehund ya sabe (sus cobros) y lo que contestaste en las preguntas manda sobre las reglas de arriba
       const CASA = ["telecos", "energia", "agua", "alarmas", "hogar", "gastos_fijos", "vivienda"], SUSC = ["streaming", "musica", "nube_apps", "ia", "prensa", "gimnasios", "citas", "videojuegos", "idiomas", "reparto", "suscripciones", "club_descuentos", "bienestar", "pasarelas"];
-      const sabe = {};
+      const sabe = {}, conocido = new Set(); // conocido: lo que el motor ya ha reconocido (no se pregunta «¿Qué es…?»)
+      [].concat(r.cobros || [], r.gastos_fijos || [], r.terminados || []).forEach((c) => (c.movimientos || []).forEach((m) => conocido.add(m.fecha + "|" + m.importe + "|" + m.concepto)));
       (r.cobros || []).forEach((c) => {
         const s2 = CASA.indexOf(c.categoria) >= 0 ? "casa" : SUSC.indexOf(c.categoria) >= 0 ? "suscr" : c.categoria === "comisiones" ? "comisiones" : null;
         if (s2) (c.movimientos || []).forEach((m) => { sabe[m.fecha + "|" + m.importe + "|" + m.concepto] = s2; });
       });
       todos = ((r.lectura && r.lectura.movimientos) || []).map((m, n) => {
         const c = clasificar(m), k = sabe[m.fecha + "|" + m.importe + "|" + m.concepto];
-        return Object.assign({}, m, { id: "m" + n, c: k ? { k: c.k, s: k } : c });
+        const kk = m.fecha + "|" + m.importe + "|" + m.concepto;
+        return Object.assign({}, m, { id: "m" + n, c: k ? { k: c.k, s: k } : c, conocido: conocido.has(kk) });
       });
       if (caja) caja.remove();
       montarCaja(); setTimeout(colocar, 0); setTimeout(altoOrdenador, 800); // otra vez cuando ya está todo encima (el aviso de ejemplo llega después)

@@ -122,3 +122,33 @@ export async function diccionario(env) {
   const dic = JSON.parse((await env.FEEHUND_KV.get('apr:dic')) || '{"entradas":{}}');
   return { version: dic.version || null, entradas: dic.entradas || {} };
 }
+
+// ---------- «¿Qué es…?»: lo que dice la gente en el chat de Tiqui
+// apr:v:<huella del nombre> → { nombre, votos: { sector: [huellas] } }. Pasa al diccionario cuando un sector llega a 3
+// personas, nadie ha dicho «una persona» y ningún otro sector tiene ni la mitad. Si la búsqueda en la web dijo otra cosa,
+// no se publica: queda para revisar.
+const VOTOS_DIA = 30; // por persona y día
+export async function votar(env, comercio, sector, quien) {
+  const kv = env.FEEHUND_KV, n = normal(comercio), hoy = new Date().toISOString().slice(0, 10);
+  if (!sePuedeBuscar(n) || !(sector === 'persona' || SECTORES_APRENDE[sector])) return { ok: false };
+  const kq = 'apr:vq:' + hoy + ':' + quien, hechos = +((await kv.get(kq)) || 0);
+  if (hechos >= VOTOS_DIA) return { ok: false };
+  await kv.put(kq, String(hechos + 1), { expirationTtl: 2 * 86400 });
+  const k = 'apr:v:' + (await sha('feehund-aprende:' + n)).slice(0, 32);
+  const x = JSON.parse((await kv.get(k)) || 'null') || { votos: {} };
+  Object.values(x.votos).forEach((l) => { const i = l.indexOf(quien); if (i >= 0) l.splice(i, 1); }); // un voto por persona
+  (x.votos[sector] = x.votos[sector] || []).push(quien);
+  if ((x.votos.persona || []).length) { // si alguien dice que es una persona, el nombre no se guarda y sale del diccionario
+    delete x.nombre;
+    const dic = JSON.parse((await kv.get('apr:dic')) || '{"entradas":{}}');
+    if (dic.entradas[n]) { delete dic.entradas[n]; dic.version = new Date().toISOString(); await kv.put('apr:dic', JSON.stringify(dic)); }
+  } else x.nombre = n;
+  await kv.put(k, JSON.stringify(x));
+  const [gana, l] = Object.entries(x.votos).filter(([s]) => s !== 'persona').sort((a, b) => b[1].length - a[1].length)[0] || [];
+  const otros = Object.entries(x.votos).filter(([s]) => s !== gana && s !== 'persona').reduce((m, [, v]) => Math.max(m, v.length), 0);
+  if (x.nombre && gana && l.length >= GENTE_PARA_PUBLICAR && otros * 2 < l.length) {
+    const web = JSON.parse((await kv.get(await clave(n))) || 'null');
+    if (!web || !web.sector || web.sector === gana) await publicar(env, n, gana);
+  }
+  return { ok: true };
+}
