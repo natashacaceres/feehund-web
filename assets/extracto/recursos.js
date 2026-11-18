@@ -5,7 +5,7 @@
 //   ACTUALIZAR_RECURSOS=1 node --test tests/unit/worker-montaje.test.mjs
 // La versión es una huella de todos los archivos de las listas: cambia en cuanto cambia cualquiera de ellos.
 globalThis.RECURSOS_EXTRACTO = {
-  version: '7514533c3e4b',
+  version: '678a64ab3e1a',
   // Página, fuentes, motor, núcleo, lectores y textos: se guardan al instalar.
   PAGINA: [
     '/extracto/',
@@ -80,7 +80,7 @@ globalThis.RECURSOS_EXTRACTO = {
     '/assets/extracto/textos/validacion.js',
     '/assets/extracto/textos/web.js',
     '/assets/extracto/tiqui.css',
-    '/assets/extracto/tiqui.css?v=20261118132852',
+    '/assets/extracto/tiqui.css?v=20261118133150',
     '/assets/extracto/tiqui.js',
     '/assets/extracto/tiqui.js?v=20261118132737',
     '/assets/extracto/worker.js',

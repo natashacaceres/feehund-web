@@ -68,3 +68,10 @@
 .tqc-inv-s{font:400 14px/1.35 var(--f-text);color:#4F5667;word-break:break-all}
 .tqc-inv-s[hidden]{display:none}
 .tqc-plan-p{white-space:nowrap}@media (max-width:480px){.tqc-plan-p{font-size:24px}}
+/* Ordenador: Tiqui ocupa muchas filas de la rejilla y cada fila vacía sumaba su hueco (casi 900 px en blanco al final).
+   Sin hueco entre filas; la separación la pone cada bloque de la izquierda. Así la página acaba donde acaba el contenido. */
+@media (min-width:1100px){
+  #xRes:has(#tqcIa){row-gap:0}
+  #xRes:has(#tqcIa)>*:not(#tqcIa){margin-bottom:24px}
+  #xRes:has(#tqcIa)>.pg-tabs{margin-bottom:40px}
+}
