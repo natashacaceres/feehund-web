@@ -1,0 +1,124 @@
+// El motor que aprende. Cuando Tiqui no sabe qué es un comercio, lo busca una sola vez en la web (Claude Haiku con
+// búsqueda) y lo guarda. La siguiente persona que lo pregunte ya lo tiene al momento y sin gastar nada.
+// Lo que han preguntado al menos 3 personas distintas, y se sabe con seguridad, pasa al diccionario compartido que el
+// móvil se descarga (GET /api/ia/aprende): así también clasifica el resumen gratis, sin mandar nada.
+// Qué se guarda: solo el nombre del comercio como sale en el extracto y lo que es. Nunca importes, fechas ni quién.
+// De las personas solo una huella para contar cuántas distintas lo han visto (máximo 3). Si un nombre es de una
+// persona particular (un alquiler, un Bizum), no se guarda el nombre.
+//
+// KV (FEEHUND_KV):
+//   apr:r:<huella del nombre> → { nombre, sector, que, confianza, fuente, fecha, gente: [huellas] } o { persona: true }
+//   apr:dic                   → { version, entradas: { NOMBRE: sector } }  (lo que se descarga el móvil)
+//   apr:dia:<AAAA-MM-DD>      → búsquedas hechas hoy (tope diario)
+
+const MODELO = 'claude-haiku-5-5';
+export const GENTE_PARA_PUBLICAR = 3; // personas distintas antes de pasar al diccionario compartido
+const TOPE_DIA = 400; // búsquedas en la web al día, como mucho
+const POR_PREGUNTA = 3; // comercios que Tiqui puede buscar en una pregunta
+
+export const SECTORES_APRENDE = {
+  casa: 'luz, agua, gas, móvil, internet, alquiler, comunidad, seguro de hogar',
+  super: 'supermercado o tienda de alimentación',
+  fuera: 'bar, cafetería, restaurante, panadería, heladería',
+  domicilio: 'comida a domicilio',
+  transporte: 'gasolinera, taxi, tren, bus, metro, avión, peaje, aparcamiento, taller',
+  ropa: 'ropa, calzado, peluquería, estética',
+  salud: 'farmacia, clínica, dentista, óptica, fisio',
+  ocio: 'ocio, deporte, cine, libros, viajes, hoteles, juegos',
+  suscr: 'suscripción o servicio digital que se paga cada mes',
+  online: 'tienda online',
+  impuestos: 'impuestos y administraciones',
+  otro: 'otra cosa (tienda de barrio, ferretería, electrónica, hogar, mascotas, educación…)',
+};
+
+const hex = (buf) => [...new Uint8Array(buf)].map((b) => b.toString(16).padStart(2, '0')).join('');
+const sha = async (s) => hex(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(s)));
+
+/** El nombre tal y como se guarda: mayúsculas, sin acentos ni signos raros. */
+export function normal(k) {
+  return String(k || '').toUpperCase().normalize('NFD').replace(/[̀-ͯ]/g, '')
+    .replace(/[^A-Z0-9&.' ]+/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 60);
+}
+const clave = async (n) => 'apr:r:' + (await sha('feehund-aprende:' + n)).slice(0, 32);
+
+/** Lo que nunca se busca: Bizum, transferencias, nóminas, cajeros, números sueltos. */
+export function sePuedeBuscar(n) {
+  return n.length >= 3 && /[A-Z]{3}/.test(n) && !/BIZUM|TRANSFER|TRASPASO|NOMINA|PENSION|CAJERO|REINTEGRO|DEVOLUCION|ABONO|INGRESO/.test(n);
+}
+
+const ESQUEMA = {
+  type: 'object',
+  properties: {
+    persona: { type: 'boolean', description: 'true si el texto es el nombre de una persona particular y no de un negocio' },
+    sector: { anyOf: [{ type: 'string', enum: Object.keys(SECTORES_APRENDE) }, { type: 'null' }] },
+    que: { anyOf: [{ type: 'string' }, { type: 'null' }], description: 'Qué es, en pocas palabras (p. ej. «cafetería en Valencia»)' },
+    confianza: { type: 'string', enum: ['alta', 'media', 'baja'] },
+    fuente: { anyOf: [{ type: 'string' }, { type: 'null' }], description: 'La dirección web que lo confirma' },
+  },
+  required: ['persona', 'sector', 'que', 'confianza', 'fuente'],
+  additionalProperties: false,
+};
+
+const INSTRUCCIONES = `Identificas comercios a partir del texto que sale en un extracto bancario español.
+Busca en la web qué negocio es y elige su sector:
+${Object.entries(SECTORES_APRENDE).map(([k, v]) => '- ' + k + ': ' + v).join('\n')}
+Reglas:
+- Confianza alta solo si una página encontrada confirma que ese nombre es ese negocio (su web, Google Maps, un directorio de empresas, una app). Pon esa dirección en fuente.
+- Si hay varios negocios con ese nombre y son de sectores distintos, o no encuentras nada claro, sector null y confianza baja. No adivines.
+- Si parece el nombre y apellidos de una persona particular, persona true, sector null, y no busques nada más.
+- Las siglas S.L., S.A. o SLU son de empresas, no de personas.`;
+
+async function buscarEnLaWeb(env, nombre) {
+  const r = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: { 'content-type': 'application/json', 'x-api-key': env.ANTHROPIC_API_KEY, 'anthropic-version': '2026-10-21' },
+    body: JSON.stringify({
+      model: env.APRENDE_MODELO || MODELO, max_tokens: 3000, system: INSTRUCCIONES,
+      tools: [{ type: 'web_search_20260209', name: 'web_search', max_uses: 2, user_location: { type: 'approximate', country: 'ES' } }],
+      output_config: { effort: 'low', format: { type: 'json_schema', schema: ESQUEMA } },
+      messages: [{ role: 'user', content: 'Texto del extracto: «' + nombre + '»' }],
+    }),
+  });
+  if (!r.ok) throw new Error('api ' + r.status);
+  const d = await r.json();
+  const txt = (d.content || []).filter((b) => b.type === 'text').map((b) => b.text).join('');
+  return JSON.parse(txt);
+}
+
+async function publicar(env, nombre, sector) {
+  const dic = JSON.parse((await env.FEEHUND_KV.get('apr:dic')) || '{"entradas":{}}');
+  if (dic.entradas[nombre] === sector) return;
+  dic.entradas[nombre] = sector; dic.version = new Date().toISOString();
+  await env.FEEHUND_KV.put('apr:dic', JSON.stringify(dic));
+}
+
+/** Qué es cada comercio (como mucho POR_PREGUNTA). quien = huella de la persona, solo para contar personas distintas. */
+export async function queEs(env, nombres, quien) {
+  const kv = env.FEEHUND_KV, hoy = new Date().toISOString().slice(0, 10);
+  const lista = [...new Set((Array.isArray(nombres) ? nombres : []).map(normal))].slice(0, POR_PREGUNTA);
+  const salida = [];
+  for (const n of lista) {
+    if (!sePuedeBuscar(n)) { salida.push({ comercio: n, sector: null, que: 'no se busca (Bizum, transferencia o similar)' }); continue; }
+    const k = await clave(n);
+    let x = JSON.parse((await kv.get(k)) || 'null');
+    if (!x) {
+      const kDia = 'apr:dia:' + hoy, hechas = +((await kv.get(kDia)) || 0);
+      if (hechas >= TOPE_DIA || !env.ANTHROPIC_API_KEY) { salida.push({ comercio: n, sector: null, que: 'hoy no se puede buscar' }); continue; }
+      await kv.put(kDia, String(hechas + 1), { expirationTtl: 2 * 86400 });
+      let r; try { r = await buscarEnLaWeb(env, n); } catch (e) { console.log('aprende', String(e.message)); salida.push({ comercio: n, sector: null, que: 'no se ha podido buscar' }); continue; }
+      x = r.persona ? { persona: true, fecha: hoy } : { nombre: n, sector: r.sector, que: r.que, confianza: r.confianza, fuente: r.fuente, fecha: hoy, gente: [] };
+    }
+    if (x.persona) { await kv.put(k, JSON.stringify(x)); salida.push({ comercio: n, sector: null, que: 'parece una persona' }); continue; }
+    if (quien && x.gente.length < GENTE_PARA_PUBLICAR && x.gente.indexOf(quien) < 0) x.gente.push(quien);
+    await kv.put(k, JSON.stringify(x));
+    if (x.sector && x.confianza === 'alta' && x.gente.length >= GENTE_PARA_PUBLICAR) await publicar(env, n, x.sector);
+    salida.push({ comercio: n, sector: x.confianza === 'baja' ? null : x.sector, que: x.que, seguro: x.confianza === 'alta' });
+  }
+  return salida;
+}
+
+/** El diccionario compartido que se descarga el móvil. */
+export async function diccionario(env) {
+  const dic = JSON.parse((await env.FEEHUND_KV.get('apr:dic')) || '{"entradas":{}}');
+  return { version: dic.version || null, entradas: dic.entradas || {} };
+}

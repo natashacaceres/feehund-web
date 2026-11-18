@@ -99,10 +99,14 @@
     if (/IMPUESTO|A\.E\.A\.T/.test(u)) return "HACIENDA";
     return u.replace(/ \d{4} \d{4}.*$/, "").slice(0, 40);
   }
+  // Lo que Tiqui ha aprendido con otras personas (GET /api/ia/aprende): solo se descarga, no se manda nada
+  let aprendido = {};
+  const normal = (k) => String(k || "").toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^A-Z0-9&.' ]+/g, " ").replace(/\s+/g, " ").trim().slice(0, 60);
+  const aprendidoP = fetch(ROOT + "api/ia/aprende").then((r) => (r.ok ? r.json() : null)).then((d) => { if (d && d.entradas) aprendido = d.entradas; }).catch(() => {});
   function clasificar(m) {
     const k = comercio(m.concepto), u = (k + " | " + m.concepto).toUpperCase();
     for (const [id, re] of SECTORES) if (re.test(id === "bizum" || id === "transfer" ? String(m.concepto).toUpperCase() : u)) return { k, s: id };
-    return { k, s: null };
+    return { k, s: aprendido[normal(k)] || null };
   }
 
   let todos = [];
@@ -356,8 +360,9 @@
   ancho.addEventListener("change", colocar);
   document.addEventListener("click", (e) => { if (e.target.closest && e.target.closest("#pgTabs")) setTimeout(colocar, 0); });
 
-  document.addEventListener("fh-resultado", (e) => {
+  document.addEventListener("fh-resultado", async (e) => {
     const r = e.detail; if (!r) return;
+    await Promise.race([aprendidoP, new Promise((ok) => setTimeout(ok, 1500))]); // sin esperar más de 1,5 s
     try {
       ultimoR = r;
       // Lo que Feehund ya sabe (sus cobros) y lo que contestaste en las preguntas manda sobre las reglas de arriba
