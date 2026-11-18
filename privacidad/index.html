@@ -61,19 +61,18 @@
 <h2>La calculadora</h2>
 <p>Los importes y las respuestas se procesan en el navegador del usuario y no se envían ni se guardan en ningún servidor.</p>
 <h2>Mi banco (lector del extracto)</h2>
-<p>El extracto se lee en el navegador del usuario. Si el navegador no puede leerlo entero, por ejemplo un PDF con un formato que no reconoce o una foto, el archivo se envía cifrado a Anthropic, que con su inteligencia artificial Claude extrae los movimientos y los devuelve. El titular no guarda el archivo ni los movimientos en ningún servidor.</p>
+<p>El extracto se lee en el navegador del usuario. Si el navegador no puede leerlo entero, por ejemplo un PDF con un formato que no reconoce o una foto, el archivo se envía cifrado a un servicio de inteligencia artificial que extrae los movimientos y los devuelve. El titular no guarda el archivo ni los movimientos en ningún servidor.</p>
 <ul class="list">
 <li><strong>Finalidad:</strong> leer los movimientos del extracto para mostrar el resultado que pide el usuario.</li>
 <li><strong>Base jurídica:</strong> prestación del servicio que el usuario solicita al elegir su extracto.</li>
-<li><strong>Conservación:</strong> el titular no conserva nada. Anthropic trata la petición según sus condiciones de la API.</li>
+<li><strong>Conservación:</strong> el titular no conserva nada.</li>
 </ul>
 <h2>Pregúntale a Tiqui</h2>
-<p>Cuando el usuario hace una pregunta a Tiqui, se envían los movimientos de su extracto (fecha, concepto, comercio e importe) a Anthropic para que su inteligencia artificial Claude conteste. Con un plan de pago, el extracto se guarda cifrado con un código que solo tiene el usuario, de modo que el titular no puede leerlo, y se borra al terminar el plan.</p>
-<p>Tiqui aprende qué es cada comercio. Si no sabe qué es uno, puede buscar su nombre en internet. Si el usuario contesta «¿Qué es esto?» antes del resumen, se envía el nombre del comercio y la opción elegida. Solo se guarda el nombre del comercio y lo que es, nunca importes, fechas ni datos del usuario, salvo una huella corta que no permite saber quién es y sirve para contar cuántas personas distintas lo han dicho. Los nombres que parecen de una persona no se guardan.</p>
+<p>Tiqui contesta tus preguntas sobre tu extracto y aprende a reconocer comercios para que el resultado sea cada vez más preciso para todos. Es anónimo. Lo que Tiqui aprende no se puede relacionar con ninguna persona.</p>
 <ul class="list">
-<li><strong>Finalidad:</strong> contestar las preguntas del usuario y reconocer mejor los comercios para todos los usuarios.</li>
-<li><strong>Base jurídica:</strong> prestación del servicio que el usuario solicita al preguntar, e interés legítimo en mejorar el reconocimiento de comercios con datos que no identifican al usuario.</li>
-<li><strong>Conservación:</strong> las preguntas no se conservan; el extracto cifrado, hasta que termina el plan; los nombres de comercios, mientras sirvan para reconocerlos.</li>
+<li><strong>Finalidad:</strong> contestar las preguntas del usuario y reconocer mejor los comercios.</li>
+<li><strong>Base jurídica:</strong> prestación del servicio que el usuario solicita al preguntar, e interés legítimo en mejorar el servicio con datos anónimos.</li>
+<li><strong>Conservación:</strong> las preguntas no se guardan. Con un plan de pago, el extracto se guarda cifrado y aislado hasta que termina el plan, y nadie más puede leerlo. De los comercios solo se guarda su nombre y qué son, sin ningún dato del usuario.</li>
 </ul>
 <h2>Compra del informe</h2>
 <p>El pago lo gestiona Stripe, que trata los datos de la tarjeta; el titular no tiene acceso a ellos. El titular recibe el nombre, el correo, la dirección de facturación y, si se facilita, el NIF o el nombre de la empresa.</p>
@@ -112,7 +111,7 @@
 <li><strong>Stripe:</strong> pagos.</li>
 <li><strong>Prestador cualificado de servicios de confianza:</strong> certificación de las cartas de «Te damos de baja».</li>
 <li><strong>Servicio de envío de correo electrónico:</strong> correos de «Te damos de baja».</li>
-<li><strong>Anthropic:</strong> lectura con inteligencia artificial de los extractos que el navegador no puede leer, respuestas de Tiqui y búsqueda del nombre de los comercios que Tiqui no conoce.</li>
+<li><strong>Servicio de inteligencia artificial:</strong> lectura de los extractos que el navegador no puede leer y respuestas de Tiqui.</li>
 <li><strong>FormSubmit:</strong> envío de formularios.</li>
 </ul>
 <p>Algunos pueden tratar datos fuera del Espacio Económico Europeo con las garantías previstas en el RGPD, como las cláusulas contractuales tipo. No se ceden datos a terceros salvo obligación legal.</p>
