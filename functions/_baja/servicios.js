@@ -54,11 +54,28 @@ export function crearPago(env, { compra, unidades, precio, correo, idioma, vuelt
   }, 'pago-' + compra);
 }
 /** Pago de «Pregúntale a Tiqui» (Checkout). importe en céntimos; ref: huella del código (no el código). */
-export function crearPagoTiqui(env, { ref, plan, importe, producto, idioma, vuelta, cancelar, textos, amigo, factura }) {
+/**
+ * El IVA del 21 % de España, sumado aparte (no incluido en el precio). Se busca en Stripe; si no está, se crea una sola
+ * vez. El id se guarda en KV para no preguntarlo en cada pago.
+ */
+export async function ivaNegocios(env) {
+  const kv = env.FEEHUND_KV, k = 'stripe:iva21';
+  const ya = kv && (await kv.get(k));
+  if (ya) return ya;
+  const l = await stripe(env, 'GET', '/v1/tax_rates?active=true&limit=100');
+  let t = (l.data || []).find((x) => Number(x.percentage) === 21 && x.inclusive === false && x.country === 'ES');
+  if (!t) t = await stripe(env, 'POST', '/v1/tax_rates', { display_name: 'IVA', percentage: 21, inclusive: false, country: 'ES', jurisdiction: 'ES', tax_type: 'vat', description: 'IVA España 21 %' }, 'iva-21-es');
+  if (kv && t?.id) await kv.put(k, t.id);
+  return t.id;
+}
+
+export async function crearPagoTiqui(env, { ref, plan, importe, producto, idioma, vuelta, cancelar, textos, amigo, factura }) {
   const meta = amigo ? { servicio: 'tiqui', plan, amigo } : { servicio: 'tiqui', plan };
+  // negocios: el IVA se suma en la página de pago (4,99 € + 21 %)
+  const iva = factura ? await ivaNegocios(env) : null;
   return stripe(env, 'POST', '/v1/checkout/sessions', {
     mode: 'payment',
-    line_items: { 0: { quantity: 1, price_data: { currency: 'eur', unit_amount: importe, product: producto } } },
+    line_items: { 0: { quantity: 1, price_data: { currency: 'eur', unit_amount: importe, product: producto, tax_behavior: 'exclusive' }, ...(iva ? { tax_rates: { 0: iva } } : {}) } },
     client_reference_id: ref,
     locale: idioma === 'ca' ? 'es' : idioma,
     success_url: vuelta,
@@ -69,7 +86,7 @@ export function crearPagoTiqui(env, { ref, plan, importe, producto, idioma, vuel
     // [REVISIÓN LEGAL] contenido digital: empieza en cuanto se paga (art. 103 m TRLGDCU)
     custom_text: { submit: { message: textos.renuncia } },
     // negocios: factura con IVA al pagar y casilla para su NIF
-    ...(factura ? { invoice_creation: { enabled: true, invoice_data: { description: textos.descripcion } }, tax_id_collection: { enabled: true } } : {}),
+    ...(factura ? { invoice_creation: { enabled: true, invoice_data: { description: textos.descripcion } }, tax_id_collection: { enabled: true }, billing_address_collection: 'required' } : {}),
   }, 'tiqui-' + ref);
 }
 export const leerPago = (env, sesion) => stripe(env, 'GET', '/v1/checkout/sessions/' + encodeURIComponent(sesion));
