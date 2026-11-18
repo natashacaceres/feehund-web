@@ -164,7 +164,7 @@
   function planesEnChat() {
     if ($("tqcPlanes")) return;
     if (sug) sug.hidden = true;
-    sub.textContent = T.siguePlanes;
+    sub.textContent = T.siguePlanes; sub.hidden = false;
     const f = document.createDocumentFragment(); f.appendChild(document.createTextNode(T.seguimos));
     const pl = mk("div", "tqc-planes"); pl.id = "tqcPlanes";
     Object.keys(T.planes).forEach((k) => {
@@ -224,7 +224,7 @@
   }
   async function preguntar(t) {
     const p = leerPase(); if (p) return preguntarPago(p, t);
-    if (gratisUsada()) { abrirPago("basico"); return; }
+    if (gratisUsada()) { burbuja("tu", t); planesEnChat(); return; }
     burbuja("tu", t);
     const pensando = burbuja("ia", mk("span", "tqc-dots")); pensando.firstChild.append(mk("i"), mk("i"), mk("i"));
     const r = await api("pregunta-gratis", { pregunta: t, idioma: LANG, movimientos: envio() });
@@ -240,7 +240,7 @@
     caja = mk("section", "tqc"); caja.id = "tqcIa"; caja.setAttribute("aria-label", T.titulo);
     const ch = mk("div", "tqc-chat");
     const pase = leerPase();
-    const top = mk("div", "tqc-top"); top.appendChild(mk("h2", "tqc-h", T.titulo)); sub = mk("p", "tqc-sub", pase ? T.hasta(new Date(pase.hasta)) : gratisUsada() ? T.siguePlanes : T.gratis); top.appendChild(sub);
+    const top = mk("div", "tqc-top"); top.appendChild(mk("h2", "tqc-h", T.titulo)); sub = mk("p", "tqc-sub", pase ? T.hasta(new Date(pase.hasta)) : gratisUsada() ? "" : T.gratis); sub.hidden = !sub.textContent; top.appendChild(sub);
     msgs = mk("div", "tqc-msgs"); msgs.setAttribute("aria-live", "polite");
     sug = mk("div", "tqc-sug");
     sugerencias().forEach((q) => { const b = mk("button", null, q); b.type = "button"; b.addEventListener("click", () => preguntar(q)); sug.appendChild(b); });
@@ -261,7 +261,7 @@
       }
       burbuja("ia", T.hola);
       if (regaloPendiente) { burbuja("ia", T.regalo(T.hasta(new Date(pase.hasta)))); regaloPendiente = 0; } else estado(pase);
-    } else if (gratisUsada()) { msgs.textContent = ""; planesEnChat(); } else burbuja("ia", T.hola);
+    } else burbuja("ia", T.hola); // los planes salen solo cuando la persona pregunta
   }
   // Invita a un amigo: un enlace propio (sin el código); si el amigo paga, 30 días más para ti
   const RUTA = { es: "/extracto/", ca: "/ca/extracte/", en: "/en/statement/" }[LANG];

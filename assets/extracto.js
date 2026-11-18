@@ -42,7 +42,7 @@
       tarjeta: "Puede que ahora lo pagues con la tarjeta de crédito.", darBaja: "Dar de baja", darme: "Darme de baja",
       aDuplicado: ["Pagas dos servicios para lo mismo", (a, b) => a + " y " + b + " hacen lo mismo. Puedes quedarte con uno."], priv: "Privado. No se guarda.",
       none: "No ha encontrado cobros que se repitan. Prueba con más meses.", bad: "No se ha podido leer. Prueba con Excel o CSV.", mapeo: "No reconocemos las columnas de este archivo. Prueba a descargarlo en Excel o CSV.",
-      dl: "Imagen descargada.", ics: "Archivo de avisos descargado.", sinIcs: "No hay cobros para avisar.", share: (x) => x + " €/año en cobros que se repiten · feehund.com", lista: "Cobros que se repiten" },
+      dl: "Imagen guardada. Desde el móvil se comparte directo en Instagram o WhatsApp.", ics: "Archivo de avisos descargado.", sinIcs: "No hay cobros para avisar.", share: (x) => x + " €/año en cobros que se repiten · feehund.com", lista: "Cobros que se repiten" },
     ca: { datafono: "Això és el resum del teu datàfon, no l'extracte del teu compte. Es llegeix a El meu datàfon.", irDatafono: "Anar a El meu datàfon", year: "€/any", menos: " menys/any",
       si: "Sí", no: "No", el: "el", yMas: (n) => " i " + n + " més", deA: (x, a, b) => x + ", de " + a + " a " + b + " €", enExtracto: (x) => x + " € en aquest extracte",
       preguntas: [["doble", "Et cobren alguna cosa dues vegades?"], ["subida", "T'han pujat algun preu?"], ["recibo", "Algun rebut ha vingut més alt del normal?"], ["comision", "Pagues comissions al banc?"]],
@@ -70,7 +70,7 @@
       tarjeta: "Potser ara el pagues amb la targeta de crèdit.", darBaja: "Donar de baixa", darme: "Donar-me de baixa",
       aDuplicado: ["Pagues dos serveis per al mateix", (a, b) => a + " i " + b + " fan el mateix. Pots quedar-te amb un."], priv: "Privat. No es desa.",
       none: "No ha trobat cobraments que es repeteixin. Prova amb més mesos.", bad: "No s'ha pogut llegir. Prova amb Excel o CSV.", mapeo: "No reconeixem les columnes d'aquest fitxer. Prova de descarregar-lo en Excel o CSV.",
-      dl: "Imatge descarregada.", ics: "Fitxer d'avisos descarregat.", sinIcs: "No hi ha cobraments per avisar.", share: (x) => x + " €/any en cobraments que es repeteixen · feehund.com", lista: "Cobraments que es repeteixen" },
+      dl: "Imatge desada. Des del mòbil es comparteix directament a Instagram o WhatsApp.", ics: "Fitxer d'avisos descarregat.", sinIcs: "No hi ha cobraments per avisar.", share: (x) => x + " €/any en cobraments que es repeteixen · feehund.com", lista: "Cobraments que es repeteixen" },
     en: { datafono: "This is your card machine summary, not your bank statement. It goes in My card machine.", irDatafono: "Go to My card machine", year: "€/year", menos: " less/year",
       si: "Yes", no: "No", el: "on", yMas: (n) => " and " + n + " more", deA: (x, a, b) => x + ", from " + a + " to " + b + " €", enExtracto: (x) => x + " € in this statement",
       preguntas: [["doble", "Are you charged twice for anything?"], ["subida", "Has any price gone up?"], ["recibo", "Has any bill come in higher than usual?"], ["comision", "Do you pay bank fees?"]],
@@ -98,7 +98,7 @@
       tarjeta: "You may now be paying it with your credit card.", darBaja: "Cancel", darme: "Cancel it for me",
       aDuplicado: ["Two services for the same thing", (a, b) => a + " and " + b + " do the same. You could keep just one."], priv: "Private. Never stored.",
       none: "No recurring charges found. Try with more months.", bad: "The file could not be read. Try Excel or CSV.", mapeo: "We do not recognise the columns in this file. Try downloading it as Excel or CSV.",
-      dl: "Image downloaded.", ics: "Reminder file downloaded.", sinIcs: "There are no charges to remind you about.", share: (x) => "€" + x + "/year in recurring charges · feehund.com", lista: "Recurring charges" },
+      dl: "Image saved. On your phone it shares straight to Instagram or WhatsApp.", ics: "Reminder file downloaded.", sinIcs: "There are no charges to remind you about.", share: (x) => "€" + x + "/year in recurring charges · feehund.com", lista: "Recurring charges" },
   }[LANG];
   const BAJA_DIR = { es: "baja", ca: "baixa", en: "cancel" }[LANG];
   // Páginas de baja que existen hoy en la web (las demás no se enlazan hasta que existan)
