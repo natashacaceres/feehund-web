@@ -997,3 +997,19 @@ const PAISES = [{codigo:"ES", nombre:"España", ruta:"/datafono/", idiomas:"Espa
       el.textContent = l === "en" ? dd + " " + mo + " " + y : l === "ca" ? dd + (/^[ao]/.test(mo) ? " d'" : " de ") + mo + " de " + y : dd + " de " + mo + " de " + y; });
   }).catch(() => {});
 })();
+
+// Portada: el nombre de cada tarjeta en una sola línea en todos los idiomas, como en español. Si en catalán o inglés
+// es más largo, la letra se encoge un poco (hasta el 72 %); si aun así no cabe, se parte en dos líneas (lo que dice el CSS).
+(function () {
+  const ajustar = () => document.querySelectorAll(".cubo-t").forEach((t) => {
+    t.style.fontSize = ""; t.style.whiteSpace = "nowrap";
+    const base = parseFloat(getComputedStyle(t).fontSize);
+    let f = base;
+    while (t.scrollWidth > t.clientWidth + 1 && f > base * 0.72) { f -= 0.5; t.style.fontSize = f + "px"; }
+    if (t.scrollWidth > t.clientWidth + 1) { t.style.fontSize = ""; t.style.whiteSpace = ""; }
+  });
+  if (!document.querySelector(".cubo-t")) return;
+  const ya = () => { ajustar(); if (document.fonts && document.fonts.ready) document.fonts.ready.then(ajustar); };
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", ya); else ya();
+  let t0; addEventListener("resize", () => { clearTimeout(t0); t0 = setTimeout(ajustar, 120); });
+})();

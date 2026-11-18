@@ -1652,3 +1652,9 @@ body.con-barra{padding-bottom:calc(88px + env(safe-area-inset-bottom))}
 .hdr-tiqui img{width:32px;height:32px;border-radius:50%;object-fit:cover;background:var(--bg)}
 .hdr-tiqui[aria-current="page"]{box-shadow:inset 0 0 0 2px var(--brand)}
 @media (max-width:480px){.hdr .brand img{width:132px;height:auto}.hdr-tiqui{width:44px;padding:0;justify-content:center;font-size:0;gap:0}.hdr-tiqui img{width:36px;height:36px}}
+/* Portada: si el nombre no cabe (catalán, inglés), baja a una segunda línea en vez de montarse sobre la flecha */
+.cubo-t,.cubo-s{white-space:normal;overflow-wrap:normal;text-wrap:balance;min-width:0;max-width:100%}
+/* Cabecera en móvil: cabe igual en los tres idiomas («Donar de baixa» es más largo) */
+@media (max-width:480px){.hdr .wrap{gap:8px}.hdr-r{gap:2px}.hdr-baja{padding:0 4px;font-size:15px}.hdr .brand img{width:124px;height:auto}}
+@media (max-width:360px){.hdr .brand img{width:104px}.hdr-baja{font-size:14px}}
+.cubo-t{overflow:hidden}
