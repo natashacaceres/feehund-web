@@ -8,15 +8,15 @@
   const $ = (id) => document.getElementById(id);
   const LANG = ["es", "ca", "en"].indexOf(document.documentElement.lang) >= 0 ? document.documentElement.lang : "es";
   const TX = {
-    es: { renovado: "Hemos puesto al día el lector. Vuelve a soltar tu resumen.", banco: "Esto es el extracto de tu cuenta del banco, no el resumen del datáfono. Se lee en Mi banco.", irBanco: "Ir a Mi banco", seguro: "Leído y comprobado", revisar: "Revísalo", vacio: "No sale en el resumen. Escríbelo si lo sabes.", con: "Con quién cobras",
+    es: { ia: "Leído con IA. Revísalo.", masDetalle: "Lo estamos leyendo con más detalle…", renovado: "Hemos puesto al día el lector. Vuelve a soltar tu resumen.", banco: "Esto es el extracto de tu cuenta del banco, no el resumen del datáfono. Se lee en Mi banco.", irBanco: "Ir a Mi banco", seguro: "Leído y comprobado", revisar: "Revísalo", vacio: "No sale en el resumen. Escríbelo si lo sabes.", con: "Con quién cobras",
       mes: (d, h) => "Del " + d + " al " + h, suma: (n) => "Suma de " + n + " filas", noCifra: "Escribe solo la cifra, por ejemplo 1234,56.",
       bad: "No se ha podido leer. Prueba con el PDF o el Excel del resumen.", nada: "No encontramos las ventas con tarjeta en este archivo. Prueba con el resumen del mes o escríbelo a mano.",
       clave: (a) => "Contraseña de " + a, listo: (n) => "Hemos rellenado " + n + " casillas de la calculadora. Revísalas y sigue con las preguntas." },
-    ca: { renovado: "Hem posat al dia el lector. Torna a deixar anar el teu resum.", banco: "Això és l'extracte del teu compte del banc, no el resum del datàfon. Es llegeix a El meu banc.", irBanco: "Anar a El meu banc", seguro: "Llegit i comprovat", revisar: "Revisa-ho", vacio: "No surt al resum. Escriu-ho si ho saps.", con: "Amb qui cobres",
+    ca: { ia: "Llegit amb IA. Revisa-ho.", masDetalle: "Ho estem llegint amb més detall…", renovado: "Hem posat al dia el lector. Torna a deixar anar el teu resum.", banco: "Això és l'extracte del teu compte del banc, no el resum del datàfon. Es llegeix a El meu banc.", irBanco: "Anar a El meu banc", seguro: "Llegit i comprovat", revisar: "Revisa-ho", vacio: "No surt al resum. Escriu-ho si ho saps.", con: "Amb qui cobres",
       mes: (d, h) => "Del " + d + " al " + h, suma: (n) => "Suma de " + n + " files", noCifra: "Escriu només la xifra, per exemple 1234,56.",
       bad: "No s'ha pogut llegir. Prova amb el PDF o l'Excel del resum.", nada: "No trobem les vendes amb targeta en aquest arxiu. Prova amb el resum del mes o escriu-ho a mà.",
       clave: (a) => "Contrasenya de " + a, listo: (n) => "Hem omplert " + n + " caselles de la calculadora. Revisa-les i continua amb les preguntes." },
-    en: { renovado: "We have updated the reader. Please drop your summary again.", banco: "This is your bank account statement, not the card machine summary. It goes in My bank.", irBanco: "Go to My bank", seguro: "Read and checked", revisar: "Please check", vacio: "Not in the summary. Type it in if you know it.", con: "Who you use",
+    en: { ia: "Read with AI. Please check.", masDetalle: "Reading it in more detail…", renovado: "We have updated the reader. Please drop your summary again.", banco: "This is your bank account statement, not the card machine summary. It goes in My bank.", irBanco: "Go to My bank", seguro: "Read and checked", revisar: "Please check", vacio: "Not in the summary. Type it in if you know it.", con: "Who you use",
       mes: (d, h) => "From " + d + " to " + h, suma: (n) => "Sum of " + n + " rows", noCifra: "Type just the number, for example 1234.56.",
       bad: "We could not read it. Try the PDF or Excel version of the summary.", nada: "We could not find your card sales in this file. Try the monthly summary or type the figures in.",
       clave: (a) => "Password for " + a, listo: (n) => "We filled in " + n + " boxes in the calculator. Check them and carry on with the questions." },
@@ -141,14 +141,56 @@
     if (vacio) {
       // ¿un extracto del banco en PDF, Excel o CSV? Si «Mi banco» le lee movimientos, se dice y se enlaza
       const banco = esBanco(r) || await esExtractoBanco(entrada);
-      show("up");
-      if (banco) aMiBanco($("dErr")); else msg($("dErr"), r.errores && r.errores[0] ? r.errores[0].texto : TX.nada);
-      return;
+      if (banco) { show("up"); aMiBanco($("dErr")); return; }
+      // Segunda oportunidad, como en Mi banco: el PDF o la foto va a Claude (/api/leer-datafono), que dice qué es
+      // (resumen del datáfono, extracto del banco u otra cosa) y copia las cifras que trae. Nada se guarda.
+      if (cargando) cargando.textContent = TX.masDetalle;
+      show("load");
+      const ia = await leerConIA(entrada);
+      if (cargando) cargando.textContent = textoCarga;
+      if (ia && ia.tipo === "extracto_banco") { show("up"); aMiBanco($("dErr")); return; }
+      const deIa = ia && ia.tipo === "resumen_datafono" ? conIA(ia, r) : null;
+      if (!deIa) { show("up"); msg($("dErr"), r.errores && r.errores[0] ? r.errores[0].texto : TX.nada); return; }
+      r = deIa;
     }
     actual = r;
     try { await pintar(r); } catch (e) { show("up"); msg($("dErr"), TX.bad); return; }
     show("rev");
     const h = $("dRevH"); if (h) h.focus({ preventScroll: true });
+  }
+
+  // ---------- lectura con IA (cuando el lector del dispositivo no entiende el resumen)
+  const TIPOS_IA = ["application/pdf", "image/jpeg", "image/png", "image/webp", "image/gif"];
+  async function leerConIA(entrada) {
+    const lista = (Array.isArray(entrada) ? entrada : [entrada]).filter((f) => f && typeof f === "object" && "type" in f && f.size > 0 && f.size <= 10 * 1024 * 1024);
+    const f = lista.find((x) => TIPOS_IA.indexOf(x.type) >= 0);
+    if (!f) return null;
+    try {
+      const res = await fetch(ROOT + "api/leer-datafono", { method: "POST", body: f, headers: { "content-type": f.type }, credentials: "omit", cache: "no-store" });
+      return res.ok ? await res.json() : null;
+    } catch (e) { return null; }
+  }
+  /** Lo que ha leído Claude, con la misma forma que el lector del dispositivo: todo «revísalo», nada «comprobado». */
+  function conIA(ia, base) {
+    const r = { campos: {}, lectura: { periodo: null }, errores: [], avisos: [], comprobaciones: [], ia: true, tipo: "resumen_datafono" };
+    const fecha = (s) => (typeof s === "string" && /^\d{4}-\d{2}-\d{2}$/.test(s) ? s : null);
+    if (fecha(ia.desde) && fecha(ia.hasta)) r.lectura.periodo = { desde: ia.desde, hasta: ia.hasta };
+    const n = (v) => (typeof v === "number" && isFinite(v) && v >= 0 ? v : null);
+    const tipos = ["ventas_particulares", "ventas_empresa", "ventas_fuera_europa", "ventas_amex", "ventas_bizum"];
+    const valores = {};
+    tipos.forEach((k) => { valores[k] = n(ia[k]); });
+    // si el resumen no separa por tipo de tarjeta, todo va a la primera casilla (como dice la calculadora)
+    if (tipos.every((k) => valores[k] === null) && n(ia.ventas_total)) valores.ventas_particulares = n(ia.ventas_total);
+    ["operaciones", "pagado", "tasa_particulares", "fijo_por_cobro", "cuota", "alquiler"].forEach((k) => { valores[k] = n(ia[k]); });
+    if (valores.operaciones !== null) valores.operaciones = Math.round(valores.operaciones);
+    let hay = false;
+    for (const k of Object.keys(base.campos || {})) {
+      const c = base.campos[k], v = k === "proveedor" ? (typeof ia.proveedor === "string" && ia.proveedor.trim() ? ia.proveedor.trim() : null) : (k in valores ? valores[k] : null);
+      r.campos[k] = Object.assign({}, c, { valor: v, seguro: false, como: "ia", origen: [], motivos: [], motivos_texto: [] });
+      if (k === "proveedor") Object.assign(r.campos[k], { nombre: v, calculadora: null });
+      if (v !== null && k !== "proveedor" && tipos.concat(["operaciones"]).indexOf(k) >= 0 && v > 0) hay = true;
+    }
+    return hay ? r : null;
   }
 
   // ---------- revisa tus cifras
@@ -191,7 +233,7 @@
       poner(n, "unidad", c.unidad === "pct" ? "%" : c.unidad === "eur" ? "€" : "");
       n.dataset.estado = c.valor === null ? "vacio" : c.seguro ? "seguro" : "revisar";
       poner(n, "estado", c.valor === null ? TX.vacio : c.seguro ? TX.seguro : TX.revisar);
-      poner(n, "origen", origen(c, t));
+      poner(n, "origen", c.como === "ia" ? (c.valor === null ? "" : TX.ia) : origen(c, t));
       poner(n, "motivos", (c.motivos_texto || []).join(" "));
       input.addEventListener("input", () => input.setCustomValidity(""));
       caja.appendChild(n);
