@@ -255,7 +255,7 @@ export async function onRequestPost({ request, env, params }) {
       const s2 = await crearPagoTiqui(env, { ref: h, plan, importe: P.precio, producto: env.STRIPE_PRODUCT_TIQUI || PRODUCTO_TIQUI, idioma, textos, amigo, factura: negocio,
         vuelta: base + vuelta + '?tiqui=ok&s={CHECKOUT_SESSION_ID}', cancelar: base + vuelta + '?tiqui=no' });
       return json({ url: s2.url });
-    } catch (e) { return json({ error: 'pago', detalle: env.IA_PRUEBAS === '1' ? String(e.message) : undefined }, 502); }
+    } catch (e) { console.log('pago tiqui', String(e.message)); return json({ error: 'pago', detalle: env.IA_PRUEBAS === '1' ? String(e.message) : undefined }, 502); }
   }
   if (ruta === 'canjear') {
     if (!codigoValido(b.codigo) || !/^cs_[A-Za-z0-9_]+$/.test(String(b.sesion || ''))) return json({ error: 'datos' }, 400);
