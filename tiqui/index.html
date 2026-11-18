@@ -54,29 +54,30 @@
   .tq-mi{margin:0;text-align:center;font:400 14px/1.3 ui-monospace,Menlo,monospace;color:var(--ink-2)}
   .tq-salir{justify-self:center;min-height:44px;border:0;background:none;color:var(--ink-2);font:700 16px/1 var(--f-text);text-decoration:underline;cursor:pointer}
   @media (min-width:960px){
-    .tq{padding-top:var(--s-5);padding-bottom:var(--s-5)}
-    .tq-g{max-width:none;grid-template-columns:minmax(0,1fr) minmax(0,1fr);grid-template-areas:"titulo ." "sw demo" "dif demo" "planes demo" "acc demo";grid-template-rows:auto auto auto auto 1fr;column-gap:clamp(40px,6vw,96px);row-gap:var(--s-4);align-items:start}
+    /* que respire: secciones separadas y el pie por debajo de la pantalla */
+    .tq{padding-top:var(--s-7);padding-bottom:var(--s-9);min-height:calc(100dvh - var(--hdr))}
+    .tq-g{max-width:none;grid-template-columns:minmax(0,1fr) minmax(0,1fr);grid-template-areas:"titulo ." "sw demo" "dif demo" "planes demo" "acc demo";grid-template-rows:auto auto auto auto 1fr;column-gap:clamp(48px,7vw,112px);row-gap:var(--s-7);align-items:start}
     .tq-hero{display:contents;text-align:left}
     .tq-hero .tq-h{justify-self:start}
     .tq-err:empty{display:none}
     .tq-hero .tq-h{grid-area:titulo}
     .tq-hero .tq-sw{grid-area:sw;margin-top:0}
+    .tq-hero .tq-h{margin-bottom:calc(var(--s-4) - var(--s-7))}
     .tq-img{width:140px}
     .tq-h{font-size:clamp(40px,3.9vw,56px);white-space:nowrap}
     /* el chat empieza a la altura de «Para ti» y acaba a la altura del código: no cuenta para el alto (contain), se estira */
     .tq-demo{grid-area:demo;align-self:stretch;contain:size;display:flex;flex-direction:column}
     .tq-msgs{flex:1 1 auto;min-height:0;overflow:hidden;display:flex;flex-direction:column;justify-content:flex-end;gap:12px}
-    .tq-msgs>.p-m:nth-child(-n+2){display:none}
     .tq-acc{align-self:end}
     .tq-msgs .p-m--tu{align-self:flex-end}
     .tq-msgs .p-m--ia{align-self:flex-start}
     .tq-dif{grid-area:dif}
-    .tq-dif{gap:var(--s-2)}
-    .tq-dif li{font-size:26px;padding-left:40px;background-size:26px}
+    .tq-dif{gap:var(--s-3)}
+    .tq-dif li{font-size:28px;padding-left:42px;background-size:26px}
     .tq-planes{grid-area:planes;margin-top:0}
     .tq-acc{grid-area:acc;margin-top:0;align-content:start;gap:var(--s-3)}
-    .tq-acc .tq-sin{margin-top:-6px}
-    .tq-cod{margin-top:0}
+    .tq-acc .tq-sin{margin-top:-4px}
+    .tq-acc .tq-cod{margin-top:var(--s-6)}
     .tq-dentro{max-width:420px;margin:0 auto}
     .tq-g--dentro{grid-template-columns:1fr;grid-template-areas:none;max-width:560px;margin:0 auto}
     .tq-g--dentro .tq-hero{justify-items:center;text-align:center}
@@ -239,7 +240,16 @@
     } else { $("tqAbrir").textContent = ctaTi.t; $("tqAbrir").href = ctaTi.h; $("tqSin").textContent = ctaTi.s; $("tqInv").hidden = !(p && p.codigo); }
     try { history.replaceState(null, "", m === "neg" ? "#negocio" : location.pathname); } catch (e) {}
   }
-  $("tqModo").addEventListener("click", function (e) { var b = e.target.closest("button"); if (b) modo(b.dataset.m); });
+  // Ordenador: el chat de ejemplo enseña solo los mensajes que caben enteros (los de arriba se esconden)
+  function caben() {
+    [].forEach.call(document.querySelectorAll(".tq-msgs"), function (m) {
+      [].forEach.call(m.children, function (x) { x.hidden = false; });
+      if (!matchMedia("(min-width:960px)").matches || !m.offsetParent) return;
+      for (var i = 0; i < m.children.length - 1 && m.scrollHeight > m.clientHeight + 1; i++) m.children[i].hidden = true;
+    });
+  }
+  addEventListener("resize", caben); addEventListener("load", caben);
+  $("tqModo").addEventListener("click", function (e) { var b = e.target.closest("button"); if (b) { modo(b.dataset.m); caben(); } });
   if (location.hash === "#negocio" || (pn && pn.codigo && !(p && p.codigo))) modo("neg");
   $("tqForm").addEventListener("submit", function (e) {
     e.preventDefault();
