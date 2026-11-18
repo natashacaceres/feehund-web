@@ -27,7 +27,7 @@ let deScript = null;
 // LISTA = la versión de recursos.js (la escribe el mismo paso que genera recursos.js). Va en la dirección del import
 // para que el navegador no use una copia vieja guardada en su caché (Cloudflare la manda con 4 horas de caché)
 // y para que este archivo cambie en cuanto cambia la lista: así el navegador instala la versión nueva al momento.
-const LISTA = 'cdaed84079c5';
+const LISTA = 'a099eee703fe';
 try {
   importScripts(RECURSOS_JS + '?l=' + LISTA);
   deScript = self.RECURSOS_EXTRACTO || null;

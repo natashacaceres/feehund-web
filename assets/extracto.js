@@ -353,7 +353,8 @@
       escVarios: (x, m) => x + " se te escaparon " + (m >= 12 ? "este año" : m <= 1 ? "este mes" : "en estos " + m + " meses"), escNada: "No se te escapa nada",
       suscr: (n, x, r) => n ? "Tienes " + n + (n === 1 ? " suscripción que te cuesta " : " suscripciones que te cuestan ") + x + " al año" + (r ? ", y " + r + (r === 1 ? " recibo más." : " recibos más.") : ".")
         : "Tienes " + r + (r === 1 ? " recibo que se repite" : " recibos que se repiten") + " y ninguna suscripción.",
-      dq: { titulo: "1 minuto y queda perfecto", que: "¿Qué es esto?", de: (i, n) => i + " de " + n, veces: (x, n, p) => x + " · " + n + " veces" + (p ? ", " + p : ""), mes: "cada mes", dosMeses: "cada 2 meses", ops: { vivienda: "Alquiler o hipoteca", casa: "Luz, agua o internet", susc: "Suscripción", seg: "Seguro", otros: "Otra cosa" }, nose: "No lo sé", grupo: "Lo que me has dicho" },
+      dq: { titulo: "1 minuto y queda perfecto", que: "¿Qué es esto?", de: (i, n) => i + " de " + n, veces: (x, n, p) => x + " · " + n + " veces" + (p ? ", " + p : ""), mes: "cada mes", dosMeses: "cada 2 meses", ops: { vivienda: "Alquiler o hipoteca", casa: "Luz, agua o internet", susc: "Suscripción", seg: "Seguro", otros: "Otra cosa" }, nose: "No lo sé", grupo: "Lo que me has dicho",
+        pagos: (x, n) => x + " en " + n + (n === 1 ? " pago" : " pagos"), ops2: { fuera: "Bar o restaurante", super: "Súper", otro: "Tienda", transporte: "Transporte", salud: "Salud", ocio: "Ocio", persona: "Una persona" } },
       nada: "No hemos visto cobros que se repitan.", tipos: { casa: "Casa", susc: "Suscripciones", seg: "Seguros", banco: "Comisiones del banco", otros: "Otros pagos" }, otros: "Otros", recibos: "Recibos que varían", devolvieron: (x) => "Te devolvieron " + x, devoluciones: (n) => (n === 1 ? "1 devolución" : n + " devoluciones"),
       verMas: (n) => "Ver " + n + " más", verMenos: "Ver menos", verDetalle: "Ver todo el detalle", ocultarDetalle: "Ocultar el detalle",
       revisar: "Revisar", anadir: "Añadir", ver: "Ver", darme: "Darme de baja", darBaja: "Dar de baja",
@@ -370,7 +371,8 @@
       escVarios: (x, m) => x + " se t'han escapat " + (m >= 12 ? "aquest any" : m <= 1 ? "aquest mes" : "en aquests " + m + " mesos"), escNada: "No se t'escapa res",
       suscr: (n, x, r) => n ? "Tens " + n + (n === 1 ? " subscripció que et costa " : " subscripcions que et costen ") + x + " l'any" + (r ? ", i " + r + (r === 1 ? " rebut més." : " rebuts més.") : ".")
         : "Tens " + r + (r === 1 ? " rebut que es repeteix" : " rebuts que es repeteixen") + " i cap subscripció.",
-      dq: { titulo: "1 minut i queda perfecte", que: "Què és això?", de: (i, n) => i + " de " + n, veces: (x, n, p) => x + " · " + n + " vegades" + (p ? ", " + p : ""), mes: "cada mes", dosMeses: "cada 2 mesos", ops: { vivienda: "Lloguer o hipoteca", casa: "Llum, aigua o internet", susc: "Subscripció", seg: "Assegurança", otros: "Una altra cosa" }, nose: "No ho sé", grupo: "El que m'has dit" },
+      dq: { titulo: "1 minut i queda perfecte", que: "Què és això?", de: (i, n) => i + " de " + n, veces: (x, n, p) => x + " · " + n + " vegades" + (p ? ", " + p : ""), mes: "cada mes", dosMeses: "cada 2 mesos", ops: { vivienda: "Lloguer o hipoteca", casa: "Llum, aigua o internet", susc: "Subscripció", seg: "Assegurança", otros: "Una altra cosa" }, nose: "No ho sé", grupo: "El que m'has dit",
+        pagos: (x, n) => x + " en " + n + (n === 1 ? " pagament" : " pagaments"), ops2: { fuera: "Bar o restaurant", super: "Súper", otro: "Botiga", transporte: "Transport", salud: "Salut", ocio: "Oci", persona: "Una persona" } },
       nada: "No hem vist cobraments que es repeteixin.", tipos: { casa: "Casa", susc: "Subscripcions", seg: "Assegurances", banco: "Comissions del banc", otros: "Altres pagaments" }, otros: "Altres", recibos: "Rebuts que varien", devolvieron: (x) => "T'han retornat " + x, devoluciones: (n) => (n === 1 ? "1 devolució" : n + " devolucions"),
       verMas: (n) => "Veure'n " + n + " més", verMenos: "Veure'n menys", verDetalle: "Veure tot el detall", ocultarDetalle: "Amagar el detall",
       revisar: "Revisar", anadir: "Afegir", ver: "Veure", darme: "Donar-me de baixa", darBaja: "Donar de baixa",
@@ -387,7 +389,8 @@
       escVarios: (x, m) => x + " slipped away " + (m >= 12 ? "this year" : m <= 1 ? "this month" : "in these " + m + " months"), escNada: "Nothing is slipping away",
       suscr: (n, x, r) => n ? "You have " + n + (n === 1 ? " subscription costing " : " subscriptions costing ") + x + " a year" + (r ? ", and " + r + (r === 1 ? " more bill." : " more bills.") : ".")
         : "You have " + r + (r === 1 ? " bill that repeats" : " bills that repeat") + " and no subscriptions.",
-      dq: { titulo: "1 minute and it's perfect", que: "What is this?", de: (i, n) => i + " of " + n, veces: (x, n, p) => x + " · " + n + " times" + (p ? ", " + p : ""), mes: "every month", dosMeses: "every 2 months", ops: { vivienda: "Rent or mortgage", casa: "Power, water or internet", susc: "Subscription", seg: "Insurance", otros: "Something else" }, nose: "I don't know", grupo: "What you told me" },
+      dq: { titulo: "1 minute and it's perfect", que: "What is this?", de: (i, n) => i + " of " + n, veces: (x, n, p) => x + " · " + n + " times" + (p ? ", " + p : ""), mes: "every month", dosMeses: "every 2 months", ops: { vivienda: "Rent or mortgage", casa: "Power, water or internet", susc: "Subscription", seg: "Insurance", otros: "Something else" }, nose: "I don't know", grupo: "What you told me",
+        pagos: (x, n) => x + " in " + n + (n === 1 ? " payment" : " payments"), ops2: { fuera: "Bar or restaurant", super: "Supermarket", otro: "Shop", transporte: "Transport", salud: "Health", ocio: "Leisure", persona: "A person" } },
       nada: "We have not seen any repeating charges.", tipos: { casa: "Home", susc: "Subscriptions", seg: "Insurance", banco: "Bank fees", otros: "Other payments" }, otros: "Other", recibos: "Bills that vary", devolvieron: (x) => "You got " + x + " back", devoluciones: (n) => (n === 1 ? "1 refund" : n + " refunds"),
       verMas: (n) => "See " + n + " more", verMenos: "See less", verDetalle: "See all the detail", ocultarDetalle: "Hide the detail",
       revisar: "Check", anadir: "Add", ver: "See", darme: "Cancel it for me", darBaja: "Cancel",
@@ -800,21 +803,52 @@
     const g = (r.grupos || []).find((y) => y.codigo === "sector_tuyos");
     if (g) g.ids = g.ids.concat(ids); else r.grupos = (r.grupos || []).concat([{ codigo: "sector_tuyos", titulo: T3.dq.grupo, ids, total: 0 }]);
   }
-  function preguntarDesconocidos(r, guardar) {
-    const T = T3 && T3.dq; if (!T) return Promise.resolve();
+  // Comercios que Tiqui no sabe qué son y no se repiten como un recibo (un bar, una tienda): se pregunta su sector.
+  // Lo contestado vale en este móvil y, sin importes ni fechas, cuenta como un voto para todos (/api/ia/voto).
+  function comerciosRaros(r) {
+    const C = window.FeehundComercio; if (!C) return { lista: [], importante: false };
+    const enCobro = new Set(); [].concat(r.cobros || [], r.gastos_fijos || [], r.terminados || []).forEach((c) => (c.movimientos || []).forEach((m) => enCobro.add(m.id)));
+    const FUERA = /BIZUM|LIQUIDACI|RECOBRO|TRASPASO|TRANSFER|IMPUESTO|HACIENDA|A\.E\.A\.T|TRIBUT|CAJERO|REINTEGRO|DEVOLUCI|NOMINA|NÓMINA|HIPOTECA|PRESTAMO|PRÉSTAMO/i;
+    let gastado = 0; const por = {};
+    ((r.lectura && r.lectura.movimientos) || []).forEach((m) => {
+      if (!(m.importe < 0) || FUERA.test(m.concepto || "")) return;
+      gastado -= m.importe;
+      if (enCobro.has(m.id)) return;
+      const c = C.clasificar(m.concepto);
+      if (c.s || c.contestado || !c.k || !/[A-Z]{3}/.test(c.k)) return;
+      const x = por[c.k] || (por[c.k] = { k: c.k, nombre: bonito(c.k), l: [], total: 0, comercio: true });
+      x.l.push(m); x.total -= m.importe;
+    });
+    const lista = Object.values(por).sort((a, b) => b.total - a.total), raro = lista.reduce((t, x) => t + x.total, 0);
+    return { lista, importante: lista.length >= 5 && gastado > 0 && raro / gastado >= 0.15 };
+  }
+  async function preguntarDesconocidos(r, guardar) {
+    const T = T3 && T3.dq; if (!T) return;
+    if (window.FeehundComercio) await window.FeehundComercio.listo();
     const lista = desconocidos(r), mios = leerTuyos();
     lista.forEach((x) => { if (!mios[x.k] && conocida(x.k)) x.auto = conocida(x.k); });
     const yaSe = lista.filter((x) => x.auto || (mios[x.k] && mios[x.k] !== "nose")).map((x) => Object.assign(x, { op: x.auto || mios[x.k] }));
-    const faltan = lista.filter((x) => !x.auto && !mios[x.k]);
-    if (!faltan.length) { anadirTuyos(r, yaSe); return Promise.resolve(); }
+    // Como mucho 3 preguntas; 5 si lo que Tiqui no sabe qué es pesa mucho (15 % o más de lo gastado, en 5 sitios o más).
+    // Primero lo que se repite (puede ser el alquiler); después los comercios de más dinero.
+    const raros = comerciosRaros(r), tope = raros.importante ? 5 : 3;
+    const recibos = lista.filter((x) => !x.auto && !mios[x.k]).slice(0, tope);
+    const faltan = recibos.concat(raros.lista.slice(0, tope - recibos.length));
+    if (!faltan.length) { anadirTuyos(r, yaSe); return; }
     return new Promise((fin) => {
       const ov = el("div", "dq"); ov.setAttribute("role", "dialog"); ov.setAttribute("aria-modal", "true");
       const c = el("div", "dq-c"); ov.appendChild(c); document.body.appendChild(ov); document.body.classList.add("dq-abierta");
       const contestadas = [];
       const paso = (i) => {
         if (i >= faltan.length) {
-          if (guardar) { const m = leerTuyos(); contestadas.forEach((x) => { m[x.k] = x.op; }); try { localStorage.setItem(TUYOS, JSON.stringify(m)); } catch (e) {} }
-          anadirTuyos(r, yaSe.concat(contestadas.filter((x) => x.op !== "nose")));
+          const deRecibo = contestadas.filter((x) => !x.comercio), deComercio = contestadas.filter((x) => x.comercio);
+          if (guardar) {
+            const m = leerTuyos(); deRecibo.forEach((x) => { m[x.k] = x.op; }); try { localStorage.setItem(TUYOS, JSON.stringify(m)); } catch (e) {}
+            deComercio.forEach((x) => {
+              window.FeehundComercio.guardar(x.k, x.op);
+              if (x.op !== "nose") fetch(ROOT + "api/ia/voto", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ comercio: x.k, sector: x.op }) }).catch(() => {});
+            });
+          }
+          anadirTuyos(r, yaSe.concat(deRecibo.filter((x) => x.op !== "nose")));
           ov.remove(); document.body.classList.remove("dq-abierta"); fin(); return;
         }
         const x = faltan[i]; c.textContent = "";
@@ -825,9 +859,9 @@
         c.appendChild(el("p", "dq-n", T.de(i + 1, faltan.length)));
         c.appendChild(el("p", "dq-q", T.que));
         c.appendChild(el("p", "dq-nom", x.nombre));
-        c.appendChild(el("p", "dq-imp", T.veces(eur(x.media), x.l.length, x.alAnio === 12 ? T.mes : x.alAnio === 6 ? T.dosMeses : "")));
-        const ops = el("div", "dq-ops");
-        Object.keys(T.ops).forEach((k) => { const b = el("button", "dq-op", T.ops[k]); b.type = "button"; b.addEventListener("click", () => { x.op = k; contestadas.push(x); paso(i + 1); }); ops.appendChild(b); });
+        c.appendChild(el("p", "dq-imp", x.comercio ? T.pagos(eur(x.total), x.l.length) : T.veces(eur(x.media), x.l.length, x.alAnio === 12 ? T.mes : x.alAnio === 6 ? T.dosMeses : "")));
+        const ops = el("div", "dq-ops"), OPS = x.comercio ? T.ops2 : T.ops;
+        Object.keys(OPS).forEach((k) => { const b = el("button", "dq-op", OPS[k]); b.type = "button"; b.addEventListener("click", () => { x.op = k; contestadas.push(x); paso(i + 1); }); ops.appendChild(b); });
         c.appendChild(ops);
         const no = el("button", "dq-nose", T.nose); no.type = "button"; no.addEventListener("click", () => { x.op = "nose"; contestadas.push(x); paso(i + 1); }); c.appendChild(no);
         const b0 = ops.querySelector("button"); if (b0) b0.focus({ preventScroll: true });
