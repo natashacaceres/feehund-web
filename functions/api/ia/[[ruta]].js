@@ -14,6 +14,7 @@
 
 import { PLANES, PRODUCTO_TIQUI, AMIGO, GUARDA_PASE, activarTiqui, codigoValido, refValido } from '../../_ia/pase.js';
 import { crearPagoTiqui, leerPago } from '../../_baja/servicios.js';
+import { limpiarNegocio, HERRAMIENTAS_NEGOCIO, ejecutarNegocio, instruccionesNegocio } from '../../_ia/negocio.js';
 
 const MODELO = 'claude-opus-5-5';
 // La primera pregunta es gratis: 1 por persona (IP) y día, y un tope global al día.
@@ -171,9 +172,11 @@ const ESQUEMA = {
   additionalProperties: false,
 };
 
-async function preguntar(env, movs, pregunta, historial) {
-  const permitidas = new Set();
-  const sistema = [{ type: 'text', text: instrucciones(movs, new Date().toISOString().slice(0, 10)), cache_control: { type: 'ephemeral' } }];
+async function preguntar(env, movs, pregunta, historial, neg) {
+  const permitidas = new Set(), hoy = new Date().toISOString().slice(0, 10);
+  // neg: los datos del datáfono (Tiqui para negocios); si no, el extracto del banco
+  const sistema = [{ type: 'text', text: neg ? instruccionesNegocio(neg, hoy) : instrucciones(movs, hoy), cache_control: { type: 'ephemeral' } }];
+  const herramientas = neg ? HERRAMIENTAS_NEGOCIO : HERRAMIENTAS;
   const mensajes = [];
   (historial || []).slice(-6).forEach((h) => mensajes.push({ role: h.rol === 'tu' ? 'user' : 'assistant', content: String(h.texto).slice(0, 1500) }));
   mensajes.push({ role: 'user', content: pregunta });
@@ -184,7 +187,7 @@ async function preguntar(env, movs, pregunta, historial) {
       method: 'POST',
       headers: { 'content-type': 'application/json', 'x-api-key': env.ANTHROPIC_API_KEY, 'anthropic-version': '2026-10-21', 'anthropic-beta': 'server-side-fallback-2026-07-01' },
       body: JSON.stringify({
-        model: env.IA_MODELO || MODELO, max_tokens: 8000, fallbacks: 'default', system: sistema, tools: HERRAMIENTAS, messages: mensajes,
+        model: env.IA_MODELO || MODELO, max_tokens: 8000, fallbacks: 'default', system: sistema, tools: herramientas, messages: mensajes,
         output_config: { effort: env.IA_ESFUERZO || 'medium', format: { type: 'json_schema', schema: ESQUEMA } },
       }),
     });
@@ -194,7 +197,7 @@ async function preguntar(env, movs, pregunta, historial) {
     uso.cache_lee += d.usage?.cache_read_input_tokens || 0; uso.cache_escribe += d.usage?.cache_creation_input_tokens || 0;
     mensajes.push({ role: 'assistant', content: d.content });
     if (d.stop_reason === 'tool_use') {
-      const resultados = d.content.filter((b) => b.type === 'tool_use').map((b) => ({ type: 'tool_result', tool_use_id: b.id, content: JSON.stringify(ejecutar(b.name, b.input || {}, movs, permitidas)) }));
+      const resultados = d.content.filter((b) => b.type === 'tool_use').map((b) => ({ type: 'tool_result', tool_use_id: b.id, content: JSON.stringify(neg ? ejecutarNegocio(b.name, b.input || {}, neg, permitidas) : ejecutar(b.name, b.input || {}, movs, permitidas)) }));
       mensajes.push({ role: 'user', content: resultados });
       continue;
     }
@@ -234,19 +237,22 @@ export async function onRequestPost({ request, env, params }) {
     if (!codigoValido(b.codigo)) return json({ error: 'codigo' }, 400);
     const caja = b.caja;
     if (!caja || typeof caja.datos !== 'string' || caja.datos.length > 4e6) return json({ error: 'caja' }, 400);
-    const vuelta = ['/extracto/', '/ca/extracte/', '/en/statement/'].includes(b.vuelta) ? b.vuelta : '/extracto/';
+    const negocio = plan.indexOf('negocio') === 0;
+    const VUELTAS = negocio ? ['/datafono/', '/ca/datafon/', '/en/card-machine/'] : ['/extracto/', '/ca/extracte/', '/en/statement/'];
+    const vuelta = VUELTAS.includes(b.vuelta) ? b.vuelta : VUELTAS[0];
     const idioma = ['ca', 'en'].includes(b.idioma) ? b.idioma : 'es';
     const h = await huella(b.codigo), base = new URL(request.url).origin;
     const amigo = refValido(b.amigo) && (await env.FEEHUND_KV.get('ia:ref:' + b.amigo)) ? b.amigo : undefined;
     await env.FEEHUND_KV.put('ia:caja:' + h, JSON.stringify({ sal: caja.sal, iv: caja.iv, datos: caja.datos }), { expirationTtl: 2 * 86400 });
     await env.FEEHUND_KV.put('ia:pend:' + h, JSON.stringify({ plan, codigo: String(b.codigo).toUpperCase(), idioma, creado: Date.now() }), { expirationTtl: 2 * 86400 });
-    const dura = { es: plan === 'basico' ? '7 días' : '3 meses', ca: plan === 'basico' ? '7 dies' : '3 mesos', en: plan === 'basico' ? '7 days' : '3 months' }[idioma];
+    const DURA = { basico: ['7 días', '7 dies', '7 days'], completo: ['3 meses', '3 mesos', '3 months'], negocio_mes: ['Negocios · 1 mes', 'Negocis · 1 mes', 'Business · 1 month'], negocio_3m: ['Negocios · 3 meses', 'Negocis · 3 mesos', 'Business · 3 months'] }[plan];
+    const dura = DURA[{ es: 0, ca: 1, en: 2 }[idioma]];
     const textos = {
       descripcion: { es: 'Pregúntale a Tiqui · ' + dura + ' · Tu código ', ca: 'Pregunta-li a Tiqui · ' + dura + ' · El teu codi ', en: 'Ask Tiqui · ' + dura + ' · Your code ' }[idioma] + String(b.codigo).toUpperCase(),
       renuncia: { es: 'Empieza en cuanto pagas. Al pagar aceptas que empiece ya y renuncias al desistimiento: no hay devoluciones.', ca: 'Comença tan bon punt pagues. En pagar acceptes que comenci ja i renuncies al desistiment: no hi ha devolucions.', en: 'It starts as soon as you pay. By paying you agree it starts now and waive the right to cancel: no refunds.' }[idioma],
     };
     try {
-      const s2 = await crearPagoTiqui(env, { ref: h, plan, importe: P.precio, producto: env.STRIPE_PRODUCT_TIQUI || PRODUCTO_TIQUI, idioma, textos, amigo,
+      const s2 = await crearPagoTiqui(env, { ref: h, plan, importe: P.precio, producto: env.STRIPE_PRODUCT_TIQUI || PRODUCTO_TIQUI, idioma, textos, amigo, factura: negocio,
         vuelta: base + vuelta + '?tiqui=ok&s={CHECKOUT_SESSION_ID}', cancelar: base + vuelta + '?tiqui=no' });
       return json({ url: s2.url });
     } catch (e) { return json({ error: 'pago', detalle: env.IA_PRUEBAS === '1' ? String(e.message) : undefined }, 502); }
@@ -270,9 +276,9 @@ export async function onRequestPost({ request, env, params }) {
     if (nIp >= porIp || nDia >= GRATIS.porDia) return json({ error: 'gratis_usada' }, 402);
     const pregunta = String(b.pregunta || '').trim().slice(0, 400) + ({ ca: '\n\n(Respon en català. Escriu els imports com 1.307,00 €.)', en: '\n\n(Answer in English. Write amounts like 1.307,00 €.)' }[b.idioma] || '');
     if (!pregunta) return json({ error: 'vacia' }, 400);
-    const movs = limpiarMovs(b);
-    if (!movs.length) return json({ error: 'sin_movimientos' }, 400);
-    const res = await preguntar(env, movs, pregunta, []);
+    const neg = limpiarNegocio(b.negocio), movs = neg ? [] : limpiarMovs(b);
+    if (!neg && !movs.length) return json({ error: 'sin_movimientos' }, 400);
+    const res = await preguntar(env, movs, pregunta, [], neg);
     if (res.error) return json({ error: res.error, estado: res.estado, detalle: res.detalle, uso: env.IA_PRUEBAS === '1' ? res.uso : undefined }, 502);
     await env.FEEHUND_KV.put(kIp, String(nIp + 1), { expirationTtl: 2 * 86400 });
     await env.FEEHUND_KV.put(kDia, String(nDia + 1), { expirationTtl: 2 * 86400 });
@@ -323,9 +329,10 @@ export async function onRequestPost({ request, env, params }) {
     if (pase.hoy >= tope.porDia) return json({ error: 'tope_dia', plan: pase.plan, hasta: pase.hasta }, 429);
     const pregunta = String(b.pregunta || '').trim().slice(0, 400) + ({ ca: '\n\n(Respon en català. Escriu els imports com 1.307,00 €.)', en: '\n\n(Answer in English. Write amounts like 1.307,00 €.)' }[b.idioma] || '');
     if (!pregunta) return json({ error: 'vacia' }, 400);
-    const movs = limpiarMovs(b);
-    if (!movs.length) return json({ error: 'sin_movimientos' }, 400);
-    const res = await preguntar(env, movs, pregunta, b.historial);
+    // un pase de negocio pregunta por su datáfono; uno de particular, por su extracto
+    const neg = String(pase.plan || '').indexOf('negocio') === 0 ? limpiarNegocio(b.negocio) : null, movs = neg ? [] : limpiarMovs(b);
+    if (!neg && !movs.length) return json({ error: String(pase.plan || '').indexOf('negocio') === 0 ? 'sin_datos' : 'sin_movimientos' }, 400);
+    const res = await preguntar(env, movs, pregunta, b.historial, neg);
     if (res.error) return json({ error: res.error, estado: res.estado, detalle: res.detalle, uso: env.IA_PRUEBAS === '1' ? res.uso : undefined }, 502);
     pase.usadas = (pase.usadas || 0) + 1; pase.hoy += 1; // solo cuenta si hay respuesta comprobada
     await env.FEEHUND_KV.put('ia:pase:' + h, JSON.stringify(pase), { expirationTtl: ttl + GUARDA_PASE });

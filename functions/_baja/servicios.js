@@ -54,7 +54,7 @@ export function crearPago(env, { compra, unidades, precio, correo, idioma, vuelt
   }, 'pago-' + compra);
 }
 /** Pago de «Pregúntale a Tiqui» (Checkout). importe en céntimos; ref: huella del código (no el código). */
-export function crearPagoTiqui(env, { ref, plan, importe, producto, idioma, vuelta, cancelar, textos, amigo }) {
+export function crearPagoTiqui(env, { ref, plan, importe, producto, idioma, vuelta, cancelar, textos, amigo, factura }) {
   const meta = amigo ? { servicio: 'tiqui', plan, amigo } : { servicio: 'tiqui', plan };
   return stripe(env, 'POST', '/v1/checkout/sessions', {
     mode: 'payment',
@@ -68,6 +68,8 @@ export function crearPagoTiqui(env, { ref, plan, importe, producto, idioma, vuel
     payment_intent_data: { metadata: meta, description: textos.descripcion, statement_descriptor_suffix: 'FEEHUND TIQUI' },
     // [REVISIÓN LEGAL] contenido digital: empieza en cuanto se paga (art. 103 m TRLGDCU)
     custom_text: { submit: { message: textos.renuncia } },
+    // negocios: factura con IVA al pagar y casilla para su NIF
+    ...(factura ? { invoice_creation: { enabled: true, invoice_data: { description: textos.descripcion } }, tax_id_collection: { enabled: true } } : {}),
   }, 'tiqui-' + ref);
 }
 export const leerPago = (env, sesion) => stripe(env, 'GET', '/v1/checkout/sessions/' + encodeURIComponent(sesion));

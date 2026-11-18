@@ -8,6 +8,9 @@ import { enviarCorreo } from '../_baja/servicios.js';
 export const PLANES = {
   basico: { dias: 7, porDia: 20, total: 40, precio: 99 },       // 0,99 €
   completo: { dias: 90, porDia: 25, total: 120, precio: 299 },  // 2,99 €
+  // Tiqui para negocios (Mi datáfono), con factura
+  negocio_mes: { dias: 30, porDia: 25, total: 80, precio: 499 },  // 4,99 €
+  negocio_3m: { dias: 90, porDia: 25, total: 200, precio: 999 },  // 9,99 €
 };
 export const PRODUCTO_TIQUI = 'prod_VeGsASLYslzV0Q'; // Stripe (en vivo): «Pregúntale a Tiqui»
 // Invita a un amigo: si paga, quien invitó tiene 30 días más (y 40 preguntas más), hasta 3 amigos.
@@ -48,8 +51,16 @@ const MESES = {
   ca: ['de gener', 'de febrer', 'de març', "d'abril", 'de maig', 'de juny', 'de juliol', "d'agost", 'de setembre', "d'octubre", 'de novembre', 'de desembre'],
   en: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
 };
-function correoTexto(idioma, codigo, hasta, origen) {
-  const d = new Date(hasta), enlace = origen + ({ ca: '/ca/tiqui/#', en: '/en/tiqui/#' }[idioma] || '/tiqui/#') + codigo;
+function correoTexto(idioma, codigo, hasta, origen, negocio) {
+  const res = correoBase(idioma, codigo, hasta, origen, negocio);
+  if (!negocio) return res;
+  // negocios: el resumen del datáfono, no el extracto
+  const cambios = { es: [['sin subir el extracto otra vez', 'sin subir el resumen del datáfono otra vez'], ['abre tus movimientos', 'abre las cifras de tu negocio']], ca: [["sense pujar l'extracte una altra vegada", 'sense pujar el resum del datàfon una altra vegada'], ['obre els teus moviments', 'obre les xifres del teu negoci']], en: [['without uploading your statement again', 'without uploading your card machine summary again'], ['it opens your transactions', "it opens your business's figures"]] }[idioma] || [];
+  cambios.forEach(([x, y]) => { res.texto = res.texto.replace(x, y); });
+  return res;
+}
+function correoBase(idioma, codigo, hasta, origen, negocio) {
+  const d = new Date(hasta), enlace = origen + (negocio ? ({ ca: '/ca/datafon/?vuelta#', en: '/en/card-machine/?vuelta#' }[idioma] || '/datafono/?vuelta#') : ({ ca: '/ca/tiqui/#', en: '/en/tiqui/#' }[idioma] || '/tiqui/#')) + codigo;
   if (idioma === 'ca') return { asunto: 'El teu codi de Tiqui', texto: `Aquest és el teu codi de Tiqui:\n\n${codigo}\n\nAmb ell tornes quan vulguis, des de qualsevol mòbil, sense pujar l'extracte una altra vegada:\n${enlace}\n\nEl tens fins al ${d.getUTCDate()} ${MESES.ca[d.getUTCMonth()]}.\n\nNo el comparteixis: obre els teus moviments.\n\nVas acceptar que el servei comencés de seguida, així que no hi ha devolucions.\n\nFeehund` };
   if (idioma === 'en') return { asunto: 'Your Tiqui code', texto: `This is your Tiqui code:\n\n${codigo}\n\nUse it to come back any time, from any phone, without uploading your statement again:\n${enlace}\n\nIt's yours until ${d.getUTCDate()} ${MESES.en[d.getUTCMonth()]}.\n\nDon't share it: it opens your transactions.\n\nYou agreed that the service starts right away, so there are no refunds.\n\nFeehund` };
   return { asunto: 'Tu código de Tiqui', texto: `Este es tu código de Tiqui:\n\n${codigo}\n\nCon él vuelves cuando quieras, desde cualquier móvil, sin subir el extracto otra vez:\n${enlace}\n\nLo tienes hasta el ${d.getUTCDate()} de ${MESES.es[d.getUTCMonth()]}.\n\nNo lo compartas: abre tus movimientos.\n\nAceptaste que el servicio empezara al momento, así que no hay devoluciones.\n\nFeehund` };
@@ -70,7 +81,7 @@ export async function activarTiqui(env, h, sesion, origen) {
   const pend = JSON.parse((await env.FEEHUND_KV.get('ia:pend:' + h)) || 'null');
   const correo = sesion.customer_details?.email || sesion.customer_email;
   if (pend?.codigo && correo) {
-    const { asunto, texto } = correoTexto(pend.idioma, pend.codigo, pase.hasta, origen || 'https://feehund.com');
+    const { asunto, texto } = correoTexto(pend.idioma, pend.codigo, pase.hasta, origen || 'https://feehund.com', plan.indexOf('negocio') === 0);
     try { await enviarCorreo(env, { de: { nombre: 'Feehund' }, para: correo, asunto, texto, idem: 'tiqui-' + sesion.id }); } catch (e) { /* el código también se ve en pantalla y en el recibo */ }
   }
   await env.FEEHUND_KV.delete('ia:pend:' + h);

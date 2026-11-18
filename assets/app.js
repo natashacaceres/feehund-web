@@ -220,7 +220,7 @@ function iniciarUI(){
       payLine: (x, p) => "Ahorras al menos " + x + " al año · Recomendación por " + p,
       mes: x => "Tu mes: " + x + " con tarjeta", cifraSi: "Pagas de más cada mes, como mínimo", cifraEff: "Pagas de cada 100 € que cobras con tarjeta",
       claveSi: x => "Cambiando de tarifa ahorras al menos " + x + " al año.",
-      acPagoT: "A quién cambiarte", acPagoL: "El plan, cuándo salir y qué pedir", acPagoB: p => p,
+      acPagoT: "A quién cambiarte", acPagoL: "Pregúntaselo a Tiqui", acPagoB: () => "Preguntar", acPagoQ: "¿A quién me cambio?",
       acBajaT: n => "Te damos de baja de " + n, acBajaL: "Enviamos la carta por ti", acBajaB: "Empezar", tuBanco: "tu banco",
       acFalta: { pagado: ["Mira lo que te cobró el banco", "Está en tu resumen o en tu cuenta"], perm: ["Mira si tienes permanencia", "Está en tu contrato del datáfono"],
         iva: ["Pregunta si recuperas el IVA", "Te lo dice tu gestoría"], caja: ["Mira si la caja está conectada", "Pregunta a quien te la vendió"] },
@@ -254,7 +254,7 @@ function iniciarUI(){
       payLine: (x, p) => "Estalvies almenys " + x + " l'any · Recomanació per " + p,
       mes: x => "El teu mes: " + x + " amb targeta", cifraSi: "Pagues de més cada mes, com a mínim", cifraEff: "Pagues de cada 100 € que cobres amb targeta",
       claveSi: x => "Canviant de tarifa estalvies almenys " + x + " l'any.",
-      acPagoT: "A qui canviar-te", acPagoL: "El pla, quan sortir i què demanar", acPagoB: p => p,
+      acPagoT: "A qui canviar-te", acPagoL: "Pregunta-ho a Tiqui", acPagoB: () => "Preguntar", acPagoQ: "A qui em canvio?",
       acBajaT: n => "Et donem de baixa de " + n, acBajaL: "Enviem la carta per tu", acBajaB: "Començar", tuBanco: "el teu banc",
       acFalta: { pagado: ["Busca el que et cobra el banc", "És al resum o al compte"], perm: ["Mira si tens permanència", "És al contracte del datàfon"],
         iva: ["Pregunta si recuperes l'IVA", "T'ho diu la gestoria"], caja: ["Mira si la caixa està connectada", "Pregunta a qui te la va vendre"] },
@@ -288,7 +288,7 @@ function iniciarUI(){
       payLine: (x, p) => "You save at least " + x + " a year · Recommendation for " + p,
       mes: x => "Your month: " + x + " by card", cifraSi: "You overpay each month, at least", cifraEff: "You pay out of every €100 you take by card",
       claveSi: x => "Switching rates saves you at least " + x + " a year.",
-      acPagoT: "Who to switch to", acPagoL: "The plan, when to leave, what to ask", acPagoB: p => p,
+      acPagoT: "Who to switch to", acPagoL: "Ask Tiqui", acPagoB: () => "Ask", acPagoQ: "Who should I switch to?",
       acBajaT: n => "We cancel " + n + " for you", acBajaL: "We send the letter for you", acBajaB: "Start", tuBanco: "your bank",
       acFalta: { pagado: ["Find what your bank charged you", "It's on your statement or account"], perm: ["Check your minimum term", "It's in your card machine contract"],
         iva: ["Ask if you reclaim VAT", "Your accountant will know"], caja: ["Check if your till is linked", "Ask whoever sold it to you"] },
@@ -473,7 +473,7 @@ function iniciarUI(){
     const S = seguro(I); if (!S) return;
     last = { kind: "precisa", I, R: S.R, S };
     tok++; hideOut();
-    fill(); $("res").hidden = false; $("pay").hidden = !ofrecer(last);
+    fill(); $("res").hidden = false; $("pay").hidden = true; // el informe de 4 € ya no se ofrece: lo sustituye Tiqui
     $("rVerdict").focus({ preventScroll: true });
     requestAnimationFrame(() => goTo($("res"), true));
   }
@@ -503,7 +503,8 @@ function iniciarUI(){
     // 5: qué hacer ahora
     const acc = [];
     if (yes) {
-      acc.push({ t: t.acPagoT, l: t.acPagoL, b: t.acPagoB(precio()), fn: () => { const pay = $("pay"); goTo(pay, true); const c = $("payOk"); if (c) c.focus({ preventScroll: true }); } });
+      // «A quién cambiarte» lo contesta Tiqui (assets/extracto/tiqui.js), con sinceridad; ya no hay informe de 4 €
+      acc.push({ t: t.acPagoT, l: t.acPagoL, b: t.acPagoB(), fn: () => document.dispatchEvent(new CustomEvent("fh-tiqui-preguntar", { detail: t.acPagoQ })) });
       const plan = PLANS.find(p => p.id === I.cur), prov = plan ? plan.prov : "";
       const nombre = prov === "Santander-Getnet" ? "Santander" : prov;
       acc.push({ logo: LOGOS[prov] ? "/assets/logos/" + LOGOS[prov] + ".png" : null, t: t.acBajaT(nombre || t.tuBanco), l: t.acBajaL, b: t.acBajaB, fn: () => { const a = $("rBajaA"); if (a) location.href = a.href; } });

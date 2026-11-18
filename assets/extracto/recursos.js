@@ -5,13 +5,13 @@
 //   ACTUALIZAR_RECURSOS=1 node --test tests/unit/worker-montaje.test.mjs
 // La versión es una huella de todos los archivos de las listas: cambia en cuanto cambia cualquiera de ellos.
 globalThis.RECURSOS_EXTRACTO = {
-  version: '342ac71b0da7',
+  version: '60eabde29cd2',
   // Página, fuentes, motor, núcleo, lectores y textos: se guardan al instalar.
   PAGINA: [
     '/extracto/',
     '/extracto/dev/',
     '/assets/app.css?v=20261118120851',
-    '/assets/app.js?v=20261118150721',
+    '/assets/app.js?v=20261118153201',
     '/assets/atras.js?v=20261113141239',
     '/assets/bancos-guia.js?v=20261116140713',
     '/assets/brand/apple-touch-icon.png?v=202611111722',
@@ -80,9 +80,9 @@ globalThis.RECURSOS_EXTRACTO = {
     '/assets/extracto/textos/validacion.js',
     '/assets/extracto/textos/web.js',
     '/assets/extracto/tiqui.css',
-    '/assets/extracto/tiqui.css?v=20261118134706',
+    '/assets/extracto/tiqui.css?v=20261118153201',
     '/assets/extracto/tiqui.js',
-    '/assets/extracto/tiqui.js?v=20261118134706',
+    '/assets/extracto/tiqui.js?v=20261118153201',
     '/assets/extracto/worker.js',
     '/assets/fonts/atkinson-next-400.woff2',
     '/assets/fonts/atkinson-next-600.woff2',

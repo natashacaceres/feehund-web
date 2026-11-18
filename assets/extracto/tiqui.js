@@ -6,6 +6,9 @@
   "use strict";
   const $ = (id) => document.getElementById(id);
   const LANG = ["es", "ca", "en"].indexOf(document.documentElement.lang) >= 0 ? document.documentElement.lang : "es";
+  // Mi datáfono: Tiqui para negocios (pregunta por el resumen del datáfono, planes 4,99 € y 9,99 € con factura)
+  const NEG = /\/(datafono|datafon|card-machine)\//.test(location.pathname);
+  const PAG_DAT = { es: "/datafono/", ca: "/ca/datafon/", en: "/en/card-machine/" };
   const ROOT = (document.currentScript && document.currentScript.dataset.root) || "../";
   const nf0 = new Intl.NumberFormat("es-ES", { maximumFractionDigits: 0, useGrouping: "always" });
   const nf2 = new Intl.NumberFormat("es-ES", { minimumFractionDigits: 2, maximumFractionDigits: 2, useGrouping: "always" });
@@ -22,6 +25,8 @@
       noComprobado: "No he podido comprobar las cifras, así que prefiero no dártelas. Prueba a preguntarlo de otra forma.", noPuedo: "Ahora no puedo responder. Prueba en un momento.",
       planes: { basico: ["0,99 €", "7 días"], completo: ["2,99 €", "3 meses"] }, pagar: (p) => "Pagar " + p,
       unPago: "Un solo pago. Sin suscripción", ahoraNo: "Ahora no", momento: "Un momento…", errorPago: "No se ha podido. Prueba otra vez.",
+      holaNeg: "¿Qué quieres saber de tu datáfono?", sugNeg: ["¿Cuánto me cobra el banco al mes?", "¿Por qué unas tarjetas me cobran más?", "¿A quién me cambio?"],
+      planesNeg: { negocio_mes: ["4,99 €", "1 mes"], negocio_3m: ["9,99 €", "3 meses"] }, unPagoNeg: "Un solo pago. Sin suscripción. Con factura",
       tuyo: "Tiqui ya es tuyo", copiar: "Copiar", copiado: "Copiado", correo: "Te lo hemos mandado por correo. Con él vuelves desde Tu Tiqui, sin subir nada.",
       hasta: (d) => "Hasta el " + d.getDate() + " de " + ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"][d.getMonth()],
       invita: "Invitar a un amigo", invitaYo: "Tus preguntas me salen caras, jeje. Invita a un amigo: si paga, te regalo 30 días.", fin: "Se nos acabó el tiempo.",
@@ -37,6 +42,8 @@
       noComprobado: "No he pogut comprovar les xifres, així que prefereixo no donar-te-les. Prova de preguntar-ho d'una altra manera.", noPuedo: "Ara no puc respondre. Prova-ho d'aquí a un moment.",
       planes: { basico: ["0,99 €", "7 dies"], completo: ["2,99 €", "3 mesos"] }, pagar: (p) => "Pagar " + p,
       unPago: "Un sol pagament. Sense subscripció", ahoraNo: "Ara no", momento: "Un moment…", errorPago: "No s'ha pogut. Torna-ho a provar.",
+      holaNeg: "Què vols saber del teu datàfon?", sugNeg: ["Quant em cobra el banc al mes?", "Per què unes targetes em cobren més?", "A qui em canvio?"],
+      planesNeg: { negocio_mes: ["4,99 €", "1 mes"], negocio_3m: ["9,99 €", "3 mesos"] }, unPagoNeg: "Un sol pagament. Sense subscripció. Amb factura",
       tuyo: "Tiqui ja és teu", copiar: "Copiar", copiado: "Copiat", correo: "T'ho hem enviat per correu. Amb ell tornes des d'El teu Tiqui, sense pujar res.",
       hasta: (d) => "Fins al " + d.getDate() + " " + ["de gener", "de febrer", "de març", "d'abril", "de maig", "de juny", "de juliol", "d'agost", "de setembre", "d'octubre", "de novembre", "de desembre"][d.getMonth()],
       invita: "Convidar un amic", invitaYo: "Les teves preguntes em surten cares, jeje. Convida un amic: si paga, et regalo 30 dies.", fin: "Se'ns ha acabat el temps.",
@@ -52,6 +59,8 @@
       noComprobado: "I couldn't check the figures, so I'd rather not give them to you. Try asking another way.", noPuedo: "I can't answer right now. Try again in a moment.",
       planes: { basico: ["0,99 €", "7 days"], completo: ["2,99 €", "3 months"] }, pagar: (p) => "Pay " + p,
       unPago: "One payment. No subscription", ahoraNo: "Not now", momento: "One moment…", errorPago: "That didn't work. Try again.",
+      holaNeg: "What do you want to know about your card machine?", sugNeg: ["How much does the bank charge me a month?", "Why do some cards cost me more?", "Who should I switch to?"],
+      planesNeg: { negocio_mes: ["4,99 €", "1 month"], negocio_3m: ["9,99 €", "3 months"] }, unPagoNeg: "One payment. No subscription. With invoice",
       tuyo: "Tiqui is yours", copiar: "Copy", copiado: "Copied", correo: "We've emailed it to you. Use it to come back from Your Tiqui, without uploading anything.",
       hasta: (d) => "Until " + d.getDate() + " " + ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"][d.getMonth()],
       invita: "Invite a friend", invitaYo: "Your questions cost me a fortune, hehe. Invite a friend: if they pay, I'll give you 30 days.", fin: "Our time is up.",
@@ -60,6 +69,8 @@
       topeDia: "That's it for today. See you tomorrow.", topeTotal: "You've reached the limit of this pass.", noAbre: "That code doesn't exist or has expired.", sinPagar: "We haven't received the payment yet. If you've paid, reload in a moment.",
     },
   }[LANG];
+
+  if (NEG) { T.hola = T.holaNeg; T.planes = T.planesNeg; T.unPago = T.unPagoNeg; }
 
   // Sectores: solo lo que se sabe seguro (cadena conocida o palabra que no deja dudas). Lo demás, Tiqui lo dice como «sin saber qué es».
   const SECTORES = [
@@ -98,13 +109,15 @@
   const envio = () => todos.map((m) => ({ id: m.id, f: m.fecha, c: m.concepto, k: m.c.k, s: m.c.s, i: m.importe }));
   const MARCAS = [["Mercadona", /MERCADONA/], ["Vodafone", /VODAFONE/], ["Netflix", /NETFLIX/], ["Spotify", /SPOTIFY/], ["Amazon", /AMAZON/], ["Glovo", /GLOVO/], ["Uber Eats", /UBER \*?EATS/], ["Just Eat", /JUST ?EAT/], ["Zara", /ZARA/], ["Ryanair", /RYANAIR/], ["Endesa", /ENDESA/], ["Iberdrola", /IBERDROLA/], ["Movistar", /MOVISTAR/], ["Lidl", /LIDL/], ["Carrefour", /CARREFOUR/], ["Octopus", /OCTOPUS/], ["Apple", /APPLE\.COM/]];
   function sugerencias() {
+    if (NEG) return T.sugNeg.slice();
     const porMarca = {};
     todos.forEach((m) => { if (!(m.importe < 0)) return; const mk = MARCAS.find(([, re]) => re.test(String(m.concepto).toUpperCase())); if (mk) porMarca[mk[0]] = (porMarca[mk[0]] || 0) - m.importe; });
     const top = Object.keys(porMarca).sort((a, b) => porMarca[b] - porMarca[a])[0];
     return [T.adonde, T.raro, top ? T.llevo(top) : T.mesMas];
   }
 
-  const GRATIS = "fh-tiqui-gratis", PASE = "fh-tiqui-pase", PEND = "fh-tiqui-pend", AMIGO = "fh-amigo", MIREF = "fh-tiqui-ref";
+  // el pase de negocio se guarda aparte del de Mi banco: cada uno pregunta por lo suyo
+  const GRATIS = NEG ? "fh-tiqui-gratis-negocio" : "fh-tiqui-gratis", PASE = NEG ? "fh-tiqui-pase-negocio" : "fh-tiqui-pase", PEND = NEG ? "fh-tiqui-pend-negocio" : "fh-tiqui-pend", AMIGO = "fh-amigo", MIREF = "fh-tiqui-ref";
   const leer = (k) => { try { return JSON.parse(localStorage.getItem(k) || "null"); } catch (e) { return null; } };
   const poner = (k, v) => { try { if (v) localStorage.setItem(k, JSON.stringify(v)); else localStorage.removeItem(k); } catch (e) {} };
   const leerPase = () => { const p = leer(PASE); return p && p.hasta > Date.now() ? p : null; };
@@ -126,7 +139,8 @@
     const claro = await crypto.subtle.decrypt({ name: "AES-GCM", iv: deB64(caja.iv) }, await llave(codigo, deB64(caja.sal)), deB64(caja.datos));
     return JSON.parse(new TextDecoder().decode(claro));
   }
-  let ultimoR = null, historial = [], codigoNuevo = null;
+  let ultimoR = null, historial = [], codigoNuevo = null, datosNeg = null;
+  const datosPregunta = () => (NEG ? { negocio: datosNeg } : { movimientos: envio() });
   const gratisUsada = () => { try { return !!localStorage.getItem(GRATIS); } catch (e) { return false; } };
   const api = async (ruta, cuerpo) => {
     try { const r = await fetch(ROOT + "api/ia/" + ruta, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(cuerpo) }); return { ok: r.ok, d: await r.json().catch(() => ({})) }; }
@@ -168,7 +182,7 @@
     const f = document.createDocumentFragment(); f.appendChild(document.createTextNode(T.seguimos));
     const pl = mk("div", "tqc-planes"); pl.id = "tqcPlanes";
     Object.keys(T.planes).forEach((k) => {
-      const [p, d, mas] = T.planes[k]; const b = mk("button", "tqc-plan" + (k === "completo" ? " tqc-plan--top" : "")); b.type = "button";
+      const [p, d, mas] = T.planes[k]; const b = mk("button", "tqc-plan" + (k === "completo" || k === "negocio_3m" ? " tqc-plan--top" : "")); b.type = "button";
       b.append(mk("span", "tqc-plan-p", p), mk("span", "tqc-plan-d", d)); if (mas) b.appendChild(mk("span", "tqc-plan-m", mas));
       b.addEventListener("click", () => abrirPago(k)); pl.appendChild(b);
     });
@@ -176,7 +190,7 @@
     burbuja("ia", f).classList.add("tqc-m--planes");
   }
   function abrirPago(planIni) {
-    let plan = T.planes[planIni] ? planIni : "basico";
+    let plan = T.planes[planIni] ? planIni : Object.keys(T.planes)[0];
     const d = mk("div", "tqc-pago"), c = mk("div", "tqc-pago-c"); c.setAttribute("role", "dialog"); c.setAttribute("aria-modal", "true");
     c.appendChild(mk("h2", "tqc-pago-t", T.titulo));
     const pl = mk("div", "tqc-planes"); pl.setAttribute("role", "radiogroup");
@@ -184,16 +198,16 @@
     const msg = mk("p", "tqc-pronto"); msg.hidden = true; msg.setAttribute("role", "status");
     const pintar = () => { pl.querySelectorAll("button").forEach((x) => x.setAttribute("aria-checked", String(x.dataset.plan === plan))); ok.textContent = T.pagar(T.planes[plan][0]); };
     Object.keys(T.planes).forEach((k) => {
-      const [p, du, mas] = T.planes[k]; const b = mk("button", "tqc-plan" + (k === "completo" ? " tqc-plan--top" : "")); b.type = "button"; b.setAttribute("role", "radio"); b.dataset.plan = k;
+      const [p, du, mas] = T.planes[k]; const b = mk("button", "tqc-plan" + (k === "completo" || k === "negocio_3m" ? " tqc-plan--top" : "")); b.type = "button"; b.setAttribute("role", "radio"); b.dataset.plan = k;
       b.append(mk("span", "tqc-plan-p", p), mk("span", "tqc-plan-d", du)); if (mas) b.appendChild(mk("span", "tqc-plan-m", mas));
       b.addEventListener("click", () => { plan = k; pintar(); }); pl.appendChild(b);
     });
     ok.addEventListener("click", async () => {
-      if (!ultimoR) return;
+      if (!(NEG ? datosNeg : ultimoR)) return;
       ok.disabled = true; ok.textContent = T.momento; msg.hidden = true;
       try {
         const codigo = nuevoCodigo();
-        const caja = await cerrarCaja(codigo, { r: ultimoR });
+        const caja = await cerrarCaja(codigo, NEG ? { n: datosNeg } : { r: ultimoR });
         const am = leer(AMIGO), mio = leer(MIREF);
         const r = await api("pagar", { plan, codigo, caja, idioma: LANG, vuelta: location.pathname, amigo: am && am !== mio ? am : undefined });
         if (!r.ok || !r.d.url) throw new Error("pago");
@@ -211,7 +225,7 @@
   async function preguntarPago(p, t) {
     burbuja("tu", t);
     const pensando = burbuja("ia", mk("span", "tqc-dots")); pensando.firstChild.append(mk("i"), mk("i"), mk("i"));
-    const r = await api("pregunta", { codigo: p.codigo, pregunta: t, idioma: LANG, historial, movimientos: envio() });
+    const r = await api("pregunta", Object.assign({ codigo: p.codigo, pregunta: t, idioma: LANG, historial }, datosPregunta()));
     pensando.remove();
     if (!r.ok) {
       if (r.d.error === "codigo") { burbuja("ia", T.fin); invitar(p); return; }
@@ -227,7 +241,7 @@
     if (gratisUsada()) { burbuja("tu", t); planesEnChat(); return; }
     burbuja("tu", t);
     const pensando = burbuja("ia", mk("span", "tqc-dots")); pensando.firstChild.append(mk("i"), mk("i"), mk("i"));
-    const r = await api("pregunta-gratis", { pregunta: t, idioma: LANG, movimientos: envio() });
+    const r = await api("pregunta-gratis", Object.assign({ pregunta: t, idioma: LANG }, datosPregunta()));
     pensando.remove();
     if (!r.ok) {
       if (r.d.error === "gratis_usada") { try { localStorage.setItem(GRATIS, "1"); } catch (e) {} planesEnChat(); return; }
@@ -312,6 +326,12 @@
   const ancho = matchMedia("(min-width:1100px)");
   function colocar() {
     if (!caja) return;
+    if (NEG) {
+      const res = $("res"), solo = $("tqcSolo");
+      if (res && !res.hidden) { if (ancho.matches) { if (caja.parentNode !== res) res.insertBefore(caja, res.firstChild); } else if (caja.parentNode !== res || caja.nextElementSibling) res.appendChild(caja); }
+      else if (solo && caja.parentNode !== solo) solo.appendChild(caja);
+      altoOrdenador(); return;
+    }
     const res = $("xRes"), r3 = res && res.querySelector(".r3"), tj = $("xTarjeta"), gr = $("pgGr");
     if (!res) return;
     if (ancho.matches) { if (caja.parentNode !== res) res.insertBefore(caja, res.firstChild); }
@@ -326,7 +346,8 @@
     if (!caja) return;
     if (!ancho.matches) { caja.style.removeProperty("--tqc-alto"); return; }
     // dónde empieza Tiqui sin hacer scroll: arriba de su columna (Tiqui es fijo al bajar, así que se mide la columna, no Tiqui)
-    const res = caja.parentNode, arriba = res.getBoundingClientRect().top + scrollY + (parseFloat(getComputedStyle(res).paddingTop) || 0);
+    const res = caja.parentNode; if (!res || res.id === "tqcSolo") { caja.style.removeProperty("--tqc-alto"); return; }
+    const arriba = res.getBoundingClientRect().top + scrollY + (parseFloat(getComputedStyle(res).paddingTop) || 0);
     caja.style.setProperty("--tqc-alto", Math.max(420, Math.round(innerHeight - arriba - 16)) + "px");
   }
   let tAlto; addEventListener("resize", () => { clearTimeout(tAlto); tAlto = setTimeout(altoOrdenador, 120); });
@@ -353,13 +374,54 @@
     } catch (err) { /* si algo falla, el resumen sigue como siempre */ }
   });
 
+  // Mi datáfono: los datos del negocio salen del mismo cálculo que pinta el resultado (assets/app.js, evento «fh-datafono»)
+  function datosDeCalculo(d) {
+    const { I, R, PLANS } = d, V = I.V || 0, ops = I.T > 0 ? V / I.T : 0, c = R && R.cur, plan = c && c.p;
+    const per = /(\d{2})\/(\d{2})\/(\d{4}).*?(\d{2})\/(\d{2})\/(\d{4})/.exec(($("dPeriodo") || {}).textContent || "");
+    let filas = (R && R.ranked) || [];
+    try { if (typeof calcular === "function" && PLANS) { const R2 = calcular(PLANS, Object.assign({}, I, { cons: 0 })); if (R2 && R2.ranked) filas = R2.ranked; } } catch (e) { /* las de la recomendación */ }
+    const cada = plan && (plan.modelo === "Porcentaje" || plan.id === "CONTRATO") && I.T > 0
+      ? { particulares: c.rp * 100 + (c.fp || 0) / I.T * 100, empresa: c.re * 100 + (c.fe || 0) / I.T * 100, fuera_europa: c.rn * 100 + (c.fn || 0) / I.T * 100, amex: c.ra * 100 + (c.fa || 0) / I.T * 100, bizum: c.rb * 100 + (c.fb || 0) / I.T * 100 } : null;
+    if (cada && plan.id === "CONTRATO") ["rp", "re", "rn", "ra", "rb"].forEach((k, i) => { if (plan[k] == null || plan[k] === "") delete cada[["particulares", "empresa", "fuera_europa", "amex", "bizum"][i]]; });
+    return {
+      desde: per ? per[3] + "-" + per[2] + "-" + per[1] : null, hasta: per ? per[6] + "-" + per[5] + "-" + per[4] : null,
+      sector: I.sector || null, forma: I.forma || null, actual: plan ? (plan.id === "CONTRATO" ? null : plan.plan) : null,
+      ventas: { particulares: V * I.wP, empresa: V * I.wE, fuera_europa: V * I.wN, amex: V * I.wA, bizum: V * I.wB },
+      operaciones: Math.round(ops), pagado: I.curCost > 0 ? I.curCost : null, permanencia_meses: I.MREM || 0, cada100_actual: cada,
+      fijo: plan && plan.id === "CONTRATO" ? (plan.fp || null) : null, cuota: plan && plan.id === "CONTRATO" ? (plan.cuota || null) : null, alquiler: plan && plan.id === "CONTRATO" ? (plan.alq || null) : null,
+      tarifas: filas.filter((r) => !r.es_actual && V > 0).slice(0, 40).map((r) => ({ nombre: r.p.plan, coste_mes: Math.round(r.Cn * 100) / 100, cada100: Math.round(r.Cn / V * 10000) / 100, comprobada: r.p.fiab === "Alta", nota: r.p.aviso || null })),
+    };
+  }
+  if (NEG) {
+    document.addEventListener("fh-datafono", (e) => {
+      try { datosNeg = datosDeCalculo(e.detail); if (caja) caja.remove(); montarCaja(); setTimeout(colocar, 0); setTimeout(altoOrdenador, 800); } catch (err) { /* el resultado sigue como siempre */ }
+    });
+    // «A quién cambiarte» (Qué hacer ahora) pregunta a Tiqui
+    document.addEventListener("fh-tiqui-preguntar", (e) => {
+      if (!caja) return;
+      caja.scrollIntoView({ behavior: "smooth", block: "nearest" });
+      if (e.detail) preguntar(String(e.detail));
+    });
+  }
+
   // ---------- Al abrir la página: volver de Stripe (?tiqui=ok / ?tiqui=no) o con el código (?vuelta#CÓDIGO) ----------
-  const aviso = (t) => { const e = $("xErr"); if (e) { e.textContent = t; e.hidden = false; } };
+  const aviso = (t) => { const e = $(NEG ? "dErr" : "xErr"); if (e) { e.textContent = t; e.hidden = false; } };
   async function abrirYMostrar(codigo) {
     const r = await api("abrir", { codigo });
     if (!r.ok || !r.d.caja) { aviso(T.noAbre); return false; }
     if (r.d.plan && r.d.hasta) poner(PASE, { codigo, plan: r.d.plan, hasta: r.d.hasta });
     let datos; try { datos = await abrirCaja(codigo, r.d.caja); } catch (e) { aviso(T.noAbre); return false; }
+    // un pase de negocio abierto desde Mi banco o Tu Tiqui: se va a Mi datáfono
+    if (datos && datos.n && !NEG) { try { localStorage.setItem("fh-tiqui-pase-negocio", JSON.stringify({ codigo, plan: r.d.plan, hasta: r.d.hasta })); localStorage.removeItem(PASE); } catch (e) {} location.replace(PAG_DAT[LANG] + "?vuelta#" + encodeURIComponent(codigo)); return true; }
+    if (NEG) {
+      if (!datos || !datos.n) return false;
+      // Mi datáfono sin resultado delante: Tiqui sale solo, arriba, con los datos guardados
+      datosNeg = datos.n;
+      let solo = $("tqcSolo");
+      if (!solo) { solo = mk("div", "tqc-solo"); solo.id = "tqcSolo"; const lector = $("dLector"); (lector && lector.parentNode ? lector.parentNode : document.body).insertBefore(solo, lector); }
+      if (caja) caja.remove(); montarCaja(); colocar(); solo.scrollIntoView({ block: "start" });
+      return true;
+    }
     return !!(window.FeehundMostrar && datos && window.FeehundMostrar(datos.r));
   }
   async function inicio() {
