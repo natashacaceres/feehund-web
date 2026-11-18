@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="es"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tu Tiqui · Feehund</title>
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#0E5E6F">
+<link rel="icon" href="../assets/brand/favicon.ico?v=202611111722" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="../assets/brand/favicon-32.png?v=202611111722">
+<link rel="icon" type="image/png" sizes="16x16" href="../assets/brand/favicon-16.png?v=202611111722">
+<link rel="icon" type="image/png" sizes="192x192" href="../assets/brand/favicon-192.png?v=202611111722">
+<link rel="icon" type="image/png" sizes="512x512" href="../assets/brand/favicon-512.png?v=202611111722">
+<link rel="apple-touch-icon" sizes="180x180" href="../assets/brand/apple-touch-icon.png?v=202611111722">
+<link rel="manifest" href="../manifest.webmanifest">
+<link rel="preload" href="../assets/fonts/fraunces-800.woff" as="font" type="font/woff" crossorigin>
+<link rel="preload" href="../assets/fonts/atkinson-next-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="../assets/app.css?v=20261116164919">
+<style>
+  .tq{max-width:calc(1180px + var(--side) * 2);margin:0 auto;padding:var(--s-5) var(--side) var(--s-8)}
+  .tq-g{display:grid;gap:var(--s-7);max-width:560px;margin:0 auto}
+  .tq-acc{display:grid;gap:var(--s-4)}
+  .tq-acc .tq-sin{margin:0}
+  .tq-hero{display:grid;justify-items:center;text-align:center;gap:var(--s-3)}
+  .tq-img{width:200px;height:auto;border-radius:50%;aspect-ratio:1;object-fit:cover;object-position:50% 30%}
+  .tq-h{margin:0;font:800 clamp(30px,8.6vw,44px)/1.05 var(--f-head);color:var(--ink);white-space:nowrap}
+  .tq-hasta{margin:0;font:400 17px/1.3 var(--f-text);color:var(--ink-2)}
+  .tq-demo{background:var(--ink);border-radius:24px;padding:var(--s-5) var(--s-4);display:grid;gap:12px}
+  .tq-pagos{display:block;margin-top:8px;font:700 15px/1.3 var(--f-text);color:var(--brand);text-decoration:underline}
+  .tq-dif{list-style:none;margin:0;padding:0;display:grid;gap:var(--s-4)}
+  .tq-dif li{padding-left:36px;background:var(--ico-check-ink) left 2px/24px no-repeat;font:800 24px/1.2 var(--f-head);color:var(--ink)}
+  .tq-planes{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .tq-planes .p-plan{cursor:default}
+  .tq-cta{display:flex;align-items:center;justify-content:center;min-height:56px;border-radius:999px;background:var(--amber);color:var(--ink);font:700 18px/1 var(--f-text);text-decoration:none}
+  .tq-sin{margin:-12px 0 0;text-align:center;font:400 16px/1.3 var(--f-text);color:var(--ink-2)}
+  .tq-cod{display:grid;gap:8px}
+  .tq-cod label{font:700 16px/1.2 var(--f-text);color:var(--ink)}
+  .tq-cod input{border:1.5px solid var(--line)!important;font-family:ui-monospace,Menlo,monospace!important;text-transform:uppercase}
+  .tq-cod .p-in button{background:var(--ink);color:var(--bg)}
+  .tq-err{margin:0;min-height:1em;font:400 15px/1.3 var(--f-text);color:var(--amber-text)}
+  .tq-dentro{display:grid;gap:var(--s-3)}
+  .tq-mi{margin:0;text-align:center;font:400 14px/1.3 ui-monospace,Menlo,monospace;color:var(--ink-2)}
+  .tq-salir{justify-self:center;min-height:44px;border:0;background:none;color:var(--ink-2);font:700 16px/1 var(--f-text);text-decoration:underline;cursor:pointer}
+  @media (min-width:960px){
+    .tq{padding-top:var(--s-7)}
+    .tq-g{max-width:none;grid-template-columns:minmax(0,1fr) minmax(0,1fr);grid-template-areas:"hero demo" "dif demo" "planes acc";column-gap:clamp(40px,6vw,96px);row-gap:var(--s-6);align-items:start}
+    .tq-hero{grid-area:hero;justify-items:start;text-align:left}
+    .tq-img{width:140px}
+    .tq-h{font-size:clamp(40px,3.9vw,56px);white-space:nowrap}
+    .tq-demo{grid-area:demo;padding:var(--s-6) var(--s-5)}
+    .tq-dif{grid-area:dif}
+    .tq-dif li{font-size:30px;padding-left:44px;background-size:28px}
+    .tq-planes{grid-area:planes;margin-top:var(--s-4)}
+    .tq-acc{grid-area:acc;margin-top:var(--s-4);align-content:start}
+    .tq-dentro{max-width:420px;margin:0 auto}
+    .tq-g--dentro{grid-template-columns:1fr;grid-template-areas:none;max-width:560px;margin:0 auto}
+    .tq-g--dentro .tq-hero{justify-items:center;text-align:center}
+    .tq-g--dentro .tq-img{width:200px}
+  }
+  [hidden]{display:none!important}
+  .tq-demo .p-m--ia{position:relative;margin-left:48px;max-width:calc(88% - 48px)}
+  .tq-demo .p-m--ia::before{content:"";position:absolute;left:-48px;bottom:0;width:38px;height:38px;border-radius:50%;background:#FFF8EC url("../assets/img/tiqui-olfatea.webp") center/cover}
+  .p-m{max-width:88%;padding:12px 14px;border-radius:16px;font:400 16px/1.45 var(--f-text)}
+  .p-m--tu{justify-self:end;background:var(--amber);color:var(--ink);border-bottom-right-radius:4px}
+  .p-m--ia{justify-self:start;background:var(--bg);color:var(--ink);border-bottom-left-radius:4px}
+  .p-m b{font-weight:700}
+  .p-m b{white-space:nowrap}
+  .hdr-tiqui{display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:0 12px 0 4px;border-radius:999px;background:#F3E6CC;font:700 16px/1 var(--f-text);color:var(--ink);text-decoration:none;white-space:nowrap}
+  .hdr-tiqui img{width:32px;height:32px;border-radius:50%;object-fit:cover;background:var(--bg)}
+  .p-plan{display:grid;gap:6px;align-content:start;justify-items:start;padding:16px 14px;border:2px solid var(--line);border-radius:16px;background:var(--bg);color:var(--ink);text-align:left;cursor:pointer}
+  .p-plan--top{background:#FFF1D6}
+  .p-plan-p{font:800 30px/1 var(--f-head)}
+  .p-plan-d{font:700 16px/1.2 var(--f-text)}
+  .p-plan-m{font:400 15px/1.3 var(--f-text);color:var(--ink-2)}
+  .hdr-tiqui[data-tuyo]::after{content:"";position:absolute;right:2px;top:4px;width:10px;height:10px;border-radius:50%;background:#2E9E5B;box-shadow:0 0 0 2px var(--bg)}
+  .hdr-tiqui{position:relative}
+  @media (max-width:480px){.hdr .brand img{width:132px;height:auto}.hdr-tiqui{position:relative;width:44px;padding:0;justify-content:center;font-size:0;gap:0}.hdr-tiqui img{width:36px;height:36px}}
+</style>
+</head>
+<body>
+<header class="hdr">
+  <div class="wrap">
+    <a class="brand" href="../"><img src="../assets/brand/feehund-logo-h64.png?v=202611111722" srcset="../assets/brand/feehund-logo-h64.png?v=202611111722 1x, ../assets/brand/feehund-logo-h128.png?v=202611111722 2x" alt="Feehund" width="211" height="64"></a>
+    <div class="hdr-r">
+      <a class="hdr-tiqui" href="./" aria-current="page"><img src="../assets/img/tiqui-olfatea.webp" alt="" width="32" height="32">Tu Tiqui</a>
+      <a class="hdr-baja" href="../baja/">Dar de baja</a>
+      <details class="langdd">
+      <summary aria-label="Idioma: Español">ES<span class="langdd-i" aria-hidden="true"></span></summary>
+      <ul><li><a href="./" hreflang="es" lang="es" aria-current="page">Español</a></li><li><a href="../ca/" hreflang="ca" lang="ca">Català</a></li><li><a href="../en/" hreflang="en" lang="en">English</a></li></ul>
+    </details>
+    </div>
+  </div>
+</header>
+
+<main class="tq">
+<div class="tq-g">
+  <section class="tq-hero">
+    <img class="tq-img" src="../assets/img/tiqui-olfatea.webp" alt="Tiqui" width="320" height="320">
+    <h1 class="tq-h">Pregúntale a Tiqui</h1>
+  </section>
+
+  <section class="tq-demo" aria-label="Así se pregunta">
+    <div class="p-m p-m--tu">¿Adónde se va mi dinero?</div>
+    <div class="p-m p-m--ia">La mitad se va en <b>casa</b>, con el alquiler, la luz y el agua. Después va el súper, con <b>312,40 €</b> al mes.<span class="tq-pagos">Ver los pagos</span></div>
+    <div class="p-m p-m--tu">¿Hay algo raro en mi cuenta?</div>
+    <div class="p-m p-m--ia">Spotify te cobró <b>dos veces</b> el 13 de marzo. Son <b>11,99 €</b> de más.</div>
+    <div class="p-m p-m--tu">¿Cuánto llevo en Glovo?</div>
+    <div class="p-m p-m--ia"><b>186,40 €</b> desde marzo, en 14 pedidos.</div>
+  </section>
+
+  <ul class="tq-dif">
+    <li>Todos tus bancos, juntos</li>
+    <li>Cada cifra, con sus pagos</li>
+    <li>Sin conectar tu banco</li>
+  </ul>
+
+  <section class="tq-planes" aria-label="Precio">
+    <div class="p-plan"><span class="p-plan-p">0,99 €</span><span class="p-plan-d">7 días</span></div>
+    <div class="p-plan p-plan--top"><span class="p-plan-p">2,99 €</span><span class="p-plan-d">3 meses</span><span class="p-plan-m">Añade más extractos</span></div>
+  </section>
+
+  <div class="tq-acc">
+    <a class="tq-cta" href="../extracto/">Subir mi extracto</a>
+    <p class="tq-sin">Un solo pago. Sin suscripción</p>
+  </div>
+</div>
+</main>
+<footer class="ftr"><div class="wrap ftr-in">
+  <p class="ftr-indep">Ningún banco ni empresa de pago paga por aparecer en Feehund.</p>
+  <ul class="ftr-links">
+    <li><a href="../baja/">Dar de baja</a></li>
+    <li><a href="../blog/">La Letra Pequeña</a></li>
+    <li><a href="../metodologia/">Cómo se calcula</a></li>
+    <li><a href="../como-gana-dinero/">Cómo gana dinero</a></li>
+    <li><a href="../contacto/">Contacto</a></li>
+  </ul>
+  <ul class="ftr-legal">
+    <li><a href="../aviso-legal/">Aviso legal</a></li>
+    <li><a href="../privacidad/">Privacidad</a></li>
+    <li><a href="../cookies/">Cookies</a></li>
+    <li><a href="../condiciones/">Condiciones</a></li>
+    <li>© 2026 <span data-marca>Feehund</span></li>
+  </ul>
+</div></footer>
+</body>
+</html>
