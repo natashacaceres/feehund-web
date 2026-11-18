@@ -5,13 +5,13 @@
 //   ACTUALIZAR_RECURSOS=1 node --test tests/unit/worker-montaje.test.mjs
 // La versión es una huella de todos los archivos de las listas: cambia en cuanto cambia cualquiera de ellos.
 globalThis.RECURSOS_EXTRACTO = {
-  version: '69ecfeaa29e9',
+  version: '1bcff9eb4666',
   // Página, fuentes, motor, núcleo, lectores y textos: se guardan al instalar.
   PAGINA: [
     '/extracto/',
     '/extracto/dev/',
-    '/assets/app.css?v=20261118034808',
-    '/assets/app.js?v=20261118034741',
+    '/assets/app.css?v=20261118041103',
+    '/assets/app.js?v=20261118041103',
     '/assets/atras.js?v=20261113141239',
     '/assets/bancos-guia.js?v=20261116140713',
     '/assets/brand/apple-touch-icon.png?v=202611111722',
@@ -22,7 +22,7 @@ globalThis.RECURSOS_EXTRACTO = {
     '/assets/brand/favicon.ico?v=202611111722',
     '/assets/brand/feehund-logo-h128.png?v=202611111722',
     '/assets/brand/feehund-logo-h64.png?v=202611111722',
-    '/assets/extracto.js?v=20261118031431',
+    '/assets/extracto.js?v=20261118040934',
     '/assets/extracto/bandeja.css',
     '/assets/extracto/bandeja.js',
     '/assets/extracto/datafono/confirmar.js',
@@ -33,9 +33,9 @@ globalThis.RECURSOS_EXTRACTO = {
     '/assets/extracto/datafono/rellenar.js',
     '/assets/extracto/datafono/resumen.js',
     '/assets/extracto/graficas.css',
-    '/assets/extracto/graficas.css?v=20261118031431',
+    '/assets/extracto/graficas.css?v=20261118040934',
     '/assets/extracto/graficas.js',
-    '/assets/extracto/graficas.js?v=20261118031431',
+    '/assets/extracto/graficas.js?v=20261118040934',
     '/assets/extracto/lectores/camt053.js',
     '/assets/extracto/lectores/csv.js',
     '/assets/extracto/lectores/formato.js',

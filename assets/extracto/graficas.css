@@ -80,3 +80,24 @@ body.dq-abierta{overflow:hidden}
 .dq-op:hover,.dq-op:focus-visible{border-color:var(--brand);background:#F3E6CC;outline:none}
 .dq-nose{justify-self:center;min-height:44px;margin-top:4px;border:0;background:none;color:var(--ink-2);font:700 16px/1 var(--f-text);text-decoration:underline;cursor:pointer}
 @media (prefers-reduced-motion:reduce){.dq-bar i{transition:none}}
+
+/* La cifra grande con «al año, calculado con N meses» pequeño a su derecha (Resumen y Gráficas) */
+.pg-fila{display:flex;align-items:flex-end;gap:12px;flex-wrap:nowrap}
+.pg-fila .r3-cifra{margin:0}
+.pg-fila .r3-calc:not([hidden]){margin:0 0 .55em;max-width:7.5em;font:400 15px/1.25 var(--f-text);color:var(--ink-2)}
+@media (max-width:480px){.pg-fila .r3-cifra{font-size:54px!important}.pg-fila .r3-calc:not([hidden]){font-size:14px;max-width:7em;margin-bottom:.45em}}
+.pg-top{display:flex;flex-wrap:wrap;align-items:flex-end;column-gap:12px}
+.pg-top .pg-k,.pg-top .pg-mes{flex-basis:100%}
+.pg-top .pg-calc{max-width:7.5em;margin:0 0 .5em;font-size:15px;line-height:1.25}
+/* «Quién se lo lleva» en el resumen */
+.pg-res{display:grid;gap:12px}
+/* Mes a mes */
+.pg-mm{position:relative;height:170px;margin:26px 0 30px}
+.pg-mm-cols{display:flex;align-items:flex-end;gap:6px;height:100%}
+.pg-mm-c{position:relative;flex:1;display:flex;justify-content:center;align-items:flex-end;height:100%;outline:none;cursor:default}
+.pg-mm-c i{display:block;width:100%;max-width:44px;background:var(--brand);border-radius:6px 6px 2px 2px;transition:filter .15s}
+.pg-mm-c i.alto{background:var(--amber)}
+.pg-mm-c:hover i,.pg-mm-c:focus-visible i{filter:brightness(1.12)}
+.pg-mm-c span{position:absolute;bottom:-24px;font:400 14px/1 var(--f-text);color:var(--ink-2)}
+.pg-mm-media{position:absolute;left:0;right:0;border-top:2px dashed #8A8270;pointer-events:none}
+.pg-mm-media span{position:absolute;right:0;top:-22px;font:700 13px/1 var(--f-text);color:var(--ink-2);background:var(--bg);padding:2px 4px;border-radius:6px}

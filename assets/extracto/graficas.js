@@ -21,6 +21,7 @@
       tipMes: (n, x) => n + ": unos " + x + " al mes", tip100: (k, l) => k + " de cada 100 €: " + l, menos: "Menos de 1",
       nada: "No hemos visto pagos que se repitan.", waffle: "Cien cuadritos: cada uno es 1 € de cada 100 que se repiten",
       compartirMi: "Compartir mi tarjeta", compartir: "Compartir", guardar: "Guardar imagen",
+      mesAMes: "Mes a mes", media: (x) => "lo habitual " + x, mesTip: (m, x) => m + " · " + x, meses: ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", "nov", "dic"],
     },
     ca: {
       resumen: "Resum", graficas: "Gràfics", pagas: "Pagues l'any en coses que es repeteixen",
@@ -30,6 +31,7 @@
       tipMes: (n, x) => n + ": uns " + x + " al mes", tip100: (k, l) => k + " de cada 100 €: " + l, menos: "Menys d'1",
       nada: "No hem vist pagaments que es repeteixin.", waffle: "Cent quadradets: cadascun és 1 € de cada 100 que es repeteixen",
       compartirMi: "Compartir la meva targeta", compartir: "Compartir", guardar: "Desar la imatge",
+      mesAMes: "Mes a mes", media: (x) => "l'habitual " + x, mesTip: (m, x) => m + " · " + x, meses: ["gen", "febr", "març", "abr", "maig", "juny", "jul", "ag", "set", "oct", "nov", "des"],
     },
     en: {
       resumen: "Summary", graficas: "Charts", pagas: "You pay each year in things that repeat",
@@ -39,6 +41,7 @@
       tipMes: (n, x) => n + ": about " + x + " a month", tip100: (k, l) => k + " of every 100 €: " + l, menos: "Less than 1",
       nada: "We didn't see any payments that repeat.", waffle: "A hundred squares: each one is 1 € of every 100 that repeat",
       compartirMi: "Share my card", compartir: "Share", guardar: "Save image",
+      mesAMes: "Month by month", media: (x) => "usual " + x, mesTip: (m, x) => m + " · " + x, meses: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
     },
   }[LANG];
 
@@ -62,7 +65,7 @@
     const periodo = (r.lectura && r.lectura.periodo) || {};
     const dias = periodo.dias || 365, meses = periodo.meses || 12;
     const anualCom = (c) => (c.periodicidad === "puntual" ? (c.coste_anual || c.importe || 0) * 365 / dias : c.coste_anual || 0);
-    const junta = {}, porTipo = {};
+    const junta = {}, porTipo = {}, porMes = {};
     (r.grupos || []).forEach((g) => {
       if (!(g.codigo.indexOf("sector_") === 0 || g.codigo === "recibos" || g.codigo === "comisiones")) return;
       const com = g.codigo === "comisiones";
@@ -73,10 +76,13 @@
         const k = com ? "_comisiones" : c.comercio_id || c.nombre;
         const it = junta[k] || (junta[k] = { n: com ? T.tipos.banco : c.nombre, id: com ? null : c.comercio_id, cat: com ? "comisiones" : c.categoria, v: 0, com });
         it.v += v;
+        (c.movimientos || []).forEach((m) => { const k2 = String(m.fecha || "").slice(0, 7); if (k2.length === 7 && m.importe < 0) porMes[k2] = (porMes[k2] || 0) - m.importe; });
       });
     });
     const total = Object.values(porTipo).reduce((t, v) => t + Math.max(0, Math.round(v)), 0); // la misma cifra que el resumen
-    return { total, meses, items: Object.values(junta).filter((x) => x.v >= 0.5).sort((a, b) => b.v - a.v) };
+    // todos los meses del extracto, también los que no tuvieron cargos
+    const lista = []; if (periodo.desde && periodo.hasta) { let [y, m] = periodo.desde.slice(0, 7).split("-").map(Number); const fin = periodo.hasta.slice(0, 7); for (let n = 0; n < 40; n++) { const k3 = y + "-" + String(m).padStart(2, "0"); lista.push([k3, porMes[k3] || 0]); if (k3 >= fin) break; m++; if (m > 12) { m = 1; y++; } } }
+    return { total, meses, porMes: lista, items: Object.values(junta).filter((x) => x.v >= 0.5).sort((a, b) => b.v - a.v) };
   }
 
   // Aviso que sigue al ratón o al dedo
@@ -101,6 +107,40 @@
     s.appendChild(img); return s;
   }
 
+  function ranking(rk) {
+    const max = repe.items[0].v;
+    repe.items.forEach((it) => {
+      const li = document.createElement("li"); li.tabIndex = 0; if (it.com) li.className = "pg-ambar";
+      li.appendChild(logo(it));
+      const nom = document.createElement("span"); nom.className = "pg-nom"; nom.textContent = it.n;
+      if (it.com) { const tg = document.createElement("span"); tg.className = "pg-tag"; tg.textContent = T.evitable; nom.appendChild(tg); }
+      const val = document.createElement("span"); val.className = "pg-val"; val.textContent = eur(it.v);
+      const bar = document.createElement("span"); bar.className = "pg-bar"; const i = document.createElement("i"); i.style.width = Math.max(2, (it.v / max) * 100) + "%"; bar.appendChild(i);
+      li.append(nom, val, bar); rk.appendChild(li);
+      const t = T.tipMes(it.n, eur(it.v / 12));
+      const on = (e) => { li.classList.add("on"); tip(e, t); }, off = () => { li.classList.remove("on"); tip(null, ""); };
+      li.addEventListener("mousemove", on); li.addEventListener("mouseleave", off); li.addEventListener("touchstart", on, { passive: true });
+      li.addEventListener("focus", () => { const b = li.getBoundingClientRect(); on({ clientX: b.left + b.width / 2, clientY: b.top }); }); li.addEventListener("blur", off);
+    });
+  }
+  // Resumen: «Quién se lo lleva» justo después de la frase de suscripciones; fuera «En qué se te va» (lo dice la lista)
+  // y las buenas noticias del resumen (siguen dentro de «Ver todo el detalle»)
+  function ponerEnResumen() {
+    // la cifra grande y «al año, calculado con N meses» en la misma fila (la nota pequeña a la derecha)
+    const cifra = document.querySelector("#xRes .r3-cifra"), calc = $("xCalc");
+    if (cifra && calc && !cifra.parentNode.classList.contains("pg-fila")) { const fila = document.createElement("div"); fila.className = "pg-fila"; cifra.before(fila); fila.append(cifra, calc); }
+    const viejo = $("pgRes"); if (viejo) viejo.remove();
+    const va = $("xVa"); if (va) va.hidden = true;
+    const bn = $("xBuenas"); if (bn) bn.hidden = true;
+    if (!repe || !repe.items.length) return;
+    const ancla = $("xEscapo"); if (!ancla) return;
+    const sec = document.createElement("section"); sec.className = "r3-blq pg-res"; sec.id = "pgRes";
+    const h = document.createElement("h2"); h.className = "r3-h"; h.textContent = T.quien;
+    const ul = document.createElement("ul"); ul.className = "pg-rk";
+    const nota = document.createElement("p"); nota.className = "pg-nota"; nota.textContent = T.alAno;
+    sec.append(h, ul, nota); ancla.after(sec); ranking(ul);
+  }
+
   let repe = null;
   function pintar() {
     const gr = $("pgGr"); if (!gr || !repe) return;
@@ -116,24 +156,8 @@
     gr.innerHTML =
       '<div class="pg-top"><p class="pg-k">' + esc(T.pagas) + '</p><p class="pg-big">' + eur(repe.total) + "</p>" +
       (repe.meses < 12 ? '<p class="pg-calc">' + esc(T.calc(repe.meses)) + "</p>" : "") + '<p class="pg-mes">' + esc(T.mes(eur(repe.total / 12))) + "</p></div>" +
-      '<section class="pg-blq"><h3 class="pg-h">' + esc(T.quien) + '</h3><ul class="pg-rk"></ul><p class="pg-nota">' + esc(T.alAno) + "</p></section>" +
-      '<section class="pg-blq"><h3 class="pg-h">' + esc(T.cada100) + '</h3><div class="pg-wfz"><div class="pg-wf" role="img" aria-label="' + esc(T.waffle) + '"></div><ul class="pg-wl"></ul></div></section>';
-
-    // Quién se lo lleva
-    const rk = gr.querySelector(".pg-rk");
-    repe.items.forEach((it) => {
-      const li = document.createElement("li"); li.tabIndex = 0; if (it.com) li.className = "pg-ambar";
-      li.appendChild(logo(it));
-      const nom = document.createElement("span"); nom.className = "pg-nom"; nom.textContent = it.n;
-      if (it.com) { const tg = document.createElement("span"); tg.className = "pg-tag"; tg.textContent = T.evitable; nom.appendChild(tg); }
-      const val = document.createElement("span"); val.className = "pg-val"; val.textContent = eur(it.v);
-      const bar = document.createElement("span"); bar.className = "pg-bar"; const i = document.createElement("i"); i.style.width = Math.max(2, (it.v / max) * 100) + "%"; bar.appendChild(i);
-      li.append(nom, val, bar); rk.appendChild(li);
-      const t = T.tipMes(it.n, eur(it.v / 12));
-      const on = (e) => { li.classList.add("on"); tip(e, t); }, off = () => { li.classList.remove("on"); tip(null, ""); };
-      li.addEventListener("mousemove", on); li.addEventListener("mouseleave", off); li.addEventListener("touchstart", on, { passive: true });
-      li.addEventListener("focus", () => { const b = li.getBoundingClientRect(); on({ clientX: b.left + b.width / 2, clientY: b.top }); }); li.addEventListener("blur", off);
-    });
+      '<section class="pg-blq"><h3 class="pg-h">' + esc(T.cada100) + '</h3><div class="pg-wfz"><div class="pg-wf" role="img" aria-label="' + esc(T.waffle) + '"></div><ul class="pg-wl"></ul></div></section>' +
+      (repe.porMes.length > 1 ? '<section class="pg-blq"><h3 class="pg-h">' + esc(T.mesAMes) + '</h3><div class="pg-mm" role="img" aria-label="' + esc(T.mesAMes) + '"></div></section>' : "");
 
     // De cada 100 €
     const wf = gr.querySelector(".pg-wf"), wl = gr.querySelector(".pg-wl");
@@ -156,6 +180,26 @@
     wf.querySelectorAll("i").forEach((c) => { c.addEventListener("mousemove", (e) => marca(c.dataset.t, e)); c.addEventListener("touchstart", (e) => marca(c.dataset.t, e), { passive: true }); });
     wf.addEventListener("mouseleave", () => marca(null));
     filas.forEach((li) => { li.addEventListener("mousemove", (e) => marca(li.dataset.t, e)); li.addEventListener("mouseleave", () => marca(null)); li.addEventListener("touchstart", (e) => marca(li.dataset.t, e), { passive: true }); });
+
+    // Mes a mes: lo que se pagó en cosas que se repiten cada mes, con la media (se ve si un mes se disparó)
+    const mm = gr.querySelector(".pg-mm");
+    if (mm) {
+      const vals = repe.porMes.map((x) => x[1]), mx = Math.max(...vals, 1), ord = vals.slice().sort((a, b) => a - b);
+      const media = ord.length % 2 ? ord[(ord.length - 1) / 2] : (ord[ord.length / 2 - 1] + ord[ord.length / 2]) / 2; // lo habitual (mediana): un mes raro no lo mueve
+      const linea = document.createElement("div"); linea.className = "pg-mm-media"; linea.style.bottom = Math.round((media / mx) * 100) + "%";
+      linea.appendChild(Object.assign(document.createElement("span"), { textContent: T.media(eur(media)) }));
+      const cols = document.createElement("div"); cols.className = "pg-mm-cols";
+      repe.porMes.forEach(([k, v]) => {
+        const c = document.createElement("div"); c.className = "pg-mm-c"; c.tabIndex = 0;
+        const b = document.createElement("i"); b.style.height = Math.max(2, Math.round((v / mx) * 100)) + "%"; if (v > media * 1.3) b.className = "alto"; // solo si se dispara de verdad
+        const et = document.createElement("span"); et.textContent = T.meses[+k.slice(5) - 1];
+        c.append(b, et); cols.appendChild(c);
+        const t = T.mesTip(T.meses[+k.slice(5) - 1] + " " + k.slice(0, 4), eur(v));
+        c.addEventListener("mousemove", (e) => tip(e, t)); c.addEventListener("mouseleave", () => tip(null, "")); c.addEventListener("touchstart", (e) => tip(e, t), { passive: true });
+        c.addEventListener("focus", () => { const r = c.getBoundingClientRect(); tip({ clientX: r.left + r.width / 2, clientY: r.top }, t); }); c.addEventListener("blur", () => tip(null, ""));
+      });
+      mm.append(cols, linea);
+    }
   }
 
   function montarPestanas() {
@@ -212,6 +256,6 @@
 
   document.addEventListener("fh-resultado", (e) => {
     const r = e.detail; if (!r) return;
-    try { repe = calcRepe(r); montarPestanas(); plegarTarjeta(); } catch (err) { /* si algo falla, el resumen sigue como siempre */ }
+    try { repe = calcRepe(r); montarPestanas(); ponerEnResumen(); plegarTarjeta(); } catch (err) { /* si algo falla, el resumen sigue como siempre */ }
   });
 })();

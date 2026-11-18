@@ -788,7 +788,8 @@
       const id = "tuyo-" + x.k.replace(/[^a-z0-9]+/gi, "-").toLowerCase();
       if ((r.cobros || []).some((c) => c.id === id)) return;
       const imps = x.l.map((m) => -m.importe);
-      r.cobros = (r.cobros || []).concat([{ id, nombre: x.nombre, nombre_codigo: null, categoria: CAT_DE[x.op] || "otros", comercio_id: null, tipo: "comercio", pasarela: null,
+      const marca = x.auto ? x.k.toLowerCase().split(/[ .]/)[0] : null; // Netflix, Vodafone…: con su logo y su nombre de siempre
+      r.cobros = (r.cobros || []).concat([{ id, nombre: marca ? marca.charAt(0).toUpperCase() + marca.slice(1) : x.nombre, nombre_codigo: null, categoria: CAT_DE[x.op] || "otros", comercio_id: marca, tipo: "comercio", pasarela: null,
         periodicidad: x.alAnio === 12 ? "mensual" : x.alAnio === 6 ? "bimestral" : x.alAnio === 4 ? "trimestral" : "anual", importe: Math.round(x.media * 100) / 100,
         importe_tipo: Math.max(...imps) - Math.min(...imps) < 0.01 ? "fijo" : "variable", coste_anual: Math.round(x.media * x.alAnio * 100) / 100, estado: "seguro", etiquetas: ["tuyo"],
         subida_mensual: null, subida: null, bajada_mensual: null, bajada: null, importe_min: Math.min(...imps), importe_max: Math.max(...imps), pagado: Math.round(imps.reduce((a, b) => a + b, 0) * 100) / 100,

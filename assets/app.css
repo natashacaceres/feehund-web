@@ -1657,4 +1657,5 @@ body.con-barra{padding-bottom:calc(88px + env(safe-area-inset-bottom))}
 /* Cabecera en móvil: cabe igual en los tres idiomas («Donar de baixa» es más largo) */
 @media (max-width:480px){.hdr .wrap{gap:8px}.hdr-r{gap:2px}.hdr-baja{padding:0 4px;font-size:15px}.hdr .brand img{width:124px;height:auto}}
 @media (max-width:360px){.hdr .brand img{width:104px}.hdr-baja{font-size:14px}}
-.cubo-t{overflow:hidden}
+/* Portada en el móvil: las cuatro ventajas, una por línea, ordenadas */
+@media (max-width:600px){.home-ok{display:grid!important;grid-template-columns:auto;justify-content:center;justify-items:start;gap:8px!important}.home-ok li{white-space:nowrap}}
