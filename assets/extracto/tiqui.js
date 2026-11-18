@@ -318,7 +318,18 @@
     else if (r3 && r3.hidden && gr) { if (caja.previousElementSibling !== gr) gr.after(caja); }
     else if (tj && tj.parentNode) { if (caja.nextElementSibling !== tj) tj.before(caja); }
     else if (caja.parentNode !== res) res.appendChild(caja);
+    altoOrdenador();
   }
+  // Ordenador: Tiqui cabe entero en la pantalla nada más entrar (con «Escribe tu pregunta» a la vista) y es lo bastante
+  // alto para que, al final de la página, su borde de abajo coincida con el del contenido.
+  function altoOrdenador() {
+    if (!caja) return;
+    if (!ancho.matches) { caja.style.removeProperty("--tqc-alto"); return; }
+    // dónde empieza Tiqui sin hacer scroll: arriba de su columna (Tiqui es fijo al bajar, así que se mide la columna, no Tiqui)
+    const res = caja.parentNode, arriba = res.getBoundingClientRect().top + scrollY + (parseFloat(getComputedStyle(res).paddingTop) || 0);
+    caja.style.setProperty("--tqc-alto", Math.max(420, Math.round(innerHeight - arriba - 16)) + "px");
+  }
+  let tAlto; addEventListener("resize", () => { clearTimeout(tAlto); tAlto = setTimeout(altoOrdenador, 120); });
   ancho.addEventListener("change", colocar);
   document.addEventListener("click", (e) => { if (e.target.closest && e.target.closest("#pgTabs")) setTimeout(colocar, 0); });
 
@@ -338,7 +349,7 @@
         return Object.assign({}, m, { id: "m" + n, c: k ? { k: c.k, s: k } : c });
       });
       if (caja) caja.remove();
-      montarCaja(); setTimeout(colocar, 0);
+      montarCaja(); setTimeout(colocar, 0); setTimeout(altoOrdenador, 800); // otra vez cuando ya está todo encima (el aviso de ejemplo llega después)
     } catch (err) { /* si algo falla, el resumen sigue como siempre */ }
   });
 
