@@ -103,8 +103,10 @@
   function pintarNegocio(n) {
     const lista = $("tcLista"), aviso = $("tcAviso");
     $("tcExtH").textContent = T.dat;
-    const li = el("li", "tc-ext"); li.appendChild(el("span", "tc-logo tc-logo--x", "€"));
-    const f = (s) => { if (!s) return "?"; const d = new Date(s + "T12:00:00"); return d.getDate() + " " + T.meses[d.getMonth()]; };
+    const li = el("li", "tc-ext"), b = bancoDe({ nombre: n && (n.actual || n.proveedor) });
+    if (b) { const img = el("img", "tc-logo"); img.src = ROOT + "assets/logos/bancos/" + b + ".png"; img.alt = ""; img.width = 44; img.height = 44; li.appendChild(img); }
+    else li.appendChild(el("span", "tc-logo tc-logo--x", "€"));
+    const f = (s) => { if (!s) return "?"; const d = new Date(s + "T12:00:00"); return d.getDate() + (LANG === "en" ? " " : " de ") + T.meses[d.getMonth()]; };
     const tx = el("div"); tx.append(el("b", null, (n && (n.actual || n.proveedor)) || T.dat), el("small", null, n && n.desde ? T.de(f(n.desde), f(n.hasta)) : ""));
     li.appendChild(tx); lista.appendChild(li);
     aviso.hidden = true; $("tcCal").hidden = true;

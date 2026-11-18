@@ -26,6 +26,11 @@
   .tq-hasta{margin:0;font:400 17px/1.3 var(--f-text);color:var(--ink-2)}
   .tq-demo{position:relative;overflow:hidden;background:var(--ink);border-radius:24px;padding:var(--s-4) var(--s-4) var(--s-5);display:grid;gap:12px}
   .tq-demo::after{content:"";position:absolute;right:-70px;bottom:-60px;width:300px;height:300px;border-radius:50%;background:url("../assets/img/tiqui-olfatea.webp") center/cover;opacity:.07;filter:grayscale(1);pointer-events:none}
+  .tq-vista{margin:0;justify-self:center;width:100%;max-width:400px;border:1.5px solid var(--line);border-radius:24px;overflow:hidden;background:var(--bg)}
+  .tq-vista-bar{display:flex;align-items:center;gap:6px;padding:10px 14px;background:#F3E6CC}
+  .tq-vista-bar i{width:10px;height:10px;border-radius:50%;background:#D9CCB2}
+  .tq-vista-bar span{margin-left:8px;font:600 13px/1 var(--f-text);color:var(--ink-2)}
+  .tq-vista img{display:block;width:100%;height:auto}
   .tq-demo>*{position:relative;z-index:1}
   .tq-msgs{display:grid;gap:12px}
   .tq-in{display:flex;gap:8px;margin-top:4px}
@@ -69,6 +74,9 @@
     .tq-demo{grid-area:demo;align-self:stretch;contain:size;display:flex;flex-direction:column}
     .tq-msgs{flex:1 1 auto;min-height:0;overflow:hidden;display:flex;flex-direction:column;justify-content:flex-end;gap:12px}
     .tq-acc{align-self:end}
+    /* un pantallazo de ordenador, apaisado, en una columna más ancha y centrado en vertical */
+    .tq-g{grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr)}
+    .tq-vista{grid-area:demo;align-self:center;max-width:none}
     .tq-msgs .p-m--tu{align-self:flex-end}
     .tq-msgs .p-m--ia{align-self:flex-start}
     .tq-dif{grid-area:dif}
@@ -131,29 +139,15 @@
       <div class="tq-sw" id="tqModo" role="tablist"><button type="button" role="tab" data-m="ti" aria-selected="true">Para ti</button><button type="button" role="tab" data-m="neg" aria-selected="false">Para tu negocio</button></div>
   </section>
 
-    <section class="tq-demo" data-m="neg" hidden>
-    <div class="tq-top"><img src="../assets/img/tiqui-olfatea.webp" alt="" width="44" height="44"><div><p class="tq-nom">Tiqui</p><p class="tq-est"><i></i>Olfateando tu datáfono</p></div><span class="tq-priv">Privado</span></div>
-    <div class="tq-msgs">
-    <div class="p-m p-m--tu">¿Cuánto me cobra el banco al mes?</div>
-    <div class="p-m p-m--ia">En octubre, 83,42&nbsp;€. Son 1,04&nbsp;€ de cada 100 que cobras con tarjeta.</div>
-    <div class="p-m p-m--tu">¿Por qué unas tarjetas me cobran más?</div>
-    <div class="p-m p-m--ia">Las de turistas y las de empresa no tienen máximo por ley. Este mes te costaron 17,55&nbsp;€.</div>
-    <div class="p-m p-m--tu">¿A quién me cambio?</div>
-    <div class="p-m p-m--ia">Con tus ventas, hay quien te cobraría 0,63&nbsp;€. Te digo quién y con qué condiciones.</div>
-    </div>
-    <div class="tq-in" aria-hidden="true"><span>Escribe tu pregunta</span><i>→</i></div>  </section>
+    <figure class="tq-vista" data-m="neg" hidden>
+    <div class="tq-vista-bar" aria-hidden="true"><i></i><i></i><i></i><span>feehund.com/tiqui</span></div>
+    <picture><source media="(min-width:960px)" srcset="../assets/img/tu-tiqui-negocio-es.webp" width="1600" height="1000"><img src="../assets/img/tu-tiqui-negocio-es-movil.webp" width="780" height="1531" alt="Tu Tiqui para tu negocio por dentro: el resumen de tu datáfono y el chat con Tiqui"></picture>
+  </figure>
 
-<section class="tq-demo" data-m="ti" aria-label="Así se pregunta">
-    <div class="tq-top"><img src="../assets/img/tiqui-olfatea.webp" alt="" width="44" height="44"><div><p class="tq-nom">Tiqui</p><p class="tq-est"><i></i>Olfateando tu extracto</p></div><span class="tq-priv">Privado</span></div>
-    <div class="tq-msgs">
-    <div class="p-m p-m--tu">¿Adónde se va mi dinero?</div>
-    <div class="p-m p-m--ia">La mitad se va en casa, con el alquiler, la luz y el agua. Después va el súper, con 312,40&nbsp;€ al mes.<span class="tq-pagos">Ver los pagos</span></div>
-    <div class="p-m p-m--tu">¿Hay algo raro en mi cuenta?</div>
-    <div class="p-m p-m--ia">Spotify te cobró dos veces el 13 de marzo. Son 11,99&nbsp;€ de más.</div>
-    <div class="p-m p-m--tu">¿Cuánto llevo en Glovo?</div>
-    <div class="p-m p-m--ia">186,40&nbsp;€ desde marzo, en 14 pedidos.</div>
-    </div>
-    <div class="tq-in" aria-hidden="true"><span>Escribe tu pregunta</span><i>→</i></div>  </section>
+<figure class="tq-vista" data-m="ti">
+    <div class="tq-vista-bar" aria-hidden="true"><i></i><i></i><i></i><span>feehund.com/tiqui</span></div>
+    <picture><source media="(min-width:960px)" srcset="../assets/img/tu-tiqui-es.webp" width="1600" height="1000"><img src="../assets/img/tu-tiqui-es-movil.webp" width="780" height="1531" alt="Tu Tiqui por dentro: tus extractos de CaixaBank y Revolut con sus meses, y el chat con Tiqui"></picture>
+  </figure>
 
     <ul class="tq-dif" data-m="neg" hidden>
     <li>Lee el resumen de tu datáfono</li>
