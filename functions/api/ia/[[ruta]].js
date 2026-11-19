@@ -17,7 +17,7 @@
 
 import { PLANES, PRODUCTO_PREGUNTA, AMIGO, GUARDA_PASE, activarPregunta, codigoValido, refValido } from '../../_ia/pase.js';
 import { crearPagoPregunta, leerPago } from '../../_baja/servicios.js';
-import { queEs, diccionario, normal, votar, apuntarDesconocidos } from '../../_ia/aprende.js';
+import { queEs, diccionario, normal, votar, apuntarDesconocidos, clasificarDesconocidos } from '../../_ia/aprende.js';
 import { limpiarNegocio, HERRAMIENTAS_NEGOCIO, ejecutarNegocio, instruccionesNegocio, ESTILO_FEEHUND } from '../../_ia/negocio.js';
 
 const MODELO = 'claude-opus-5-5';
@@ -309,7 +309,8 @@ export async function onRequestPost({ request, env, params }) {
 
   if (ruta === 'desconocidos') {
     const quien = (await huella('apr' + (request.headers.get('CF-Connecting-IP') || 'local'))).slice(0, 8);
-    return json(await apuntarDesconocidos(env, b.nombres, quien));
+    const [, sectores] = await Promise.all([apuntarDesconocidos(env, b.nombres, quien), clasificarDesconocidos(env, b.nombres, quien)]);
+    return json({ ok: true, sectores });
   }
   if (ruta === 'voto') {
     const quien = (await huella('apr' + (request.headers.get('CF-Connecting-IP') || 'local'))).slice(0, 8);

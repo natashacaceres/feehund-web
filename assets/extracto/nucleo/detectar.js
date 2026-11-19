@@ -441,7 +441,9 @@ function seriesDelGrupoSinMandato(g) {
   const tiendaDesconocida = g.kind === 'desconocido' && !recibos;
   const cambio = g.kind === 'comercio' || g.kind === 'comision' ? CAMBIO_PRECIO.conocido : tiendaDesconocida ? CAMBIO_PRECIO.tienda : CAMBIO_PRECIO.otro;
   let fijas = seriesFijas(g.cargos, true, tiendaDesconocida, cambio, 1, g.kind === 'comercio');
-  if (g.kind === 'comercio' && g.cl.comercio && g.cl.comercio.importe !== 'variable' && fijas.length > 1) {
+  // un recibo agrupado por su mandato SEPA es el mismo contrato: el alquiler que sube de 1.261 a 1.290 € sigue siendo uno
+  const mismoContrato = g.kind === 'desconocido' && String(g.clave || '').startsWith('m:');
+  if (((g.kind === 'comercio' && g.cl.comercio && g.cl.comercio.importe !== 'variable') || mismoContrato) && fijas.length > 1) {
     const junta = juntarParecidos(fijas);
     if (junta) fijas = [junta];
   }

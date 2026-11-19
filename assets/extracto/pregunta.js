@@ -101,7 +101,7 @@
   ];
   function comercio(c) {
     // sin el número de tarjeta tapado (5402XXXXXXXX1234): ni se enseña ni sale del móvil
-    const u = String(c || "").toUpperCase().replace(/\b\d{4,6}[X*•·]{4,10}\d{2,4}\b\s*/g, "");
+    const u = String(c || "").toUpperCase().replace(/\b\d{4,6}[X*•·]{4,10}\d{2,4}\b\s*/g, "").replace(/(COMPRA EN |^)\d{3,6}\s+(?=[A-Z])/, "$1"); // y el número de tienda («11667 BARCELONA ARENAS»)
     let m = u.match(/COMPRA EN (.*?), CON LA/); if (m) return m[1].replace(/^SQ \*|^SUMUP \*\*/, "").trim();
     m = u.match(/^RECIBO (.*?) Nº/); if (m) return m[1].replace(/^GC RE /, "").replace(/,? S\.?L\.?U?\.?|,? S\.A\.?/g, "").trim();
     m = u.match(/A FAVOR DE (.*)/); if (m) return m[1].trim();
@@ -112,7 +112,7 @@
   // Lo que Feehund ha aprendido con otras personas (GET /api/ia/aprende): solo se descarga, no se manda nada
   let aprendido = {};
   const normal = (k) => String(k || "").toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^A-Z0-9&.' ]+/g, " ").replace(/\s+/g, " ").trim().slice(0, 60);
-  const aprendidoP = fetch(ROOT + "api/ia/aprende").then((r) => (r.ok ? r.json() : null)).then((d) => { if (d && d.entradas) aprendido = d.entradas; }).catch(() => {});
+  const aprendidoP = fetch(ROOT + "api/ia/aprende").then((r) => (r.ok ? r.json() : null)).then((d) => { if (d && d.entradas) aprendido = Object.assign({}, d.entradas, aprendido); }).catch(() => {});
   // Lo que la persona contestó en «¿Qué es esto?» antes del resumen (assets/extracto.js), en este móvil
   const MIOS = "fh-pregunta-quees";
   const mios = () => { try { const x = JSON.parse(localStorage.getItem(MIOS) || "{}"); return x && !Array.isArray(x) ? x : {}; } catch (e) { return {}; } };
@@ -142,6 +142,8 @@
     listo: () => Promise.race([Promise.all([aprendidoP, motorP]), new Promise((ok) => setTimeout(ok, 3000))]),
     clasificar: (concepto) => clasificar({ concepto }),
     guardar: (k, v) => { const x = mios(); x[k] = v; try { localStorage.setItem(MIOS, JSON.stringify(x)); } catch (e) {} },
+    // lo que el servidor ha encontrado de los comercios que no conocíamos (assets/extracto.js, consultarDesconocidos)
+    aprender: (m) => { Object.keys(m || {}).forEach((k) => { aprendido[normal(k)] = m[k]; }); },
   };
 
   let todos = [];

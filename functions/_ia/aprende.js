@@ -74,7 +74,7 @@ async function buscarEnLaWeb(env, nombre) {
     headers: { 'content-type': 'application/json', 'x-api-key': env.ANTHROPIC_API_KEY, 'anthropic-version': '2026-10-21' },
     body: JSON.stringify({
       model: env.APRENDE_MODELO || MODELO, max_tokens: 3000, system: INSTRUCCIONES,
-      tools: [{ type: 'web_search_20260209', name: 'web_search', max_uses: 2, user_location: { type: 'approximate', country: 'ES' } }],
+      tools: [{ type: 'web_search_20260209', name: 'web_search', max_uses: 1, user_location: { type: 'approximate', country: 'ES' } }],
       output_config: { effort: 'low', format: { type: 'json_schema', schema: ESQUEMA } },
       messages: [{ role: 'user', content: 'Texto del extracto: «' + nombre + '»' }],
     }),
@@ -169,4 +169,60 @@ export async function apuntarDesconocidos(env, nombres, quien) {
   for (const n of nuevos) if (x.nombres.length < DESCONOCIDOS_MAX && x.nombres.indexOf(n) < 0) x.nombres.push(n);
   if (x.nombres.length > antes) await kv.put(k, JSON.stringify(x), { expirationTtl: 120 * 86400 });
   return { ok: true };
+}
+
+// ---------- Lo que no reconoce Mi banco, también gratis: se busca en internet una sola vez (19 nov 2026)
+// Lo ya sabido (por otra persona o por el chat) se devuelve al momento. De lo nuevo se buscan como mucho
+// BUSCAR_POR_VEZ nombres, en el orden en que llegan (el móvil manda primero lo de más gasto), y 20 al día por persona,
+// dentro del tope diario de queEs. Cada búsqueda queda guardada para todos (y cuenta para el diccionario compartido).
+const BUSCAR_POR_VEZ = 6, BUSCAR_PERSONA_DIA = 20;
+// ---------- El mapa de locales (OpenStreetMap: Barcelona y Madrid, 19 nov 2026), gratis antes de buscar en internet
+// KV osm:i:<letra> → { NOMBRE: sector } (nombre completo del local) y osm:p:<letra> → { DOS PALABRAS: sector } (cuando el
+// banco pone el principio del nombre y todos los locales del mapa con ese principio son del mismo sector).
+// Datos © colaboradores de OpenStreetMap, licencia ODbL (lo dice «Cómo se calcula»).
+const NO_MAPA = new Set(['CATALUNYA', 'CATALUNA', 'DUBLIN', 'LONDON', 'LONDRES', 'PARIS', 'ROMA', 'MILANO', 'NAPOLES', 'NAPOLI', 'EUROPA', 'ESPANYA', 'IBIZA', 'MALLORCA', 'VALENCIA', 'SEVILLA', 'BILBAO', 'MALAGA', 'GIRONA', 'TARRAGONA', 'EL RINCON', 'LA CASA', 'EL RACO', 'LA TERRAZA', 'LA PLAZA', 'EL PATIO', 'LA ESQUINA', 'BARCELONA', 'MADRID', 'CENTRO', 'CENTRE', 'GRAN VIA', 'SPAIN', 'ESPANA', 'PLAZA', 'PLACA', 'MERCADO', 'MERCAT', 'TIENDA', 'BOTIGA', 'CASA', 'HOME', 'SHOP', 'STORE', 'CAFE', 'BAR', 'RESTAURANTE', 'FARMACIA', 'HOTEL', 'PARKING', 'METRO', 'GLOBAL', 'SERVICIOS', 'SERVEIS', 'GRUPO', 'GROUP', 'INTERNATIONAL']);
+const NEXOS = new Set(['DE', 'DEL', 'LA', 'EL', 'LES', 'LOS', 'LAS', 'I', 'Y', 'D', 'DELS']);
+async function delMapa(env, nombre) {
+  let w = String(nombre).replace(/^.*?\bCOMPRA EN\s+/, '').replace(/'/g, ' ').split(' ').filter(Boolean)
+    .filter((x) => !/^(SQ|SUMUP|ZTL|CRV|PAYPAL|TPV)\*?$|^\*+$/.test(x));
+  while (w.length && /^\d+$/.test(w[0])) w.shift();
+  if (!w.length) return null;
+  const leer = (k) => env.FEEHUND_KV.get(k, { type: 'json', cacheTtl: 3600 }).catch(() => null);
+  const [ix, px] = await Promise.all([leer('osm:i:' + w[0][0]), leer('osm:p:' + w[0][0])]);
+  for (let k = Math.min(5, w.length); k > 0 && ix; k--) {
+    const c = w.slice(0, k).join(' ').replace(/^[.* ]+|[.* ]+$/g, '');
+    if (NO_MAPA.has(c) || (k === 1 && c.length < 6)) continue;
+    if (ix[c]) return ix[c];
+    if (ix[c.replace(/\./g, '')]) return ix[c.replace(/\./g, '')];
+  }
+  if (px && w.length >= 2 && !NEXOS.has(w[1])) {
+    const c = w[0] + ' ' + w[1];
+    if (!NO_MAPA.has(c) && c.replace(' ', '').length >= 6 && px[c]) return px[c];
+  }
+  return null;
+}
+
+export async function clasificarDesconocidos(env, nombres, quien) {
+  const kv = env.FEEHUND_KV, hoy = new Date().toISOString().slice(0, 10), sectores = {};
+  const lista = [...new Set((Array.isArray(nombres) ? nombres : []).slice(0, 80).map(normal))]
+    .filter((n) => sePuedeBuscar(n) && !/\d{3}|X{4}/.test(n) && n.split(' ').length <= 6).slice(0, 60);
+  const sabidos = await Promise.all(lista.map(async (n) => [n, JSON.parse((await kv.get(await clave(n))) || 'null')]));
+  const nuevos = [];
+  for (const [n, x] of sabidos) {
+    if (x && !x.persona && x.sector && x.confianza !== 'baja') sectores[n] = x.sector;
+    else if (!x) nuevos.push(n);
+  }
+  // primero el mapa de locales (gratis); solo lo que no está se busca en internet
+  const delM = await Promise.all(nuevos.map((n) => delMapa(env, n).catch(() => null)));
+  const quedan = [];
+  nuevos.forEach((n, i) => { if (delM[i]) sectores[n] = delM[i]; else quedan.push(n); });
+  nuevos.length = 0; nuevos.push(...quedan);
+  if (!nuevos.length || !quien || !env.ANTHROPIC_API_KEY) return sectores;
+  const kq = 'apr:bq:' + hoy + ':' + quien, hechas = +((await kv.get(kq)) || 0);
+  const toca = nuevos.slice(0, Math.max(0, Math.min(BUSCAR_POR_VEZ, BUSCAR_PERSONA_DIA - hechas)));
+  if (!toca.length) return sectores;
+  await kv.put(kq, String(hechas + toca.length), { expirationTtl: 2 * 86400 });
+  const r = await Promise.all(toca.map((n) => queEs(env, [n], quien).then((s) => s[0]).catch(() => null)));
+  for (const s of r) if (s && s.sector) sectores[s.comercio] = s.sector;
+  return sectores;
 }

@@ -7,7 +7,8 @@ import { normalizar } from './texto.js';
 /** Categorías del diccionario con importe que cambia cada vez (luz, gas, agua, teléfono). */
 export const CATEGORIAS_VARIABLES = new Set(['telecos', 'energia', 'agua']);
 /** Categorías del diccionario que no son un servicio al que estás suscrito. */
-const NO_SUSCRIPCION = new Set(['comisiones', 'pasarelas', 'gastos_fijos', 'impuestos', 'tarjetas']);
+// vivienda: un alquiler no es una suscripción (un pago suelto a una agencia no se toma por un cobro que empieza)
+const NO_SUSCRIPCION = new Set(['comisiones', 'pasarelas', 'gastos_fijos', 'impuestos', 'tarjetas', 'vivienda']);
 
 /** ¿Es un comercio del diccionario al que se paga por estar dado de alta? (para «posible» con 1 cargo y «nuevo»). */
 export function esSuscripcion(comercio) {
@@ -435,6 +436,13 @@ function clasificarSinCache(m, imp, dic) {
     return res('comercio', 'pasarela:' + c.id, { comercio: c, nombre: c.nombre, pasarela: c.id });
   }
 
+  // Un recibo con mandato SEPA es el mismo contrato cada mes aunque el número de recibo cambie («Nº RECIBO 0073 0100 755
+  // CNWTDWB»): se agrupa por el mandato y se nombra con lo que va antes del número (el alquiler de Atbarcelona, 19 nov 2026)
+  if (recibo && mandato) {
+    const antes = n.split(/\bN\s?[º°O]?\.?\s*(?:DE\s+)?RECIBO\b|\b\d{4}\s\d{4}\b|\bREF(?:ERENCIA)?\b|\bMANDATO\b/)[0];
+    const pm = palabrasClave(antes).filter((t) => !/\d/.test(t));
+    return res('desconocido', 'm:' + mandato, { nombre: pm.length ? nombreLegible(pm) : 'Recibo · ' + mandato });
+  }
   const p = palabrasClave(limpio);
   const palabras = p.length ? p : tokensDe(concepto).filter((t) => !/^\d+$/.test(t)).slice(0, 3);
   return res('desconocido', 'd:' + (palabras.join(' ') || 'SIN CONCEPTO'), { nombre: palabras.length ? nombreLegible(palabras) : null });

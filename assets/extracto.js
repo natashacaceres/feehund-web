@@ -29,7 +29,7 @@
       aReclamar: ["Comisión que puedes reclamar", (x) => x, "Pide que te la devuelvan"],
       aTarjeta: ["Pagos con tarjeta de crédito", (i, n) => "Pagas " + i + " € con tu tarjeta de crédito (" + n + " pagos). Lo que compras con ella no sale en este extracto.", "Elige también el extracto de la tarjeta"],
       nDevol: (x, i) => x + " te devolvió " + i + " €", nBaja: (x, a, b) => x + " bajó de " + a + " a " + b + " €", nFin: (x, f) => "Ya no te cobran " + x + " (último cargo el " + f + ")", nFinT: (x, f) => x + " ya no sale en esta cuenta desde el " + f + ". Puede que ahora lo pagues con la tarjeta de crédito", nDevC: (x, i) => "Te devolvieron la " + x.toLowerCase() + " (" + i + " €)", otroC: " (otro contrato)",
-      eEstable: "Estable", eVaria: "Varía mucho", totalSec: (x, suf) => "Total: " + x + " €" + suf,
+      eEstable: "Estable", eVaria: "Varía mucho", buscando: "Buscando lo que no conozco…", totalSec: (x, suf) => "Total: " + x + " €" + suf,
       cada: { semanal: "cada semana", cuatrisemanal: "cada 4 semanas", mensual: "cada mes", bimestral: "cada 2 meses", trimestral: "cada 3 meses", semestral: "cada 6 meses", anual: "cada año" },
       head: (n, m) => n
         ? "Es lo que pagas al año en " + n + (n === 1 ? " cobro que se repite." : " cobros que se repiten.") + (m ? (m === 1 ? " Hay 1 más que no sumamos porque lo hemos visto pocas veces." : " Hay " + m + " más que no sumamos porque los hemos visto pocas veces.") : "")
@@ -57,7 +57,7 @@
       aReclamar: ["Comissió que pots reclamar", (x) => x, "Demana que te la retornin"],
       aTarjeta: ["Pagaments amb targeta de crèdit", (i, n) => "Pagues " + i + " € amb la teva targeta de crèdit (" + n + " pagaments). El que compres amb ella no surt en aquest extracte.", "Tria també l'extracte de la targeta"],
       nDevol: (x, i) => x + " t'ha retornat " + i + " €", nBaja: (x, a, b) => x + " ha baixat de " + a + " a " + b + " €", nFin: (x, f) => "Ja no et cobren " + x + " (últim càrrec el " + f + ")", nFinT: (x, f) => x + " ja no surt en aquest compte des del " + f + ". Potser ara el pagues amb la targeta de crèdit", nDevC: (x, i) => "T'han retornat la " + x.toLowerCase() + " (" + i + " €)", otroC: " (un altre contracte)",
-      eEstable: "Estable", eVaria: "Varia molt", totalSec: (x, suf) => "Total: " + x + " €" + suf,
+      eEstable: "Estable", eVaria: "Varia molt", buscando: "Buscant el que no conec…", totalSec: (x, suf) => "Total: " + x + " €" + suf,
       cada: { semanal: "cada setmana", cuatrisemanal: "cada 4 setmanes", mensual: "cada mes", bimestral: "cada 2 mesos", trimestral: "cada 3 mesos", semestral: "cada 6 mesos", anual: "cada any" },
       head: (n, m) => n
         ? "És el que pagues cada any en " + n + (n === 1 ? " cobrament que es repeteix." : " cobraments que es repeteixen.") + (m ? (m === 1 ? " N'hi ha 1 més que no sumem perquè l'hem vist poques vegades." : " N'hi ha " + m + " més que no sumem perquè els hem vist poques vegades.") : "")
@@ -85,7 +85,7 @@
       aReclamar: ["A fee you can claim back", (x) => x, "Ask for it back"],
       aTarjeta: ["Credit card payments", (i, n) => "You pay " + i + " € with your credit card (" + n + " payments). What you buy with it is not in this statement.", "Choose the card statement too"],
       nDevol: (x, i) => x + " refunded you " + i + " €", nBaja: (x, a, b) => x + " went down from " + a + " to " + b + " €", nFin: (x, f) => "You are no longer charged for " + x + " (last charge on " + f + ")", nFinT: (x, f) => x + " has not appeared in this account since " + f + ". You may now pay it with your credit card", nDevC: (x, i) => "Your " + x.toLowerCase() + " was refunded (" + i + " €)", otroC: " (another contract)",
-      eEstable: "Stable", eVaria: "Varies a lot", totalSec: (x, suf) => "Total: " + x + " €" + suf,
+      eEstable: "Stable", eVaria: "Varies a lot", buscando: "Looking up what I don't know…", totalSec: (x, suf) => "Total: " + x + " €" + suf,
       cada: { semanal: "every week", cuatrisemanal: "every 4 weeks", mensual: "every month", bimestral: "every 2 months", trimestral: "every 3 months", semestral: "every 6 months", anual: "every year" },
       head: (n, m) => n
         ? "This is what you pay each year in " + n + (n === 1 ? " repeating charge." : " repeating charges.") + (m ? (m === 1 ? " 1 more is not added in because we have only seen it a few times." : " " + m + " more are not added in because we have only seen them a few times.") : "")
@@ -153,6 +153,7 @@
       ia() { subir(97, 0.006); }, // la lectura con IA tarda más: sigue avanzando, despacio
       async fin() { if (!caja) return; clearInterval(reloj); v = 100; pintar(); await new Promise((ok) => setTimeout(ok, 250)); },
       parar() { clearInterval(reloj); },
+      seguir() { if (!caja) return; clearInterval(reloj); techo = 97; paso = 0.012; reloj = setInterval(() => { v = Math.min(techo, v + Math.max(0.04, (techo - v) * paso)); pintar(); }, 120); },
     };
   })();
 
@@ -197,11 +198,17 @@
     }
     actual = r;
     await envioP;
-    await barraCarga.fin();
     anadirFijos(r);
+    if (!(entrada && entrada.deEjemplo) && navigator.onLine) {
+      // lo que no conocemos se busca mientras sigue la barra (la segunda vez ya está guardado y es al momento)
+      if (cargando) cargando.textContent = TX.buscando;
+      barraCarga.seguir();
+      await consultarDesconocidos(r);
+      barraCarga.parar(); if (cargando) cargando.textContent = textoCarga;
+    }
+    await barraCarga.fin();
     // Lo grande que se repite y no reconocemos (el alquiler, por ejemplo): se pregunta antes del resumen, como mucho 3
     await preguntarDesconocidos(r, !(entrada && entrada.deEjemplo)).catch((e) => console.error("Feehund: preguntas", e));
-    if (!(entrada && entrada.deEjemplo)) enviarDesconocidos(r);
     cobros = (r.cobros || []).filter((c) => c.estado === "seguro" || c.estado === "posible");
     setTimeout(() => document.dispatchEvent(new CustomEvent("fh-resultado", { detail: r })), 0); // pestañas y gráficas (assets/extracto/graficas.js), después de pintar el resumen
     render(r, cobros); show("res");
@@ -792,6 +799,14 @@
       const media = total / l.length;
       out.push({ k, nombre: bonito(k), l, media, alAnio, anual: Math.max(media * alAnio, total * 365 / dias), primero: fechas[0], ultimo: fechas[fechas.length - 1] });
     }
+    // Recibos que el motor sí ve repetirse pero sin saber qué son (el alquiler de una agencia): también se preguntan
+    (r.cobros || []).forEach((c) => {
+      if (c.comercio_id || String(c.id || "").startsWith("tuyo-") || (c.etiquetas || []).indexOf("fijo") >= 0 || !(c.estado === "seguro" || c.estado === "posible")) return;
+      if (c.tipo === "comision" || !c.movimientos || !c.movimientos.length || FUERA.test(c.movimientos[0].concepto || "")) return;
+      const k = claveDe(c.movimientos[0].concepto); if (k.length < 3 || out.some((y) => y.k === k)) return;
+      const alAnio = { mensual: 12, bimestral: 6, trimestral: 4, semestral: 2, anual: 1 }[c.periodicidad] || 12;
+      out.push({ k, nombre: c.nombre || bonito(k), l: c.movimientos, media: c.importe || 0, alAnio, anual: c.coste_anual || 0, cobro: c });
+    });
     return out.filter((x) => x.anual >= 150).sort((a, b) => b.anual - a.anual).slice(0, 3);
   }
   // Hipoteca, préstamos, impuestos y cuotas fijas (gastos_fijos del motor) también se repiten: entran en la cifra y en
@@ -808,6 +823,16 @@
     if (!lista.length) return;
     const ids = [];
     lista.forEach((x) => {
+      if (x.cobro) { // ya es un cobro del motor: solo cambia de tipo (y de grupo, a «Lo que me has dicho»)
+        const c = x.cobro; c.categoria = CAT_DE[x.op] || "otros"; if (x.texto) c.nombre = (c.nombre + " · " + x.texto).slice(0, 40);
+        (r.grupos || []).forEach((g) => {
+          if (!(g.ids || []).includes(c.id)) return;
+          g.ids = g.ids.filter((id) => id !== c.id);
+          if (typeof g.total === "number") g.total = Math.max(0, Math.round((g.total - (c.coste_anual || 0)) * 100) / 100);
+        });
+        r.grupos = (r.grupos || []).filter((g) => (g.ids || []).length);
+        ids.push(c.id); return;
+      }
       const id = "tuyo-" + x.k.replace(/[^a-z0-9]+/gi, "-").toLowerCase();
       if ((r.cobros || []).some((c) => c.id === id)) return;
       const imps = x.l.map((m) => -m.importe);
@@ -844,20 +869,36 @@
     const lista = Object.values(por).sort((a, b) => b.total - a.total), raro = lista.reduce((t, x) => t + x.total, 0);
     return { lista, importante: lista.length >= 5 && gastado > 0 && raro / gastado >= 0.15 };
   }
-  // Lo que Feehund no reconoce, para investigarlo después (lo dice Privacidad): solo el nombre de la empresa. Nunca
-  // importes, fechas, números, transferencias, Bizum ni personas. Después del análisis y solo con conexión.
-  function enviarDesconocidos(r) {
+  // Lo que Feehund no reconoce (lo dice Privacidad): solo el nombre de la empresa, primero lo de más gasto. Nunca importes,
+  // fechas, números, transferencias, Bizum ni personas. El servidor lo apunta y busca en internet lo nuevo (una vez para
+  // todos); lo que contesta a tiempo (15 s) ya sale con su sector y no se pregunta. Sin conexión no se manda nada.
+  async function consultarDesconocidos(r) {
     try {
       if (!navigator.onLine) return;
+      if (window.FeehundComercio) await window.FeehundComercio.listo();
       const NO = /BIZUM|TRANSF|TRASPASO|N[OÓ]MINA|PENSI[OÓ]N|CAJERO|REINTEGRO|DEVOLUCI|ABONO|INGRESO|IMPUESTO|HACIENDA|TRIBUT|HIPOTECA|PR[EÉ]STAMO|ALQUILER|A FAVOR DE/i;
-      const limpio = (k) => String(k || "").toUpperCase().split(/\s+/).filter((w) => w.length > 1 && !/\d|[*•]|^X{3,}$/.test(w)).slice(0, 4).join(" ");
-      const mios = leerTuyos(), nombres = new Set();
-      const mirar = (x) => { if (!mios[x.k] && !x.l.some((m) => NO.test(m.concepto || ""))) nombres.add(limpio(x.k)); };
-      comerciosRaros(r).lista.forEach(mirar); desconocidos(r).forEach(mirar);
+      const limpio = (k) => String(k || "").toUpperCase().split(/\s+/).filter((w) => w && !/\d|[*•]|^X{3,}$/.test(w)).slice(0, 4).join(" "); // «W BARCELONA» sigue siendo W
+      const norm = (k) => String(k || "").toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^A-Z0-9&.' ]+/g, " ").replace(/\s+/g, " ").trim().slice(0, 60);
+      const mios = leerTuyos(), nombres = new Set(), original = {};
+      const mirar = (x) => {
+        if (mios[x.k] || x.l.some((m) => NO.test(m.concepto || ""))) return;
+        const n = limpio(x.k); nombres.add(n); (original[norm(n)] = original[norm(n)] || []).push(x.k);
+      };
+      // primero lo que se repite (lo grande), después las compras sueltas de más dinero
+      desconocidos(r).forEach(mirar);
       // lo que se repite y el motor cuenta, pero sin saber qué empresa es (sin comercio del diccionario)
       (r.cobros || []).forEach((c) => { if (!c.comercio_id && c.movimientos && c.movimientos.length && !String(c.id || "").startsWith("tuyo-")) mirar({ k: c.nombre || claveDe(c.movimientos[0].concepto), l: c.movimientos }); });
+      comerciosRaros(r).lista.forEach(mirar);
       const lista = [...nombres].filter((n) => /[A-Z]{3}/.test(n)).slice(0, 60);
-      if (lista.length) fetch(ROOT + "api/ia/desconocidos", { method: "POST", keepalive: true, headers: { "content-type": "application/json" }, body: JSON.stringify({ nombres: lista }) }).catch(() => {});
+      if (!lista.length) return;
+      const ctl = typeof AbortController === "function" ? new AbortController() : null;
+      const corte = setTimeout(() => ctl && ctl.abort(), 15000);
+      const resp = await fetch(ROOT + "api/ia/desconocidos", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ nombres: lista }), signal: ctl ? ctl.signal : undefined }).then((x) => x.json()).catch(() => null);
+      clearTimeout(corte);
+      if (resp && resp.sectores && window.FeehundComercio && window.FeehundComercio.aprender) {
+        const m = {}; Object.keys(resp.sectores).forEach((n) => { (original[norm(n)] || [n]).forEach((k) => { m[k] = resp.sectores[n]; }); });
+        window.FeehundComercio.aprender(m);
+      }
     } catch (e) {}
   }
   // Lo que la persona escribe en «Otra cosa»: si dice qué es, va a su sitio; si no, «otra cosa» (pago) o «tienda» (comercio)
