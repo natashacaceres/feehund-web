@@ -176,11 +176,11 @@ export async function apuntarDesconocidos(env, nombres, quien) {
 // BUSCAR_POR_VEZ nombres, en el orden en que llegan (el móvil manda primero lo de más gasto), y 20 al día por persona,
 // dentro del tope diario de queEs. Cada búsqueda queda guardada para todos (y cuenta para el diccionario compartido).
 const BUSCAR_POR_VEZ = 6, BUSCAR_PERSONA_DIA = 20;
-// ---------- El mapa de locales (OpenStreetMap: Barcelona y Madrid, 19 nov 2026), gratis antes de buscar en internet
-// KV osm:i:<letra> → { NOMBRE: sector } (nombre completo del local) y osm:p:<letra> → { DOS PALABRAS: sector } (cuando el
-// banco pone el principio del nombre y todos los locales del mapa con ese principio son del mismo sector).
+// ---------- El mapa de locales (OpenStreetMap: toda España, 19 nov 2026), gratis antes de buscar en internet
+// KV osm:i:<2 letras> → { NOMBRE: sector } (nombre completo del local; «sector?» si es un solo local en toda España).
+// Antes había también osm:p (prefijos de dos palabras): se quitó con toda España porque casaba nombres por casualidad.
 // Datos © colaboradores de OpenStreetMap, licencia ODbL (lo dice «Cómo se calcula»).
-const NO_MAPA = new Set(['CATALUNYA', 'CATALUNA', 'DUBLIN', 'LONDON', 'LONDRES', 'PARIS', 'ROMA', 'MILANO', 'NAPOLES', 'NAPOLI', 'EUROPA', 'ESPANYA', 'IBIZA', 'MALLORCA', 'VALENCIA', 'SEVILLA', 'BILBAO', 'MALAGA', 'GIRONA', 'TARRAGONA', 'EL RINCON', 'LA CASA', 'EL RACO', 'LA TERRAZA', 'LA PLAZA', 'EL PATIO', 'LA ESQUINA', 'BARCELONA', 'MADRID', 'CENTRO', 'CENTRE', 'GRAN VIA', 'SPAIN', 'ESPANA', 'PLAZA', 'PLACA', 'MERCADO', 'MERCAT', 'TIENDA', 'BOTIGA', 'CASA', 'HOME', 'SHOP', 'STORE', 'CAFE', 'BAR', 'RESTAURANTE', 'FARMACIA', 'HOTEL', 'PARKING', 'METRO', 'GLOBAL', 'SERVICIOS', 'SERVEIS', 'GRUPO', 'GROUP', 'INTERNATIONAL']);
+const NO_MAPA = new Set(['GRANVIA', 'GRAN VIA', 'RAMBLA', 'DIAGONAL', 'ALAVA', 'ARABA', 'ALBACETE', 'ALICANTE', 'ALACANT', 'ALMERIA', 'ASTURIAS', 'AVILA', 'BADAJOZ', 'BURGOS', 'CACERES', 'CADIZ', 'CANTABRIA', 'CASTELLON', 'CASTELLO', 'CIUDAD REAL', 'CORDOBA', 'CUENCA', 'GIPUZKOA', 'GUIPUZCOA', 'GRANADA', 'GUADALAJARA', 'HUELVA', 'HUESCA', 'JAEN', 'LEON', 'LLEIDA', 'LERIDA', 'LUGO', 'MURCIA', 'NAVARRA', 'OURENSE', 'ORENSE', 'PALENCIA', 'PONTEVEDRA', 'SALAMANCA', 'SEGOVIA', 'SORIA', 'TERUEL', 'TOLEDO', 'VALLADOLID', 'BIZKAIA', 'VIZCAYA', 'ZAMORA', 'ZARAGOZA', 'CEUTA', 'MELILLA', 'CANARIAS', 'TENERIFE', 'LAS PALMAS', 'GRAN CANARIA', 'LANZAROTE', 'FUERTEVENTURA', 'MENORCA', 'ANDALUCIA', 'ARAGON', 'GALICIA', 'EXTREMADURA', 'LA RIOJA', 'RIOJA', 'EUSKADI', 'PAIS VASCO', 'OVIEDO', 'GIJON', 'SANTANDER', 'PAMPLONA', 'LOGRONO', 'VITORIA', 'DONOSTIA', 'SAN SEBASTIAN', 'VIGO', 'CORUNA', 'A CORUNA', 'LA CORUNA', 'SANTIAGO', 'MARBELLA', 'BENIDORM', 'ELCHE', 'CARTAGENA', 'JEREZ', 'ALGECIRAS', 'BADALONA', 'SABADELL', 'TERRASSA', 'HOSPITALET', 'REUS', 'MATARO', 'ESPANA', 'SPAIN', 'PORTUGAL', 'FRANCE', 'FRANCIA', 'ITALIA', 'ITALY', 'LONDON', 'NEW YORK', 'PARIS', 'ROMA', 'BERLIN', 'LISBOA', 'PORTO', 'AMSTERDAM', 'MEXICO', 'ARGENTINA', 'COLOMBIA', 'VENEZUELA', 'CUBA', 'PERU', 'CHILE', 'BRASIL', 'CHINA', 'JAPON', 'TOKYO', 'INDIA', 'ORIENTAL', 'MEDITERRANEO', 'MEDITERRANEA', 'ATLANTICO', 'CENTRAL', 'PLAZA MAYOR', 'EL CENTRO', 'SOL', 'LUNA', 'MAR', 'PLAYA', 'CATALUNYA', 'CATALUNA', 'DUBLIN', 'LONDON', 'LONDRES', 'PARIS', 'ROMA', 'MILANO', 'NAPOLES', 'NAPOLI', 'EUROPA', 'ESPANYA', 'IBIZA', 'MALLORCA', 'VALENCIA', 'SEVILLA', 'BILBAO', 'MALAGA', 'GIRONA', 'TARRAGONA', 'EL RINCON', 'LA CASA', 'EL RACO', 'LA TERRAZA', 'LA PLAZA', 'EL PATIO', 'LA ESQUINA', 'BARCELONA', 'MADRID', 'CENTRO', 'CENTRE', 'GRAN VIA', 'SPAIN', 'ESPANA', 'PLAZA', 'PLACA', 'MERCADO', 'MERCAT', 'TIENDA', 'BOTIGA', 'CASA', 'HOME', 'SHOP', 'STORE', 'CAFE', 'BAR', 'RESTAURANTE', 'FARMACIA', 'HOTEL', 'PARKING', 'METRO', 'GLOBAL', 'SERVICIOS', 'SERVEIS', 'GRUPO', 'GROUP', 'INTERNATIONAL']);
 const NEXOS = new Set(['DE', 'DEL', 'LA', 'EL', 'LES', 'LOS', 'LAS', 'I', 'Y', 'D', 'DELS']);
 async function delMapa(env, nombre) {
   let w = String(nombre).replace(/^.*?\bCOMPRA EN\s+/, '').replace(/'/g, ' ').split(' ').filter(Boolean)
@@ -188,16 +188,17 @@ async function delMapa(env, nombre) {
   while (w.length && /^\d+$/.test(w[0])) w.shift();
   if (!w.length) return null;
   const leer = (k) => env.FEEHUND_KV.get(k, { type: 'json', cacheTtl: 3600 }).catch(() => null);
-  const [ix, px] = await Promise.all([leer('osm:i:' + w[0][0]), leer('osm:p:' + w[0][0])]);
-  for (let k = Math.min(5, w.length); k > 0 && ix; k--) {
+  const ix = await leer('osm:i:' + w[0].slice(0, 2)); // por las dos primeras letras: cada consulta lee un trozo pequeño
+  if (!ix) return null;
+  for (let k = Math.min(5, w.length); k > 0; k--) {
     const c = w.slice(0, k).join(' ').replace(/^[.* ]+|[.* ]+$/g, '');
     if (NO_MAPA.has(c) || (k === 1 && c.length < 6)) continue;
-    if (ix[c]) return ix[c];
-    if (ix[c.replace(/\./g, '')]) return ix[c.replace(/\./g, '')];
-  }
-  if (px && w.length >= 2 && !NEXOS.has(w[1])) {
-    const c = w[0] + ' ' + w[1];
-    if (!NO_MAPA.has(c) && c.replace(' ', '').length >= 6 && px[c]) return px[c];
+    for (const c2 of [c, c.replace(/\./g, '')]) {
+      const v = ix[c2]; if (!v) continue;
+      // «sector?»: un solo local en toda España con ese nombre; vale solo si el banco pone el nombre entero
+      if (v.endsWith('?')) { if (k === w.length) return v.slice(0, -1); continue; }
+      return v;
+    }
   }
   return null;
 }
