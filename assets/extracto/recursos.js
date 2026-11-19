@@ -5,7 +5,7 @@
 //   ACTUALIZAR_RECURSOS=1 node --test tests/unit/worker-montaje.test.mjs
 // La versión es una huella de todos los archivos de las listas: cambia en cuanto cambia cualquiera de ellos.
 globalThis.RECURSOS_EXTRACTO = {
-  version: '060101451ee2',
+  version: 'c8d343a651c9',
   // Página, fuentes, motor, núcleo, lectores y textos: se guardan al instalar.
   PAGINA: [
     '/extracto/',
@@ -22,7 +22,7 @@ globalThis.RECURSOS_EXTRACTO = {
     '/assets/brand/favicon.ico?v=202611111722',
     '/assets/brand/feehund-logo-h128.png?v=202611111722',
     '/assets/brand/feehund-logo-h64.png?v=202611111722',
-    '/assets/extracto.js?v=20261119000014',
+    '/assets/extracto.js?v=20261119170000',
     '/assets/extracto/bandeja.css',
     '/assets/extracto/bandeja.js',
     '/assets/extracto/datafono/confirmar.js',
@@ -73,7 +73,7 @@ globalThis.RECURSOS_EXTRACTO = {
     '/assets/extracto/pregunta.css',
     '/assets/extracto/pregunta.css?v=20261119000014',
     '/assets/extracto/pregunta.js',
-    '/assets/extracto/pregunta.js?v=20261119000014',
+    '/assets/extracto/pregunta.js?v=20261119170000',
     '/assets/extracto/recursos.js',
     '/assets/extracto/tarjeta.js',
     '/assets/extracto/textos.js',

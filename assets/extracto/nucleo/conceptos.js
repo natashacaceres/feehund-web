@@ -74,7 +74,7 @@ const FECHAS = [
  * @returns {string}
  */
 export function limpiarConcepto(texto) {
-  let s = sinComisionDeCompra(normalizar(recortarConcepto(texto)));
+  let s = sinDatafono(sinComisionDeCompra(normalizar(recortarConcepto(texto))));
   if (!s) return '';
   for (const re of TARJETAS) s = s.replace(re, ' ');
   s = s.replace(PREFIJOS, ' ');
@@ -93,6 +93,13 @@ export function limpiarConcepto(texto) {
 function sinComisionDeCompra(n) {
   if (!/\b(?:COMPRA|PAGO|TARJETA|TARJ|CARD)\b/.test(n)) return n;
   return n.replace(/(?:,\s*|\s)COMISI(?:ON|ONES)\b\s*:?\s*(?:\d{1,4}[.,]\d{2}\s*(?:EUR|€)?)?(?=\s*(?:[,;.]|$))/g, ' ').replace(/\s+/g, ' ').trim();
+}
+
+// El datáfono del negocio (SumUp, POS de PayPal) o una tarjeta intermedia (Curve) van delante del comercio de verdad:
+// «SUMUP *BAR PEPE» es una compra en el Bar Pepe, no un cobro de SumUp. Solo se quitan si llevan su asterisco o guion.
+const DATAFONOS = /(?:^|\s)(?:SUMUP|SUM UP|POS DE PAYPAL|CRV)\s?[*-]\s?/g;
+function sinDatafono(n) {
+  return n.replace(DATAFONOS, ' ').replace(/\s+/g, ' ').trim();
 }
 
 /** Palabras para buscar en el diccionario: solo letras y cifras; «+» se lee «PLUS» (Disney+, Movistar+). */
@@ -171,7 +178,7 @@ export function prepararDiccionario(dic) {
   }
   for (const g of llave.excluir ?? []) {
     // solo_sin_recibo: REPSOL es gasolinera cuando se paga con tarjeta, pero un recibo de Repsol es la luz o el gas
-    const ref = { excluir: true, motivo: g.motivo || 'compra_frecuente', soloSinRecibo: g.solo_sin_recibo === true };
+    const ref = { excluir: true, motivo: g.motivo || 'compra_frecuente', sector: g.sector || null, soloSinRecibo: g.solo_sin_recibo === true };
     for (const pat of g.patrones ?? []) agregar(pat, ref);
   }
   // La lista general de pasarelas («PAYPAL *») se asocia a su entrada por la primera palabra.
@@ -330,7 +337,7 @@ export function clasificar(movimiento, diccionario) {
 
 function clasificarSinCache(m, imp, dic) {
   const concepto = recortarConcepto(m.concepto);
-  const n = sinComisionDeCompra(normalizar(concepto));
+  const n = sinDatafono(sinComisionDeCompra(normalizar(concepto)));
   const tokens = quitarCarteras(tokensDe(n));
   const set = new Set(tokens);
   const tt = new Set(tokensDe(recortarConcepto(m.tipo))); // tipo de operación que da el banco (Revolut, N26)
@@ -349,7 +356,7 @@ function clasificarSinCache(m, imp, dic) {
   const res = (tipo, clave, extra = {}) => ({
     clave, nombre: extra.nombre ?? null, comercio: extra.comercio ?? null, pasarela: extra.pasarela ?? null, tipo,
     categoria: extra.categoria ?? extra.comercio?.categoria ?? null, recibo, tarjeta, mandato, online: online || Boolean(extra.pasarela),
-    concepto_limpio: limpio, ...(extra.motivo ? { motivo: extra.motivo } : {}), ...(extra.sentido ? { sentido: extra.sentido } : {}),
+    concepto_limpio: limpio, ...(extra.motivo ? { motivo: extra.motivo } : {}), ...(extra.sector ? { sector: extra.sector } : {}), ...(extra.sentido ? { sentido: extra.sentido } : {}),
   });
   const deId = (id) => dic.porId.get(id)?.comercio ?? null;
   const conComercio = (tipo, c, extra = {}) => res(tipo, c.id, { comercio: c, nombre: c.nombre, ...extra });
@@ -364,8 +371,14 @@ function clasificarSinCache(m, imp, dic) {
   // Retenciones y verificaciones de tarjeta: «PP*1234» (PayPal comprueba la tarjeta con un cargo pequeño)
   if (/(?:^|\s)PP\s?\*\s?\d{4}(?:\s|$)/.test(n)) return res('excluido', 'excluido:retencion_temporal', { motivo: 'retencion_temporal' });
 
+  // Transferencias a otra persona (las que no van a un comercio conocido)
+  const transferencia = algun(set, ['TRANSFERENCIA', 'TRANSF']) || /\bTRANS\./.test(n) || hayFrase(tokens, 'TRANSFER TO')
+    || cc === '04' || tt.has('TRANSFER');
+
   const coinc = buscar(tokens, dic);
-  const comercioM = mejor(coinc, (x) => (x.excluir && !(x.soloSinRecibo && recibo)) || x.tipo === 'comercio');
+  // solo_sin_recibo: compras con tarjeta. Un recibo o una transferencia con ese nombre (Zara, Douglas, Pedro del Hierro
+  // también son personas) no se esconde.
+  const comercioM = mejor(coinc, (x) => (x.excluir && !(x.soloSinRecibo && (recibo || transferencia))) || x.tipo === 'comercio');
   const comisionM = mejor(coinc, (x) => x.tipo === 'comision');
   const gastoM = mejor(coinc, (x) => x.tipo === 'gasto_fijo');
   const pasarelaM = mejor(coinc, (x) => x.tipo === 'pasarela');
@@ -399,9 +412,6 @@ function clasificarSinCache(m, imp, dic) {
   if (gasto?.id === 'alquiler' && (set.has('RENTACAR') || ALQUILER_DE_UN_DIA.some((f) => hayFrase(tokens, f)))) gasto = null;
   if (gasto && !(GASTOS_BLANDOS.has(gasto.id) && suscripcion)) return conComercio('gasto_fijo', gasto);
 
-  // Transferencias a otra persona (las que no van a un comercio conocido)
-  const transferencia = algun(set, ['TRANSFERENCIA', 'TRANSF']) || /\bTRANS\./.test(n) || hayFrase(tokens, 'TRANSFER TO')
-    || cc === '04' || tt.has('TRANSFER');
   if (transferencia && !comercioM) {
     const p = palabrasClave(limpio);
     const quien = p.length ? p : ['SIN', 'NOMBRE'];
@@ -409,7 +419,7 @@ function clasificarSinCache(m, imp, dic) {
   }
 
   // Comercio del diccionario o algo que no se cuenta (supermercado, gasolinera...)
-  if (comercioM?.ref.excluir) return res('excluido', 'excluido:' + comercioM.ref.motivo, { motivo: comercioM.ref.motivo });
+  if (comercioM?.ref.excluir) return res('excluido', 'excluido:' + comercioM.ref.motivo, { motivo: comercioM.ref.motivo, sector: comercioM.ref.sector });
   if (suscripcion?.empate) {
     // Dos marcas igual de probables: no se elige ninguna («Posible X o Y»)
     const a = suscripcion.ref.comercio, b = suscripcion.empate.ref.comercio;

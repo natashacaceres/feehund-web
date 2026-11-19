@@ -115,15 +115,30 @@
   // Lo que la persona contestó en «¿Qué es esto?» antes del resumen (assets/extracto.js), en este móvil
   const MIOS = "fh-pregunta-quees";
   const mios = () => { try { const x = JSON.parse(localStorage.getItem(MIOS) || "{}"); return x && !Array.isArray(x) ? x : {}; } catch (e) { return {}; } };
+  // Primero el mismo diccionario y la misma regla que el motor (data/comercios.json con nucleo/conceptos.js): lo que se
+  // sabe de cada comercio está en un solo sitio. La lista de arriba queda para palabras sueltas (BAR, FARMACIA…).
+  const CAT_SECTOR = { telecos: "casa", energia: "casa", agua: "casa", alarmas: "casa", hogar: "casa", gastos_fijos: "casa", impuestos: "impuestos", autonomos: "impuestos", comisiones: "comisiones", reparto: "domicilio", movilidad: "transporte", viajes: "ocio", streaming: "suscr", musica: "suscr", nube_apps: "suscr", ia: "suscr", prensa: "suscr", videojuegos: "suscr", suscripciones: "suscr", idiomas: "suscr", citas: "suscr", club_descuentos: "suscr", bienestar: "suscr", gimnasios: "suscr" };
+  let motor = null;
+  const motorP = Promise.all([import(new URL(ROOT + "assets/extracto/nucleo/conceptos.js", document.baseURI).href), fetch(ROOT + "data/comercios.json").then((r) => r.json())])
+    .then(([mod, dic]) => { motor = { mod, dic }; }).catch(() => {});
+  function delMotor(concepto) {
+    if (!motor) return null;
+    try {
+      const r = motor.mod.clasificar({ concepto, importe: -1 }, motor.dic);
+      if (r.tipo === "excluido") return r.sector || null;
+      return r.comercio && CAT_SECTOR[r.comercio.categoria] || null;
+    } catch (e) { return null; }
+  }
   function clasificar(m) {
     const k = comercio(m.concepto), u = (k + " | " + m.concepto).toUpperCase();
+    const sm = delMotor(m.concepto); if (sm) return { k, s: sm };
     for (const [id, re] of SECTORES) if (re.test(id === "bizum" || id === "transfer" ? String(m.concepto).toUpperCase() : u)) return { k, s: id };
     const yo = mios()[k];
     return { k, s: yo && yo !== "persona" && yo !== "nose" ? yo : aprendido[normal(k)] || null, contestado: !!yo };
   }
   // Para la ventana de preguntas de Mi banco: qué comercio es cada pago y si Feehund ya sabe su sector
   window.FeehundComercio = {
-    listo: () => Promise.race([aprendidoP, new Promise((ok) => setTimeout(ok, 1500))]),
+    listo: () => Promise.race([Promise.all([aprendidoP, motorP]), new Promise((ok) => setTimeout(ok, 3000))]),
     clasificar: (concepto) => clasificar({ concepto }),
     guardar: (k, v) => { const x = mios(); x[k] = v; try { localStorage.setItem(MIOS, JSON.stringify(x)); } catch (e) {} },
   };
@@ -401,7 +416,7 @@
 
   async function cargar(r) {
     if (!r) return;
-    await Promise.race([aprendidoP, new Promise((ok) => setTimeout(ok, 1500))]); // sin esperar más de 1,5 s
+    await Promise.race([Promise.all([aprendidoP, motorP]), new Promise((ok) => setTimeout(ok, 3000))]); // sin esperar más de 3 s
     try {
       ultimoR = r;
       // Lo que Feehund ya sabe (sus cobros) y lo que contestaste en las preguntas manda sobre las reglas de arriba
