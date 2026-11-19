@@ -1,13 +1,14 @@
 # Feehund
 
-> Feehund es una web española independiente que ayuda a ver qué se paga de más. Para particulares, lee el extracto del banco en el propio dispositivo (si no puede, con la inteligencia artificial de Claude, sin guardarlo), y muestra suscripciones, recibos que se repiten, cobros duplicados y subidas de precio. Para comercios y autónomos, compara lo que se paga por el datáfono con 30 tarifas de 25 bancos y empresas de pago.
+> Feehund es una web española independiente que ayuda a ver qué se paga de más. Para particulares, lee el extracto del banco en el propio dispositivo (si no puede, en un servidor, sin guardarlo), y muestra suscripciones, recibos que se repiten, cobros duplicados y subidas de precio. Para comercios y autónomos, compara lo que se paga por el datáfono con 30 tarifas de 25 bancos y empresas de pago.
 
-Feehund no es un banco ni un comparador que cobre por contratar. El extracto no sale del móvil o del ordenador de la persona.
+Feehund no es un banco ni un comparador que cobre por contratar. El extracto se lee en el móvil o el ordenador de la persona y no se guarda.
 
 ## Particulares
 
-- [Mi banco: qué se repite en tu cuenta](https://feehund.com/extracto/): lector del extracto del banco (PDF, Excel, CSV o foto) que lo lee en el navegador y, si hace falta, con la inteligencia artificial de Claude, sin guardar datos.
+- [Mi banco: qué se repite en tu cuenta](https://feehund.com/extracto/): lector del extracto del banco (PDF, Excel, CSV o foto) que lo lee en el navegador y, si hace falta, en un servidor, sin guardar datos.
 - [Dar de baja](https://feehund.com/baja/): cómo darse de baja de 186 empresas en España (telefonía, streaming, gimnasios, seguros, alarmas, apps y más), con los pasos, el plazo de aviso, la permanencia y la fecha de revisión. Cada ficha se comprueba con la web oficial de la empresa.
+- [Tu Tiqui](https://feehund.com/tiqui/): chat de pago que contesta preguntas sobre los propios extractos de la persona o sobre lo que le cobra el datáfono a su negocio.
 
 ## Comercios y autónomos
 
