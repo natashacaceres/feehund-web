@@ -100,7 +100,8 @@
     ["transfer", /^TRANSFERENCIA/],
   ];
   function comercio(c) {
-    const u = String(c || "").toUpperCase();
+    // sin el número de tarjeta tapado (5402XXXXXXXX1234): ni se enseña ni sale del móvil
+    const u = String(c || "").toUpperCase().replace(/\b\d{4,6}[X*•·]{4,10}\d{2,4}\b\s*/g, "");
     let m = u.match(/COMPRA EN (.*?), CON LA/); if (m) return m[1].replace(/^SQ \*|^SUMUP \*\*/, "").trim();
     m = u.match(/^RECIBO (.*?) Nº/); if (m) return m[1].replace(/^GC RE /, "").replace(/,? S\.?L\.?U?\.?|,? S\.A\.?/g, "").trim();
     m = u.match(/A FAVOR DE (.*)/); if (m) return m[1].trim();

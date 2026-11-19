@@ -181,3 +181,9 @@ body.dq-abierta{overflow:hidden}
 @media (max-width:480px){.pg-sig-cols{height:140px;gap:4px}.pg-sig-ej{gap:4px}.pg-sig-eq{font-size:21px}}
 @media (prefers-reduced-motion:reduce){.pg-vivo-t i,.pg-sub-b i{animation:none}}
 body:has(.pg-atras:not([hidden])) .pg-vivo{top:calc(var(--hdr) + 56px)}
+/* «Otra cosa»: escribirlo como quieras (19 nov 2026) */
+.dq-escribe{display:grid;gap:12px;margin-top:10px}
+.dq-txt{min-height:56px;padding:0 18px;border:2px solid var(--line);border-radius:18px;background:var(--bg);color:var(--ink);font:400 18px/1.2 var(--f-text)}
+.dq-txt:focus-visible{border-color:var(--brand);outline:none}
+.dq-listo{min-height:52px;border:0;border-radius:99px;background:var(--brand);color:#fff;font:800 17px/1 var(--f-text);cursor:pointer}
+.dq-listo:focus-visible{outline:3px solid var(--ink);outline-offset:2px}

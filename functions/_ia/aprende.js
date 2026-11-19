@@ -129,8 +129,8 @@ export async function diccionario(env) {
 // no se publica: queda para revisar.
 const VOTOS_DIA = 30; // por persona y día
 export async function votar(env, comercio, sector, quien) {
-  const kv = env.FEEHUND_KV, n = normal(comercio), hoy = new Date().toISOString().slice(0, 10);
-  if (!sePuedeBuscar(n) || !(sector === 'persona' || SECTORES_APRENDE[sector])) return { ok: false };
+  const kv = env.FEEHUND_KV, n = normal(comercio).replace(/\b\d{4,6}X{4,10}\d{2,4}\b\s*/g, '').trim(), hoy = new Date().toISOString().slice(0, 10);
+  if (/\d{4}/.test(n) || !sePuedeBuscar(n) || !(sector === 'persona' || SECTORES_APRENDE[sector])) return { ok: false };
   const kq = 'apr:vq:' + hoy + ':' + quien, hechos = +((await kv.get(kq)) || 0);
   if (hechos >= VOTOS_DIA) return { ok: false };
   await kv.put(kq, String(hechos + 1), { expirationTtl: 2 * 86400 });

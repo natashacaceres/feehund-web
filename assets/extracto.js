@@ -356,7 +356,7 @@
       suscr: (n, x, r) => n ? "Tienes " + n + (n === 1 ? " suscripción que te cuesta " : " suscripciones que te cuestan ") + x + " al año" + (r ? ", y " + r + (r === 1 ? " recibo más." : " recibos más.") : ".")
         : "Tienes " + r + (r === 1 ? " recibo que se repite" : " recibos que se repiten") + " y ninguna suscripción.",
       dq: { titulo: "1 minuto y queda perfecto", que: "¿Qué es esto?", de: (i, n) => i + " de " + n, veces: (x, n, p) => x + " · " + n + " veces" + (p ? ", " + p : ""), mes: "cada mes", dosMeses: "cada 2 meses", ops: { vivienda: "Alquiler o habitación", casa: "Luz, agua o internet", susc: "Suscripción", seg: "Seguro", otros: "Otra cosa" }, nose: "No lo sé", grupo: "Lo que me has dicho",
-        pagos: (x, n) => x + " en " + n + (n === 1 ? " pago" : " pagos"), ops2: { fuera: "Comer fuera", super: "Súper", otro: "Tienda", transporte: "Transporte", salud: "Salud", ocio: "Ocio" }, persona: "Es una persona" },
+        pagos: (x, n) => x + " en " + n + (n === 1 ? " pago" : " pagos"), ops2: { casa: "Casa o alquiler", fuera: "Comer fuera", super: "Súper", otro: "Tienda", transporte: "Transporte", salud: "Salud", ocio: "Ocio", escribir: "Otra cosa" }, escribe: "Escríbelo como quieras", listo: "Listo", persona: "Es una persona" },
       nada: "No hemos visto cobros que se repitan.", tipos: { casa: "Casa", susc: "Suscripciones", seg: "Seguros", banco: "Comisiones del banco", fijo: "Préstamos e impuestos", otros: "Otros pagos" }, fijos: "Hipoteca, préstamos e impuestos", otros: "Otros", recibos: "Recibos que varían", devolvieron: (x) => "Te devolvieron " + x, devoluciones: (n) => (n === 1 ? "1 devolución" : n + " devoluciones"),
       verMas: (n) => "Ver " + n + " más", verMenos: "Ver menos", verDetalle: "Ver todo el detalle", ocultarDetalle: "Ocultar el detalle",
       revisar: "Revisar", anadir: "Añadir", ver: "Ver", darme: "Darme de baja", darBaja: "Dar de baja",
@@ -374,7 +374,7 @@
       suscr: (n, x, r) => n ? "Tens " + n + (n === 1 ? " subscripció que et costa " : " subscripcions que et costen ") + x + " l'any" + (r ? ", i " + r + (r === 1 ? " rebut més." : " rebuts més.") : ".")
         : "Tens " + r + (r === 1 ? " rebut que es repeteix" : " rebuts que es repeteixen") + " i cap subscripció.",
       dq: { titulo: "1 minut i queda perfecte", que: "Què és això?", de: (i, n) => i + " de " + n, veces: (x, n, p) => x + " · " + n + " vegades" + (p ? ", " + p : ""), mes: "cada mes", dosMeses: "cada 2 mesos", ops: { vivienda: "Lloguer o habitació", casa: "Llum, aigua o internet", susc: "Subscripció", seg: "Assegurança", otros: "Una altra cosa" }, nose: "No ho sé", grupo: "El que m'has dit",
-        pagos: (x, n) => x + " en " + n + (n === 1 ? " pagament" : " pagaments"), ops2: { fuera: "Menjar fora", super: "Súper", otro: "Botiga", transporte: "Transport", salud: "Salut", ocio: "Oci" }, persona: "És una persona" },
+        pagos: (x, n) => x + " en " + n + (n === 1 ? " pagament" : " pagaments"), ops2: { casa: "Casa o lloguer", fuera: "Menjar fora", super: "Súper", otro: "Botiga", transporte: "Transport", salud: "Salut", ocio: "Oci", escribir: "Una altra cosa" }, escribe: "Escriu-ho com vulguis", listo: "Fet", persona: "És una persona" },
       nada: "No hem vist cobraments que es repeteixin.", tipos: { casa: "Casa", susc: "Subscripcions", seg: "Assegurances", banco: "Comissions del banc", fijo: "Préstecs i impostos", otros: "Altres pagaments" }, fijos: "Hipoteca, préstecs i impostos", otros: "Altres", recibos: "Rebuts que varien", devolvieron: (x) => "T'han retornat " + x, devoluciones: (n) => (n === 1 ? "1 devolució" : n + " devolucions"),
       verMas: (n) => "Veure'n " + n + " més", verMenos: "Veure'n menys", verDetalle: "Veure tot el detall", ocultarDetalle: "Amagar el detall",
       revisar: "Revisar", anadir: "Afegir", ver: "Veure", darme: "Donar-me de baixa", darBaja: "Donar de baixa",
@@ -392,7 +392,7 @@
       suscr: (n, x, r) => n ? "You have " + n + (n === 1 ? " subscription costing " : " subscriptions costing ") + x + " a year" + (r ? ", and " + r + (r === 1 ? " more bill." : " more bills.") : ".")
         : "You have " + r + (r === 1 ? " bill that repeats" : " bills that repeat") + " and no subscriptions.",
       dq: { titulo: "1 minute and it's perfect", que: "What is this?", de: (i, n) => i + " of " + n, veces: (x, n, p) => x + " · " + n + " times" + (p ? ", " + p : ""), mes: "every month", dosMeses: "every 2 months", ops: { vivienda: "Rent or room", casa: "Power, water or internet", susc: "Subscription", seg: "Insurance", otros: "Something else" }, nose: "I don't know", grupo: "What you told me",
-        pagos: (x, n) => x + " in " + n + (n === 1 ? " payment" : " payments"), ops2: { fuera: "Eating out", super: "Supermarket", otro: "Shop", transporte: "Transport", salud: "Health", ocio: "Leisure" }, persona: "It's a person" },
+        pagos: (x, n) => x + " in " + n + (n === 1 ? " payment" : " payments"), ops2: { casa: "Home or rent", fuera: "Eating out", super: "Supermarket", otro: "Shop", transporte: "Transport", salud: "Health", ocio: "Leisure", escribir: "Something else" }, escribe: "Write it any way you like", listo: "Done", persona: "It's a person" },
       nada: "We have not seen any repeating charges.", tipos: { casa: "Home", susc: "Subscriptions", seg: "Insurance", banco: "Bank fees", fijo: "Loans and taxes", otros: "Other payments" }, fijos: "Mortgage, loans and taxes", otros: "Other", recibos: "Bills that vary", devolvieron: (x) => "You got " + x + " back", devoluciones: (n) => (n === 1 ? "1 refund" : n + " refunds"),
       verMas: (n) => "See " + n + " more", verMenos: "See less", verDetalle: "See all the detail", ocultarDetalle: "Hide the detail",
       revisar: "Check", anadir: "Add", ver: "See", darme: "Cancel it for me", darBaja: "Cancel",
@@ -812,7 +812,7 @@
       if ((r.cobros || []).some((c) => c.id === id)) return;
       const imps = x.l.map((m) => -m.importe);
       const marca = x.auto ? x.k.toLowerCase().split(/[ .]/)[0] : null; // Netflix, Vodafone…: con su logo y su nombre de siempre
-      r.cobros = (r.cobros || []).concat([{ id, nombre: marca ? marca.charAt(0).toUpperCase() + marca.slice(1) : x.nombre, nombre_codigo: null, categoria: CAT_DE[x.op] || "otros", comercio_id: marca, tipo: "comercio", pasarela: null,
+      r.cobros = (r.cobros || []).concat([{ id, nombre: marca ? marca.charAt(0).toUpperCase() + marca.slice(1) : x.texto ? (x.nombre + " · " + x.texto).slice(0, 40) : x.nombre, nombre_codigo: null, categoria: CAT_DE[x.op] || "otros", comercio_id: marca, tipo: "comercio", pasarela: null,
         periodicidad: x.alAnio === 12 ? "mensual" : x.alAnio === 6 ? "bimestral" : x.alAnio === 4 ? "trimestral" : "anual", importe: Math.round(x.media * 100) / 100,
         importe_tipo: Math.max(...imps) - Math.min(...imps) < 0.01 ? "fijo" : "variable", coste_anual: Math.round(x.media * x.alAnio * 100) / 100, estado: "seguro", etiquetas: ["tuyo"],
         subida_mensual: null, subida: null, bajada_mensual: null, bajada: null, importe_min: Math.min(...imps), importe_max: Math.max(...imps), pagado: Math.round(imps.reduce((a, b) => a + b, 0) * 100) / 100,
@@ -860,12 +860,21 @@
       if (lista.length) fetch(ROOT + "api/ia/desconocidos", { method: "POST", keepalive: true, headers: { "content-type": "application/json" }, body: JSON.stringify({ nombres: lista }) }).catch(() => {});
     } catch (e) {}
   }
+  // Lo que la persona escribe en «Otra cosa»: si dice qué es, va a su sitio; si no, «otra cosa» (pago) o «tienda» (comercio)
+  function adivinar(t, comercio) {
+    const u = String(t || "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    const R = comercio
+      ? [["casa", /alquil|lloguer|rent|piso|pis\b|habitaci|room|hipotec|mortgage|comunidad|luz|llum|agua|aigua|gas\b|internet|fibra|movil|mobil|phone/], ["fuera", /bar\b|restaur|cafe|cafeter|comida|menjar|food|pizz|tapas|panad|forn\b|pasteler|helad|bakery/], ["super", /super|mercado|mercat|aliment|grocer/], ["transporte", /taxi|gasol|benzin|tren|bus\b|metro|parking|aparcam|peaje|uber|cabify/], ["salud", /farmac|medic|dent|clinic|fisio|salud|salut|health|optic/], ["ocio", /cine|teatr|viaje|viatge|travel|hotel|ocio|oci\b|libro|llibre|concierto|concert|gym|gimnas/]]
+      : [["vivienda", /alquil|lloguer|rent|piso|pis\b|habitaci|room|hipotec|mortgage/], ["casa", /luz|llum|agua|aigua|gas\b|internet|fibra|movil|mobil|phone|comunidad|electric/], ["susc", /suscrip|subscrip|netflix|spotify|gym|gimnas|app\b|plataforma/], ["seg", /seguro|asseguran|insuranc/]];
+    const e = R.find(([, re]) => re.test(u));
+    return e ? e[0] : comercio ? "otro" : "otros";
+  }
   async function preguntarDesconocidos(r, guardar) {
     const T = T3 && T3.dq; if (!T) return;
     if (window.FeehundComercio) await window.FeehundComercio.listo();
     const lista = desconocidos(r), mios = leerTuyos();
     lista.forEach((x) => { if (!mios[x.k] && conocida(x.k)) x.auto = conocida(x.k); });
-    const yaSe = lista.filter((x) => x.auto || (mios[x.k] && mios[x.k] !== "nose")).map((x) => Object.assign(x, { op: x.auto || mios[x.k] }));
+    const yaSe = lista.filter((x) => x.auto || (mios[x.k] && mios[x.k] !== "nose")).map((x) => Object.assign(x, { op: x.auto || mios[x.k], texto: mios["txt:" + x.k] || null }));
     // Como mucho 3 preguntas; 5 si lo que Feehund no sabe qué es pesa mucho (15 % o más de lo gastado, en 5 sitios o más).
     // Primero lo que se repite (puede ser el alquiler); después los comercios de más dinero.
     const raros = comerciosRaros(r), tope = raros.importante ? 5 : 3;
@@ -880,7 +889,7 @@
         if (i >= faltan.length) {
           const deRecibo = contestadas.filter((x) => !x.comercio), deComercio = contestadas.filter((x) => x.comercio);
           if (guardar) {
-            const m = leerTuyos(); deRecibo.forEach((x) => { m[x.k] = x.op; }); try { localStorage.setItem(TUYOS, JSON.stringify(m)); } catch (e) {}
+            const m = leerTuyos(); deRecibo.forEach((x) => { m[x.k] = x.op; if (x.texto) m["txt:" + x.k] = x.texto; }); try { localStorage.setItem(TUYOS, JSON.stringify(m)); } catch (e) {}
             deComercio.forEach((x) => {
               window.FeehundComercio.guardar(x.k, x.op);
               if (x.op !== "nose") fetch(ROOT + "api/ia/voto", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ comercio: x.k, sector: x.op }) }).catch(() => {});
@@ -899,7 +908,17 @@
         c.appendChild(el("p", "dq-nom", x.nombre));
         c.appendChild(el("p", "dq-imp", x.comercio ? T.pagos(eur(x.total), x.l.length) : T.veces(eur(x.media), x.l.length, x.alAnio === 12 ? T.mes : x.alAnio === 6 ? T.dosMeses : "")));
         const ops = el("div", "dq-ops"), OPS = x.comercio ? T.ops2 : T.ops;
-        Object.keys(OPS).forEach((k) => { const b = el("button", "dq-op", OPS[k]); b.type = "button"; b.addEventListener("click", () => { x.op = k; contestadas.push(x); paso(i + 1); }); ops.appendChild(b); });
+        // «Otra cosa» abre una casilla para escribirlo como quieras: lo escrito se queda en este móvil y, si dice qué es
+        // (alquiler, luz, bar, farmacia…), coloca el pago donde toca
+        const escribir = () => {
+          ops.textContent = ""; ops.className = "dq-escribe";
+          const inp = el("input", "dq-txt"); inp.type = "text"; inp.maxLength = 60; inp.placeholder = T.escribe; inp.setAttribute("aria-label", T.escribe);
+          const ok = el("button", "dq-listo", T.listo); ok.type = "button";
+          const fin = () => { const t = inp.value.trim(); x.texto = t; x.op = adivinar(t, Boolean(x.comercio)); contestadas.push(x); paso(i + 1); };
+          ok.addEventListener("click", fin); inp.addEventListener("keydown", (e) => { if (e.key === "Enter") fin(); });
+          ops.append(inp, ok); inp.focus();
+        };
+        Object.keys(OPS).forEach((k) => { const b = el("button", "dq-op", OPS[k]); b.type = "button"; b.addEventListener("click", () => { if (k === "escribir" || (!x.comercio && k === "otros")) return escribir(); x.op = k; contestadas.push(x); paso(i + 1); }); ops.appendChild(b); });
         c.appendChild(ops);
         const enlaces = el("div", "dq-links");
         if (x.comercio) { const pe = el("button", "dq-nose", T.persona); pe.type = "button"; pe.addEventListener("click", () => { x.op = "persona"; contestadas.push(x); paso(i + 1); }); enlaces.appendChild(pe); }
