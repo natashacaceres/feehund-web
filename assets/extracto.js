@@ -200,6 +200,7 @@
     await barraCarga.fin();
     // Lo grande que se repite y no reconocemos (el alquiler, por ejemplo): se pregunta antes del resumen, como mucho 3
     await preguntarDesconocidos(r, !(entrada && entrada.deEjemplo)).catch((e) => console.error("Feehund: preguntas", e));
+    if (!(entrada && entrada.deEjemplo)) enviarDesconocidos(r);
     cobros = (r.cobros || []).filter((c) => c.estado === "seguro" || c.estado === "posible");
     setTimeout(() => document.dispatchEvent(new CustomEvent("fh-resultado", { detail: r })), 0); // pestañas y gráficas (assets/extracto/graficas.js), después de pintar el resumen
     render(r, cobros); show("res");
@@ -822,6 +823,22 @@
     });
     const lista = Object.values(por).sort((a, b) => b.total - a.total), raro = lista.reduce((t, x) => t + x.total, 0);
     return { lista, importante: lista.length >= 5 && gastado > 0 && raro / gastado >= 0.15 };
+  }
+  // Lo que Feehund no reconoce, para investigarlo después (lo dice Privacidad): solo el nombre de la empresa. Nunca
+  // importes, fechas, números, transferencias, Bizum ni personas. Después del análisis y solo con conexión.
+  function enviarDesconocidos(r) {
+    try {
+      if (!navigator.onLine) return;
+      const NO = /BIZUM|TRANSF|TRASPASO|N[OÓ]MINA|PENSI[OÓ]N|CAJERO|REINTEGRO|DEVOLUCI|ABONO|INGRESO|IMPUESTO|HACIENDA|TRIBUT|HIPOTECA|PR[EÉ]STAMO|ALQUILER|A FAVOR DE/i;
+      const limpio = (k) => String(k || "").toUpperCase().split(/\s+/).filter((w) => w.length > 1 && !/\d|[*•]|^X{3,}$/.test(w)).slice(0, 4).join(" ");
+      const mios = leerTuyos(), nombres = new Set();
+      const mirar = (x) => { if (!mios[x.k] && !x.l.some((m) => NO.test(m.concepto || ""))) nombres.add(limpio(x.k)); };
+      comerciosRaros(r).lista.forEach(mirar); desconocidos(r).forEach(mirar);
+      // lo que se repite y el motor cuenta, pero sin saber qué empresa es (sin comercio del diccionario)
+      (r.cobros || []).forEach((c) => { if (!c.comercio_id && c.movimientos && c.movimientos.length && !String(c.id || "").startsWith("tuyo-")) mirar({ k: c.nombre || claveDe(c.movimientos[0].concepto), l: c.movimientos }); });
+      const lista = [...nombres].filter((n) => /[A-Z]{3}/.test(n)).slice(0, 60);
+      if (lista.length) fetch(ROOT + "api/ia/desconocidos", { method: "POST", keepalive: true, headers: { "content-type": "application/json" }, body: JSON.stringify({ nombres: lista }) }).catch(() => {});
+    } catch (e) {}
   }
   async function preguntarDesconocidos(r, guardar) {
     const T = T3 && T3.dq; if (!T) return;

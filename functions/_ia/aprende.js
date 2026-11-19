@@ -152,3 +152,21 @@ export async function votar(env, comercio, sector, quien) {
   }
   return { ok: true };
 }
+
+// ---------- Lo que Feehund no reconoce: nombres de empresas para investigar por tandas (Privacidad lo dice)
+// apr:u:<AAAA-MM-DD>:<huella de la persona> → { nombres: [...] }: una escritura por persona y día, como mucho 60 nombres.
+// Solo el nombre de la empresa: nunca importes, fechas, transferencias, Bizum ni personas (el móvil ya los quita y aquí
+// se vuelve a filtrar). Caduca a los 120 días. Para investigar: listar el prefijo apr:u: y contar personas por nombre.
+const DESCONOCIDOS_MAX = 60;
+export async function apuntarDesconocidos(env, nombres, quien) {
+  const kv = env.FEEHUND_KV, hoy = new Date().toISOString().slice(0, 10);
+  const nuevos = [...new Set((Array.isArray(nombres) ? nombres : []).slice(0, 80).map(normal))]
+    .filter((n) => sePuedeBuscar(n) && !/\d{3}|X{4}/.test(n) && n.split(' ').length <= 6);
+  if (!nuevos.length || !quien) return { ok: true };
+  const k = 'apr:u:' + hoy + ':' + quien;
+  const x = JSON.parse((await kv.get(k)) || 'null') || { nombres: [] };
+  const antes = x.nombres.length;
+  for (const n of nuevos) if (x.nombres.length < DESCONOCIDOS_MAX && x.nombres.indexOf(n) < 0) x.nombres.push(n);
+  if (x.nombres.length > antes) await kv.put(k, JSON.stringify(x), { expirationTtl: 120 * 86400 });
+  return { ok: true };
+}

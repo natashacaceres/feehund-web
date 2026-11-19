@@ -10,13 +10,14 @@
 //   POST /api/ia/estado      {codigo}                                    → lo que queda del pase y los días regalados por amigos
 //   POST /api/ia/invitar     {codigo}                                    → el enlace para invitar a un amigo (si paga, +30 días)
 //   POST /api/ia/voto        {comercio, sector}                          → «¿Qué es…?»: lo que dice la persona de un comercio
+//   POST /api/ia/desconocidos {nombres}                                 → nombres de empresas que Feehund no reconoce (_ia/aprende.js)
 //   GET  /api/ia/aprende                                                 → el diccionario compartido de comercios aprendidos (_ia/aprende.js)
 // Cerrada: Claude no tiene internet ni más herramientas que las de abajo (que_es busca solo el NOMBRE de un comercio, nunca importes), y TODA cifra en euros de su respuesta
 // tiene que haber salido de una herramienta. Si no, se le devuelve para que lo corrija; si sigue igual, no se enseña.
 
 import { PLANES, PRODUCTO_PREGUNTA, AMIGO, GUARDA_PASE, activarPregunta, codigoValido, refValido } from '../../_ia/pase.js';
 import { crearPagoPregunta, leerPago } from '../../_baja/servicios.js';
-import { queEs, diccionario, normal, votar } from '../../_ia/aprende.js';
+import { queEs, diccionario, normal, votar, apuntarDesconocidos } from '../../_ia/aprende.js';
 import { limpiarNegocio, HERRAMIENTAS_NEGOCIO, ejecutarNegocio, instruccionesNegocio, ESTILO_FEEHUND } from '../../_ia/negocio.js';
 
 const MODELO = 'claude-opus-5-5';
@@ -306,6 +307,10 @@ export async function onRequestPost({ request, env, params }) {
     return json({ texto: res.texto, pagos: res.pagos, uso: env.IA_PRUEBAS === '1' ? res.uso : undefined });
   }
 
+  if (ruta === 'desconocidos') {
+    const quien = (await huella('apr' + (request.headers.get('CF-Connecting-IP') || 'local'))).slice(0, 8);
+    return json(await apuntarDesconocidos(env, b.nombres, quien));
+  }
   if (ruta === 'voto') {
     const quien = (await huella('apr' + (request.headers.get('CF-Connecting-IP') || 'local'))).slice(0, 8);
     return json(await votar(env, String(b.comercio || '').slice(0, 80), String(b.sector || ''), quien));
