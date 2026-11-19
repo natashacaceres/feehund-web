@@ -19,7 +19,7 @@
       resumen: "Resumen", graficas: "Gráficas", pagas: "Pagas al año en cosas que se repiten",
       calc: (n) => "al año, calculado con " + (n === 1 ? "1 mes" : n + " meses"), mes: (x) => "Unos " + x + " al mes",
       quien: "Quién se lo lleva", alAno: "Al año", evitable: "Se puede evitar", cada100: "De cada 100 €", menos1: "<1 €",
-      tipos: { casa: "Casa", susc: "Suscripciones", seg: "Seguros", banco: "Comisiones del banco", otros: "Otros pagos" },
+      tipos: { casa: "Casa", susc: "Suscripciones", seg: "Seguros", banco: "Comisiones del banco", fijo: "Préstamos e impuestos", otros: "Otros pagos" },
       tipMes: (n, x) => n + ": unos " + x + " al mes", tip100: (k, l) => k + " de cada 100 €: " + l, menos: "Menos de 1",
       nada: "No hemos visto pagos que se repitan.", waffle: "Cien cuadritos: cada uno es 1 € de cada 100 que se repiten",
       compartirMi: "Compartir mi tarjeta", compartir: "Compartir", guardar: "Guardar imagen",
@@ -35,7 +35,7 @@
       resumen: "Resum", graficas: "Gràfics", pagas: "Pagues l'any en coses que es repeteixen",
       calc: (n) => "a l'any, calculat amb " + (n === 1 ? "1 mes" : n + " mesos"), mes: (x) => "Uns " + x + " al mes",
       quien: "Qui se l'emporta", alAno: "L'any", evitable: "Es pot evitar", cada100: "De cada 100 €", menos1: "<1 €",
-      tipos: { casa: "Casa", susc: "Subscripcions", seg: "Assegurances", banco: "Comissions del banc", otros: "Altres pagaments" },
+      tipos: { casa: "Casa", susc: "Subscripcions", seg: "Assegurances", banco: "Comissions del banc", fijo: "Préstecs i impostos", otros: "Altres pagaments" },
       tipMes: (n, x) => n + ": uns " + x + " al mes", tip100: (k, l) => k + " de cada 100 €: " + l, menos: "Menys d'1",
       nada: "No hem vist pagaments que es repeteixin.", waffle: "Cent quadradets: cadascun és 1 € de cada 100 que es repeteixen",
       compartirMi: "Compartir la meva targeta", compartir: "Compartir", guardar: "Desar la imatge",
@@ -51,7 +51,7 @@
       resumen: "Summary", graficas: "Charts", pagas: "You pay each year in things that repeat",
       calc: (n) => "a year, worked out from " + (n === 1 ? "1 month" : n + " months"), mes: (x) => "About " + x + " a month",
       quien: "Who gets it", alAno: "A year", evitable: "Avoidable", cada100: "Out of every 100 €", menos1: "<1 €",
-      tipos: { casa: "Home", susc: "Subscriptions", seg: "Insurance", banco: "Bank fees", otros: "Other payments" },
+      tipos: { casa: "Home", susc: "Subscriptions", seg: "Insurance", banco: "Bank fees", fijo: "Loans and taxes", otros: "Other payments" },
       tipMes: (n, x) => n + ": about " + x + " a month", tip100: (k, l) => k + " of every 100 €: " + l, menos: "Less than 1",
       nada: "We didn't see any payments that repeat.", waffle: "A hundred squares: each one is 1 € of every 100 that repeat",
       compartirMi: "Share my card", compartir: "Share", guardar: "Save image",
@@ -96,10 +96,11 @@
     { k: "casa", cats: ["telecos", "energia", "agua", "alarmas", "hogar", "gastos_fijos", "vivienda"] },
     { k: "susc", cats: SUSC },
     { k: "seg", cats: ["seguros"] },
-    { k: "banco", cats: ["comisiones", "tarjetas"] },
+    { k: "fijo", cats: ["tarjetas", "impuestos", "autonomos"] }, // préstamos, créditos e impuestos (19 nov 2026)
+    { k: "banco", cats: ["comisiones"] },
   ];
   const tipoDe = (cat) => (TIPOS.find((t) => t.cats.indexOf(cat) >= 0) || { k: "otros" }).k;
-  const COLOR_TIPO = { casa: "#0E5E6F", susc: "#7FC1CC", seg: "#3E8F9D", otros: "#D9C7A5", banco: "#FFB238" };
+  const COLOR_TIPO = { casa: "#0E5E6F", susc: "#7FC1CC", seg: "#3E8F9D", otros: "#D9C7A5", banco: "#FFB238", fijo: "#A8957A" };
 
   function calcRepe(r) {
     const cobros = r.cobros || [], porId = {}; cobros.forEach((c) => { porId[c.id] = c; });
