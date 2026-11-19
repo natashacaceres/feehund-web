@@ -208,11 +208,14 @@ export async function clasificarDesconocidos(env, nombres, quien) {
   const lista = [...new Set((Array.isArray(nombres) ? nombres : []).slice(0, 80).map(normal))]
     .filter((n) => sePuedeBuscar(n) && !/\d{3}|X{4}/.test(n) && n.split(' ').length <= 6).slice(0, 60);
   const sabidos = await Promise.all(lista.map(async (n) => [n, JSON.parse((await kv.get(await clave(n))) || 'null')]));
-  const nuevos = [];
+  const nuevos = [], sinBuscar = [];
   for (const [n, x] of sabidos) {
     if (x && !x.persona && x.sector && x.confianza !== 'baja') sectores[n] = x.sector;
     else if (!x) nuevos.push(n);
+    else if (!x.persona) sinBuscar.push(n); // buscado sin éxito: el mapa aún puede saberlo, pero no se vuelve a buscar
   }
+  const delM0 = await Promise.all(sinBuscar.map((n) => delMapa(env, n).catch(() => null)));
+  sinBuscar.forEach((n, i) => { if (delM0[i]) sectores[n] = delM0[i]; });
   // primero el mapa de locales (gratis); solo lo que no está se busca en internet
   const delM = await Promise.all(nuevos.map((n) => delMapa(env, n).catch(() => null)));
   const quedan = [];
