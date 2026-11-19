@@ -1,7 +1,7 @@
 // Tarjeta para compartir de «Mi banco»: 1080 × 1920 (historia), dibujada en este dispositivo cuando la persona pulsa
 // compartir. Una sola plantilla con huecos: los textos vienen de /data/personalidades.json. No se guarda en ningún sitio
 // ni se envía nada: las fuentes, la imagen y los textos son archivos de la propia web (sin conexión, del service worker).
-// Solo lleva la cabecera, «feehund», el nombre, la frase, el número con su dato y Tiqui. Nada más.
+// Solo lleva la cabecera, «feehund», el nombre, la frase, el número con su dato y Feehund. Nada más.
 
 import { textosDe, rellenar, partirEquilibrado, palabrasDe, datoPara } from './nucleo/tarjeta.js';
 
@@ -18,7 +18,7 @@ export const M = {
   frase: { hueco: 36, tam: 46, interlineado: 1.2 },
   fila: { top: 872, numAncho: 440, numMax: 216, numInterlineado: 0.9, numEspacio: -0.02, hueco: 28, datoTam: 44, datoInterlineado: 1.15, datoAncho: 420, datoSobre: 24, cifras: 0.95 },
   circulo: { x: 810, y: 1680, r: 620 },
-  tiqui: { ancho: 940, derecha: 1170, abajo: 1926 },
+  perro: { ancho: 940, derecha: 1170, abajo: 1926 },
   zona: { x0: 80, x1: 1000, y0: 270, y1: 1570 },
   minimo: 27, // ningún texto más pequeño
 };
@@ -34,7 +34,7 @@ const FUENTES = [
 
 // ---------- Archivos de la web (se piden una vez y se quedan en memoria mientras la página está abierta) ----------
 
-let fuentes = null, datos = null, tiqui = null;
+let fuentes = null, datos = null, perro = null;
 
 /** Registra las tres fuentes autoalojadas y espera a que estén cargadas (document.fonts.load) antes de dibujar. */
 function cargarFuentes() {
@@ -61,9 +61,9 @@ function cargarDatos() {
   return datos;
 }
 
-function cargarTiqui() {
-  tiqui ??= (async () => {
-    const url = new URL('../img/tiqui-reojo.png', import.meta.url).href;
+function cargarPerro() {
+  perro ??= (async () => {
+    const url = new URL('../img/feehund-perro-reojo.png', import.meta.url).href;
     if (typeof Image !== 'undefined') {
       const img = new Image();
       img.src = url;
@@ -74,8 +74,8 @@ function cargarTiqui() {
     if (!r.ok) throw new Error('No se ha podido leer la imagen');
     return createImageBitmap(await r.blob());
   })();
-  tiqui.catch(() => { tiqui = null; });
-  return tiqui;
+  perro.catch(() => { perro = null; });
+  return perro;
 }
 
 // ---------- Texto ----------
@@ -163,13 +163,13 @@ function escribirMixto(c, linea, x, y, tam) {
  * @param {HTMLCanvasElement|OffscreenCanvas} lienzo
  * @param {Object} t  textos de la personalidad (nucleo/tarjeta.js textosDe)
  * @param {Object} valores  {n, m}
- * @param {{idioma?, tema?, capas?: string[]}} o  capas: para las pruebas (fondo, circulo, tiqui, texto)
+ * @param {{idioma?, tema?, capas?: string[]}} o  capas: para las pruebas (fondo, circulo, perro, texto)
  * @returns {Array<{que, x0, y0, x1, y1}>} dónde ha ido cada texto
  */
 export function dibujar(lienzo, t, valores, imagen, o = {}) {
   const idioma = o.idioma || 'es';
   const color = TEMAS[o.tema] || TEMAS.azul;
-  const capas = new Set(o.capas || ['fondo', 'circulo', 'tiqui', 'texto']);
+  const capas = new Set(o.capas || ['fondo', 'circulo', 'perro', 'texto']);
   const c = lienzo.getContext('2d');
   const cajas = [];
   c.textAlign = 'left';
@@ -184,12 +184,12 @@ export function dibujar(lienzo, t, valores, imagen, o = {}) {
     c.arc(M.circulo.x, M.circulo.y, M.circulo.r, 0, Math.PI * 2);
     c.fill();
   }
-  // 3. Tiqui, sin deformar: 940 de ancho, borde derecho en 1170 y borde inferior en 1926
-  if (capas.has('tiqui') && imagen) {
-    const w = M.tiqui.ancho, h = (w * imagen.height) / imagen.width;
+  // 3. Feehund, sin deformar: 940 de ancho, borde derecho en 1170 y borde inferior en 1926
+  if (capas.has('perro') && imagen) {
+    const w = M.perro.ancho, h = (w * imagen.height) / imagen.width;
     c.imageSmoothingEnabled = true;
     c.imageSmoothingQuality = 'high';
-    c.drawImage(imagen, M.tiqui.derecha - w, M.tiqui.abajo - h, w, h);
+    c.drawImage(imagen, M.perro.derecha - w, M.perro.abajo - h, w, h);
   }
   const texto = capas.has('texto');
   c.fillStyle = color.texto;
@@ -290,7 +290,7 @@ function aPng(lienzo) {
 
 /** Textos, fuentes e imagen listos para dibujar. opciones.datos: otro personalidades.json (pruebas). */
 export async function preparar(personalidadId, opciones = {}) {
-  const [d, imagen] = await Promise.all([opciones.datos ? opciones.datos : cargarDatos(), cargarTiqui().catch(() => null), cargarFuentes()]);
+  const [d, imagen] = await Promise.all([opciones.datos ? opciones.datos : cargarDatos(), cargarPerro().catch(() => null), cargarFuentes()]);
   const t = textosDe(d, personalidadId, opciones.idioma || 'es');
   if (!t) throw new Error(`No hay textos para la personalidad «${personalidadId}»`);
   return { t, imagen };

@@ -1,4 +1,4 @@
-// «Pregúntale a Tiqui» (Mi banco).
+// «Pregunta a Feehund» (Mi banco).
 // Rutas:
 //   POST /api/ia/pregunta-gratis {pregunta, idioma, movimientos}          → la primera pregunta (1 por persona y día)
 //   POST /api/ia/pagar       {plan, codigo, caja, idioma, vuelta}          → guarda la caja cifrada y devuelve el pago de Stripe
@@ -14,10 +14,10 @@
 // Cerrada: Claude no tiene internet ni más herramientas que las de abajo (que_es busca solo el NOMBRE de un comercio, nunca importes), y TODA cifra en euros de su respuesta
 // tiene que haber salido de una herramienta. Si no, se le devuelve para que lo corrija; si sigue igual, no se enseña.
 
-import { PLANES, PRODUCTO_TIQUI, AMIGO, GUARDA_PASE, activarTiqui, codigoValido, refValido } from '../../_ia/pase.js';
-import { crearPagoTiqui, leerPago } from '../../_baja/servicios.js';
+import { PLANES, PRODUCTO_PREGUNTA, AMIGO, GUARDA_PASE, activarPregunta, codigoValido, refValido } from '../../_ia/pase.js';
+import { crearPagoPregunta, leerPago } from '../../_baja/servicios.js';
 import { queEs, diccionario, normal, votar } from '../../_ia/aprende.js';
-import { limpiarNegocio, HERRAMIENTAS_NEGOCIO, ejecutarNegocio, instruccionesNegocio, ESTILO_TIQUI } from '../../_ia/negocio.js';
+import { limpiarNegocio, HERRAMIENTAS_NEGOCIO, ejecutarNegocio, instruccionesNegocio, ESTILO_FEEHUND } from '../../_ia/negocio.js';
 
 const MODELO = 'claude-opus-5-5';
 // La primera pregunta es gratis: 1 por persona (IP) y día, y un tope global al día.
@@ -137,7 +137,7 @@ function ejecutar(nombre, a, movs, permitidas) {
   return { error: 'herramienta desconocida' };
 }
 
-// Red de seguridad: Tiqui no escribe como una máquina (sin negritas, almohadillas ni viñetas)
+// Red de seguridad: Feehund no escribe como una máquina (sin negritas, almohadillas ni viñetas)
 const sinMarcas = (t) => String(t || '').replace(/\*\*|__|`/g, '').replace(/^\s*(#+|[-*•]|\d+[.)])\s+/gm, '').replace(/\s*\n+\s*/g, ' ').replace(/\s—\s/g, ', ').replace(/\s*[\p{Extended_Pictographic}\u{FE0F}]+/gu, '').trim();
 
 // Cifras en euros que aparecen en el texto, en céntimos
@@ -154,7 +154,7 @@ function instrucciones(movs, hoy) {
   const cat = {};
   movs.forEach((m) => { const k = m.k + '|' + (m.s || 'sin_saber') + '|' + (m.i < 0 ? 'gasto' : 'ingreso'); cat[k] = (cat[k] || 0) + 1; });
   const catalogo = Object.entries(cat).sort((a, b) => b[1] - a[1]).map(([k, n]) => k + '|' + n).join('\n');
-  return `Eres Tiqui, el perro de Feehund. Hablas con una persona sobre el extracto bancario que ha subido ella misma. Solo respondes sobre ese extracto.
+  return `Eres Feehund, el perro salchicha de feehund.com. Hablas con una persona sobre el extracto bancario que ha subido ella misma. Solo respondes sobre ese extracto.
 
 Reglas que no se rompen nunca:
 1. Toda cifra en euros que digas tiene que venir tal cual de una herramienta. No sumes, restes ni redondees de cabeza: para las cuentas usa la herramienta calcular. Si no tienes la cifra de una herramienta, no la digas.
@@ -167,7 +167,7 @@ Reglas que no se rompen nunca:
 8. Nombra los comercios como lo haría una persona (Mercadona, no «MERCADONA CAN BATLLO»).
 9. Si para responder importan pagos en «sin_saber», usa que_es con esos comercios (como mucho 3, los de más dinero) antes de responder. Lo que te diga con seguro false dilo con un «parece». Si sigue sin saberse, dilo.
 
-${ESTILO_TIQUI}
+${ESTILO_FEEHUND}
 
 Tu respuesta final es un JSON con «texto» (lo que lee la persona) y «pagos» (los id de los movimientos en los que se basa la respuesta, para que pueda comprobarlos; vacío si no aplica).
 
@@ -195,7 +195,7 @@ async function aprender(env, a, movs, quien) {
 
 async function preguntar(env, movs, pregunta, historial, neg, quien) {
   const permitidas = new Set(), hoy = new Date().toISOString().slice(0, 10);
-  // neg: los datos del datáfono (Tiqui para negocios); si no, el extracto del banco
+  // neg: los datos del datáfono (Feehund para negocios); si no, el extracto del banco
   const sistema = [{ type: 'text', text: neg ? instruccionesNegocio(neg, hoy) : instrucciones(movs, hoy), cache_control: { type: 'ephemeral' } }];
   const herramientas = neg ? HERRAMIENTAS_NEGOCIO : HERRAMIENTAS;
   const mensajes = [];
@@ -269,20 +269,20 @@ export async function onRequestPost({ request, env, params }) {
     const DURA = { basico: ['7 días', '7 dies', '7 days'], completo: ['3 meses', '3 mesos', '3 months'], negocio_mes: ['Negocios · 1 mes', 'Negocis · 1 mes', 'Business · 1 month'], negocio_3m: ['Negocios · 3 meses', 'Negocis · 3 mesos', 'Business · 3 months'] }[plan];
     const dura = DURA[{ es: 0, ca: 1, en: 2 }[idioma]];
     const textos = {
-      descripcion: { es: 'Pregúntale a Tiqui · ' + dura + ' · Tu código ', ca: 'Pregunta-li a Tiqui · ' + dura + ' · El teu codi ', en: 'Ask Tiqui · ' + dura + ' · Your code ' }[idioma] + String(b.codigo).toUpperCase(),
+      descripcion: { es: 'Pregunta a Feehund · ' + dura + ' · Tu código ', ca: 'Pregunta a Feehund · ' + dura + ' · El teu codi ', en: 'Ask Feehund · ' + dura + ' · Your code ' }[idioma] + String(b.codigo).toUpperCase(),
       renuncia: { es: 'Empieza en cuanto pagas. Al pagar aceptas que empiece ya y renuncias al desistimiento: no hay devoluciones.', ca: 'Comença tan bon punt pagues. En pagar acceptes que comenci ja i renuncies al desistiment: no hi ha devolucions.', en: 'It starts as soon as you pay. By paying you agree it starts now and waive the right to cancel: no refunds.' }[idioma],
     };
     try {
-      const s2 = await crearPagoTiqui(env, { ref: h, plan, importe: P.precio, producto: env.STRIPE_PRODUCT_TIQUI || PRODUCTO_TIQUI, idioma, textos, amigo, factura: negocio,
-        vuelta: base + vuelta + '?tiqui=ok&s={CHECKOUT_SESSION_ID}', cancelar: base + vuelta + '?tiqui=no' });
+      const s2 = await crearPagoPregunta(env, { ref: h, plan, importe: P.precio, producto: env.STRIPE_PRODUCT_PREGUNTA || PRODUCTO_PREGUNTA, idioma, textos, amigo, factura: negocio,
+        vuelta: base + vuelta + '?pregunta=ok&s={CHECKOUT_SESSION_ID}', cancelar: base + vuelta + '?pregunta=no' });
       return json({ url: s2.url });
-    } catch (e) { console.log('pago tiqui', String(e.message)); return json({ error: 'pago', detalle: env.IA_PRUEBAS === '1' ? String(e.message) : undefined }, 502); }
+    } catch (e) { console.log('pago pregunta', String(e.message)); return json({ error: 'pago', detalle: env.IA_PRUEBAS === '1' ? String(e.message) : undefined }, 502); }
   }
   if (ruta === 'canjear') {
     if (!codigoValido(b.codigo) || !/^cs_[A-Za-z0-9_]+$/.test(String(b.sesion || ''))) return json({ error: 'datos' }, 400);
     const h = await huella(b.codigo);
     let sesion; try { sesion = await leerPago(env, b.sesion); } catch (e) { return json({ error: 'stripe' }, 502); }
-    const pase = await activarTiqui(env, h, sesion, new URL(request.url).origin);
+    const pase = await activarPregunta(env, h, sesion, new URL(request.url).origin);
     if (!pase) return json({ error: 'sin_pagar' }, 402);
     return json({ plan: pase.plan, hasta: pase.hasta });
   }

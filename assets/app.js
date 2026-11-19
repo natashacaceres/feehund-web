@@ -220,7 +220,7 @@ function iniciarUI(){
       payLine: (x, p) => "Ahorras al menos " + x + " al año · Recomendación por " + p,
       mes: x => "Tu mes: " + x + " con tarjeta", cifraSi: "Pagas de más cada mes, como mínimo", cifraEff: "Pagas de cada 100 € que cobras con tarjeta",
       claveSi: x => "Cambiando de tarifa ahorras al menos " + x + " al año.",
-      acPagoT: "A quién cambiarte", acPagoL: "Pregúntaselo a Tiqui", acPagoB: () => "Preguntar", acPagoQ: "¿A quién me cambio?",
+      acPagoT: "A quién cambiarte", acPagoL: "Pregúntaselo a Feehund", acPagoB: () => "Preguntar", acPagoQ: "¿A quién me cambio?",
       acBajaT: n => "Te damos de baja de " + n, acBajaL: "Enviamos la carta por ti", acBajaB: "Empezar", tuBanco: "tu banco",
       acFalta: { pagado: ["Mira lo que te cobró el banco", "Está en tu resumen o en tu cuenta"], perm: ["Mira si tienes permanencia", "Está en tu contrato del datáfono"],
         iva: ["Pregunta si recuperas el IVA", "Te lo dice tu gestoría"], caja: ["Mira si la caja está conectada", "Pregunta a quien te la vendió"] },
@@ -254,7 +254,7 @@ function iniciarUI(){
       payLine: (x, p) => "Estalvies almenys " + x + " l'any · Recomanació per " + p,
       mes: x => "El teu mes: " + x + " amb targeta", cifraSi: "Pagues de més cada mes, com a mínim", cifraEff: "Pagues de cada 100 € que cobres amb targeta",
       claveSi: x => "Canviant de tarifa estalvies almenys " + x + " l'any.",
-      acPagoT: "A qui canviar-te", acPagoL: "Pregunta-ho a Tiqui", acPagoB: () => "Preguntar", acPagoQ: "A qui em canvio?",
+      acPagoT: "A qui canviar-te", acPagoL: "Pregunta-ho a Feehund", acPagoB: () => "Preguntar", acPagoQ: "A qui em canvio?",
       acBajaT: n => "Et donem de baixa de " + n, acBajaL: "Enviem la carta per tu", acBajaB: "Començar", tuBanco: "el teu banc",
       acFalta: { pagado: ["Busca el que et cobra el banc", "És al resum o al compte"], perm: ["Mira si tens permanència", "És al contracte del datàfon"],
         iva: ["Pregunta si recuperes l'IVA", "T'ho diu la gestoria"], caja: ["Mira si la caixa està connectada", "Pregunta a qui te la va vendre"] },
@@ -288,7 +288,7 @@ function iniciarUI(){
       payLine: (x, p) => "You save at least " + x + " a year · Recommendation for " + p,
       mes: x => "Your month: " + x + " by card", cifraSi: "You overpay each month, at least", cifraEff: "You pay out of every €100 you take by card",
       claveSi: x => "Switching rates saves you at least " + x + " a year.",
-      acPagoT: "Who to switch to", acPagoL: "Ask Tiqui", acPagoB: () => "Ask", acPagoQ: "Who should I switch to?",
+      acPagoT: "Who to switch to", acPagoL: "Ask Feehund", acPagoB: () => "Ask", acPagoQ: "Who should I switch to?",
       acBajaT: n => "We cancel " + n + " for you", acBajaL: "We send the letter for you", acBajaB: "Start", tuBanco: "your bank",
       acFalta: { pagado: ["Find what your bank charged you", "It's on your statement or account"], perm: ["Check your minimum term", "It's in your card machine contract"],
         iva: ["Ask if you reclaim VAT", "Your accountant will know"], caja: ["Check if your till is linked", "Ask whoever sold it to you"] },
@@ -473,12 +473,12 @@ function iniciarUI(){
     const S = seguro(I); if (!S) return;
     last = { kind: "precisa", I, R: S.R, S };
     tok++; hideOut();
-    fill(); $("res").hidden = false; $("pay").hidden = true; // el informe de 4 € ya no se ofrece: lo sustituye Tiqui
+    fill(); $("res").hidden = false; $("pay").hidden = true; // el informe de 4 € ya no se ofrece: lo sustituye Feehund
     $("rVerdict").focus({ preventScroll: true });
     requestAnimationFrame(() => goTo($("res"), true));
   }
   const lista = (xs, t) => xs.length < 2 ? xs.join("") : xs.slice(0, -1).join(", ") + t.y + xs[xs.length - 1];
-  // Resultado con el mismo orden que «Mi banco»: el mes leído, la frase de Tiqui, la cifra, lo importante,
+  // Resultado con el mismo orden que «Mi banco»: el mes leído, la frase de Feehund, la cifra, lo importante,
   // qué hacer ahora (3 como mucho), las barras de lo que pagas por cada 100 €, una buena noticia, compartir y el detalle.
   const LOGOS = { "BBVA": "bancos/bbva", "CaixaBank": "bancos/caixabank", "Santander-Getnet": "bancos/santander", "Sabadell": "bancos/sabadell",
     "Bankinter": "bancos/bankinter", "Unicaja": "bancos/unicaja", "Cajamar": "bancos/cajamar", "Abanca": "bancos/abanca", "Ibercaja": "bancos/ibercaja",
@@ -489,7 +489,7 @@ function iniciarUI(){
     const { I, R, S } = last, t = T(), b = R && R.best, yes = S.estado === "si", no = S.estado === "no";
     const wait = yes && (I.MREM || 0) > 0 && b.neto24_espera > b.neto24;
     const sabe = I.curCost > 0 && I.V > 0, hoy = sabe ? I.curCost / I.V * 100 : null, ref = REFERENCIA;
-    // 1 y 2: el mes y la frase de Tiqui
+    // 1 y 2: el mes y la frase de Feehund
     $("rMes").textContent = t.mes(eur(I.V));
     $("rVerdict").textContent = yes ? t.vYes : no ? t.vNo : S.estado === "falta" ? t.vFalta(S.faltan.length) : t.vDuda;
     // 3: la cifra (lo que pagas de más al mes, como mínimo; si no compensa, lo que pagas por cada 100 €)
@@ -503,8 +503,8 @@ function iniciarUI(){
     // 5: qué hacer ahora
     const acc = [];
     if (yes) {
-      // «A quién cambiarte» lo contesta Tiqui (assets/extracto/tiqui.js), con sinceridad; ya no hay informe de 4 €
-      acc.push({ t: t.acPagoT, l: t.acPagoL, b: t.acPagoB(), fn: () => document.dispatchEvent(new CustomEvent("fh-tiqui-preguntar", { detail: t.acPagoQ })) });
+      // «A quién cambiarte» lo contesta Feehund (assets/extracto/pregunta.js), con sinceridad; ya no hay informe de 4 €
+      acc.push({ t: t.acPagoT, l: t.acPagoL, b: t.acPagoB(), fn: () => document.dispatchEvent(new CustomEvent("fh-preguntar", { detail: t.acPagoQ })) });
       const plan = PLANS.find(p => p.id === I.cur), prov = plan ? plan.prov : "";
       const nombre = prov === "Santander-Getnet" ? "Santander" : prov;
       acc.push({ logo: LOGOS[prov] ? "/assets/logos/" + LOGOS[prov] + ".png" : null, t: t.acBajaT(nombre || t.tuBanco), l: t.acBajaL, b: t.acBajaB, fn: () => { const a = $("rBajaA"); if (a) location.href = a.href; } });
@@ -1017,7 +1017,7 @@ const PAISES = [{codigo:"ES", nombre:"España", ruta:"/datafono/", idiomas:"Espa
   let t0; addEventListener("resize", () => { clearTimeout(t0); t0 = setTimeout(ajustar, 120); });
 })();
 
-// Menú del móvil: a la derecha, las tres rayas; al pulsarlas se abre Tu Tiqui, Dar de baja y el idioma.
+// Menú del móvil: a la derecha, las tres rayas; al pulsarlas se abre Pregunta a Feehund, Dar de baja y el idioma.
 (function menuMovil(){
   const hdr = document.querySelector(".hdr"), r = hdr && hdr.querySelector(".hdr-r");
   if (!r || hdr.querySelector(".hdr-menu")) return;

@@ -18,7 +18,7 @@
 //   POST gestion/devolver       (equipo) no se pudo entregar: devolución
 //   POST tarea                  tarea diaria (la llama el Worker con TAREA_SECRET)
 
-import { activarTiqui } from '../../_ia/pase.js';
+import { activarPregunta, SERVICIOS } from '../../_ia/pase.js';
 import { EMPRESAS, PRECIO, empresaDe, modo, base, Fallo, crearBaja, reenviarCodigo, firmar, pagar, compraPagada, estado, pdfCarta, pdfCertificado, recobro, cancelar, devolverRestantes, gestion, gestionArchivo, gestionHecho, gestionDevolver, tarea } from '../../_baja/flujo.js';
 import { eventoStripe } from '../../_baja/servicios.js';
 import { igual } from '../../_baja/cripto.js';
@@ -52,7 +52,7 @@ export async function onRequest({ request, env, params }) {
       if (['checkout.session.completed', 'checkout.session.async_payment_succeeded'].includes(ev.type)) {
         const s = ev.data.object;
         if (s.metadata?.servicio === 'te-damos-de-baja') await compraPagada(env, base(env, request.url), s.client_reference_id, s);
-        if (s.metadata?.servicio === 'tiqui') await activarTiqui(env, s.client_reference_id, s, new URL(request.url).origin);
+        if (SERVICIOS.includes(s.metadata?.servicio)) await activarPregunta(env, s.client_reference_id, s, new URL(request.url).origin);
       }
       return json({ ok: true });
     }

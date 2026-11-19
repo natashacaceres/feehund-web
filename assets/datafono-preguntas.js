@@ -1,5 +1,5 @@
 // Mi datáfono: el camino corto. Después de las cifras (leídas del resumen o escritas a mano) salen solo 3 preguntas en la
-// ventana de Tiqui, como en Mi banco: con quién cobras, qué negocio tienes y si te queda permanencia. Lo demás se da por
+// ventana de Feehund, como en Mi banco: con quién cobras, qué negocio tienes y si te queda permanencia. Lo demás se da por
 // hecho (1 datáfono, vendes igual todo el año, autónomo, recuperas el IVA, el importe se teclea) y la calculadora de
 // siempre (assets/app.js) hace las cuentas: aquí solo se pulsan sus botones, como lo haría la persona. Si algo falla, se
 // enseña la calculadora entera, como antes.
@@ -34,7 +34,7 @@
     if (caja) caja.remove();
     caja = el("div", "dp"); caja.setAttribute("role", "dialog"); caja.setAttribute("aria-modal", "true");
     const c = el("div", "dp-c");
-    const t = el("div", "dp-t"); const cara = el("img"); cara.src = ROOT + "assets/img/tiqui-olfatea.webp"; cara.alt = ""; cara.width = 44; cara.height = 44;
+    const t = el("div", "dp-t"); const cara = el("img"); cara.src = ROOT + "assets/img/feehund-perro-olfatea.webp"; cara.alt = ""; cara.width = 44; cara.height = 44;
     t.append(cara, el("p", null, TX.titulo));
     c.append(t, el("div", "dp-bar"), el("p", "dp-n"), el("div", "dp-cuerpo"));
     c.querySelector(".dp-bar").appendChild(el("i"));

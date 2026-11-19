@@ -1,4 +1,4 @@
-// Pase de «Pregúntale a Tiqui»: lo usan /api/ia (al volver de pagar) y /api/baja/stripe (el aviso de Stripe, por si la
+// Pase de «Pregunta a Feehund»: lo usan /api/ia (al volver de pagar) y /api/baja/stripe (el aviso de Stripe, por si la
 // persona cierra la pestaña antes de volver). Lo que llegue primero lo activa; lo segundo no hace nada.
 // La clave del pase es la huella del código (SHA-256): Feehund no guarda el código, solo el tiempo justo para mandarlo por correo.
 
@@ -8,11 +8,11 @@ import { enviarCorreo } from '../_baja/servicios.js';
 export const PLANES = {
   basico: { dias: 7, porDia: 20, total: 40, precio: 99 },       // 0,99 €
   completo: { dias: 90, porDia: 25, total: 120, precio: 299 },  // 2,99 €
-  // Tiqui para negocios (Mi datáfono), con factura
+  // Feehund para negocios (Mi datáfono), con factura
   negocio_mes: { dias: 30, porDia: 25, total: 80, precio: 499 },  // 4,99 €
   negocio_3m: { dias: 90, porDia: 25, total: 200, precio: 999 },  // 9,99 €
 };
-export const PRODUCTO_TIQUI = 'prod_VeGsASLYslzV0Q'; // Stripe (en vivo): «Pregúntale a Tiqui»
+export const PRODUCTO_PREGUNTA = 'prod_VeGsASLYslzV0Q'; // Stripe (en vivo): «Pregunta a Feehund»
 // Invita a un amigo: si paga, quien invitó tiene 30 días más (y 40 preguntas más), hasta 3 amigos.
 export const AMIGO = { dias: 30, preguntas: 40, max: 3 };
 // El pase (sin datos tuyos: solo plan y fechas) se guarda un año más tras caducar, para que un amigo pueda revivirlo.
@@ -60,15 +60,18 @@ function correoTexto(idioma, codigo, hasta, origen, negocio) {
   return res;
 }
 function correoBase(idioma, codigo, hasta, origen, negocio) {
-  const d = new Date(hasta), enlace = origen + (negocio ? ({ ca: '/ca/datafon/?vuelta#', en: '/en/card-machine/?vuelta#' }[idioma] || '/datafono/?vuelta#') : ({ ca: '/ca/tiqui/#', en: '/en/tiqui/#' }[idioma] || '/tiqui/#')) + codigo;
-  if (idioma === 'ca') return { asunto: 'El teu codi de Tiqui', texto: `Aquest és el teu codi de Tiqui:\n\n${codigo}\n\nAmb ell tornes quan vulguis, des de qualsevol mòbil, sense pujar l'extracte una altra vegada:\n${enlace}\n\nEl tens fins al ${d.getUTCDate()} ${MESES.ca[d.getUTCMonth()]}.\n\nNo el comparteixis: obre els teus moviments.\n\nVas acceptar que el servei comencés de seguida, així que no hi ha devolucions.\n\nFeehund` };
-  if (idioma === 'en') return { asunto: 'Your Tiqui code', texto: `This is your Tiqui code:\n\n${codigo}\n\nUse it to come back any time, from any phone, without uploading your statement again:\n${enlace}\n\nIt's yours until ${d.getUTCDate()} ${MESES.en[d.getUTCMonth()]}.\n\nDon't share it: it opens your transactions.\n\nYou agreed that the service starts right away, so there are no refunds.\n\nFeehund` };
-  return { asunto: 'Tu código de Tiqui', texto: `Este es tu código de Tiqui:\n\n${codigo}\n\nCon él vuelves cuando quieras, desde cualquier móvil, sin subir el extracto otra vez:\n${enlace}\n\nLo tienes hasta el ${d.getUTCDate()} de ${MESES.es[d.getUTCMonth()]}.\n\nNo lo compartas: abre tus movimientos.\n\nAceptaste que el servicio empezara al momento, así que no hay devoluciones.\n\nFeehund` };
+  const d = new Date(hasta), enlace = origen + (negocio ? ({ ca: '/ca/datafon/?vuelta#', en: '/en/card-machine/?vuelta#' }[idioma] || '/datafono/?vuelta#') : ({ ca: '/ca/pregunta/#', en: '/en/ask/#' }[idioma] || '/pregunta/#')) + codigo;
+  if (idioma === 'ca') return { asunto: 'El teu codi de Feehund', texto: `Aquest és el teu codi de Feehund:\n\n${codigo}\n\nAmb ell tornes quan vulguis, des de qualsevol mòbil, sense pujar l'extracte una altra vegada:\n${enlace}\n\nEl tens fins al ${d.getUTCDate()} ${MESES.ca[d.getUTCMonth()]}.\n\nNo el comparteixis: obre els teus moviments.\n\nVas acceptar que el servei comencés de seguida, així que no hi ha devolucions.\n\nFeehund` };
+  if (idioma === 'en') return { asunto: 'Your Feehund code', texto: `This is your Feehund code:\n\n${codigo}\n\nUse it to come back any time, from any phone, without uploading your statement again:\n${enlace}\n\nIt's yours until ${d.getUTCDate()} ${MESES.en[d.getUTCMonth()]}.\n\nDon't share it: it opens your transactions.\n\nYou agreed that the service starts right away, so there are no refunds.\n\nFeehund` };
+  return { asunto: 'Tu código de Feehund', texto: `Este es tu código de Feehund:\n\n${codigo}\n\nCon él vuelves cuando quieras, desde cualquier móvil, sin subir el extracto otra vez:\n${enlace}\n\nLo tienes hasta el ${d.getUTCDate()} de ${MESES.es[d.getUTCMonth()]}.\n\nNo lo compartas: abre tus movimientos.\n\nAceptaste que el servicio empezara al momento, así que no hay devoluciones.\n\nFeehund` };
 }
 
 /** Activa el pase si la sesión de Stripe está pagada y es de este código. Devuelve el pase o null. */
-export async function activarTiqui(env, h, sesion, origen) {
-  if (!sesion || sesion.payment_status !== 'paid' || sesion.client_reference_id !== h || sesion.metadata?.servicio !== 'tiqui') return null;
+// Antes del 19/11/2026 el chat se llamaba de otra forma y el pago llevaba ese nombre: se aceptan los dos
+export const SERVICIOS = ['pregunta', 'tiqui'];
+
+export async function activarPregunta(env, h, sesion, origen) {
+  if (!sesion || sesion.payment_status !== 'paid' || sesion.client_reference_id !== h || !SERVICIOS.includes(sesion.metadata?.servicio)) return null;
   const plan = PLANES[sesion.metadata.plan] ? sesion.metadata.plan : 'basico', P = PLANES[plan];
   const kPase = 'ia:pase:' + h;
   const ya = JSON.parse((await env.FEEHUND_KV.get(kPase)) || 'null');
@@ -82,7 +85,7 @@ export async function activarTiqui(env, h, sesion, origen) {
   const correo = sesion.customer_details?.email || sesion.customer_email;
   if (pend?.codigo && correo) {
     const { asunto, texto } = correoTexto(pend.idioma, pend.codigo, pase.hasta, origen || 'https://feehund.com', plan.indexOf('negocio') === 0);
-    try { await enviarCorreo(env, { de: { nombre: 'Feehund' }, para: correo, asunto, texto, idem: 'tiqui-' + sesion.id }); } catch (e) { /* el código también se ve en pantalla y en el recibo */ }
+    try { await enviarCorreo(env, { de: { nombre: 'Feehund' }, para: correo, asunto, texto, idem: 'pregunta-' + sesion.id }); } catch (e) { /* el código también se ve en pantalla y en el recibo */ }
   }
   await env.FEEHUND_KV.delete('ia:pend:' + h);
   try { await regalarAmigo(env, h, sesion); } catch (e) { /* el pase del que paga ya está hecho */ }

@@ -135,7 +135,7 @@
   function show(which) { for (const k in scr) scr[k].hidden = k !== which; document.body.classList.toggle("con-barra", which === "res" && Boolean($("xBarra"))); scrollTo({ top: 0, behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" }); }
   function msg(el, t) { el.textContent = t; el.hidden = !t; }
 
-  // Barra de la espera bajo Tiqui: avanza con lo que va contando el motor (leyendo, página 3 de 10, saldo, cobros) y, entre
+  // Barra de la espera bajo Feehund: avanza con lo que va contando el motor (leyendo, página 3 de 10, saldo, cobros) y, entre
   // aviso y aviso, poco a poco, para que nunca parezca parada. Llega al 100 % justo antes de enseñar el resultado.
   const barraCarga = (() => {
     const caja = $("xProg"), lleno = $("xProgL");
@@ -211,7 +211,7 @@
     const h = $("xResH"); if (h) h.focus({ preventScroll: true });
   }
 
-  // Volver con el código de Tiqui (o de pagar): pinta un resultado guardado, sin leer nada ni volver a preguntar
+  // Volver con el código de Feehund (o de pagar): pinta un resultado guardado, sin leer nada ni volver a preguntar
   window.FeehundMostrar = (r) => {
     if (!r || !r.cobros) return false;
     actual = r; propio = true;
@@ -227,7 +227,7 @@
   // El archivo va a /api/leer (Cloudflare), que se lo pasa a Claude y devuelve los movimientos sin guardar nada.
   // Los movimientos vuelven a pasar por el motor de siempre como un CSV: el mismo análisis y la misma comprobación de saldos.
   const AVISOS_DUDOSOS = ["no_cuadra", "filas_sin_leer"];
-  // Mientras lee, la misma pantalla de carga de siempre (Tiqui olfateando), sin textos de IA (decisión del 16 nov)
+  // Mientras lee, la misma pantalla de carga de siempre (Feehund olfateando), sin textos de IA (decisión del 16 nov)
   const TIPO_IA = { pdf: "application/pdf", jpg: "image/jpeg", jpeg: "image/jpeg", png: "image/png", webp: "image/webp", gif: "image/gif" };
   const tipoIA = (f) => {
     if (!f || typeof f.name !== "string") return null;
@@ -804,7 +804,7 @@
     const g = (r.grupos || []).find((y) => y.codigo === "sector_tuyos");
     if (g) g.ids = g.ids.concat(ids); else r.grupos = (r.grupos || []).concat([{ codigo: "sector_tuyos", titulo: T3.dq.grupo, ids, total: 0 }]);
   }
-  // Comercios que Tiqui no sabe qué son y no se repiten como un recibo (un bar, una tienda): se pregunta su sector.
+  // Comercios que Feehund no sabe qué son y no se repiten como un recibo (un bar, una tienda): se pregunta su sector.
   // Lo contestado vale en este móvil y, sin importes ni fechas, cuenta como un voto para todos (/api/ia/voto).
   function comerciosRaros(r) {
     const C = window.FeehundComercio; if (!C) return { lista: [], importante: false };
@@ -829,7 +829,7 @@
     const lista = desconocidos(r), mios = leerTuyos();
     lista.forEach((x) => { if (!mios[x.k] && conocida(x.k)) x.auto = conocida(x.k); });
     const yaSe = lista.filter((x) => x.auto || (mios[x.k] && mios[x.k] !== "nose")).map((x) => Object.assign(x, { op: x.auto || mios[x.k] }));
-    // Como mucho 3 preguntas; 5 si lo que Tiqui no sabe qué es pesa mucho (15 % o más de lo gastado, en 5 sitios o más).
+    // Como mucho 3 preguntas; 5 si lo que Feehund no sabe qué es pesa mucho (15 % o más de lo gastado, en 5 sitios o más).
     // Primero lo que se repite (puede ser el alquiler); después los comercios de más dinero.
     const raros = comerciosRaros(r), tope = raros.importante ? 5 : 3;
     const recibos = lista.filter((x) => !x.auto && !mios[x.k]).slice(0, tope);
@@ -853,7 +853,7 @@
           ov.remove(); document.body.classList.remove("dq-abierta"); fin(); return;
         }
         const x = faltan[i]; c.textContent = "";
-        const top = el("div", "dq-top"); const img = el("img", "dq-tiqui"); img.src = ROOT + "assets/img/tiqui-olfatea.webp"; img.alt = ""; img.width = 56; img.height = 56;
+        const top = el("div", "dq-top"); const img = el("img", "dq-perro"); img.src = ROOT + "assets/img/feehund-perro-olfatea.webp"; img.alt = ""; img.width = 56; img.height = 56;
         top.appendChild(img); top.appendChild(el("p", "dq-t", T.titulo)); c.appendChild(top);
         const barra = el("div", "dq-bar"); const lleno = el("i"); lleno.style.width = Math.round((i / faltan.length) * 100) + "%"; barra.appendChild(lleno); c.appendChild(barra);
         setTimeout(() => { lleno.style.width = Math.round(((i + 0.5) / faltan.length) * 100) + "%"; }, 30);

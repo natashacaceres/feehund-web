@@ -53,7 +53,7 @@ export function crearPago(env, { compra, unidades, precio, correo, idioma, vuelt
     custom_text: { submit: { message: textos.renuncia } },
   }, 'pago-' + compra);
 }
-/** Pago de «Pregúntale a Tiqui» (Checkout). importe en céntimos; ref: huella del código (no el código). */
+/** Pago de «Pregunta a Feehund» (Checkout). importe en céntimos; ref: huella del código (no el código). */
 /**
  * El IVA del 21 % de España, sumado aparte (no incluido en el precio). Se busca en Stripe; si no está, se crea una sola
  * vez. El id se guarda en KV para no preguntarlo en cada pago.
@@ -69,8 +69,8 @@ export async function ivaNegocios(env) {
   return t.id;
 }
 
-export async function crearPagoTiqui(env, { ref, plan, importe, producto, idioma, vuelta, cancelar, textos, amigo, factura }) {
-  const meta = amigo ? { servicio: 'tiqui', plan, amigo } : { servicio: 'tiqui', plan };
+export async function crearPagoPregunta(env, { ref, plan, importe, producto, idioma, vuelta, cancelar, textos, amigo, factura }) {
+  const meta = amigo ? { servicio: 'pregunta', plan, amigo } : { servicio: 'pregunta', plan };
   // negocios: el IVA se suma en la página de pago (4,99 € + 21 %)
   // si Stripe no deja leer o crear el IVA (llave sin permiso), el pago sigue saliendo, sin IVA, y queda en el registro
   const iva = factura ? await ivaNegocios(env).catch((e) => { console.log('iva negocios', String(e.message)); return null; }) : null;
@@ -83,12 +83,12 @@ export async function crearPagoTiqui(env, { ref, plan, importe, producto, idioma
     cancel_url: cancelar,
     expires_at: Math.floor(Date.now() / 1000) + 3600,
     metadata: meta,
-    payment_intent_data: { metadata: meta, description: textos.descripcion, statement_descriptor_suffix: 'FEEHUND TIQUI' },
+    payment_intent_data: { metadata: meta, description: textos.descripcion, statement_descriptor_suffix: 'PREGUNTA FEEHUND' },
     // [REVISIÓN LEGAL] contenido digital: empieza en cuanto se paga (art. 103 m TRLGDCU)
     custom_text: { submit: { message: textos.renuncia } },
     // negocios: factura con IVA al pagar y casilla para su NIF
     ...(factura ? { invoice_creation: { enabled: true, invoice_data: { description: textos.descripcion } }, tax_id_collection: { enabled: true }, billing_address_collection: 'required' } : {}),
-  }, 'tiqui-' + ref);
+  }, 'pregunta-' + ref);
 }
 export const leerPago = (env, sesion) => stripe(env, 'GET', '/v1/checkout/sessions/' + encodeURIComponent(sesion));
 

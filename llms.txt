@@ -8,7 +8,7 @@ Feehund no es un banco ni un comparador que cobre por contratar. El extracto se 
 
 - [Mi banco: qué se repite en tu cuenta](https://feehund.com/extracto/): lector del extracto del banco (PDF, Excel, CSV o foto) que lo lee en el navegador y, si hace falta, en un servidor, sin guardar datos.
 - [Dar de baja](https://feehund.com/baja/): cómo darse de baja de 186 empresas en España (telefonía, streaming, gimnasios, seguros, alarmas, apps y más), con los pasos, el plazo de aviso, la permanencia y la fecha de revisión. Cada ficha se comprueba con la web oficial de la empresa.
-- [Tu Tiqui](https://feehund.com/tiqui/): chat de pago que contesta preguntas sobre los propios extractos de la persona o sobre lo que le cobra el datáfono a su negocio.
+- [Pregunta a Feehund](https://feehund.com/pregunta/): chat de pago que contesta preguntas sobre los propios extractos de la persona o sobre lo que le cobra el datáfono a su negocio.
 
 ## Comercios y autónomos
 

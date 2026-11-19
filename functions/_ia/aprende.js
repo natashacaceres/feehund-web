@@ -1,4 +1,4 @@
-// El motor que aprende. Cuando Tiqui no sabe qué es un comercio, lo busca una sola vez en la web (Claude Haiku con
+// El motor que aprende. Cuando Feehund no sabe qué es un comercio, lo busca una sola vez en la web (Claude Haiku con
 // búsqueda) y lo guarda. La siguiente persona que lo pregunte ya lo tiene al momento y sin gastar nada.
 // Lo que han preguntado al menos 3 personas distintas, y se sabe con seguridad, pasa al diccionario compartido que el
 // móvil se descarga (GET /api/ia/aprende): así también clasifica el resumen gratis, sin mandar nada.
@@ -14,7 +14,7 @@
 const MODELO = 'claude-haiku-5-5';
 export const GENTE_PARA_PUBLICAR = 3; // personas distintas antes de pasar al diccionario compartido
 const TOPE_DIA = 400; // búsquedas en la web al día, como mucho
-const POR_PREGUNTA = 3; // comercios que Tiqui puede buscar en una pregunta
+const POR_PREGUNTA = 3; // comercios que Feehund puede buscar en una pregunta
 
 export const SECTORES_APRENDE = {
   casa: 'luz, agua, gas, móvil, internet, alquiler, comunidad, seguro de hogar',
@@ -123,7 +123,7 @@ export async function diccionario(env) {
   return { version: dic.version || null, entradas: dic.entradas || {} };
 }
 
-// ---------- «¿Qué es…?»: lo que dice la gente en el chat de Tiqui
+// ---------- «¿Qué es…?»: lo que dice la gente en el chat de Feehund
 // apr:v:<huella del nombre> → { nombre, votos: { sector: [huellas] } }. Pasa al diccionario cuando un sector llega a 3
 // personas, nadie ha dicho «una persona» y ningún otro sector tiene ni la mitad. Si la búsqueda en la web dijo otra cosa,
 // no se publica: queda para revisar.

@@ -1,0 +1,6 @@
+{
+  "_nota": "Nombres del perro y del chat de pago. Las páginas son estáticas y llevan el nombre escrito; si cambia, se cambia aquí y se pasa el mismo script por toda la web.",
+  "perro": "Feehund",
+  "chat": { "es": "Pregunta a Feehund", "ca": "Pregunta a Feehund", "en": "Ask Feehund" },
+  "rutas": { "es": "/pregunta/", "ca": "/ca/pregunta/", "en": "/en/ask/" }
+}

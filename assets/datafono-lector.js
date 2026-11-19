@@ -270,7 +270,7 @@
     for (let i = 0; i < 100 && !document.querySelector("#pProvChips .chip"); i++) await new Promise((r) => setTimeout(r, 50));
     const hecho = rellenar.rellenarCalculadora(ok, { documento: document, idioma: LANG });
     $("dLector").dataset.rellenado = hecho.rellenados.join(" ");
-    // el camino corto: 3 preguntas en la ventana de Tiqui (assets/datafono-preguntas.js); si no está, la calculadora entera
+    // el camino corto: 3 preguntas en la ventana de Feehund (assets/datafono-preguntas.js); si no está, la calculadora entera
     if (window.FeehundPreguntas) { $("dLector").dataset.rellenado = hecho.rellenados.join(" "); window.FeehundPreguntas.empezar(ejemplo); return; }
     irACalculadora(TX.listo(hecho.rellenados.length));
   }

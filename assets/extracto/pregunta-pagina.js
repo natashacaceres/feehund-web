@@ -1,5 +1,5 @@
-// Tu Tiqui, la página de quien paga (/tiqui/chat/): a la izquierda sus extractos (banco, meses y un calendario con lo que
-// falta) y el botón para sumar otro; a la derecha el chat (assets/extracto/tiqui.js lo monta en #tqcPagina).
+// Pregunta a Feehund, la página de quien paga (/pregunta/chat/): a la izquierda sus extractos (banco, meses y un calendario con lo que
+// falta) y el botón para sumar otro; a la derecha el chat (assets/extracto/pregunta.js lo monta en #tqcPagina).
 // Sumar un extracto: se vuelve a leer todo junto en el dispositivo (lo de antes, desde la caja, más lo nuevo) y el motor
 // quita lo repetido. Después se guarda cifrado con el código, como siempre. Nada sale de aquí sin cifrar.
 (function () {
@@ -135,14 +135,14 @@
       ((r && r.lectura && r.lectura.archivos) || []).forEach((a) => { const b = bancoDe(a); if (b) bancos[a.nombre.replace(/\.[^.]+$/, "") + ".csv"] = bancos[a.nombre.replace(/\.[^.]+$/, "") + ".csv"] || b; });
       ((r2.lectura && r2.lectura.archivos) || []).forEach((a) => { const b = bancoDe(a); if (b && !bancos[a.nombre]) bancos[a.nombre] = b; });
       r2.bancos = bancos;
-      try { await window.FeehundTiqui.guardar(r2); } catch (e) { st.textContent = T.noGuardo; return; }
+      try { await window.FeehundPregunta.guardar(r2); } catch (e) { st.textContent = T.noGuardo; return; }
       estado.datos = { r: r2 }; pintar(estado);
       st.textContent = T.listo(Math.max(0, movs2.length - viejos.length));
     } catch (e) { console.error("Feehund: sumar extracto", e); st.textContent = T.noLeo; }
     finally { $("tcAnadir").disabled = false; }
   }
 
-  document.addEventListener("fh-tiqui-pagina", (e) => {
+  document.addEventListener("fh-pregunta-pagina", (e) => {
     const d = e.detail || {};
     $("tcCarga").hidden = true;
     if (d.error) { $("tcApp").hidden = true; const er = $("tcError"); er.hidden = false; $("tcErrorT").textContent = d.error; return; }

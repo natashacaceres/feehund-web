@@ -24,9 +24,9 @@
 .gr .gr-ok p{margin:0;max-width:34ch;font-size:18px;line-height:1.5}
 .gr .gr-1{font-size:20px}
 .gr .gr-altura{font-weight:700;color:var(--brand)}
-.gr .gr-tiqui{margin:var(--s-4) 0 0}
-.gr .gr-tiqui img{width:160px;height:auto}
-.gr .gr-tiqui figcaption{font-size:14px;color:var(--ink-2)}
+.gr .gr-perro{margin:var(--s-4) 0 0}
+.gr .gr-perro img{width:160px;height:auto}
+.gr .gr-perro figcaption{font-size:14px;color:var(--ink-2)}
 .gr .tb-acc{width:100%;max-width:420px}
 @keyframes gr-pop{from{transform:scale(.4);opacity:0}to{transform:scale(1);opacity:1}}
 @keyframes gr-trazo{to{stroke-dashoffset:0}}

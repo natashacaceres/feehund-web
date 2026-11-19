@@ -1,9 +1,9 @@
 <!doctype html>
-<html lang="ca" data-title-fijo><head>
+<html lang="en" data-title-fijo><head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Pregunta-li a Tiqui per les teves despeses · Feehund</title>
-<meta name="description" content="Pregunta-li a Tiqui per les teves despeses o pel que et cobra el datàfon. Et contesta amb els teus propis extractes.">
+<title>Ask Feehund about your spending</title>
+<meta name="description" content="Ask Feehund about your spending or what your card machine costs you. It answers with your own statements.">
 <meta name="theme-color" content="#0E5E6F">
 <link rel="icon" href="../../assets/brand/favicon.ico?v=202611111722" sizes="any">
 <link rel="icon" type="image/png" sizes="32x32" href="../../assets/brand/favicon-32.png?v=202611111722">
@@ -25,7 +25,7 @@
   .tq-h{margin:0;font:800 clamp(30px,8.6vw,44px)/1.05 var(--f-head);color:var(--ink);white-space:nowrap}
   .tq-hasta{margin:0;font:400 17px/1.3 var(--f-text);color:var(--ink-2)}
   .tq-demo{position:relative;overflow:hidden;background:var(--ink);border-radius:24px;padding:var(--s-4) var(--s-4) var(--s-5);display:grid;gap:12px}
-  .tq-demo::after{content:"";position:absolute;right:-70px;bottom:-60px;width:300px;height:300px;border-radius:50%;background:url("../../assets/img/tiqui-olfatea.webp") center/cover;opacity:.07;filter:grayscale(1);pointer-events:none}
+  .tq-demo::after{content:"";position:absolute;right:-70px;bottom:-60px;width:300px;height:300px;border-radius:50%;background:url("../../assets/img/feehund-perro-olfatea.webp") center/cover;opacity:.07;filter:grayscale(1);pointer-events:none}
   .tq-vista{margin:0;justify-self:center;width:100%;max-width:400px;border:1.5px solid var(--line);border-radius:24px;overflow:hidden;background:var(--bg)}
   .tq-vista-bar{display:flex;align-items:center;gap:6px;padding:10px 14px;background:#F3E6CC}
   .tq-vista-bar i{width:10px;height:10px;border-radius:50%;background:#D9CCB2}
@@ -114,19 +114,19 @@
   .p-iva{font:600 12px/1 var(--f-text);opacity:.7;white-space:nowrap}
   .p-plan-p{white-space:nowrap}@media (max-width:480px){.p-plan-p{font-size:26px}}
   .p-plan-m{font:400 15px/1.3 var(--f-text);color:var(--ink-2)}
-  .hdr-tiqui[data-tuyo]::after{content:"";position:absolute;right:2px;top:4px;width:10px;height:10px;border-radius:50%;background:#2E9E5B;box-shadow:0 0 0 2px var(--bg)}
+  .hdr-pregunta[data-tuyo]::after{content:"";position:absolute;right:2px;top:4px;width:10px;height:10px;border-radius:50%;background:#2E9E5B;box-shadow:0 0 0 2px var(--bg)}
 </style>
 </head>
 <body>
 <header class="hdr">
   <div class="wrap">
-    <a class="brand" href="../../ca/"><img src="../../assets/brand/feehund-logo-h64.png?v=202611111722" srcset="../../assets/brand/feehund-logo-h64.png?v=202611111722 1x, ../../assets/brand/feehund-logo-h128.png?v=202611111722 2x" alt="Feehund" width="211" height="64"></a>
+    <a class="brand" href="../../en/"><img src="../../assets/brand/feehund-logo-h64.png?v=202611111722" srcset="../../assets/brand/feehund-logo-h64.png?v=202611111722 1x, ../../assets/brand/feehund-logo-h128.png?v=202611111722 2x" alt="Feehund" width="211" height="64"></a>
     <div class="hdr-r">
-      <a class="hdr-tiqui" href="./" aria-current="page">El teu Tiqui</a>
-      <a class="hdr-baja" href="../../ca/baixa/">Donar de baixa</a>
+      <a class="hdr-pregunta" href="./" aria-current="page">Ask Feehund</a>
+      <a class="hdr-baja" href="../../en/cancel/">Cancel</a>
       <details class="langdd">
-      <summary aria-label="Idioma: Català">CA<span class="langdd-i" aria-hidden="true"></span></summary>
-      <ul><li><a href="../../tiqui/" hreflang="es" lang="es">Español</a></li><li><a href="../../ca/tiqui/" hreflang="ca" lang="ca" aria-current="page">Català</a></li><li><a href="../../en/tiqui/" hreflang="en" lang="en">English</a></li></ul>
+      <summary aria-label="Language: English">EN<span class="langdd-i" aria-hidden="true"></span></summary>
+      <ul><li><a href="../../pregunta/" hreflang="es" lang="es">Español</a></li><li><a href="../../ca/pregunta/" hreflang="ca" lang="ca">Català</a></li><li><a href="../../en/ask/" hreflang="en" lang="en" aria-current="page">English</a></li></ul>
     </details>
     </div>
   </div>
@@ -135,53 +135,53 @@
 <main class="tq">
 <div class="tq-g">
   <section class="tq-hero">
-     <h1 class="tq-h">Pregunta-li a Tiqui</h1>
-      <div class="tq-sw" id="tqModo" role="tablist"><button type="button" role="tab" data-m="ti" aria-selected="true">Per a tu</button><button type="button" role="tab" data-m="neg" aria-selected="false">Per al teu negoci</button></div>
+     <h1 class="tq-h">Ask Feehund</h1>
+      <div class="tq-sw" id="tqModo" role="tablist"><button type="button" role="tab" data-m="ti" aria-selected="true">For you</button><button type="button" role="tab" data-m="neg" aria-selected="false">For your business</button></div>
   </section>
 
     <figure class="tq-vista" data-m="neg" hidden>
-    <div class="tq-vista-bar" aria-hidden="true"><i></i><i></i><i></i><span>feehund.com/ca/tiqui</span></div>
-    <picture><source media="(min-width:960px)" srcset="../../assets/img/tu-tiqui-negocio-ca.webp" width="1600" height="1000"><img src="../../assets/img/tu-tiqui-negocio-ca-movil.webp" width="780" height="1531" alt="El teu Tiqui per al teu negoci per dins: el resum del teu datàfon i el xat amb Tiqui"></picture>
+    <div class="tq-vista-bar" aria-hidden="true"><i></i><i></i><i></i><span>feehund.com/en/ask</span></div>
+    <picture><source media="(min-width:960px)" srcset="../../assets/img/pregunta-feehund-negocio-en.webp" width="1600" height="1000"><img src="../../assets/img/pregunta-feehund-negocio-en-movil.webp" width="780" height="1531" alt="Inside Ask Feehund for your business: your card machine summary and the chat with Feehund"></picture>
   </figure>
 
 <figure class="tq-vista" data-m="ti">
-    <div class="tq-vista-bar" aria-hidden="true"><i></i><i></i><i></i><span>feehund.com/ca/tiqui</span></div>
-    <picture><source media="(min-width:960px)" srcset="../../assets/img/tu-tiqui-ca.webp" width="1600" height="1000"><img src="../../assets/img/tu-tiqui-ca-movil.webp" width="780" height="1531" alt="El teu Tiqui per dins: els teus extractes de CaixaBank i Revolut amb els seus mesos, i el xat amb Tiqui"></picture>
+    <div class="tq-vista-bar" aria-hidden="true"><i></i><i></i><i></i><span>feehund.com/en/ask</span></div>
+    <picture><source media="(min-width:960px)" srcset="../../assets/img/pregunta-feehund-en.webp" width="1600" height="1000"><img src="../../assets/img/pregunta-feehund-en-movil.webp" width="780" height="1531" alt="Inside Ask Feehund: your CaixaBank and Revolut statements with their months, and the chat with Feehund"></picture>
   </figure>
 
     <ul class="tq-dif" data-m="neg" hidden>
-    <li>Llegeix el resum del teu datàfon</li>
-    <li>El compara amb 23 tarifes</li>
-    <li>Amb factura</li>
+    <li>Reads your card machine summary</li>
+    <li>Compares it with 23 rates</li>
+    <li>With invoice</li>
   </ul>
 
 <ul class="tq-dif" data-m="ti">
-    <li>Tots els teus bancs, junts</li>
-    <li>Cada xifra, amb els seus pagaments</li>
-    <li>Sense connectar el teu banc</li>
+    <li>All your banks, together</li>
+    <li>Every figure, with its payments</li>
+    <li>No bank connection</li>
   </ul>
 
     <section class="tq-planes" data-m="neg" hidden>
-    <div class="p-plan"><span class="p-plan-p">4,99 €<small class="p-iva"> + IVA</small></span><span class="p-plan-d">1 mes</span></div>
-    <div class="p-plan p-plan--top"><span class="p-plan-p">9,99 €<small class="p-iva"> + IVA</small></span><span class="p-plan-d">3 mesos</span></div>
+    <div class="p-plan"><span class="p-plan-p">4,99 €<small class="p-iva"> + VAT</small></span><span class="p-plan-d">1 month</span></div>
+    <div class="p-plan p-plan--top"><span class="p-plan-p">9,99 €<small class="p-iva"> + VAT</small></span><span class="p-plan-d">3 months</span></div>
   </section>
 
-<section class="tq-planes" data-m="ti" aria-label="7 dies · 3 mesos">
-    <div class="p-plan"><span class="p-plan-p">0,99 €</span><span class="p-plan-d">7 dies</span></div>
-    <div class="p-plan p-plan--top"><span class="p-plan-p">2,99 €</span><span class="p-plan-d">3 mesos</span></div>
+<section class="tq-planes" data-m="ti" aria-label="7 days · 3 months">
+    <div class="p-plan"><span class="p-plan-p">0,99 €</span><span class="p-plan-d">7 days</span></div>
+    <div class="p-plan p-plan--top"><span class="p-plan-p">2,99 €</span><span class="p-plan-d">3 months</span></div>
   </section>
 
   <div class="tq-acc">
-    <a class="tq-cta" id="tqAbrir" href="../../ca/extracte/">Pujar el meu extracte</a>
-    <p class="tq-sin" id="tqSin">Un sol pagament. Sense subscripció</p>
+    <a class="tq-cta" id="tqAbrir" href="../../en/statement/">Upload my statement</a>
+    <p class="tq-sin" id="tqSin">One payment. No subscription</p>
     <div class="tq-inv" id="tqInv" hidden>
-      <img src="../../assets/img/tiqui-olfatea.webp" alt="" width="44" height="44">
-      <p>Les teves preguntes em surten cares, jeje. Convida un amic: si paga, et regalo 30 dies.</p>
-      <button type="button" class="tq-inv-b" id="tqInvB"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="8.5" width="17" height="4" rx="1"/><path d="M5 12.5v8h14v-8M12 8.5v12M12 8.5c-1.5-3.5-5.5-4-5.5-1.5S10 8.5 12 8.5zM12 8.5c1.5-3.5 5.5-4 5.5-1.5S14 8.5 12 8.5z"/></svg>Convidar un amic</button>
+      <img src="../../assets/img/feehund-perro-olfatea.webp" alt="" width="44" height="44">
+      <p>Your questions cost me a fortune, hehe. Invite a friend: if they pay, I'll give you 30 days.</p>
+      <button type="button" class="tq-inv-b" id="tqInvB"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="8.5" width="17" height="4" rx="1"/><path d="M5 12.5v8h14v-8M12 8.5v12M12 8.5c-1.5-3.5-5.5-4-5.5-1.5S10 8.5 12 8.5zM12 8.5c1.5-3.5 5.5-4 5.5-1.5S14 8.5 12 8.5z"/></svg>Invite a friend</button>
       <p class="tq-inv-s" id="tqInvS" role="status" hidden></p>
     </div>
     <form class="tq-cod" id="tqForm">
-      <label for="tqCod">Ja tens el teu codi?</label>
+      <label for="tqCod">Already have your code?</label>
       <div class="p-in"><input id="tqCod" autocomplete="off" autocapitalize="characters" placeholder="FH-XXXX-XXXX-XXXX-XXXX"><button type="submit" aria-label="Entrar">→</button></div>
       <p class="tq-err" id="tqErr" role="status"></p>
     </form>
@@ -189,20 +189,23 @@
 </div>
 </main>
 <script>
+// Las claves guardadas antes del 19/11/2026 llevaban el nombre antiguo del chat: se pasan a las nuevas una vez
+try { Object.keys(localStorage).forEach(function (k) { if (k.indexOf("fh-tiqui-") === 0) { var n = "fh-pregunta-" + k.slice(9); if (localStorage.getItem(n) === null) localStorage.setItem(n, localStorage.getItem(k)); localStorage.removeItem(k); } }); } catch (e) {}
+
 (function () {
   var $ = function (id) { return document.getElementById(id); };
-  // Enlace del correo: /tiqui/#CÓDIGO abre tus gastos directamente
+  // Enlace del correo: /pregunta/#CÓDIGO abre tus gastos directamente
   var h = decodeURIComponent(location.hash.slice(1)).trim().toUpperCase();
-  if (/^FH-?[0-9A-Z]{4}/.test(h)) { location.replace("xat/#" + encodeURIComponent(h)); return; }
-  var p = null; try { p = JSON.parse(localStorage.getItem("fh-tiqui-pase") || "null"); } catch (e) {}
+  if (/^FH-?[0-9A-Z]{4}/.test(h)) { location.replace("chat/#" + encodeURIComponent(h)); return; }
+  var p = null; try { p = JSON.parse(localStorage.getItem("fh-pregunta-pase") || "null"); } catch (e) {}
   if (p && p.hasta > Date.now()) {
-    var meses = ["de gener","de febrer","de març","d'abril","de maig","de juny","de juliol","d'agost","de setembre","d'octubre","de novembre","de desembre"], d = new Date(p.hasta);
-    $("tqAbrir").textContent = "Parlar amb Tiqui"; $("tqAbrir").href = "xat/";
-    $("tqSin").textContent = "Fins al " + d.getDate() + " " + meses[d.getMonth()];
+    var meses = ["January","February","March","April","May","June","July","August","September","October","November","December"], d = new Date(p.hasta);
+    $("tqAbrir").textContent = "Talk to Feehund"; $("tqAbrir").href = "chat/";
+    $("tqSin").textContent = "Until " + d.getDate() + " " + meses[d.getMonth()];
   }
-  // Invita a un amigo (con pase, aunque haya caducado): si paga, Tiqui te regala 30 días
+  // Invita a un amigo (con pase, aunque haya caducado): si paga, Feehund te regala 30 días
   if (p && p.codigo) {
-    if (p.hasta <= Date.now()) $("tqSin").textContent = "Se'ns ha acabat el temps.";
+    if (p.hasta <= Date.now()) $("tqSin").textContent = "Our time is up.";
     $("tqInv").hidden = false;
     $("tqInvB").addEventListener("click", function () {
       var b = $("tqInvB"), s = $("tqInvS"); b.disabled = true;
@@ -210,26 +213,26 @@
       fetch("../../api/ia/invitar", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ codigo: p.codigo }) })
         .then(function (r) { return r.ok ? r.json() : null; }).then(function (j) {
           b.disabled = false;
-          if (!j || !j.id) { di("Ara no puc. Torna-ho a provar."); return; }
-          try { localStorage.setItem("fh-tiqui-ref", JSON.stringify(j.id)); } catch (e) {}
-          if (!j.quedan) { di("Ja t'han regalat dies 3 amics. Gràcies!"); return; }
-          var url = location.origin + "/ca/extracte/" + "?amigo=" + j.id, txt = "Mira què pagues cada mes sense adonar-te'n. És gratis.";
+          if (!j || !j.id) { di("I can't right now. Try again in a moment."); return; }
+          try { localStorage.setItem("fh-pregunta-ref", JSON.stringify(j.id)); } catch (e) {}
+          if (!j.quedan) { di("3 friends have already given you days. Thank you!"); return; }
+          var url = location.origin + "/en/statement/" + "?amigo=" + j.id, txt = "See what you pay every month without noticing. It's free.";
           if (navigator.share) { navigator.share({ title: "Feehund", text: txt, url: url }).catch(function () {}); return; }
-          try { navigator.clipboard.writeText(txt + " " + url).then(function () { di("Enllaç copiat. Passa'l a qui vulguis."); }, function () { di(url); }); } catch (e) { di(url); }
-        }, function () { b.disabled = false; di("Ara no puc. Torna-ho a provar."); });
+          try { navigator.clipboard.writeText(txt + " " + url).then(function () { di("Link copied. Send it to anyone you like."); }, function () { di(url); }); } catch (e) { di(url); }
+        }, function () { b.disabled = false; di("I can't right now. Try again in a moment."); });
     });
   }
   // Para ti / Para tu negocio: cambian el ejemplo, los precios y adónde lleva el botón
-  var pn = null; try { pn = JSON.parse(localStorage.getItem("fh-tiqui-pase-negocio") || "null"); } catch (e) {}
+  var pn = null; try { pn = JSON.parse(localStorage.getItem("fh-pregunta-pase-negocio") || "null"); } catch (e) {}
   var ctaTi = { t: $("tqAbrir").textContent, h: $("tqAbrir").getAttribute("href"), s: $("tqSin").textContent };
-  var mesesN = ["de gener","de febrer","de març","d'abril","de maig","de juny","de juliol","d'agost","de setembre","d'octubre","de novembre","de desembre"];
+  var mesesN = ["January","February","March","April","May","June","July","August","September","October","November","December"];
   function modo(m) {
     [].forEach.call(document.querySelectorAll("#tqModo button"), function (b) { b.setAttribute("aria-selected", String(b.dataset.m === m)); });
     [].forEach.call(document.querySelectorAll("[data-m]:not(button)"), function (e) { e.hidden = e.dataset.m !== m; });
     if (m === "neg") {
       var vivo = pn && pn.hasta > Date.now();
-      $("tqAbrir").textContent = vivo ? 'Parlar amb Tiqui' : 'Pujar el resum del datàfon'; $("tqAbrir").href = vivo ? 'xat/?negocio' : '../../ca/datafon/';
-      $("tqSin").textContent = vivo ? 'Fins al ' + new Date(pn.hasta).getDate() + ' ' + mesesN[new Date(pn.hasta).getMonth()] : 'Un sol pagament. Sense subscripció. Amb factura';
+      $("tqAbrir").textContent = vivo ? 'Talk to Feehund' : 'Upload my card machine summary'; $("tqAbrir").href = vivo ? 'chat/?negocio' : '../../en/card-machine/';
+      $("tqSin").textContent = vivo ? 'Until ' + new Date(pn.hasta).getDate() + ' ' + mesesN[new Date(pn.hasta).getMonth()] : 'One payment. No subscription. With invoice';
       $("tqInv").hidden = true;
     } else { $("tqAbrir").textContent = ctaTi.t; $("tqAbrir").href = ctaTi.h; $("tqSin").textContent = ctaTi.s; $("tqInv").hidden = !(p && p.codigo); }
     try { history.replaceState(null, "", m === "neg" ? "#negocio" : location.pathname); } catch (e) {}
@@ -248,25 +251,25 @@
   $("tqForm").addEventListener("submit", function (e) {
     e.preventDefault();
     var c = $("tqCod").value.trim().toUpperCase();
-    if (!/^FH-?[0-9A-Z]{4}/.test(c)) { $("tqErr").textContent = "Revisa el codi. Comença per FH."; return; }
-    location.href = "xat/#" + encodeURIComponent(c);
+    if (!/^FH-?[0-9A-Z]{4}/.test(c)) { $("tqErr").textContent = "Check the code. It starts with FH."; return; }
+    location.href = "chat/#" + encodeURIComponent(c);
   });
 })();
 </script>
 <footer class="ftr"><div class="wrap ftr-in">
-  <p class="ftr-indep">Cap banc ni empresa de pagament paga per aparèixer a Feehund.</p>
+  <p class="ftr-indep">No bank or payment company pays to appear on Feehund.</p>
   <ul class="ftr-links">
-    <li><a href="../../ca/baixa/">Donar de baixa</a></li>
-    <li><a href="../../ca/blog/">La Letra Pequeña</a></li>
-    <li><a href="../../ca/metodologia/">Com es calcula</a></li>
-    <li><a href="../../ca/com-guanya-diners/">Com guanya diners</a></li>
-    <li><a href="../../ca/contacte/">Contacte</a></li>
+    <li><a href="../../en/cancel/">Cancel</a></li>
+    <li><a href="../../en/blog/">La Letra Pequeña</a></li>
+    <li><a href="../../en/methodology/">How it is calculated</a></li>
+    <li><a href="../../en/how-we-make-money/">How we make money</a></li>
+    <li><a href="../../en/contact/">Contact</a></li>
   </ul>
   <ul class="ftr-legal">
-    <li><a href="../../ca/avis-legal/">Avís legal</a></li>
-    <li><a href="../../ca/privacitat/">Privacitat</a></li>
-    <li><a href="../../ca/galetes/">Galetes</a></li>
-    <li><a href="../../ca/condicions/">Condicions</a></li>
+    <li><a href="../../en/legal-notice/">Legal notice</a></li>
+    <li><a href="../../en/privacy/">Privacy</a></li>
+    <li><a href="../../en/cookies/">Cookies</a></li>
+    <li><a href="../../en/terms/">Terms</a></li>
   </ul>
   <p class="ftr-copy">© 2026 <span data-marca>Feehund</span></p>
 </div></footer>

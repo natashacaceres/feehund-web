@@ -643,19 +643,19 @@
   <url><loc>https://feehund.com/blog/devolver-recibo/</loc><lastmod>2026-11-16</lastmod></url>
   <url><loc>https://feehund.com/ca/blog/devolver-recibo/</loc><lastmod>2026-11-16</lastmod></url>
   <url><loc>https://feehund.com/en/blog/devolver-recibo/</loc><lastmod>2026-11-16</lastmod></url>
-  <url><loc>https://feehund.com/tiqui/</loc><lastmod>2026-11-19</lastmod>
-    <xhtml:link rel="alternate" hreflang="es-ES" href="https://feehund.com/tiqui/"/>
-    <xhtml:link rel="alternate" hreflang="ca-ES" href="https://feehund.com/ca/tiqui/"/>
-    <xhtml:link rel="alternate" hreflang="en-ES" href="https://feehund.com/en/tiqui/"/>
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://feehund.com/tiqui/"/></url>
-  <url><loc>https://feehund.com/ca/tiqui/</loc><lastmod>2026-11-19</lastmod>
-    <xhtml:link rel="alternate" hreflang="es-ES" href="https://feehund.com/tiqui/"/>
-    <xhtml:link rel="alternate" hreflang="ca-ES" href="https://feehund.com/ca/tiqui/"/>
-    <xhtml:link rel="alternate" hreflang="en-ES" href="https://feehund.com/en/tiqui/"/>
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://feehund.com/tiqui/"/></url>
-  <url><loc>https://feehund.com/en/tiqui/</loc><lastmod>2026-11-19</lastmod>
-    <xhtml:link rel="alternate" hreflang="es-ES" href="https://feehund.com/tiqui/"/>
-    <xhtml:link rel="alternate" hreflang="ca-ES" href="https://feehund.com/ca/tiqui/"/>
-    <xhtml:link rel="alternate" hreflang="en-ES" href="https://feehund.com/en/tiqui/"/>
-    <xhtml:link rel="alternate" hreflang="x-default" href="https://feehund.com/tiqui/"/></url>
+  <url><loc>https://feehund.com/pregunta/</loc><lastmod>2026-11-19</lastmod>
+    <xhtml:link rel="alternate" hreflang="es-ES" href="https://feehund.com/pregunta/"/>
+    <xhtml:link rel="alternate" hreflang="ca-ES" href="https://feehund.com/ca/pregunta/"/>
+    <xhtml:link rel="alternate" hreflang="en-ES" href="https://feehund.com/en/ask/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://feehund.com/pregunta/"/></url>
+  <url><loc>https://feehund.com/ca/pregunta/</loc><lastmod>2026-11-19</lastmod>
+    <xhtml:link rel="alternate" hreflang="es-ES" href="https://feehund.com/pregunta/"/>
+    <xhtml:link rel="alternate" hreflang="ca-ES" href="https://feehund.com/ca/pregunta/"/>
+    <xhtml:link rel="alternate" hreflang="en-ES" href="https://feehund.com/en/ask/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://feehund.com/pregunta/"/></url>
+  <url><loc>https://feehund.com/en/ask/</loc><lastmod>2026-11-19</lastmod>
+    <xhtml:link rel="alternate" hreflang="es-ES" href="https://feehund.com/pregunta/"/>
+    <xhtml:link rel="alternate" hreflang="ca-ES" href="https://feehund.com/ca/pregunta/"/>
+    <xhtml:link rel="alternate" hreflang="en-ES" href="https://feehund.com/en/ask/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://feehund.com/pregunta/"/></url>
 </urlset>

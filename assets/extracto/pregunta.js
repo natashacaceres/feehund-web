@@ -1,17 +1,19 @@
-// Mi banco: «Pregúntale a Tiqui». La primera pregunta es gratis (functions/api/ia/[[ruta]].js, ruta pregunta-gratis);
+// Mi banco: «Pregunta a Feehund». La primera pregunta es gratis (functions/api/ia/[[ruta]].js, ruta pregunta-gratis);
 // después salen los dos planes y se paga en Stripe (/api/ia/pagar). El extracto viaja cifrado con el código, que se crea
-// aquí y solo tiene quien paga (también le llega por correo y sale en el recibo). Al volver (?tiqui=ok) se activa el pase.
+// aquí y solo tiene quien paga (también le llega por correo y sale en el recibo). Al volver (?pregunta=ok) se activa el pase.
 // Va antes de «Compartir» en el móvil y fijo a la derecha en el ordenador. Sin estilos ni scripts en línea (CSP).
 (function () {
   "use strict";
+  // Las claves guardadas antes del 19/11/2026 llevaban el nombre antiguo del chat: se pasan a las nuevas una vez
+  try { Object.keys(localStorage).forEach((k) => { if (k.indexOf("fh-tiqui-") === 0) { const n = "fh-pregunta-" + k.slice(9); if (localStorage.getItem(n) === null) localStorage.setItem(n, localStorage.getItem(k)); localStorage.removeItem(k); } }); } catch (e) {}
   const $ = (id) => document.getElementById(id);
   const LANG = ["es", "ca", "en"].indexOf(document.documentElement.lang) >= 0 ? document.documentElement.lang : "es";
-  // Mi datáfono: Tiqui para negocios (pregunta por el resumen del datáfono, planes 4,99 € y 9,99 € con factura)
-  // Tu Tiqui (la página de quien paga, /tiqui/chat/): el chat a pantalla completa con los datos guardados del pase
+  // Mi datáfono: Feehund para negocios (pregunta por el resumen del datáfono, planes 4,99 € y 9,99 € con factura)
+  // Pregunta a Feehund (la página de quien paga, /pregunta/chat/): el chat a pantalla completa con los datos guardados del pase
   const PAGINA = !!document.getElementById("tqcPagina");
   const NEG = /\/(datafono|datafon|card-machine)\//.test(location.pathname) || (PAGINA && new URLSearchParams(location.search).has("negocio"));
   const PAG_DAT = { es: "/datafono/", ca: "/ca/datafon/", en: "/en/card-machine/" };
-  const PAG_CHAT = { es: "/tiqui/chat/", ca: "/ca/tiqui/xat/", en: "/en/tiqui/chat/" }, PAG_TIQUI = { es: "/tiqui/", ca: "/ca/tiqui/", en: "/en/tiqui/" };
+  const PAG_CHAT = { es: "/pregunta/chat/", ca: "/ca/pregunta/xat/", en: "/en/ask/chat/" }, PAG_PREGUNTA = { es: "/pregunta/", ca: "/ca/pregunta/", en: "/en/ask/" };
   const ROOT = (document.currentScript && document.currentScript.dataset.root) || "../";
   const nf0 = new Intl.NumberFormat("es-ES", { maximumFractionDigits: 0, useGrouping: "always" });
   const nf2 = new Intl.NumberFormat("es-ES", { minimumFractionDigits: 2, maximumFractionDigits: 2, useGrouping: "always" });
@@ -21,7 +23,7 @@
 
   const T = {
     es: {
-      titulo: "Pregúntale a Tiqui", gratis: "Tu primera pregunta es gratis", siguePlanes: "Elige cuánto tiempo y sigue preguntando",
+      titulo: "Pregunta a Feehund", gratis: "Tu primera pregunta es gratis", siguePlanes: "Elige cuánto tiempo y sigue preguntando",
       estado: "Olfateando tu extracto", estadoN: (n) => "Olfateando tus " + n + " extractos", estadoNeg: "Olfateando tu datáfono", uso: (p) => "Has usado el " + p + " % de tus preguntas", privado: "Privado", pensando: "Olfateando",
       hola: "¿Qué quieres saber de tus gastos?", escribe: "Escribe tu pregunta", enviar: "Enviar",
       adonde: "¿Adónde se va mi dinero?", raro: "¿Hay algo raro en mi cuenta?", llevo: (m) => "¿Cuánto llevo en " + m + "?", mesMas: "¿En qué mes gasté más?",
@@ -31,7 +33,7 @@
       unPago: "Un solo pago. Sin suscripción", ahoraNo: "Ahora no", momento: "Un momento…", errorPago: "No se ha podido. Prueba otra vez.",
       holaNeg: "¿Qué quieres saber de tu datáfono?", sugNeg: ["¿Cuánto me cobra el banco al mes?", "¿Por qué unas tarjetas me cobran más?", "¿A quién me cambio?"],
       planesNeg: { negocio_mes: ["4,99 €", "1 mes"], negocio_3m: ["9,99 €", "3 meses"] }, unPagoNeg: "Un solo pago. Sin suscripción. Con factura", ivaNeg: "+ IVA",
-      tuyo: "Tiqui ya es tuyo", copiar: "Copiar", copiado: "Copiado", correo: "Te lo hemos mandado por correo. Con él vuelves desde Tu Tiqui, sin subir nada.",
+      tuyo: "Feehund ya es tuyo", copiar: "Copiar", copiado: "Copiado", correo: "Te lo hemos mandado por correo. Con él vuelves a Pregunta a Feehund, sin subir nada.",
       hasta: (d) => "Hasta el " + d.getDate() + " de " + ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"][d.getMonth()],
       invita: "Invitar a un amigo", invitaYo: "Tus preguntas me salen caras, jeje. Invita a un amigo: si paga, te regalo 30 días.", fin: "Se nos acabó el tiempo.",
       enlaceCopiado: "Enlace copiado. Pásaselo a quien quieras.", sinHuecos: "Ya te han regalado días 3 amigos. ¡Gracias!",
@@ -39,7 +41,7 @@
       topeDia: "Por hoy ya está. Mañana seguimos.", topeTotal: "Has llegado al máximo de este pase.", noAbre: "Ese código no existe o ya caducó.", sinPagar: "Aún no nos ha llegado el pago. Si has pagado, recarga en un momento.",
     },
     ca: {
-      titulo: "Pregunta-li a Tiqui", gratis: "La teva primera pregunta és gratis", siguePlanes: "Tria quant de temps i continua preguntant",
+      titulo: "Pregunta a Feehund", gratis: "La teva primera pregunta és gratis", siguePlanes: "Tria quant de temps i continua preguntant",
       estado: "Ensumant el teu extracte", estadoN: (n) => "Ensumant els teus " + n + " extractes", estadoNeg: "Ensumant el teu datàfon", uso: (p) => "Has fet servir el " + p + " % de les teves preguntes", privado: "Privat", pensando: "Ensumant",
       hola: "Què vols saber de les teves despeses?", escribe: "Escriu la teva pregunta", enviar: "Enviar",
       adonde: "On van els meus diners?", raro: "Hi ha alguna cosa estranya al meu compte?", llevo: (m) => "Quant porto a " + m + "?", mesMas: "Quin mes vaig gastar més?",
@@ -49,7 +51,7 @@
       unPago: "Un sol pagament. Sense subscripció", ahoraNo: "Ara no", momento: "Un moment…", errorPago: "No s'ha pogut. Torna-ho a provar.",
       holaNeg: "Què vols saber del teu datàfon?", sugNeg: ["Quant em cobra el banc al mes?", "Per què unes targetes em cobren més?", "A qui em canvio?"],
       planesNeg: { negocio_mes: ["4,99 €", "1 mes"], negocio_3m: ["9,99 €", "3 mesos"] }, unPagoNeg: "Un sol pagament. Sense subscripció. Amb factura", ivaNeg: "+ IVA",
-      tuyo: "Tiqui ja és teu", copiar: "Copiar", copiado: "Copiat", correo: "T'ho hem enviat per correu. Amb ell tornes des d'El teu Tiqui, sense pujar res.",
+      tuyo: "Feehund ja és teu", copiar: "Copiar", copiado: "Copiat", correo: "T'ho hem enviat per correu. Amb ell tornes a Pregunta a Feehund, sense pujar res.",
       hasta: (d) => "Fins al " + d.getDate() + " " + ["de gener", "de febrer", "de març", "d'abril", "de maig", "de juny", "de juliol", "d'agost", "de setembre", "d'octubre", "de novembre", "de desembre"][d.getMonth()],
       invita: "Convidar un amic", invitaYo: "Les teves preguntes em surten cares, jeje. Convida un amic: si paga, et regalo 30 dies.", fin: "Se'ns ha acabat el temps.",
       enlaceCopiado: "Enllaç copiat. Passa'l a qui vulguis.", sinHuecos: "Ja t'han regalat dies 3 amics. Gràcies!",
@@ -57,7 +59,7 @@
       topeDia: "Per avui ja està. Demà continuem.", topeTotal: "Has arribat al màxim d'aquest passi.", noAbre: "Aquest codi no existeix o ja ha caducat.", sinPagar: "Encara no ens ha arribat el pagament. Si has pagat, torna a carregar d'aquí a un moment.",
     },
     en: {
-      titulo: "Ask Tiqui", gratis: "Your first question is free", siguePlanes: "Pick how long and keep asking",
+      titulo: "Ask Feehund", gratis: "Your first question is free", siguePlanes: "Pick how long and keep asking",
       estado: "Sniffing your statement", estadoN: (n) => "Sniffing your " + n + " statements", estadoNeg: "Sniffing your card machine", uso: (p) => "You've used " + p + "% of your questions", privado: "Private", pensando: "Sniffing",
       hola: "What do you want to know about your spending?", escribe: "Type your question", enviar: "Send",
       adonde: "Where does my money go?", raro: "Is anything odd in my account?", llevo: (m) => "How much have I spent on " + m + "?", mesMas: "Which month did I spend the most?",
@@ -67,7 +69,7 @@
       unPago: "One payment. No subscription", ahoraNo: "Not now", momento: "One moment…", errorPago: "That didn't work. Try again.",
       holaNeg: "What do you want to know about your card machine?", sugNeg: ["How much does the bank charge me a month?", "Why do some cards cost me more?", "Who should I switch to?"],
       planesNeg: { negocio_mes: ["4,99 €", "1 month"], negocio_3m: ["9,99 €", "3 months"] }, unPagoNeg: "One payment. No subscription. With invoice", ivaNeg: "+ VAT",
-      tuyo: "Tiqui is yours", copiar: "Copy", copiado: "Copied", correo: "We've emailed it to you. Use it to come back from Your Tiqui, without uploading anything.",
+      tuyo: "Feehund is yours", copiar: "Copy", copiado: "Copied", correo: "We've emailed it to you. Use it to come back to Ask Feehund, without uploading anything.",
       hasta: (d) => "Until " + d.getDate() + " " + ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"][d.getMonth()],
       invita: "Invite a friend", invitaYo: "Your questions cost me a fortune, hehe. Invite a friend: if they pay, I'll give you 30 days.", fin: "Our time is up.",
       enlaceCopiado: "Link copied. Send it to anyone you like.", sinHuecos: "3 friends have already given you days. Thank you!",
@@ -78,7 +80,7 @@
 
   if (NEG) { T.estado = T.estadoNeg; T.hola = T.holaNeg; T.planes = T.planesNeg; T.unPago = T.unPagoNeg; T.iva = T.ivaNeg; }
 
-  // Sectores: solo lo que se sabe seguro (cadena conocida o palabra que no deja dudas). Lo demás, Tiqui lo dice como «sin saber qué es».
+  // Sectores: solo lo que se sabe seguro (cadena conocida o palabra que no deja dudas). Lo demás, Feehund lo dice como «sin saber qué es».
   const SECTORES = [
     ["casa", /HIPOTECA|ALQUILER|COMUNIDAD DE PROP|OCTOPUS|ENDESA|IBERDROLA|NATURGY|AIGUES|AGUAS DE|VODAFONE|MOVISTAR|ORANGE|DIGI|HOLALUZ|REPSOL|YOIGO|MASMOVIL|LOWI|PEPEPHONE|JAZZTEL/],
     ["super", /MERCADONA|ALDI|LIDL|CONDIS|BON PREU|ESCLAT|GUISSONA|CARREFOUR|CAPRABO|EROSKI|CONSUM|DIA %|SUPERMERCA|SUPERMARKET|HIPERMERCA|\bSUPER\b|ALIMENTACI|AHORRAMAS|HIPERCOR|ALCAMPO/],
@@ -106,12 +108,12 @@
     if (/IMPUESTO|A\.E\.A\.T/.test(u)) return "HACIENDA";
     return u.replace(/^(COMPRA|PAGO)( CON)? (TARJETA|TARJ\.?|TJ\.?)( DEBITO| CREDITO)?\s+|^(RECIBO|ADEUDO|CARGO)( SEPA)?\s+/, "").replace(/ \d{4} \d{4}.*$/, "").slice(0, 40);
   }
-  // Lo que Tiqui ha aprendido con otras personas (GET /api/ia/aprende): solo se descarga, no se manda nada
+  // Lo que Feehund ha aprendido con otras personas (GET /api/ia/aprende): solo se descarga, no se manda nada
   let aprendido = {};
   const normal = (k) => String(k || "").toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^A-Z0-9&.' ]+/g, " ").replace(/\s+/g, " ").trim().slice(0, 60);
   const aprendidoP = fetch(ROOT + "api/ia/aprende").then((r) => (r.ok ? r.json() : null)).then((d) => { if (d && d.entradas) aprendido = d.entradas; }).catch(() => {});
   // Lo que la persona contestó en «¿Qué es esto?» antes del resumen (assets/extracto.js), en este móvil
-  const MIOS = "fh-tiqui-quees";
+  const MIOS = "fh-pregunta-quees";
   const mios = () => { try { const x = JSON.parse(localStorage.getItem(MIOS) || "{}"); return x && !Array.isArray(x) ? x : {}; } catch (e) { return {}; } };
   function clasificar(m) {
     const k = comercio(m.concepto), u = (k + " | " + m.concepto).toUpperCase();
@@ -119,7 +121,7 @@
     const yo = mios()[k];
     return { k, s: yo && yo !== "persona" && yo !== "nose" ? yo : aprendido[normal(k)] || null, contestado: !!yo };
   }
-  // Para la ventana de preguntas de Mi banco: qué comercio es cada pago y si Tiqui ya sabe su sector
+  // Para la ventana de preguntas de Mi banco: qué comercio es cada pago y si Feehund ya sabe su sector
   window.FeehundComercio = {
     listo: () => Promise.race([aprendidoP, new Promise((ok) => setTimeout(ok, 1500))]),
     clasificar: (concepto) => clasificar({ concepto }),
@@ -138,7 +140,7 @@
   }
 
   // el pase de negocio se guarda aparte del de Mi banco: cada uno pregunta por lo suyo
-  const GRATIS = NEG ? "fh-tiqui-gratis-negocio" : "fh-tiqui-gratis", PASE = NEG ? "fh-tiqui-pase-negocio" : "fh-tiqui-pase", PEND = NEG ? "fh-tiqui-pend-negocio" : "fh-tiqui-pend", AMIGO = "fh-amigo", MIREF = "fh-tiqui-ref";
+  const GRATIS = NEG ? "fh-pregunta-gratis-negocio" : "fh-pregunta-gratis", PASE = NEG ? "fh-pregunta-pase-negocio" : "fh-pregunta-pase", PEND = NEG ? "fh-pregunta-pend-negocio" : "fh-pregunta-pend", AMIGO = "fh-amigo", MIREF = "fh-pregunta-ref";
   const leer = (k) => { try { return JSON.parse(localStorage.getItem(k) || "null"); } catch (e) { return null; } };
   const poner = (k, v) => { try { if (v) localStorage.setItem(k, JSON.stringify(v)); else localStorage.removeItem(k); } catch (e) {} };
   const leerPase = () => { const p = leer(PASE); return p && p.hasta > Date.now() ? p : null; };
@@ -180,7 +182,7 @@
   // precio de un plan; en negocios lleva «+ IVA» en pequeño (el IVA lo suma Stripe al pagar)
   const precio = (p) => { const x = mk("span", "tqc-plan-p", p); if (T.iva) x.appendChild(mk("small", "tqc-iva", " " + T.iva)); return x; };
   let caja = null, msgs = null, sub = null, sug = null;
-  // Mientras Tiqui piensa: «Olfateando» y tres puntos
+  // Mientras Feehund piensa: «Olfateando» y tres puntos
   function olfateando() {
     const f = document.createDocumentFragment(), d = mk("span", "tqc-dots"); d.append(mk("i"), mk("i"), mk("i"));
     f.append(mk("span", "tqc-esc", T.pensando), d);
@@ -192,7 +194,7 @@
     msgs.appendChild(m); m.scrollIntoView({ block: "nearest", behavior: "smooth" });
     return m;
   }
-  // El texto del modelo tal cual, sin negritas (igual que los chats de ejemplo de Tu Tiqui) y sin innerHTML
+  // El texto del modelo tal cual, sin negritas (igual que los chats de ejemplo de Pregunta a Feehund) y sin innerHTML
   const conNegrita = (texto) => document.createTextNode(String(texto).replace(/(\d) €/g, "$1\u00a0€")); // la cifra y el € siempre juntos
   function respuesta(texto, pagos) {
     const f = document.createDocumentFragment(); f.appendChild(conNegrita(texto));
@@ -286,14 +288,14 @@
     caja = mk("section", "tqc"); caja.id = "tqcIa"; caja.setAttribute("aria-label", T.titulo);
     const ch = mk("div", "tqc-chat");
     const pase = leerPase();
-    // Arriba, Tiqui como un contacto: su cara, su nombre, «Olfateando tu extracto» y «Privado»
-    const top = mk("div", "tqc-top"), cara = mk("img", "tqc-cara"); cara.src = ROOT + "assets/img/tiqui-olfatea.webp"; cara.alt = ""; cara.width = 44; cara.height = 44;
-    const quien = mk("div", "tqc-quien"), h2 = mk("h2", "tqc-h", "Tiqui"); h2.setAttribute("aria-label", T.titulo);
+    // Arriba, Feehund como un contacto: su cara, su nombre, «Olfateando tu extracto» y «Privado»
+    const top = mk("div", "tqc-top"), cara = mk("img", "tqc-cara"); cara.src = ROOT + "assets/img/feehund-perro-olfatea.webp"; cara.alt = ""; cara.width = 44; cara.height = 44;
+    const quien = mk("div", "tqc-quien"), h2 = mk("h2", "tqc-h", "Feehund"); h2.setAttribute("aria-label", T.titulo);
     const nArch = !NEG && ultimoR && ultimoR.lectura ? new Set((ultimoR.lectura.movimientos || []).map((m) => (m.origen && m.origen.archivo || "").replace(/\.[^.]+$/, ""))).size : 1;
     const est = mk("p", "tqc-est"); est.append(mk("i"), document.createTextNode(nArch > 1 ? T.estadoN(nArch) : T.estado)); quien.append(h2, est);
     top.append(cara, quien, mk("span", "tqc-priv", T.privado));
     sub = mk("p", "tqc-sub", pase ? T.hasta(new Date(pase.hasta)) : gratisUsada() ? "" : T.gratis); sub.hidden = !sub.textContent;
-    if (PAGINA) sub.hidden = true; // en Tu Tiqui la fecha ya está arriba, a la izquierda
+    if (PAGINA) sub.hidden = true; // en Pregunta a Feehund la fecha ya está arriba, a la izquierda
     msgs = mk("div", "tqc-msgs"); msgs.setAttribute("aria-live", "polite");
     sug = mk("div", "tqc-sug");
     sugerencias().forEach((q) => { const b = mk("button", null, q); b.type = "button"; b.addEventListener("click", () => preguntar(q)); sug.appendChild(b); });
@@ -383,12 +385,12 @@
     else if (caja.parentNode !== res) res.appendChild(caja);
     altoOrdenador();
   }
-  // Ordenador: Tiqui cabe entero en la pantalla nada más entrar (con «Escribe tu pregunta» a la vista) y es lo bastante
+  // Ordenador: Feehund cabe entero en la pantalla nada más entrar (con «Escribe tu pregunta» a la vista) y es lo bastante
   // alto para que, al final de la página, su borde de abajo coincida con el del contenido.
   function altoOrdenador() {
     if (!caja || PAGINA) return;
     if (!ancho.matches) { caja.style.removeProperty("--tqc-alto"); return; }
-    // dónde empieza Tiqui sin hacer scroll: arriba de su columna (Tiqui es fijo al bajar, así que se mide la columna, no Tiqui)
+    // dónde empieza Feehund sin hacer scroll: arriba de su columna (Feehund es fijo al bajar, así que se mide la columna, no Feehund)
     const res = caja.parentNode; if (!res || res.id === "tqcSolo") { caja.style.removeProperty("--tqc-alto"); return; }
     const arriba = res.getBoundingClientRect().top + scrollY + (parseFloat(getComputedStyle(res).paddingTop) || 0);
     caja.style.setProperty("--tqc-alto", Math.max(420, Math.round(innerHeight - arriba - 16)) + "px");
@@ -443,26 +445,26 @@
     document.addEventListener("fh-datafono", (e) => {
       try { datosNeg = datosDeCalculo(e.detail); if (caja) caja.remove(); montarCaja(); setTimeout(colocar, 0); setTimeout(altoOrdenador, 800); } catch (err) { /* el resultado sigue como siempre */ }
     });
-    // «A quién cambiarte» (Qué hacer ahora) pregunta a Tiqui
-    document.addEventListener("fh-tiqui-preguntar", (e) => {
+    // «A quién cambiarte» (Qué hacer ahora) pregunta a Feehund
+    document.addEventListener("fh-preguntar", (e) => {
       if (!caja) return;
       caja.scrollIntoView({ behavior: "smooth", block: "nearest" });
       if (e.detail) preguntar(String(e.detail));
     });
   }
 
-  // ---------- Al abrir la página: volver de Stripe (?tiqui=ok / ?tiqui=no) o con el código (?vuelta#CÓDIGO) ----------
+  // ---------- Al abrir la página: volver de Stripe (?pregunta=ok / ?pregunta=no) o con el código (?vuelta#CÓDIGO) ----------
   const aviso = (t) => { const e = $(NEG ? "dErr" : "xErr"); if (e) { e.textContent = t; e.hidden = false; } };
   async function abrirYMostrar(codigo) {
     const r = await api("abrir", { codigo });
     if (!r.ok || !r.d.caja) { aviso(T.noAbre); return false; }
     if (r.d.plan && r.d.hasta) poner(PASE, { codigo, plan: r.d.plan, hasta: r.d.hasta });
     let datos; try { datos = await abrirCaja(codigo, r.d.caja); } catch (e) { aviso(T.noAbre); return false; }
-    // un pase de negocio abierto desde Mi banco o Tu Tiqui: se va a Mi datáfono
-    if (datos && datos.n && !NEG) { try { localStorage.setItem("fh-tiqui-pase-negocio", JSON.stringify({ codigo, plan: r.d.plan, hasta: r.d.hasta })); localStorage.removeItem(PASE); } catch (e) {} location.replace(PAG_DAT[LANG] + "?vuelta#" + encodeURIComponent(codigo)); return true; }
+    // un pase de negocio abierto desde Mi banco o Pregunta a Feehund: se va a Mi datáfono
+    if (datos && datos.n && !NEG) { try { localStorage.setItem("fh-pregunta-pase-negocio", JSON.stringify({ codigo, plan: r.d.plan, hasta: r.d.hasta })); localStorage.removeItem(PASE); } catch (e) {} location.replace(PAG_DAT[LANG] + "?vuelta#" + encodeURIComponent(codigo)); return true; }
     if (NEG) {
       if (!datos || !datos.n) return false;
-      // Mi datáfono sin resultado delante: Tiqui sale solo, arriba, con los datos guardados
+      // Mi datáfono sin resultado delante: Feehund sale solo, arriba, con los datos guardados
       datosNeg = datos.n;
       let solo = $("tqcSolo");
       if (!solo) { solo = mk("div", "tqc-solo"); solo.id = "tqcSolo"; const lector = $("dLector"); (lector && lector.parentNode ? lector.parentNode : document.body).insertBefore(solo, lector); }
@@ -471,46 +473,46 @@
     }
     return !!(window.FeehundMostrar && datos && window.FeehundMostrar(datos.r));
   }
-  // Tu Tiqui: abre la caja con el código (del enlace o del pase guardado) y monta el chat en la página
+  // Pregunta a Feehund: abre la caja con el código (del enlace o del pase guardado) y monta el chat en la página
   async function abrirPagina() {
     const h = decodeURIComponent(location.hash.slice(1)).trim().toUpperCase(), p = leer(PASE);
     const codigo = /^FH-?[0-9A-Z]/.test(h) ? h : p && p.codigo;
     history.replaceState(null, "", location.pathname + location.search);
-    const fuera = (t) => document.dispatchEvent(new CustomEvent("fh-tiqui-pagina", { detail: { error: t } }));
-    if (!codigo) { location.replace(PAG_TIQUI[LANG]); return; }
-    try { if (sessionStorage.getItem("fh-tiqui-nuevo") === codigo) codigoNuevo = codigo; sessionStorage.removeItem("fh-tiqui-nuevo"); } catch (e) {}
+    const fuera = (t) => document.dispatchEvent(new CustomEvent("fh-pregunta-pagina", { detail: { error: t } }));
+    if (!codigo) { location.replace(PAG_PREGUNTA[LANG]); return; }
+    try { if (sessionStorage.getItem("fh-pregunta-nuevo") === codigo) codigoNuevo = codigo; sessionStorage.removeItem("fh-pregunta-nuevo"); } catch (e) {}
     const r = await api("abrir", { codigo });
     if (!r.ok || !r.d.caja) { fuera(T.noAbre); return; }
     let datos; try { datos = await abrirCaja(codigo, r.d.caja); } catch (e) { fuera(T.noAbre); return; }
     if (datos && datos.n && !NEG) { location.replace(location.pathname + "?negocio#" + encodeURIComponent(codigo)); return; }
     if (datos && datos.r && NEG) { location.replace(location.pathname + "#" + encodeURIComponent(codigo)); return; }
     poner(PASE, { codigo, plan: r.d.plan, hasta: r.d.hasta });
-    // Para el panel de la izquierda (assets/extracto/tiqui-pagina.js): sus extractos y guardar lo que sume
-    window.FeehundTiqui = {
+    // Para el panel de la izquierda (assets/extracto/pregunta-pagina.js): sus extractos y guardar lo que sume
+    window.FeehundPregunta = {
       guardar: async (r2) => {
         const x = await api("caja", { codigo, caja: await cerrarCaja(codigo, { r: r2 }) });
         if (!x.ok) throw new Error("caja");
         await cargar(r2);
       },
     };
-    document.dispatchEvent(new CustomEvent("fh-tiqui-pagina", { detail: { codigo, plan: r.d.plan, hasta: r.d.hasta, datos, negocio: NEG } }));
+    document.dispatchEvent(new CustomEvent("fh-pregunta-pagina", { detail: { codigo, plan: r.d.plan, hasta: r.d.hasta, datos, negocio: NEG } }));
     if (NEG) { datosNeg = datos.n; if (caja) caja.remove(); montarCaja(); colocar(); } else await cargar(datos.r);
     pintarUso(r.d);
   }
   async function inicio() {
     if (PAGINA) return abrirPagina();
     const q = new URLSearchParams(location.search), limpia = () => history.replaceState(null, "", location.pathname);
-    if (q.get("tiqui") === "ok") {
+    if (q.get("pregunta") === "ok") {
       const pend = leer(PEND), sesion = q.get("s") || ""; limpia();
       if (!pend) return;
       let r = await api("canjear", { codigo: pend.codigo, sesion });
       if (!r.ok && r.d.error === "sin_pagar") { await new Promise((x) => setTimeout(x, 3000)); r = await api("canjear", { codigo: pend.codigo, sesion }); }
       if (!r.ok) { aviso(T.sinPagar); return; }
       poner(PASE, { codigo: pend.codigo, plan: r.d.plan, hasta: r.d.hasta }); poner(PEND, null);
-      // quien paga va a su página de Tu Tiqui (allí le sale su código)
-      try { sessionStorage.setItem("fh-tiqui-nuevo", pend.codigo); } catch (e) {}
+      // quien paga va a su página de Pregunta a Feehund (allí le sale su código)
+      try { sessionStorage.setItem("fh-pregunta-nuevo", pend.codigo); } catch (e) {}
       location.replace(PAG_CHAT[LANG] + (NEG ? "?negocio" : "") + "#" + encodeURIComponent(pend.codigo));
-    } else if (q.get("tiqui") === "no") {
+    } else if (q.get("pregunta") === "no") {
       const pend = leer(PEND); limpia(); poner(PEND, null);
       if (pend) await abrirYMostrar(pend.codigo); // vuelve a ver lo suyo, sin subir nada
     } else if (q.has("vuelta")) {

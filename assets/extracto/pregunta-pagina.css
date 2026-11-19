@@ -1,4 +1,4 @@
-/* Tu Tiqui, la página de quien paga (/tiqui/chat/, assets/extracto/tiqui-pagina.js). El chat es el de siempre (tiqui.css). */
+/* Pregunta a Feehund, la página de quien paga (/pregunta/chat/, assets/extracto/pregunta-pagina.js). El chat es el de siempre (pregunta.css). */
 .tc{padding-top:var(--s-5);padding-bottom:var(--s-6)}
 .tc-app{display:grid;gap:var(--s-4)}
 .tc-app:not(.tc-listo){display:none}

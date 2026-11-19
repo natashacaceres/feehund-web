@@ -111,10 +111,10 @@ a.firma:hover .firma-n{text-decoration:none;text-underline-offset:3px}
 @media (min-width:1024px){.ftr-in{grid-template-columns:minmax(0,1fr) auto;align-items:start}.ftr-links{justify-content:flex-end;max-width:520px}.ftr-c{grid-column:1 / -1}}
 
 /* Mascota: solo en el logo, el blog, el resultado y los errores */
-picture:has(> .tiqui){display:contents}
-.tiqui{display:block;width:auto;max-width:none;flex:none}
-.tiqui--res{position:absolute;top:0;right:0;height:44px}
-.tiqui--err{height:88px;margin:0 0 var(--s-4)}
+picture:has(> .perro){display:contents}
+.perro{display:block;width:auto;max-width:none;flex:none}
+.perro--res{position:absolute;top:0;right:0;height:44px}
+.perro--err{height:88px;margin:0 0 var(--s-4)}
 
 /* Calculadora: estructura de la portada */
 .calc{color:var(--ink);overflow-x:clip}
@@ -1265,7 +1265,7 @@ body:has(> main.home,> main.ext) :is(.ftr,.ftr-legal,.langdd summary,.langdd li 
 .ext :is(.ext-how p,.ext-err,.pq-d,.res-nota,.ext-msg,.ext-foot,.fi-d,.res-sec-tot,.ext-p,.res-todo-s,.ext-y span){font-size:16px}
 .ext :is(.res-n,.fi-e,.ext-tag){font-size:15px;white-space:nowrap}
 
-/* Carga «olfateando»: Tiqui olfatea */
+/* Carga «olfateando»: Feehund olfatea */
 .ext-prog{width:min(240px,70%);height:10px;margin:var(--s-4) auto 0;border-radius:999px;background:var(--brand-tint);overflow:hidden}
 .ext-prog span{display:block;height:100%;border-radius:999px;background:var(--brand);transform:scaleX(0);transform-origin:left;transition:transform .2s linear}
 .ext-sniff{display:block;width:120px;height:auto;margin:0 auto;transform-origin:50% 60%;animation:olfatea2 1.1s ease-in-out infinite}
@@ -1540,8 +1540,8 @@ main.art2 p a[href^="http"],main.art2 li a[href^="http"]{text-decoration:underli
 .r3 p{margin:0}
 .r3-top{display:flex;justify-content:flex-end}
 .r3-meses{display:inline-flex;align-items:center;min-height:32px;padding:4px 14px;border-radius:999px;background:var(--brand-tint);color:var(--brand-dark);font:600 15px/1.2 var(--f-text)}
-.r3-tiqui{display:flex;align-items:flex-end;gap:var(--s-3)}
-.r3-tiqui-i{flex:none;width:48px;height:48px;object-fit:contain}
+.r3-perro{display:flex;align-items:flex-end;gap:var(--s-3)}
+.r3-perro-i{flex:none;width:48px;height:48px;object-fit:contain}
 .r3-frase{flex:1;padding:12px 16px;border-radius:18px 18px 18px 6px;background:var(--ink);color:var(--bg);font:400 17px/1.4 var(--f-text)}
 .r3-cifra-l{font:600 17px/1.3 var(--f-text);color:var(--ink);margin-bottom:-12px !important}
 .r3-cifra{font:800 clamp(56px,17vw,80px)/1.05 var(--f-display);color:var(--ink);letter-spacing:-.02em;font-variant-numeric:lining-nums}
@@ -1647,10 +1647,10 @@ body.con-barra{padding-bottom:calc(88px + env(safe-area-inset-bottom))}
 #res .r3-link{color:var(--brand);font:700 16px/1.2 var(--f-text)}
 #res .r3-compartir{color:var(--ink)}
 #res .r3-bar{cursor:default}
-/* «Tu Tiqui» en la cabecera: igual que «Dar de baja», sin cara ni fondo */
-.hdr-tiqui{display:inline-flex;align-items:center;min-height:44px;padding:0 8px;border-radius:var(--r);font:700 16px/1 var(--f-text);color:var(--ink);text-decoration:none;white-space:nowrap}
-.hdr-tiqui:hover,.hdr-tiqui[aria-current="page"]{color:var(--brand)}
-.hdr-tiqui:focus-visible{outline:2px solid var(--brand);outline-offset:2px}
+/* «Pregunta a Feehund» en la cabecera: igual que «Dar de baja», sin cara ni fondo */
+.hdr-pregunta{display:inline-flex;align-items:center;min-height:44px;padding:0 8px;border-radius:var(--r);font:700 16px/1 var(--f-text);color:var(--ink);text-decoration:none;white-space:nowrap}
+.hdr-pregunta:hover,.hdr-pregunta[aria-current="page"]{color:var(--brand)}
+.hdr-pregunta:focus-visible{outline:2px solid var(--brand);outline-offset:2px}
 /* Portada: si el nombre no cabe (catalán, inglés), baja a una segunda línea en vez de montarse sobre la flecha */
 .cubo-t,.cubo-s{white-space:normal;overflow-wrap:normal;text-wrap:balance;min-width:0;max-width:100%}
 /* Cabecera en móvil: cabe igual en los tres idiomas («Donar de baixa» es más largo) */
@@ -1662,7 +1662,7 @@ body.con-barra{padding-bottom:calc(88px + env(safe-area-inset-bottom))}
   .home-ok{display:grid!important;grid-template-columns:1fr 1fr;width:100%;justify-items:center;gap:14px 12px!important;margin-top:4px}
   .home-ok li{display:inline-flex;align-items:center;white-space:nowrap}
 }
-/* Menú del móvil: el logo a la izquierda y las tres rayas a la derecha; dentro, Tu Tiqui, Dar de baja y el idioma.
+/* Menú del móvil: el logo a la izquierda y las tres rayas a la derecha; dentro, Pregunta a Feehund, Dar de baja y el idioma.
    Lo monta assets/app.js (si no hay JavaScript, se queda la cabecera de siempre). */
 .hdr-menu,.hdr-idiomas{display:none}
 @media (max-width:760px){
@@ -1673,7 +1673,7 @@ body.con-barra{padding-bottom:calc(88px + env(safe-area-inset-bottom))}
   .hdr--menu.abierto .hdr-menu i:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
   .hdr--menu .hdr-r{display:none;position:absolute;left:0;right:0;top:100%;flex-direction:column;align-items:center;gap:4px;padding:12px var(--side) 28px;background:var(--bg);box-shadow:0 18px 30px -18px rgba(20,33,61,.35)}
   .hdr--menu.abierto .hdr-r{display:flex}
-  .hdr--menu .hdr-r .hdr-tiqui,.hdr--menu .hdr-r .hdr-baja{min-height:56px;padding:0 12px;font-size:22px}
+  .hdr--menu .hdr-r .hdr-pregunta,.hdr--menu .hdr-r .hdr-baja{min-height:56px;padding:0 12px;font-size:22px}
   .hdr--menu .hdr-r .langdd{display:none}
   .hdr--menu .hdr-idiomas{display:flex;justify-content:center;gap:8px;margin-top:8px}
   .hdr-idiomas a{display:inline-flex;align-items:center;min-height:44px;padding:0 10px;font:600 17px/1 var(--f-text);color:var(--ink-2);text-decoration:none}
