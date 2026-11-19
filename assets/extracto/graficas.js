@@ -1,6 +1,6 @@
 // Mi banco: pestañas «Resumen / Gráficas» y la tarjeta de compartir plegada.
 // Las gráficas cuentan lo mismo que el resumen (lo que se repite), más fácil de ver:
-//   la cifra al año (la misma del resumen), «Quién se lo lleva» (de mayor a menor, con logos)
+//   la cifra al mes (la misma del resumen), «Sigues pagando» (de mayor a menor, con logos), «Ya no pagas»
 //   y «De cada 100 €» por tipo de pago (casa, suscripciones, seguros, comisiones, otros).
 // Escucha «fh-resultado» (lo lanza assets/extracto.js con el resultado del motor). Sin estilos ni scripts en línea (CSP).
 (function () {
@@ -10,6 +10,7 @@
   const ROOT = (document.currentScript && document.currentScript.dataset.root) || "../";
   const nf0 = new Intl.NumberFormat("es-ES", { maximumFractionDigits: 0, useGrouping: "always" });
   const eur = (x) => nf0.format(Math.round(x)) + " €";
+  const eurM = (x) => (Math.abs(x) < 10 ? nf2.format(x) + " €" : eur(x)); // al mes: 2,99 € y no 3 €
   const nf2 = new Intl.NumberFormat("es-ES", { minimumFractionDigits: 2, maximumFractionDigits: 2, useGrouping: "always" });
   const nf4 = new Intl.NumberFormat("es-ES", { minimumFractionDigits: 4, maximumFractionDigits: 4 });
   const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
@@ -18,7 +19,8 @@
     es: {
       resumen: "Resumen", graficas: "Gráficas", pagas: "Pagas al año en cosas que se repiten",
       calc: (n) => "al año, calculado con " + (n === 1 ? "1 mes" : n + " meses"), mes: (x) => "Unos " + x + " al mes",
-      quien: "Quién se lo lleva", alAno: "Al año", evitable: "Se puede evitar", cada100: "De cada 100 €", menos1: "<1 €",
+      quien: "Sigues pagando", alAno: "Al mes", yaNo: "Ya no pagas", ultimo: (m) => "Último cargo en " + m, desdeMes: (m) => "Desde " + m, tipAno: (n, x) => n + ": " + x + " al año",
+      ahorro: "Lo que puedes ahorrar", ahorroNada: "En este extracto no veo nada concreto que ahorrar.", devolver: "Te lo pueden devolver", enExtracto: "En este extracto", mesL: ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"], evitable: "Se puede evitar", cada100: "De cada 100 €", menos1: "<1 €",
       tipos: { casa: "Casa", susc: "Suscripciones", seg: "Seguros", banco: "Comisiones del banco", fijo: "Préstamos e impuestos", otros: "Otros pagos" },
       tipMes: (n, x) => n + ": unos " + x + " al mes", tip100: (k, l) => k + " de cada 100 €: " + l, menos: "Menos de 1",
       nada: "No hemos visto pagos que se repitan.", waffle: "Cien cuadritos: cada uno es 1 € de cada 100 que se repiten",
@@ -28,13 +30,12 @@
       cuando: "Cuándo se te va", cuandoQ: "Cada punto es un cobro. Toca uno.", ventana: (a, b) => "sale entre el día " + a + " y el " + b, alMes: "al mes", dia: (d) => "Día " + d, unaVez: "1 vez al año",
       sube: "Quién te ha subido el precio", subeQ: "Lo que pagas de más al año por cada subida.", subeTot: "al año, sin que nadie te avise", igual: "Igual", alAnoP: "al año",
       nadieSube: "Nadie te ha subido el precio en este extracto.",
-      sigues: "Si sigues así", siguesQ: "Mueve la barra.", enAnos: (n) => (n === 1 ? "en 1 año" : "en " + n + " años"), anos: "Años",
-      ipc: "Con lo que suben los precios hoy (IPC 4,9 %, INE, octubre 2026).",
     },
     ca: {
       resumen: "Resum", graficas: "Gràfics", pagas: "Pagues l'any en coses que es repeteixen",
       calc: (n) => "a l'any, calculat amb " + (n === 1 ? "1 mes" : n + " mesos"), mes: (x) => "Uns " + x + " al mes",
-      quien: "Qui se l'emporta", alAno: "L'any", evitable: "Es pot evitar", cada100: "De cada 100 €", menos1: "<1 €",
+      quien: "Continues pagant", alAno: "Al mes", yaNo: "Ja no pagues", ultimo: (m) => "Últim càrrec " + (/^[aeiou]/.test(m) ? "a l'" : "al ") + m, desdeMes: (m) => "Des " + (/^[aeiou]/.test(m) ? "d'" : "de ") + m, tipAno: (n, x) => n + ": " + x + " l'any",
+      ahorro: "El que pots estalviar", ahorroNada: "En aquest extracte no veig res concret per estalviar.", devolver: "Te'l poden retornar", enExtracto: "En aquest extracte", mesL: ["gener", "febrer", "març", "abril", "maig", "juny", "juliol", "agost", "setembre", "octubre", "novembre", "desembre"], evitable: "Es pot evitar", cada100: "De cada 100 €", menos1: "<1 €",
       tipos: { casa: "Casa", susc: "Subscripcions", seg: "Assegurances", banco: "Comissions del banc", fijo: "Préstecs i impostos", otros: "Altres pagaments" },
       tipMes: (n, x) => n + ": uns " + x + " al mes", tip100: (k, l) => k + " de cada 100 €: " + l, menos: "Menys d'1",
       nada: "No hem vist pagaments que es repeteixin.", waffle: "Cent quadradets: cadascun és 1 € de cada 100 que es repeteixen",
@@ -44,13 +45,12 @@
       cuando: "Quan se te'n va", cuandoQ: "Cada punt és un cobrament. Toca'n un.", ventana: (a, b) => "surt entre el dia " + a + " i el " + b, alMes: "al mes", dia: (d) => "Dia " + d, unaVez: "1 cop l'any",
       sube: "Qui t'ha apujat el preu", subeQ: "El que pagues de més l'any per cada pujada.", subeTot: "l'any, sense que ningú t'avisi", igual: "Igual", alAnoP: "l'any",
       nadieSube: "Ningú t'ha apujat el preu en aquest extracte.",
-      sigues: "Si continues així", siguesQ: "Mou la barra.", enAnos: (n) => (n === 1 ? "en 1 any" : "en " + n + " anys"), anos: "Anys",
-      ipc: "Amb el que pugen els preus avui (IPC 4,9 %, INE, octubre 2026).",
     },
     en: {
       resumen: "Summary", graficas: "Charts", pagas: "You pay each year in things that repeat",
       calc: (n) => "a year, worked out from " + (n === 1 ? "1 month" : n + " months"), mes: (x) => "About " + x + " a month",
-      quien: "Who gets it", alAno: "A year", evitable: "Avoidable", cada100: "Out of every 100 €", menos1: "<1 €",
+      quien: "Still paying", alAno: "A month", yaNo: "No longer paying", ultimo: (m) => "Last charge in " + m, desdeMes: (m) => "Since " + m, tipAno: (n, x) => n + ": " + x + " a year",
+      ahorro: "What you can save", ahorroNada: "I can't see anything specific to save in this statement.", devolver: "You can get it back", enExtracto: "In this statement", mesL: ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"], evitable: "Avoidable", cada100: "Out of every 100 €", menos1: "<1 €",
       tipos: { casa: "Home", susc: "Subscriptions", seg: "Insurance", banco: "Bank fees", fijo: "Loans and taxes", otros: "Other payments" },
       tipMes: (n, x) => n + ": about " + x + " a month", tip100: (k, l) => k + " of every 100 €: " + l, menos: "Less than 1",
       nada: "We didn't see any payments that repeat.", waffle: "A hundred squares: each one is 1 € of every 100 that repeat",
@@ -60,35 +60,9 @@
       cuando: "When it leaves", cuandoQ: "Each dot is a payment. Tap one.", ventana: (a, b) => "goes out between day " + a + " and day " + b, alMes: "a month", dia: (d) => "Day " + d, unaVez: "once a year",
       sube: "Who raised your price", subeQ: "What you pay extra each year for each rise.", subeTot: "a year, without anyone telling you", igual: "Same", alAnoP: "a year",
       nadieSube: "Nobody raised your price in this statement.",
-      sigues: "If you carry on like this", siguesQ: "Move the slider.", enAnos: (n) => (n === 1 ? "in 1 year" : "in " + n + " years"), anos: "Years",
-      ipc: "With today's price rises (CPI 4.9%, INE, October 2026).",
     },
   }[LANG];
 
-  // «Si sigues así»: a qué equivale. Precios medios de España en 2026 (fuentes en el Manual: Oney, idealista, INE,
-  // coches.com, Bodas.net, Ministerio de Vivienda, Carwow, precios públicos de las universidades)
-  const IPC = 0.049; // INE, IPC de octubre de 2026
-  const COSAS = [
-    [922, ["Un curso de universidad pública", "Un curs d'universitat pública", "A year at a state university"], ["60 créditos a 15,37 € de media", "60 crèdits a 15,37 € de mitjana", "60 credits at 15.37 € on average"]],
-    [1100, ["Sacarte el carné de conducir", "Treure't el carnet de conduir", "Getting your driving licence"], ["entre 1.000 y 1.600 € en autoescuela", "entre 1.000 i 1.600 € a l'autoescola", "1,000 to 1,600 € at a driving school"]],
-    [1389, ["Las vacaciones de verano de una persona", "Les vacances d'estiu d'una persona", "One person's summer holiday"], ["gasto medio en España", "despesa mitjana a Espanya", "average spend in Spain"]],
-    [2778, ["Las vacaciones de verano de dos personas", "Les vacances d'estiu de dues persones", "A summer holiday for two"], ["1.389 € por persona", "1.389 € per persona", "1,389 € per person"]],
-    [3672, ["Tres meses de alquiler", "Tres mesos de lloguer", "Three months' rent"], ["piso de 80 m² a 15,3 €/m²", "pis de 80 m² a 15,3 €/m²", "80 m² flat at 15.3 €/m²"]],
-    [5626, ["Toda la comida de tu casa durante un año", "Tot el menjar de casa teva durant un any", "All your household's food for a year"], ["gasto medio por hogar", "despesa mitjana per llar", "average per household"]],
-    [7344, ["Seis meses de alquiler", "Sis mesos de lloguer", "Six months' rent"], ["piso de 80 m² a 15,3 €/m²", "pis de 80 m² a 15,3 €/m²", "80 m² flat at 15.3 €/m²"]],
-    [8404, ["Un año de comida y las vacaciones de dos", "Un any de menjar i les vacances de dos", "A year of food and a holiday for two"], ["5.626 € + 2.778 €", "5.626 € + 2.778 €", "5,626 € + 2,778 €"]],
-    [11252, ["Dos años de comida de tu casa", "Dos anys de menjar de casa teva", "Two years of your household's food"], ["5.626 € al año", "5.626 € l'any", "5,626 € a year"]],
-    [13419, ["Un coche de segunda mano", "Un cotxe de segona mà", "A second-hand car"], ["precio medio en 2026", "preu mitjà el 2026", "average price in 2026"]],
-    [14688, ["Un año entero de alquiler", "Un any sencer de lloguer", "A whole year's rent"], ["piso de 80 m² a 15,3 €/m²", "pis de 80 m² a 15,3 €/m²", "80 m² flat at 15.3 €/m²"]],
-    [16197, ["Un coche de segunda mano y las vacaciones de dos", "Un cotxe de segona mà i les vacances de dos", "A second-hand car and a holiday for two"], ["13.419 € + 2.778 €", "13.419 € + 2.778 €", "13,419 € + 2,778 €"]],
-    [19045, ["Un coche de segunda mano y un año de comida", "Un cotxe de segona mà i un any de menjar", "A second-hand car and a year of food"], ["13.419 € + 5.626 €", "13.419 € + 5.626 €", "13,419 € + 5,626 €"]],
-    [20250, ["Una boda de 90 invitados", "Un casament de 90 convidats", "A wedding for 90 guests"], ["225 € por invitado", "225 € per convidat", "225 € per guest"]],
-    [25183, ["Una boda media en España", "Un casament mitjà a Espanya", "An average Spanish wedding"], ["unos 112 invitados", "uns 112 convidats", "about 112 guests"]],
-    [29376, ["Dos años de alquiler", "Dos anys de lloguer", "Two years' rent"], ["piso de 80 m² a 15,3 €/m²", "pis de 80 m² a 15,3 €/m²", "80 m² flat at 15.3 €/m²"]],
-    [42390, ["La entrada de un piso de 90 m²", "L'entrada d'un pis de 90 m²", "The deposit on a 90 m² flat"], ["el 20 % de 212.000 €", "el 20 % de 212.000 €", "20% of 212,000 €"]],
-    [43557, ["Un coche nuevo", "Un cotxe nou", "A new car"], ["precio medio en concesionario", "preu mitjà al concessionari", "average dealership price"]],
-  ];
-  const LI = { es: 0, ca: 1, en: 2 }[LANG];
 
   // Mismas reglas que la cifra del resumen (assets/extracto.js): seguros (o posibles si no hay ninguno) y comisiones no devueltas
   const SUSC = ["streaming", "musica", "nube_apps", "ia", "prensa", "gimnasios", "citas", "videojuegos", "idiomas", "reparto", "suscripciones", "club_descuentos", "bienestar", "pasarelas"];
@@ -120,8 +94,8 @@
         const v = com ? anualCom(c) : c.coste_anual || 0;
         const tk = com ? "banco" : tipoDe(c.categoria); porTipo[tk] = (porTipo[tk] || 0) + v;
         const k = com ? "_comisiones" : c.comercio_id || c.nombre;
-        const it = junta[k] || (junta[k] = { n: com ? T.tipos.banco : c.nombre, id: com ? null : c.comercio_id, cat: com ? "comisiones" : c.categoria, v: 0, com });
-        it.v += v;
+        const it = junta[k] || (junta[k] = { n: com ? T.tipos.banco : c.nombre, id: com ? null : c.comercio_id, cat: com ? "comisiones" : c.categoria, v: 0, com, pri: null });
+        it.v += v; if (!com && c.primer_cargo && (!it.pri || c.primer_cargo < it.pri)) it.pri = c.primer_cargo;
         (c.movimientos || []).forEach((m) => { const k2 = String(m.fecha || "").slice(0, 7); if (k2.length === 7 && m.importe < 0) porMes[k2] = (porMes[k2] || 0) - m.importe; });
         if (!com && v > 0) lista2.push({ c, v });
       });
@@ -145,7 +119,7 @@
         if (fin - ini >= 0.5 && k > 0 && a.slice(k).every((x) => cerca(x, fin))) subidas.push({ n: c.nombre, id: c.comercio_id, a: ini, b: fin, extra: v * (fin - ini) / fin });
       }
     });
-    return { total, meses, porMes: lista, puntos, subidas: subidas.sort((x, y) => y.extra - x.extra), items: Object.values(junta).filter((x) => x.v >= 0.5).sort((a, b) => b.v - a.v) };
+    return { total, meses, desde: periodo.desde || null, porMes: lista, puntos, subidas: subidas.sort((x, y) => y.extra - x.extra), items: Object.values(junta).filter((x) => x.v >= 0.5).sort((a, b) => b.v - a.v) };
   }
 
   // Aviso que sigue al ratón o al dedo
@@ -177,10 +151,12 @@
       li.appendChild(logo(it));
       const nom = document.createElement("span"); nom.className = "pg-nom"; nom.textContent = it.n;
       if (it.com) { const tg = document.createElement("span"); tg.className = "pg-tag"; tg.textContent = T.evitable; nom.appendChild(tg); }
-      const val = document.createElement("span"); val.className = "pg-val"; val.textContent = eur(it.v);
+      // empezó después del principio del extracto: se dice desde cuándo (Octopus, desde marzo)
+      if (it.pri && repe.desde && (Date.parse(it.pri) - Date.parse(repe.desde)) / 864e5 > 45) { const sm = document.createElement("small"); sm.textContent = T.desdeMes(T.mesL[+it.pri.slice(5, 7) - 1]); nom.appendChild(sm); }
+      const val = document.createElement("span"); val.className = "pg-val"; val.textContent = eurM(it.v / 12);
       const bar = document.createElement("span"); bar.className = "pg-bar"; const i = document.createElement("i"); i.style.width = Math.max(2, (it.v / max) * 100) + "%"; bar.appendChild(i);
       li.append(nom, val, bar); rk.appendChild(li);
-      const t = T.tipMes(it.n, eur(it.v / 12));
+      const t = T.tipAno(it.n, eur(it.v));
       const on = (e) => { li.classList.add("on"); tip(e, t); }, off = () => { li.classList.remove("on"); tip(null, ""); };
       li.addEventListener("mousemove", on); li.addEventListener("mouseleave", off); li.addEventListener("touchstart", on, { passive: true });
       li.addEventListener("focus", () => { const b = li.getBoundingClientRect(); on({ clientX: b.left + b.width / 2, clientY: b.top }); }); li.addEventListener("blur", off);
@@ -202,9 +178,29 @@
     const ul = document.createElement("ul"); ul.className = "pg-rk";
     const nota = document.createElement("p"); nota.className = "pg-nota"; nota.textContent = T.alAno;
     sec.append(h, ul, nota); ancla.after(sec); ranking(ul);
+    yaNoPagas(sec);
+  }
+  // «Ya no pagas»: lo que dejó de cobrarse (sin adivinar si ahora va por la tarjeta de crédito), con su último mes
+  function yaNoPagas(antes) {
+    const viejo = $("pgFin"); if (viejo) viejo.remove();
+    const fin = (ultimoR && ultimoR.terminados || []).filter((c) => c.ultimo_cargo && (c.coste_anual || 0) > 0).sort((a, b) => (b.coste_anual || 0) - (a.coste_anual || 0));
+    if (!fin.length) return;
+    const sec = document.createElement("section"); sec.className = "r3-blq pg-res"; sec.id = "pgFin";
+    const h = document.createElement("h2"); h.className = "r3-h"; h.textContent = T.yaNo;
+    const ul = document.createElement("ul"); ul.className = "pg-rk pg-rk--fin";
+    fin.forEach((c) => {
+      const li = document.createElement("li");
+      li.appendChild(logo({ n: c.nombre, id: c.comercio_id }));
+      const nom = document.createElement("span"); nom.className = "pg-nom"; nom.textContent = c.nombre;
+      const sm = document.createElement("small"); sm.textContent = T.ultimo(T.mesL[+c.ultimo_cargo.slice(5, 7) - 1]); nom.appendChild(sm);
+      const val = document.createElement("span"); val.className = "pg-val"; val.textContent = eurM((c.coste_anual || 0) / 12);
+      li.append(nom, val); ul.appendChild(li);
+    });
+    const nota = document.createElement("p"); nota.className = "pg-nota"; nota.textContent = T.alAno;
+    sec.append(h, ul, nota); antes.after(sec);
   }
 
-  let repe = null;
+  let repe = null, ultimoR = null;
   function pintar() {
     const gr = $("pgGr"); if (!gr || !repe) return;
     if (!repe.items.length) { gr.innerHTML = '<p class="pg-k">' + esc(T.nada) + "</p>"; return; }
@@ -222,8 +218,8 @@
       '<section class="pg-blq"><h3 class="pg-h">' + esc(T.cada100) + '</h3><div class="pg-wfz"><div class="pg-wf" role="img" aria-label="' + esc(T.waffle) + '"></div><ul class="pg-wl"></ul></div></section>' +
       (repe.puntos.length > 1 ? '<section class="pg-blq pg-rel"><h3 class="pg-h">' + esc(T.cuando) + '</h3><p class="pg-q">' + esc(T.cuandoQ) + '</p><div class="pg-rel-in"></div></section>' : "") +
       '<section class="pg-blq pg-sub"><h3 class="pg-h">' + esc(T.sube) + '</h3></section>' +
-      '<section class="pg-blq pg-sig"><h3 class="pg-h">' + esc(T.sigues) + '</h3><p class="pg-q">' + esc(T.siguesQ) + '</p><div class="pg-sig-in"></div></section>';
-    vivo(gr); reloj(gr.querySelector(".pg-rel-in")); subidas(gr.querySelector(".pg-sub")); sigues(gr.querySelector(".pg-sig-in"));
+      '<section class="pg-blq pg-aho"><h3 class="pg-h">' + esc(T.ahorro) + '</h3></section>';
+    vivo(gr); reloj(gr.querySelector(".pg-rel-in")); subidas(gr.querySelector(".pg-sub")); ahorro(gr.querySelector(".pg-aho"));
 
     // De cada 100 €
     const wf = gr.querySelector(".pg-wf"), wl = gr.querySelector(".pg-wl");
@@ -232,7 +228,7 @@
       const li = document.createElement("li"); li.tabIndex = 0; li.dataset.t = n;
       const ct = document.createElement("span"); ct.className = "pg-cnt"; ct.textContent = t.k ? t.k + " €" : T.menos1;
       const tn = document.createElement("span"); tn.className = "pg-tn"; const sq = document.createElement("i"); sq.style.background = t.color; tn.append(sq, document.createTextNode(T.tipos[t.tk]));
-      const v = document.createElement("span"); v.className = "pg-val"; v.textContent = eur(t.v);
+      const v = document.createElement("span"); v.className = "pg-val"; v.textContent = eurM(t.v / 12);
       li.append(ct, tn, v); wl.appendChild(li);
     });
     const filas = [...wl.children];
@@ -295,7 +291,7 @@
       g.addEventListener("click", () => ver(d)); g.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); ver(d); } });
       gs[d] = g; svg.appendChild(g);
     });
-    const c1 = svgEl("text", { x: cx, y: cy - 2, "text-anchor": "middle", fill: "#14213D", "font-size": 32, "font-weight": 800, class: "pg-rel-c" }); c1.textContent = eur(repe.total / 12); // la misma cifra que «al mes» de arriba svg.appendChild(c1);
+    const c1 = svgEl("text", { x: cx, y: cy - 2, "text-anchor": "middle", fill: "#14213D", "font-size": 32, "font-weight": 800, class: "pg-rel-c" }); c1.textContent = eur(repe.total / 12); svg.appendChild(c1); // la misma cifra que «al mes» de arriba
     const c2 = svgEl("text", { x: cx, y: cy + 22, "text-anchor": "middle", fill: "#4F5667", "font-size": 14 }); c2.textContent = T.alMes; svg.appendChild(c2);
     box.append(svg, info);
     const primero = Object.keys(porDia).map(Number).filter((d) => d >= mejor && d <= mejor + 4).sort((a, b) => peso(b) - peso(a))[0];
@@ -322,23 +318,21 @@
     sec.appendChild(ul);
   }
 
-  // ---------- Si sigues así: el total sube con el IPC; cada año, una cosa distinta ----------
-  function sigues(box) {
-    const T0 = repe.total, hoy = [0], con = [0];
-    for (let y = 1; y <= 10; y++) { hoy[y] = T0 * y; con[y] = con[y - 1] + T0 * Math.pow(1 + IPC, y); }
-    const usadas = {}, anio = [];
-    for (let y = 1; y <= 10; y++) { let m = null; COSAS.forEach((c, i) => { if (c[0] <= hoy[y] && !usadas[i]) m = i; }); if (m !== null) usadas[m] = 1; anio[y] = m; }
-    box.innerHTML = '<div class="pg-sig-a"><div class="pg-sig-c"><span class="pg-big"></span><span class="pg-k"></span></div><p class="pg-sig-eq"></p></div>' +
-      '<div class="pg-sig-b"><div class="pg-sig-cols" aria-hidden="true"></div><div class="pg-sig-ej" aria-hidden="true"></div><label class="pg-k" for="pgAnos">' + esc(T.anos) + '</label><input type="range" id="pgAnos" min="1" max="10" value="1"><p class="pg-sig-ipc">' + esc(T.ipc) + "</p></div>";
-    const cols = box.querySelector(".pg-sig-cols"), ej = box.querySelector(".pg-sig-ej"), rg = box.querySelector("input");
-    for (let y = 1; y <= 10; y++) { const c = document.createElement("i"); c.style.height = (con[y] / con[10]) * 100 + "%"; cols.appendChild(c); const s = document.createElement("span"); s.textContent = y; ej.appendChild(s); }
-    const pon = () => {
-      const n = +rg.value; box.querySelector(".pg-sig-c .pg-big").textContent = eur(con[n]); box.querySelector(".pg-sig-c .pg-k").textContent = T.enAnos(n);
-      [...cols.children].forEach((c, i) => { c.className = i < n - 1 ? "on" : i === n - 1 ? "yo" : ""; });
-      const q = box.querySelector(".pg-sig-eq"), k = anio[n]; q.textContent = "";
-      if (k != null) { q.textContent = COSAS[k][1][LI]; const sm = document.createElement("small"); sm.textContent = COSAS[k][2][LI]; q.appendChild(sm); }
-    };
-    rg.addEventListener("input", pon); pon();
+  // ---------- Lo que puedes ahorrar: solo cosas concretas (assets/extracto.js las deja en window.FeehundAhorro) ----------
+  // Un cobro repetido (te lo devuelven una vez), un servicio que pagas dos veces (al mes) y las comisiones del banco.
+  function ahorro(sec) {
+    const L = (window.FeehundAhorro || []).filter((x) => x && x.v > 0);
+    if (!L.length) { const p = document.createElement("p"); p.className = "pg-q"; p.textContent = T.ahorroNada; sec.appendChild(p); return; }
+    const ul = document.createElement("ul"); ul.className = "pg-rk pg-rk--fin";
+    L.forEach((x) => {
+      const li = document.createElement("li");
+      li.appendChild(logo({ n: x.n, id: x.id, com: x.k === "extracto" }));
+      const nom = document.createElement("span"); nom.className = "pg-nom"; nom.textContent = x.n;
+      const sm = document.createElement("small"); sm.textContent = x.k === "vez" ? T.devolver : x.k === "extracto" ? T.enExtracto : T.alAno; nom.appendChild(sm);
+      const val = document.createElement("span"); val.className = "pg-val"; val.textContent = eurM(x.v);
+      li.append(nom, val); ul.appendChild(li);
+    });
+    sec.appendChild(ul);
   }
 
   function montarPestanas() {
@@ -396,6 +390,6 @@
 
   document.addEventListener("fh-resultado", (e) => {
     const r = e.detail; if (!r) return;
-    try { repe = calcRepe(r); montarPestanas(); ponerEnResumen(); plegarTarjeta(); } catch (err) { /* si algo falla, el resumen sigue como siempre */ }
+    try { ultimoR = r; repe = calcRepe(r); montarPestanas(); ponerEnResumen(); plegarTarjeta(); } catch (err) { /* si algo falla, el resumen sigue como siempre */ }
   });
 })();

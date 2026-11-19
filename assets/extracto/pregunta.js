@@ -132,6 +132,8 @@
   }
   function clasificar(m) {
     const k = comercio(m.concepto), u = (k + " | " + m.concepto).toUpperCase();
+    // Hacienda, ayuntamientos y diputaciones son impuestos o tasas aunque el diccionario los tenga como gasto fijo de casa
+    if (/IMPUEST|TRIBUT|DIPUTACI|AYUNTAMIENTO|AJUNTAMENT|HACIENDA|A\.E\.A\.T|\bAEAT\b/.test(u)) return { k, s: "impuestos" };
     const sm = delMotor(m.concepto); if (sm) return { k, s: sm };
     for (const [id, re] of SECTORES) if (re.test(id === "bizum" || id === "transfer" ? String(m.concepto).toUpperCase() : u)) return { k, s: id };
     const yo = mios()[k];
@@ -148,13 +150,70 @@
 
   let todos = [];
   const envio = () => todos.map((m) => ({ id: m.id, f: m.fecha, c: m.concepto, k: m.c.k, s: m.c.s, i: m.importe }));
-  const MARCAS = [["Mercadona", /MERCADONA/], ["Vodafone", /VODAFONE/], ["Netflix", /NETFLIX/], ["Spotify", /SPOTIFY/], ["Amazon", /AMAZON/], ["Glovo", /GLOVO/], ["Uber Eats", /UBER \*?EATS/], ["Just Eat", /JUST ?EAT/], ["Zara", /ZARA/], ["Ryanair", /RYANAIR/], ["Endesa", /ENDESA/], ["Iberdrola", /IBERDROLA/], ["Movistar", /MOVISTAR/], ["Lidl", /LIDL/], ["Carrefour", /CARREFOUR/], ["Octopus", /OCTOPUS/], ["Apple", /APPLE\.COM/]];
+  // «En qué se te va el resto» (gratis, en el resumen): lo que no se repite, por sector y al mes. Fuera quedan los
+  // cobros que se repiten, Bizum, transferencias, la tarjeta de crédito, impuestos y comisiones (ya salen arriba).
+  const R = {
+    es: { titulo: "En qué se te va el resto", alMes: "Al mes", n: { fuera: "Comer fuera", super: "Súper", domicilio: "Comida a domicilio", transporte: "Transporte", ropa: "Ropa y belleza", salud: "Salud", ocio: "Ocio", otro: "Tiendas", online: "Compras online", casa: "Casa", suscr: "Suscripciones", impuestos: "Impuestos y tasas", efectivo: "Sacado en efectivo", nose: "Sin saber qué es" },
+      en: { fuera: "comer fuera", super: "el súper", domicilio: "comida a domicilio", transporte: "transporte", ropa: "ropa y belleza", salud: "salud", ocio: "ocio", otro: "tiendas", online: "compras online", casa: "casa", efectivo: "efectivo" },
+      cuanto: (x) => "¿Cuánto gasto al mes en " + x + "?", porQue: (n, m) => "¿Por qué " + n + " me cobró más en " + m + "?", sobra: "¿Qué suscripción me sobra?",
+      mesL: ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"] },
+    ca: { titulo: "En què se te'n va la resta", alMes: "Al mes", n: { fuera: "Menjar fora", super: "Súper", domicilio: "Menjar a domicili", transporte: "Transport", ropa: "Roba i bellesa", salud: "Salut", ocio: "Oci", otro: "Botigues", online: "Compres en línia", casa: "Casa", suscr: "Subscripcions", impuestos: "Impostos i taxes", efectivo: "Tret en efectiu", nose: "Sense saber què és" },
+      en: { fuera: "menjar fora", super: "el súper", domicilio: "menjar a domicili", transporte: "transport", ropa: "roba i bellesa", salud: "salut", ocio: "oci", otro: "botigues", online: "compres en línia", casa: "casa", efectivo: "efectiu" },
+      cuanto: (x) => "Quant gasto al mes en " + x + "?", porQue: (n, m) => "Per què " + n + " em va cobrar més " + (/^[aeiou]/.test(m) ? "a l'" : "al ") + m + "?", sobra: "Quina subscripció em sobra?",
+      mesL: ["gener", "febrer", "març", "abril", "maig", "juny", "juliol", "agost", "setembre", "octubre", "novembre", "desembre"] },
+    en: { titulo: "Where the rest goes", alMes: "A month", n: { fuera: "Eating out", super: "Supermarket", domicilio: "Food delivery", transporte: "Transport", ropa: "Clothes and beauty", salud: "Health", ocio: "Leisure", otro: "Shops", online: "Online shopping", casa: "Home", suscr: "Subscriptions", impuestos: "Taxes and fees", efectivo: "Cash withdrawals", nose: "Not sure what it is" },
+      en: { fuera: "eating out", super: "the supermarket", domicilio: "food delivery", transporte: "transport", ropa: "clothes and beauty", salud: "health", ocio: "leisure", otro: "shops", online: "online shopping", casa: "home", efectivo: "cash" },
+      cuanto: (x) => "How much do I spend a month on " + x + "?", porQue: (n, m) => "Why did " + n + " charge me more in " + m + "?", sobra: "Which subscription could I drop?",
+      mesL: ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"] },
+  }[LANG];
+  const FUERA_RESTO = ["bizum", "transfer", "tarjeta", "comisiones", "persona", "nose"];
+  function resto(r) {
+    const per = (r && r.lectura && r.lectura.periodo) || {}, meses = Math.max(1, per.meses || (per.dias || 30.44) / 30.44), suma = {};
+    todos.forEach((m) => {
+      if (!(m.importe < 0) || m.conocido) return;
+      const u = String(m.concepto || "").toUpperCase();
+      let s = m.c && m.c.s;
+      if (FUERA_RESTO.indexOf(s) >= 0) return;
+      if (/^BIZUM|^TRANSFERENCIA|^TRASPASO|A FAVOR DE|^TRANSFER /.test(u)) return;
+      if (/CAJERO|REINTEGRO|RETIRADA (DE )?EFECTIVO|DISPOSICION (DE )?EFECTIVO|\bATM\b/.test(u)) s = "efectivo";
+      if (!s) s = "nose"; else if (!R.n[s]) s = s === "vivienda" ? "casa" : "otro";
+      suma[s] = (suma[s] || 0) - m.importe;
+    });
+    return Object.keys(suma).map((k) => ({ k, v: suma[k] / meses })).filter((x) => x.v >= 1).sort((a, b) => (a.k === "nose") - (b.k === "nose") || b.v - a.v);
+  }
+  function pintarResto(r) {
+    const viejo = $("xResto"); if (viejo) viejo.remove();
+    const ancla = $("xHacer"); if (NEG || !ancla) return;
+    const L = resto(r); if (!L.length) return;
+    const sec = mk("section", "r3-blq pg-res"); sec.id = "xResto";
+    const h = mk("h2", "r3-h", R.titulo), ul = mk("ul", "pg-rk pg-rk--sin"), max = Math.max(...L.map((x) => x.v));
+    L.forEach((x) => {
+      const li = mk("li"), nom = mk("span", "pg-nom", R.n[x.k]), val = mk("span", "pg-val", (x.v < 10 ? nf2.format(x.v) : nf0.format(Math.round(x.v))) + " €");
+      const bar = mk("span", "pg-bar"), i = mk("i"); i.style.width = Math.max(2, x.v / max * 100) + "%"; bar.appendChild(i);
+      li.append(nom, val, bar); ul.appendChild(li);
+    });
+    sec.append(h, ul, mk("p", "pg-nota", R.alMes));
+    ancla.before(sec);
+  }
+  // Las tres preguntas de ejemplo salen de lo suyo: el recibo que vino más alto, en qué gasta más y si le sobra una suscripción
   function sugerencias() {
     if (NEG) return T.sugNeg.slice();
-    const porMarca = {};
-    todos.forEach((m) => { if (!(m.importe < 0)) return; const mk = MARCAS.find(([, re]) => re.test(String(m.concepto).toUpperCase())); if (mk) porMarca[mk[0]] = (porMarca[mk[0]] || 0) - m.importe; });
-    const top = Object.keys(porMarca).sort((a, b) => porMarca[b] - porMarca[a])[0];
-    return [T.adonde, T.raro, top ? T.llevo(top) : T.mesMas];
+    const out = [], r = ultimoR || {};
+    let peor = null;
+    (r.cobros || []).forEach((c) => {
+      if (c.estado !== "seguro" || c.periodicidad === "puntual") return;
+      const movs = (c.movimientos || []).filter((m) => m.importe < 0);
+      if (movs.length < 3) return;
+      const v = movs.map((m) => -m.importe), max = Math.max(...v), i = v.indexOf(max), med = (v.reduce((a, b) => a + b, 0) - max) / (v.length - 1);
+      if (max > med * 1.25 && max - med >= 5 && (!peor || max - med > peor.d)) peor = { n: c.nombre, d: max - med, f: movs[i].fecha };
+    });
+    if (peor && peor.f) out.push(R.porQue(peor.n, R.mesL[+peor.f.slice(5, 7) - 1]));
+    const top = resto(r).find((x) => R.en[x.k] && x.k !== "casa"); // algo que se puede recortar
+    if (top) out.push(R.cuanto(R.en[top.k]));
+    const SU = ["streaming", "musica", "nube_apps", "ia", "prensa", "gimnasios", "citas", "videojuegos", "idiomas", "reparto", "suscripciones", "club_descuentos", "bienestar", "pasarelas"];
+    if ((r.cobros || []).filter((c) => SU.indexOf(c.categoria) >= 0 && c.estado !== "terminado").length >= 2) out.push(R.sobra);
+    [T.adonde, T.raro, T.mesMas].forEach((q) => { if (out.length < 3) out.push(q); });
+    return out.slice(0, 3);
   }
 
   // el pase de negocio se guarda aparte del de Mi banco: cada uno pregunta por lo suyo
@@ -435,6 +494,7 @@
         const kk = m.fecha + "|" + m.importe + "|" + m.concepto;
         return Object.assign({}, m, { id: "m" + n, c: k ? { k: c.k, s: k } : c, conocido: conocido.has(kk) });
       });
+      try { pintarResto(r); } catch (e) { /* el resumen sigue sin este bloque */ }
       if (caja) caja.remove();
       montarCaja(); setTimeout(colocar, 0); setTimeout(altoOrdenador, 800); // otra vez cuando ya está todo encima (el aviso de ejemplo llega después)
     } catch (err) { /* si algo falla, el resumen sigue como siempre */ }

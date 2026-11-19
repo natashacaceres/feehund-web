@@ -15,7 +15,7 @@
   const $ = (id) => document.getElementById(id);
   const LANG = ["es", "ca", "en"].indexOf(document.documentElement.lang) >= 0 ? document.documentElement.lang : "es";
   const TX = {
-    es: { datafono: "Esto es el resumen de tu datáfono, no el extracto de tu cuenta. Se lee en Mi datáfono.", irDatafono: "Ir a Mi datáfono", year: "€/año", menos: " menos/año",
+    es: { datafono: "Esto es el resumen de tu datáfono, no el extracto de tu cuenta. Se lee en Mi datáfono.", irDatafono: "Ir a Mi datáfono", year: "€/año", mes: "€/mes", desde: (m) => "Desde " + m, menos: " menos/año",
       si: "Sí", no: "No", el: "el", yMas: (n) => " y " + n + " más", deA: (x, a, b) => x + ", de " + a + " a " + b + " €", enExtracto: (x) => x + " € en este extracto",
       preguntas: [["doble", "¿Te cobran algo dos veces?"], ["subida", "¿Te han subido algún precio?"], ["recibo", "¿Algún recibo ha venido más alto de lo normal?"], ["comision", "¿Pagas comisiones al banco?"]],
       pagas: ["Pagas ", " al año en suscripciones y domiciliaciones"], nada: "No hemos visto cobros que se repitan.",
@@ -43,7 +43,7 @@
       aDuplicado: ["Pagas dos servicios para lo mismo", (a, b) => a + " y " + b + " hacen lo mismo. Puedes quedarte con uno."], priv: "Privado. No se guarda.",
       none: "No ha encontrado cobros que se repitan. Prueba con más meses.", bad: "No se ha podido leer. Prueba con Excel o CSV.", mapeo: "No reconocemos las columnas de este archivo. Prueba a descargarlo en Excel o CSV.",
       dl: "Imagen guardada. Desde el móvil se comparte directo en Instagram o WhatsApp.", ics: "Archivo de avisos descargado.", sinIcs: "No hay cobros para avisar.", share: (x) => x + " €/año en cobros que se repiten · feehund.com", lista: "Cobros que se repiten" },
-    ca: { datafono: "Això és el resum del teu datàfon, no l'extracte del teu compte. Es llegeix a El meu datàfon.", irDatafono: "Anar a El meu datàfon", year: "€/any", menos: " menys/any",
+    ca: { datafono: "Això és el resum del teu datàfon, no l'extracte del teu compte. Es llegeix a El meu datàfon.", irDatafono: "Anar a El meu datàfon", year: "€/any", mes: "€/mes", desde: (m) => "Des " + (/^[aeiou]/.test(m) ? "d'" : "de ") + m, menos: " menys/any",
       si: "Sí", no: "No", el: "el", yMas: (n) => " i " + n + " més", deA: (x, a, b) => x + ", de " + a + " a " + b + " €", enExtracto: (x) => x + " € en aquest extracte",
       preguntas: [["doble", "Et cobren alguna cosa dues vegades?"], ["subida", "T'han pujat algun preu?"], ["recibo", "Algun rebut ha vingut més alt del normal?"], ["comision", "Pagues comissions al banc?"]],
       pagas: ["Pagues ", " l'any en subscripcions i domiciliacions"], nada: "No hem vist cobraments que es repeteixin.",
@@ -71,7 +71,7 @@
       aDuplicado: ["Pagues dos serveis per al mateix", (a, b) => a + " i " + b + " fan el mateix. Pots quedar-te amb un."], priv: "Privat. No es desa.",
       none: "No ha trobat cobraments que es repeteixin. Prova amb més mesos.", bad: "No s'ha pogut llegir. Prova amb Excel o CSV.", mapeo: "No reconeixem les columnes d'aquest fitxer. Prova de descarregar-lo en Excel o CSV.",
       dl: "Imatge desada. Des del mòbil es comparteix directament a Instagram o WhatsApp.", ics: "Fitxer d'avisos descarregat.", sinIcs: "No hi ha cobraments per avisar.", share: (x) => x + " €/any en cobraments que es repeteixen · feehund.com", lista: "Cobraments que es repeteixen" },
-    en: { datafono: "This is your card machine summary, not your bank statement. It goes in My card machine.", irDatafono: "Go to My card machine", year: "€/year", menos: " less/year",
+    en: { datafono: "This is your card machine summary, not your bank statement. It goes in My card machine.", irDatafono: "Go to My card machine", year: "€/year", mes: "€/month", desde: (m) => "Since " + m, menos: " less/year",
       si: "Yes", no: "No", el: "on", yMas: (n) => " and " + n + " more", deA: (x, a, b) => x + ", from " + a + " to " + b + " €", enExtracto: (x) => x + " € in this statement",
       preguntas: [["doble", "Are you charged twice for anything?"], ["subida", "Has any price gone up?"], ["recibo", "Has any bill come in higher than usual?"], ["comision", "Do you pay bank fees?"]],
       pagas: ["You pay ", " a year in subscriptions and direct debits"], nada: "We have not seen any repeating charges.",
@@ -353,14 +353,14 @@
   // El detalle de siempre (avisos, secciones y noticias) sigue debajo, en #xDetalle, y lo abren «Revisar», «Ver» y las barras.
   const TRES = Boolean($("xHacer"));
   const T3 = {
-    es: { meses: (n) => (n === 1 ? "1 mes leído" : n + " meses leídos"), calc: (n) => "al año, calculado con " + (n === 1 ? "1 mes" : n + " meses"),
+    es: { meses: (n) => (n === 1 ? "1 mes leído" : n + " meses leídos"), calc: (x) => x + " al año", cifraL: "Pagas al mes en cosas que se repiten",
       fRevisar: "Lo he revisado todo.", fNada: "Nada que reclamar. Lo he mirado dos veces, por si acaso.", fPoco: (n) => "Con " + (n === 1 ? "1 mes" : n + " meses") + " veo poco. Con 6 o más, lo veo todo.",
       difT: "Suscripción o recibo", dif: "Suscripción: la eliges y te das de baja cuando quieras, como Netflix o el gimnasio. Recibo: luz, agua, teléfono o internet; cambia según lo que gastas.",
       escRecibo: (x, n) => x + " se te escaparon en " + n + (n === 1 ? " recibo más alto de lo normal" : " recibos más altos de lo normal"),
       escDoble: (x, n) => x + " se te escaparon en " + (n === 1 ? "un posible cobro repetido" : n + " posibles cobros repetidos"),
       escComision: (x) => x + " se te escaparon en comisiones del banco",
       escVarios: (x, m) => x + " se te escaparon " + (m >= 12 ? "este año" : m <= 1 ? "este mes" : "en estos " + m + " meses"), escNada: "No se te escapa nada",
-      suscr: (n, x, r) => n ? "Tienes " + n + (n === 1 ? " suscripción que te cuesta " : " suscripciones que te cuestan ") + x + " al año" + (r ? ", y " + r + (r === 1 ? " recibo más." : " recibos más.") : ".")
+      suscr: (n, x, r) => n ? "Tienes " + n + (n === 1 ? " suscripción que te cuesta " : " suscripciones que te cuestan ") + x + " al mes" + (r ? ", y " + r + (r === 1 ? " recibo más." : " recibos más.") : ".")
         : "Tienes " + r + (r === 1 ? " recibo que se repite" : " recibos que se repiten") + " y ninguna suscripción.",
       dq: { titulo: "1 minuto y queda perfecto", que: "¿Qué es esto?", de: (i, n) => i + " de " + n, veces: (x, n, p) => x + " · " + n + " veces" + (p ? ", " + p : ""), mes: "cada mes", dosMeses: "cada 2 meses", ops: { vivienda: "Alquiler o habitación", casa: "Luz, agua o internet", susc: "Suscripción", seg: "Seguro", otros: "Otra cosa" }, nose: "No lo sé", grupo: "Lo que me has dicho",
         pagos: (x, n) => x + " en " + n + (n === 1 ? " pago" : " pagos"), ops2: { casa: "Casa o alquiler", fuera: "Comer fuera", super: "Súper", otro: "Tienda", transporte: "Transporte", salud: "Salud", ocio: "Ocio", escribir: "Otra cosa" }, escribe: "Escríbelo como quieras", listo: "Listo", persona: "Es una persona" },
@@ -370,15 +370,15 @@
       dobleT: (x) => x + ": posible cobro repetido", dobleL: (i, f) => i + " dos veces, el " + f,
       reciboT: (x, d, m) => x + ": +" + d + " en " + m, reciboL: (p) => p + " % más que tu media", reciboAnio: (p) => p + " % más que hace un año", consumo: "Puede ser por consumo",
       comT: (x) => "Comisiones del banco: " + x, comL: "Cobradas en este extracto", comLR: "Puedes pedir que te la devuelvan",
-      subT: (x, a) => x + ": " + a + " al año", subL: "Tu suscripción más cara" },
-    ca: { meses: (n) => (n === 1 ? "1 mes llegit" : n + " mesos llegits"), calc: (n) => "a l'any, calculat amb " + (n === 1 ? "1 mes" : n + " mesos"),
+      subT: (x, a) => x + ": " + a + " al mes", subL: "Tu suscripción más cara" },
+    ca: { meses: (n) => (n === 1 ? "1 mes llegit" : n + " mesos llegits"), calc: (x) => x + " l'any", cifraL: "Pagues al mes en coses que es repeteixen",
       fRevisar: "Ho he revisat tot.", fNada: "Res a reclamar. Ho he mirat dues vegades, per si de cas.", fPoco: (n) => "Amb " + (n === 1 ? "1 mes" : n + " mesos") + " veig poc. Amb 6 o més, ho veig tot.",
       difT: "Subscripció o rebut", dif: "Subscripció: la tries i et dones de baixa quan vulguis, com Netflix o el gimnàs. Rebut: llum, aigua, telèfon o internet; canvia segons el que gastes.",
       escRecibo: (x, n) => x + " se t'han escapat en " + n + (n === 1 ? " rebut més alt del normal" : " rebuts més alts del normal"),
       escDoble: (x, n) => x + " se t'han escapat en " + (n === 1 ? "un possible cobrament repetit" : n + " possibles cobraments repetits"),
       escComision: (x) => x + " se t'han escapat en comissions del banc",
       escVarios: (x, m) => x + " se t'han escapat " + (m >= 12 ? "aquest any" : m <= 1 ? "aquest mes" : "en aquests " + m + " mesos"), escNada: "No se t'escapa res",
-      suscr: (n, x, r) => n ? "Tens " + n + (n === 1 ? " subscripció que et costa " : " subscripcions que et costen ") + x + " l'any" + (r ? ", i " + r + (r === 1 ? " rebut més." : " rebuts més.") : ".")
+      suscr: (n, x, r) => n ? "Tens " + n + (n === 1 ? " subscripció que et costa " : " subscripcions que et costen ") + x + " al mes" + (r ? ", i " + r + (r === 1 ? " rebut més." : " rebuts més.") : ".")
         : "Tens " + r + (r === 1 ? " rebut que es repeteix" : " rebuts que es repeteixen") + " i cap subscripció.",
       dq: { titulo: "1 minut i queda perfecte", que: "Què és això?", de: (i, n) => i + " de " + n, veces: (x, n, p) => x + " · " + n + " vegades" + (p ? ", " + p : ""), mes: "cada mes", dosMeses: "cada 2 mesos", ops: { vivienda: "Lloguer o habitació", casa: "Llum, aigua o internet", susc: "Subscripció", seg: "Assegurança", otros: "Una altra cosa" }, nose: "No ho sé", grupo: "El que m'has dit",
         pagos: (x, n) => x + " en " + n + (n === 1 ? " pagament" : " pagaments"), ops2: { casa: "Casa o lloguer", fuera: "Menjar fora", super: "Súper", otro: "Botiga", transporte: "Transport", salud: "Salut", ocio: "Oci", escribir: "Una altra cosa" }, escribe: "Escriu-ho com vulguis", listo: "Fet", persona: "És una persona" },
@@ -388,15 +388,15 @@
       dobleT: (x) => x + ": possible cobrament repetit", dobleL: (i, f) => i + " dues vegades, el " + f,
       reciboT: (x, d, m) => x + ": +" + d + (/^[aeiou]/.test(m) ? " a l'" : " al ") + m, reciboL: (p) => p + " % més que la teva mitjana", reciboAnio: (p) => p + " % més que fa un any", consumo: "Pot ser pel consum",
       comT: (x) => "Comissions del banc: " + x, comL: "Cobrades en aquest extracte", comLR: "Pots demanar que te la retornin",
-      subT: (x, a) => x + ": " + a + " l'any", subL: "La teva subscripció més cara" },
-    en: { meses: (n) => (n === 1 ? "1 month read" : n + " months read"), calc: (n) => "a year, worked out from " + (n === 1 ? "1 month" : n + " months"),
+      subT: (x, a) => x + ": " + a + " al mes", subL: "La teva subscripció més cara" },
+    en: { meses: (n) => (n === 1 ? "1 month read" : n + " months read"), calc: (x) => x + " a year", cifraL: "You pay each month in things that repeat",
       fRevisar: "I've checked everything.", fNada: "Nothing to claim. I checked twice, just in case.", fPoco: (n) => "With " + (n === 1 ? "1 month" : n + " months") + " I see little. With 6 or more, I see it all.",
       difT: "Subscription or bill", dif: "Subscription: you choose it and can cancel any time, like Netflix or the gym. Bill: electricity, water, phone or internet; it changes with what you use.",
       escRecibo: (x, n) => x + " slipped away on " + n + (n === 1 ? " bill higher than usual" : " bills higher than usual"),
       escDoble: (x, n) => x + " slipped away on " + (n === 1 ? "a possible repeat charge" : n + " possible repeat charges"),
       escComision: (x) => x + " slipped away on bank fees",
       escVarios: (x, m) => x + " slipped away " + (m >= 12 ? "this year" : m <= 1 ? "this month" : "in these " + m + " months"), escNada: "Nothing is slipping away",
-      suscr: (n, x, r) => n ? "You have " + n + (n === 1 ? " subscription costing " : " subscriptions costing ") + x + " a year" + (r ? ", and " + r + (r === 1 ? " more bill." : " more bills.") : ".")
+      suscr: (n, x, r) => n ? "You have " + n + (n === 1 ? " subscription costing " : " subscriptions costing ") + x + " a month" + (r ? ", and " + r + (r === 1 ? " more bill." : " more bills.") : ".")
         : "You have " + r + (r === 1 ? " bill that repeats" : " bills that repeat") + " and no subscriptions.",
       dq: { titulo: "1 minute and it's perfect", que: "What is this?", de: (i, n) => i + " of " + n, veces: (x, n, p) => x + " · " + n + " times" + (p ? ", " + p : ""), mes: "every month", dosMeses: "every 2 months", ops: { vivienda: "Rent or room", casa: "Power, water or internet", susc: "Subscription", seg: "Insurance", otros: "Something else" }, nose: "I don't know", grupo: "What you told me",
         pagos: (x, n) => x + " in " + n + (n === 1 ? " payment" : " payments"), ops2: { casa: "Home or rent", fuera: "Eating out", super: "Supermarket", otro: "Shop", transporte: "Transport", salud: "Health", ocio: "Leisure", escribir: "Something else" }, escribe: "Write it any way you like", listo: "Done", persona: "It's a person" },
@@ -406,7 +406,7 @@
       dobleT: (x) => x + ": possible repeat charge", dobleL: (i, f) => i + " twice, on " + f,
       reciboT: (x, d, m) => x + ": +" + d + " in " + m, reciboL: (p) => p + " % above your average", reciboAnio: (p) => p + " % more than a year ago", consumo: "Could be down to usage",
       comT: (x) => "Bank fees: " + x, comL: "Charged in this statement", comLR: "You can ask for it back",
-      subT: (x, a) => x + ": " + a + " a year", subL: "Your most expensive subscription" },
+      subT: (x, a) => x + ": " + a + " a month", subL: "Your most expensive subscription" },
   }[LANG];
   // «Darme de baja» solo en suscripciones: nunca luz, agua, gas, teléfono ni seguros
   // Préstamos, créditos, impuestos y cuota de autónomo: gastos fijos que se enseñan con «Fijo» y sin baja (19 nov 2026)
@@ -497,8 +497,13 @@
       acciones.push({ p: 4, euros: suma, logo: null, t: T3.comT(eur(suma)), l: coms.some((x) => x.reclamable) ? T3.comLR : T3.comL, b: T3.ver, nodo: coms[0].nodo });
     }
     const susc = cobros.filter((c) => c.estado === "seguro" && SUSCRIPCIONES.indexOf(c.categoria) >= 0 && seDaDeBaja(c)).sort((a, b) => (b.coste_anual || 0) - (a.coste_anual || 0))[0];
-    if (susc) acciones.push({ p: 5, euros: susc.coste_anual || 0, logo: logoDe(susc), t: T3.subT(susc.nombre, eur(susc.coste_anual || 0)), l: T3.subL, b: compatible(susc) ? T3.darme : T3.darBaja, enlace: enviarBaja(susc) });
+    if (susc) acciones.push({ p: 5, euros: susc.coste_anual || 0, logo: logoDe(susc), t: T3.subT(susc.nombre, eur((susc.coste_anual || 0) / 12)), l: T3.subL, b: compatible(susc) ? T3.darme : T3.darBaja, enlace: enviarBaja(susc) });
     acciones.sort((a, b) => a.p - b.p || b.euros - a.euros);
+    // «Lo que puedes ahorrar» (assets/extracto/graficas.js): un cobro repetido, un servicio pagado dos veces y las comisiones
+    window.FeehundAhorro = [].concat(
+      avisos.filter((x) => x.tipo === "doble" && x.c).map((x) => ({ n: x.c.nombre, id: x.c.comercio_id, v: x.imp || 0, k: "vez" })),
+      avisos.filter((x) => x.tipo === "duplicado" && x.c).map((x) => ({ n: x.c.nombre, id: x.c.comercio_id, v: (x.c.coste_anual || 0) / 12, k: "mes" })),
+      coms.length ? [{ n: T3.tipos.banco, id: null, v: coms.reduce((t, x) => t + (x.euros || 0), 0), k: "extracto" }] : []);
 
     // ---- 1. La respuesta ----
     $("xMeses").textContent = T3.meses(meses);
@@ -506,10 +511,12 @@
     const frase = meses < 3 ? T3.fPoco(meses) : escapo > 0 || acciones.some((a) => a.p < 5) ? T3.fRevisar : T3.fNada;
     $("xFrase").textContent = frase;
     const cifra = $("xCifra");
-    if (total > 0) { cifra.textContent = eur(total); subirCifra(cifra, total); } else cifra.textContent = "0 €";
-    $("xCifraL").hidden = false;
-    const calc = $("xCalc"); calc.textContent = meses < 12 ? T3.calc(meses) : ""; calc.hidden = meses >= 12;
-    const sr = $("xTotal"); if (sr) sr.textContent = $("xCifraL").textContent + " " + eur(total) + (meses < 12 ? ", " + T3.calc(meses) : "");
+    // la cifra grande es lo de cada mes; el año, al lado y pequeño, solo para ver el impacto (20 nov 2026)
+    const alMes = Math.round(total / 12);
+    if (alMes > 0) { cifra.textContent = eur(alMes); subirCifra(cifra, alMes); } else cifra.textContent = "0 €";
+    $("xCifraL").textContent = T3.cifraL; $("xCifraL").hidden = false;
+    const calc = $("xCalc"); calc.textContent = total > 0 ? T3.calc(eur(total)) : ""; calc.hidden = !(total > 0);
+    const sr = $("xTotal"); if (sr) sr.textContent = T3.cifraL + " " + eur(alMes) + (total > 0 ? ", " + T3.calc(eur(total)) : "");
     // Lo que la gente busca primero: cuántas suscripciones tiene, cuánto le cuestan y cuántos recibos más
     const esc = $("xEscapo");
     const contados = cobros.filter((c) => cuenta(c) && c.tipo !== "comision" && c.categoria !== "comisiones");
@@ -517,7 +524,7 @@
     const recs = contados.length - subs.length;
     esc.hidden = !contados.length;
     esc.dataset.ok = subs.length ? "no" : "si";
-    esc.textContent = T3.suscr(subs.length, eur(Math.round(subs.reduce((t, c) => t + (c.coste_anual || 0), 0))), recs);
+    esc.textContent = T3.suscr(subs.length, eur(Math.round(subs.reduce((t, c) => t + (c.coste_anual || 0), 0) / 12)), recs);
 
     // ---- 2. pintar las acciones: tres a la vista y el resto detrás de «Ver X más» ----
     const ul = $("xAcciones"); ul.textContent = "";
@@ -548,7 +555,7 @@
     const maximo = barras.length ? barras[0].v : 1;
     for (const b of barras) {
       const li = el("li"), btn = el("button", "r3-bar"); btn.type = "button";
-      const fila = el("span", "r3-bar-f"); fila.appendChild(el("span", "r3-bar-n", b.titulo)); fila.appendChild(el("span", "r3-bar-v", eur(b.v)));
+      const fila = el("span", "r3-bar-f"); fila.appendChild(el("span", "r3-bar-n", b.titulo)); fila.appendChild(el("span", "r3-bar-v", eur(b.v / 12)));
       const pista = el("span", "r3-bar-p"), lleno = el("span", "r3-bar-l");
       lleno.style.width = Math.max(2, Math.round(b.v / maximo * 100)) + "%";
       pista.appendChild(lleno); btn.appendChild(fila); btn.appendChild(pista);
@@ -674,9 +681,11 @@
   }
 
   // Lo que se paga: fijo «13,99 € cada mes»; variable «Entre 54,06 y 162,10 € cada mes» y lo pagado; comisión «Cobrada 3 veces»
+  let inicioExtracto = null; // para decir «Desde marzo» de lo que empezó con el extracto ya empezado
   function lineaPrecio(c) {
     if (c.periodicidad === "puntual") return [TX.veces(c.num_cargos || 1)];
-    const extra = c.meses_sin_cargo ? " · " + TX.sinCargo(c.meses_sin_cargo) : "";
+    const tarde = inicioExtracto && c.primer_cargo && (Date.parse(c.primer_cargo) - Date.parse(inicioExtracto)) / 864e5 > 45;
+    const extra = (c.meses_sin_cargo ? " · " + TX.sinCargo(c.meses_sin_cargo) : "") + (tarde ? " · " + TX.desde(MESES[+c.primer_cargo.slice(5, 7) - 1]) : "");
     if (c.importe_tipo === "variable" && c.importe_min !== undefined) {
       const precio = c.importe_min === c.importe_max ? TX.fijo(e2(c.importe_min), cada(c)) : TX.entre(e2(c.importe_min), e2(c.importe_max), cada(c));
       return [precio + extra, TX.pagado(e2(c.pagado))];
@@ -685,6 +694,7 @@
   }
 
   function render(r, cobros) {
+    inicioExtracto = (r.lectura && r.lectura.periodo && r.lectura.periodo.desde) || null;
     if ($("tAlerta") && $("xAlertas")) { const d = renderAccion(r, cobros); if (TRES) renderTres(r, cobros, d); return; }
     renderLista(r, cobros);
   }
@@ -735,7 +745,7 @@
           const rep = (c.movimientos || []).filter((m) => m.doble).map((m) => TX.repetido(fecha(m.fecha)));
           ul.appendChild(fila(c.nombre, [], rep, e2(c.doble.importe) + " €", ""));
         } else if (g.codigo === "devoluciones") ul.appendChild(fila(c.nombre, [], [TX.devol(c.num, fecha(c.ultima_fecha))], e2(c.importe) + " €", ""));
-        else if (g.codigo === "terminados") ul.appendChild(fila(c.nombre, [], [TX.ultimo(fecha(c.ultimo_cargo), e2(c.importe), cada(c)), c.quiza_en_tarjeta ? TX.tarjeta : ""], null));
+        else if (g.codigo === "terminados") ul.appendChild(fila(c.nombre, [], [TX.ultimo(fecha(c.ultimo_cargo), e2(c.importe), cada(c))], null));
         else {
           const k2 = c.comercio_id || c.nombre, otro = Boolean(vistos[k2]); vistos[k2] = true;
           ul.appendChild(fila(c.nombre, etiquetas(c, otro), lineaPrecio(c), e2(c.coste_anual || 0) + " €", c.periodicidad === "puntual" ? "" : TX.year.replace("€", ""), enlaceBaja(c)));
@@ -1087,17 +1097,16 @@
       if (l.length < 2) continue;
       const quitar = l[l.length - 1];
       // se ve como un cobro doble, pero no cuenta en «¿Te cobran algo dos veces?»: no es un error del comercio
-      avisos.push({ tipo: "duplicado", corto: l[0].nombre + " · " + quitar.nombre, euros: quitar.coste_anual || 0,
+      avisos.push({ tipo: "duplicado", c: quitar, corto: l[0].nombre + " · " + quitar.nombre, euros: quitar.coste_anual || 0,
         nodo: alerta("doble", TX.aDuplicado[0], TX.aDuplicado[1](l[0].nombre, quitar.nombre), e2(quitar.coste_anual || 0) + " " + TX.year, TX.darme, enviarBaja(quitar), true) });
     }
     avisos.sort((a, b) => b.euros - a.euros);
     const tarjeta = ((r.lectura && r.lectura.avisos) || []).find((a) => a.codigo === "cobros_tarjeta_credito");
     const textoTarjeta = tarjeta && tarjeta.datos ? TX.aTarjeta[1](e2(tarjeta.datos.importe || 0), tarjeta.datos.n || 0) : "";
     const nota = $("xNota");
-    // Con sitio para la nota (diseño de preguntas), la tarjeta de crédito va ahí y no como aviso
-    const enTarjeta = (r.terminados || []).filter((c) => c.quiza_en_tarjeta);
-    const textoTarjeta2 = TRES && enTarjeta.length ? (textoTarjeta ? textoTarjeta + " " : "") + enTarjeta.map((c) => TX.nFinT(c.nombre, fecha(c.ultimo_cargo))).join(". ") + "." : textoTarjeta;
-    if (textoTarjeta2 && !nota) avisos.push({ tipo: "tarjeta", euros: 0, datos: tarjeta && tarjeta.datos, enTarjeta, nodo: alerta("tarjeta", TX.aTarjeta[0], textoTarjeta2, "", TX.aTarjeta[2]) });
+    // Con sitio para la nota (diseño de preguntas), la tarjeta de crédito va ahí y no como aviso.
+    // Lo que dejó de cobrarse no se adivina en la tarjeta: sale en «Ya no pagas» (20 nov 2026)
+    if (textoTarjeta && !nota) avisos.push({ tipo: "tarjeta", euros: 0, datos: tarjeta && tarjeta.datos, nodo: alerta("tarjeta", TX.aTarjeta[0], textoTarjeta, "", TX.aTarjeta[2]) });
     if (nota) { nota.textContent = textoTarjeta ? textoTarjeta + " " + TX.aTarjeta[2] + "." : ""; nota.hidden = !textoTarjeta; }
     avisos.forEach((a) => $("xAlertas").appendChild(a.nodo));
     if ($("xAvisosN")) $("xAvisosN").textContent = TX.avisosN(avisos.length);
@@ -1130,7 +1139,7 @@
     const noticias = [];
     for (const d of deGrupo("devoluciones")) noticias.push([d.tipo === "comision" || /^comisi|^comissi|fee/i.test(d.nombre) ? TX.nDevC(d.nombre, e2(d.importe)) : TX.nDevol(d.nombre, e2(d.importe)), ""]);
     for (const c of deGrupo("bajadas")) if (c.bajada) noticias.push([TX.nBaja(c.nombre, e2(c.bajada.antes), e2(c.bajada.ahora)), ""]);
-    for (const c of r.terminados || []) if (!(TRES && c.quiza_en_tarjeta)) noticias.push([(c.quiza_en_tarjeta ? TX.nFinT : TX.nFin)(c.nombre, fecha(c.ultimo_cargo)), ""]);
+    for (const c of r.terminados || []) noticias.push([TX.nFin(c.nombre, fecha(c.ultimo_cargo)), ""]);
     for (const [t, cifra] of noticias) { const n = plantilla("tNoticia"); poner(n, "texto", t); const cx = poner(n, "cifra", cifra); if (cx && !cifra) cx.remove(); $("xNoticias").appendChild(n); }
     mostrar($("xNoticias"), noticias.length);
 
@@ -1147,7 +1156,7 @@
       const sueltas = items.some((c) => c.periodicidad === "puntual");
       // lo que te devolvieron no cuenta en el total de la sección
       const tot = g.codigo === "comisiones" ? items.filter((c) => (c.etiquetas || []).indexOf("devuelto") < 0).reduce((t, c) => t + (c.coste_anual || 0), 0) : typeof g.total === "number" ? g.total : items.reduce((t, c) => t + (c.coste_anual || 0), 0);
-      poner(sec, "total", TX.totalSec(e2(tot), sueltas ? "" : TX.year.replace("€", "")));
+      poner(sec, "total", TX.totalSec(e2(sueltas ? tot : tot / 12), sueltas ? "" : TX.mes.replace("€", "")));
       const filas = sec.querySelector('[data-c="filas"]');
       const vistos = {};
       for (const c of items) {
@@ -1162,7 +1171,7 @@
         else if (c.periodicidad === "puntual") { estado = "visto"; texto = et.indexOf("devuelto") >= 0 ? TX.devuelta : et.indexOf("reclamable") >= 0 ? TX.reclamar : TX.fee; }
         const e = poner(f, "estado", texto); if (e) e.dataset.estado = estado;
         poner(f, "detalle", lineaPrecio(c).filter(Boolean).join(" · "));
-        poner(f, "cifra", e2(c.coste_anual || 0) + " " + (c.periodicidad === "puntual" ? "€" : TX.year));
+        poner(f, "cifra", c.periodicidad === "puntual" ? e2(c.coste_anual || 0) + " €" : e2((c.coste_anual || 0) / 12) + " " + TX.mes);
         const b = f.querySelector('[data-c="baja"]');
         if (b) { if (seDaDeBaja(c)) { b.href = enviarBaja(c); b.textContent = TX.darBaja; b.hidden = false; } else b.remove(); }
         filas.appendChild(f);
