@@ -287,3 +287,4 @@ body:has(.pg-atras:not([hidden])) .pg-vivo{top:calc(var(--hdr) + 56px)}
 .pg-bal-l > li{font-size:18px}
 .pg-bal-l > li .pg-nom{font-size:17px}
 .pg-wl li.pg-x--abre{cursor:pointer}
+.pg-logo--pag{background:#fff}

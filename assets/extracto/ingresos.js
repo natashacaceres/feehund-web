@@ -130,7 +130,42 @@
   // ---------- Qué es cada entrada: solo lo que dice el concepto ----------
   const limpio = (s) => String(s || "").replace(/\s+/g, " ").trim();
   const titulo = (s) => limpio(s).toLowerCase().replace(/(^|[\s.(\/-])(\p{L})/gu, (a, b, c) => b + c.toUpperCase()).replace(/\b(Sl|Sa|Slu|Ab|Bv|Ltd|Inc)\b/g, (x) => x.toUpperCase());
-  function quien(c) {
+  // Quién te paga: si el concepto nombra a una empresa o un organismo conocido, su nombre limpio y su logo oficial
+  // (bajado de su propia web: assets/logos/pagadores/ y, si ya existía para Gastos, el de siempre)
+  const PAGADORES = [
+    [/AEAT|AGENCIA ESTATAL DE ADMIN|AGENCIA TRIBUTARIA|A\.E\.A\.T/, "pagadores/aeat", null], [/\bSEPE\b|SERVICIO PUBLICO DE EMPLEO|SERV\.? ?PUB\.? ?EMPLEO/, "pagadores/sepe", "SEPE"],
+    [/SEGURIDAD SOCIAL|\bINSS\b|\bTGSS\b|TESORERIA GENERAL/, "pagadores/seguridad-social", "Seguridad Social"], [/MUFACE/, null, "MUFACE"],
+    [/GENERALITAT DE CATALUNYA|\bGENCAT\b/, null, "Generalitat de Catalunya"], [/COMUNIDAD DE MADRID/, "pagadores/comunidad-madrid", "Comunidad de Madrid"],
+    [/JUNTA DE ANDALUCIA/, null, "Junta de Andalucía"], [/GENERALITAT VALENCIANA/, "pagadores/gva", "Generalitat Valenciana"],
+    [/GOBIERNO VASCO|EUSKO JAURLARITZA/, "pagadores/euskadi", "Gobierno Vasco"], [/XUNTA DE GALICIA/, "pagadores/xunta", "Xunta de Galicia"],
+    [/LOTERIAS Y APUESTAS|\bSELAE\b/, null, "Loterías y Apuestas del Estado"], [/ORGANIZACION NACIONAL DE CIEGOS/, "pagadores/once", "ONCE"],
+    [/TRUSTLY/, "pagadores/trustly", "Trustly"], [/PAYPAL/, "paypal", "PayPal"], [/STRIPE/, "stripe", "Stripe"], [/ADYEN/, "pagadores/adyen", "Adyen"],
+    [/KLARNA/, "pagadores/klarna", "Klarna"], [/PAYONEER/, "pagadores/payoneer", "Payoneer"], [/WESTERN UNION/, "pagadores/western-union", "Western Union"],
+    [/REMITLY/, "pagadores/remitly", "Remitly"], [/RIA FINANCIAL|RIA MONEY|RIA PAYMENT/, "pagadores/ria", "Ria"], [/MONEYGRAM/, "pagadores/moneygram", "MoneyGram"],
+    [/SKRILL/, "pagadores/skrill", "Skrill"], [/\bWISE\b|TRANSFERWISE/, "bancos/wise", "Wise"], [/REVOLUT/, "bancos/revolut", "Revolut"], [/\bN26\b/, "bancos/n26", "N26"],
+    [/TRADE REPUBLIC/, "bancos/trade_republic", "Trade Republic"], [/MYINVESTOR/, "bancos/myinvestor", "MyInvestor"], [/BIT2ME/, "pagadores/bit2me", "Bit2Me"],
+    [/COINBASE/, "pagadores/coinbase", "Coinbase"], [/BINANCE/, "pagadores/binance", "Binance"], [/KRAKEN|PAYWARD/, "pagadores/kraken", "Kraken"],
+    [/DEGIRO|FLATEX/, "pagadores/degiro", "DEGIRO"], [/ETORO/, "pagadores/etoro", "eToro"], [/INTERACTIVE BROKERS/, "pagadores/interactive-brokers", "Interactive Brokers"],
+    [/INDEXA/, "pagadores/indexa", "Indexa Capital"], [/RAISIN/, "pagadores/raisin", "Raisin"], [/SCALABLE/, "pagadores/scalable", "Scalable Capital"],
+    [/VINTED/, "pagadores/vinted", "Vinted"], [/WALLAPOP/, "pagadores/wallapop", "Wallapop"], [/AIRBNB/, "pagadores/airbnb", "Airbnb"],
+    [/BOOKING\.?COM|BOOKING BV/, "pagadores/booking", "Booking.com"], [/\bEBAY\b/, "pagadores/ebay", "eBay"], [/\bETSY\b/, "pagadores/etsy", "Etsy"],
+    [/AMAZON|\bAMZN/, "amazon", "Amazon"], [/\bAPPLE\b/, "apple", "Apple"], [/GOOGLE/, "google", "Google"], [/TWITCH/, "twitch", "Twitch"], [/PATREON/, "patreon", "Patreon"],
+    [/\bUBER\b/, "pagadores/uber", "Uber"], [/GLOVO/, "pagadores/glovo", "Glovo"], [/CABIFY|MAXI MOBILITY/, "pagadores/cabify", "Cabify"], [/\bBOLT\b/, "pagadores/bolt", "Bolt"],
+    [/JUST ?EAT/, "pagadores/just-eat", "Just Eat"], [/DELIVEROO|ROOFOODS/, "pagadores/deliveroo", "Deliveroo"], [/UPWORK/, "pagadores/upwork", "Upwork"],
+    [/FIVERR/, "pagadores/fiverr", "Fiverr"], [/\bDEEL\b/, "pagadores/deel", "Deel"], [/\bMALT\b/, "pagadores/malt", "Malt"], [/TIKTOK/, "pagadores/tiktok", "TikTok"],
+    [/MERCADONA/, "pagadores/mercadona", "Mercadona"], [/INDITEX|INDUSTRIA DE DISE[NÑ]O TEXTIL/, "pagadores/inditex", "Inditex"], [/EL CORTE INGLES/, "pagadores/el-corte-ingles", "El Corte Inglés"],
+    [/CARREFOUR/, "pagadores/carrefour", "Carrefour"], [/\bLIDL\b/, "pagadores/lidl", "Lidl"], [/EROSKI/, "pagadores/eroski", "Eroski"], [/ALCAMPO/, "pagadores/alcampo", "Alcampo"],
+    [/\bCONSUM\b/, "pagadores/consum", "Consum"], [/SOCIEDAD ESTATAL CORREOS|\bCORREOS\b/, "pagadores/correos", "Correos"], [/\bRENFE\b/, "pagadores/renfe", "Renfe"],
+    [/\bIBERIA\b/, "pagadores/iberia", "Iberia"], [/\bREPSOL\b/, "pagadores/repsol", "Repsol"], [/\bACCIONA\b/, "pagadores/acciona", "Acciona"], [/FERROVIAL/, "pagadores/ferrovial", "Ferrovial"],
+    [/\bAENA\b/, "pagadores/aena", "Aena"], [/DECATHLON/, "pagadores/decathlon", "Decathlon"], [/\bIKEA\b/, "pagadores/ikea", "IKEA"], [/LEROY MERLIN/, "pagadores/leroy-merlin", "Leroy Merlin"],
+    [/\bEULEN\b/, null, "Eulen"], [/ILUNION/, "pagadores/ilunion", "Ilunion"], [/\bINDRA\b/, "pagadores/indra", "Indra"], [/ACCENTURE/, "pagadores/accenture", "Accenture"],
+    [/DELOITTE/, "pagadores/deloitte", "Deloitte"], [/PRICEWATERHOUSE|\bPWC\b/, "pagadores/pwc", "PwC"], [/\bKPMG\b/, null, "KPMG"],
+    [/TELEFONICA/, "telefonica", "Telefónica"], [/IBERDROLA/, "iberdrola", "Iberdrola"], [/MAPFRE/, "mapfre", "Mapfre"], [/MUTUA MADRILE/, "mutua-madrilena", "Mutua Madrileña"],
+    [/\bAXA\b/, "axa", "AXA"], [/ALLIANZ/, "allianz", "Allianz"], [/SANITAS/, "sanitas", "Sanitas"], [/ADESLAS|SEGURCAIXA/, "adeslas", "SegurCaixa Adeslas"], [/LINEA DIRECTA/, "linea-directa", "Línea Directa"],
+  ];
+  const pagador = (c) => { const u = limpio(c).toUpperCase(); return PAGADORES.find((x) => x[0].test(u)) || null; };
+  function quien(c) { const q = quien0(c), p = pagador(c); if (p && q.t !== "bizum") { q.logo = p[1]; if (p[2]) q.n = p[2]; } return q; }
+  function quien0(c) {
     const u = limpio(c).toUpperCase();
     let m;
     if (/N[ÓO]MINA/.test(u)) { m = u.match(/(?:TRANSFERENCIA(?: INMEDIATA)? DE|DE)\s+(.+?)(?:,| CONCEPTO|$)/); return { t: "nomina", n: m ? titulo(m[1]) : T.tipos.nomina }; }
@@ -160,7 +195,7 @@
       if (m.importe < 0) { x.s -= m.importe; return; }
       x.e += m.importe;
       const q = quien(m.concepto), key = q.t + "|" + q.n.toUpperCase();
-      const p = pag[key] || (pag[key] = { t: q.t, n: q.n, movs: [], porMes: {} }); p.movs.push(m); p.porMes[k] = (p.porMes[k] || 0) + m.importe;
+      const p = pag[key] || (pag[key] = { t: q.t, n: q.n, logo: q.logo, movs: [], porMes: {} }); p.movs.push(m); p.porMes[k] = (p.porMes[k] || 0) + m.importe;
     });
     const fijos = [], yaNo = [], todo = {};
     const meter = (cub, p, m) => { const x = cub[p.t] || (cub[p.t] = { k: p.t, n: T.tiposP[p.t], v: 0, c: 0, movs: [] }); x.v += m.importe; x.c++; x.movs.push(m); };
@@ -168,7 +203,7 @@
       const mk = Object.keys(p.porMes).sort(), n = mk.length, span = n ? idx[mk[n - 1]] - idx[mk[0]] + 1 : 0;
       const med = mediana(mk.map((k) => p.porMes[k]));
       if (NO_FIJO.indexOf(p.t) < 0 && n >= 3 && n / span >= 0.5 && med >= 20) { // 20 €: el pádel de un amigo no es un ingreso fijo
-        const it = { t: p.t, n: p.n, v: med, desde: mk[0], ultimo: mk[n - 1], movs: p.movs };
+        const it = { t: p.t, n: p.n, logo: p.logo, v: med, desde: mk[0], ultimo: mk[n - 1], movs: p.movs };
         (idx[it.ultimo] >= lista.length - 2 ? fijos : yaNo).push(it);
         return;
       }
@@ -240,7 +275,14 @@
     return parte.join(" · ");
   };
   const mesL = (k) => T.mesL[+k.slice(5, 7) - 1];
-  const logoIn = (it) => (it.t === "bizum" ? ICO_BIZUM("bizum") : ini(it.n, it.t));
+  const RAIZ_LOGOS = () => ((document.querySelector("script[src*='ingresos.js']") || {}).src || "").replace(/assets\/extracto\/ingresos\.js.*$/, "assets/logos/");
+  // el logo de quien paga; si la imagen no carga, vuelve la inicial
+  const logoIn = (it) => {
+    if (it.t === "bizum") return ICO_BIZUM("bizum");
+    if (!it.logo) return ini(it.n, it.t);
+    const s = el("span", "pg-logo pg-logo--pag"); const img = el("img"); img.alt = ""; img.width = 40; img.height = 40; img.decoding = "async"; img.loading = "lazy";
+    img.addEventListener("error", () => s.replaceWith(ini(it.n, it.t))); img.src = RAIZ_LOGOS() + it.logo + ".png"; s.appendChild(img); return s;
+  };
   function listaFijos(L, ya) {
     const ul = el("ul", "pg-rk"); const max = Math.max(0.01, ...L.map((x) => x.v));
     L.forEach((x) => {
