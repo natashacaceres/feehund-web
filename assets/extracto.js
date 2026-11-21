@@ -489,6 +489,9 @@
       if (cuentaEsc) sumarEsc("recibo", peor.dif);
       acciones.push({ p: 3, euros: peor.dif, logo: logoDe(c), t: T3.reciboT(a.nombreR, eur(peor.dif), MESES[mes - 1]), l: linea, b: T3.revisar, nodo: a.nodo });
     }
+    // lo que antes solo salía en «Lo que se te escapa» (el detalle ya no se enseña, 20 nov 2026)
+    for (const a of avisos.filter((x) => x.tipo === "subida")) acciones.push({ p: 2, euros: a.euros || 0, logo: null, t: TX.aSubida[0], l: a.corto, b: T3.revisar, nodo: a.nodo });
+    for (const a of avisos.filter((x) => x.tipo === "duplicado" && x.c)) acciones.push({ p: 2, euros: a.euros || 0, logo: logoDe(a.c), t: TX.aDuplicado[0], l: a.corto, b: T3.revisar, nodo: a.nodo });
     const coms = avisos.filter((x) => x.tipo === "comision");
     if (coms.length) {
       const suma = coms.reduce((t, x) => t + (x.euros || 0), 0);

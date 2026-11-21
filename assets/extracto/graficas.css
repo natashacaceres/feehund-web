@@ -175,3 +175,115 @@ body:has(.pg-atras:not([hidden])) .pg-vivo{top:calc(var(--hdr) + 56px)}
 .dq-txt:focus-visible{border-color:var(--brand);outline:none}
 .dq-listo{min-height:52px;border:0;border-radius:99px;background:var(--brand);color:#fff;font:800 17px/1 var(--f-text);cursor:pointer}
 .dq-listo:focus-visible{outline:3px solid var(--ink);outline-offset:2px}
+/* Ingresos (assets/extracto/ingresos.js): el mismo diseño que Gastos */
+.pg-in[hidden],.pg-tabs[hidden]{display:none}
+.pg-in{display:grid}
+#pgInGr{gap:20px}
+@media (max-width:480px){#pgInGr{gap:16px}}
+#pgInGr .pg-blq{gap:16px;padding:28px 24px 30px;border-radius:24px;background:#F3E6CC}
+#pgInGr .pg-rel{background:var(--brand-tint)}
+#pgInGr .pg-h{font-size:26px}
+@media (max-width:480px){#pgInGr .pg-blq{padding:22px 18px 24px;border-radius:20px}#pgInGr .pg-h{font-size:24px}}
+.pg-ley{display:flex;gap:20px;margin:0;font:600 15px/1 var(--f-text);color:var(--ink-2)}
+.pg-ley span{display:inline-flex;align-items:center;gap:8px}
+.pg-ley i{width:12px;height:12px;border-radius:3px;background:var(--brand)}
+.pg-ley-s i{background:var(--amber)}
+.pg-mm{list-style:none;margin:0;padding:0;display:grid;grid-auto-flow:column;grid-auto-columns:minmax(0,1fr);gap:4px;height:220px}
+.pg-mm li{display:grid;grid-template-rows:minmax(0,1fr) auto;gap:8px;height:100%;border-radius:8px;outline:none;cursor:pointer}
+.pg-mm li.on,.pg-mm li:focus-visible{background:rgba(14,94,111,.08)}
+.pg-mm-b{display:flex;align-items:flex-end;justify-content:center;gap:2px;height:100%}
+.pg-mm-b i{width:42%;max-width:16px;border-radius:4px 4px 0 0;background:var(--brand)}
+.pg-mm-b .pg-mm-s{background:var(--amber)}
+.pg-mm-m{font:600 13px/1 var(--f-text);color:var(--ink-2);text-align:center;white-space:nowrap}
+/* Ver por fechas: día, semana o mes (assets/extracto/ingresos.js) */
+.pg-per-w{display:grid;gap:20px}
+.pg-per[hidden]{display:none}
+.pg-per{display:grid;gap:16px}
+.pg-tabs--3{grid-template-columns:1fr 1fr 1fr;margin:0}
+.pg-per-nav{display:grid;grid-template-columns:48px minmax(0,1fr) 48px;gap:8px;align-items:center;text-align:center}
+.pg-per-ch{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.pg-per-ch--s{grid-template-columns:1fr 1fr}
+.pg-per-ch[hidden],.pg-per-i[hidden]{display:none}
+.pg-per-chip{min-height:44px;padding:0 6px;border:0;border-radius:999px;background:#F3E6CC;color:var(--ink);font:600 15px/1.1 var(--f-text);cursor:pointer;white-space:nowrap}
+.pg-per-chip[aria-pressed="true"]{background:var(--brand);color:#fff}
+.pg-per-chip:focus-visible{outline:2px solid var(--brand);outline-offset:2px}
+@media (min-width:761px){.pg-per-ch{grid-template-columns:repeat(6,minmax(0,1fr))}.pg-per-ch--s{grid-template-columns:repeat(3,minmax(0,1fr))}}
+.pg-per-f{width:48px;height:48px;border:0;border-radius:50%;background:#F3E6CC;color:var(--ink);font:700 24px/1 var(--f-text);cursor:pointer}
+.pg-per-f:disabled{opacity:.35;cursor:default}
+.pg-per-i{min-height:48px;width:100%;padding:0 14px;border:0;border-radius:999px;background:#F3E6CC;color:var(--ink);font:600 16px/1 var(--f-text);text-align:center}
+.pg-per-f:focus-visible,.pg-per-i:focus-visible{outline:2px solid var(--brand);outline-offset:2px}
+.pg-per-t{margin:0;font:800 22px/1.2 var(--f-head);color:var(--ink)}
+.pg-per-tot{display:grid;padding:8px 20px;border-radius:20px;background:#F3E6CC}
+.pg-per-c{display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding:10px 0}
+.pg-per-c span{font:400 16px/1.2 var(--f-text);color:var(--ink-2)}
+.pg-per-c b{font:800 20px/1.1 var(--f-text);font-variant-numeric:tabular-nums;color:var(--ink);white-space:nowrap}
+.pg-per-c--q b{color:var(--brand)}
+.pg-per-c--n b{color:var(--amber-text)}
+.pg-per-l li{padding:10px 6px}
+.pg-per-in .pg-val{color:var(--brand)}
+.pg-per-v{display:block!important;font:400 16px/1.3 var(--f-text);color:var(--ink-2)}
+/* Gastos / Ingresos arriba, grandes; Resumen / Gráficas (y Día / Semana / Mes) dentro, más pequeñas */
+.pg-main{margin-bottom:var(--s-3)}
+.pg-tabs--sub{width:100%;max-width:250px;justify-self:center;margin:0 auto var(--s-4);padding:3px;gap:3px}
+.pg-tabs--sub button{min-height:34px;font-size:16px}
+.pg-tabs--sub.pg-tabs--3{max-width:300px;margin:0 auto}
+/* Gastos por bloques: título y suma en la misma fila; Mes a mes que se abre al tocar (assets/extracto/ingresos.js) */
+.pg-cab{display:flex;justify-content:space-between;align-items:baseline;gap:12px}
+.pg-cab .r3-h{margin:0}
+.pg-cab-v{font:800 24px/1 var(--f-head);color:var(--ink);font-variant-numeric:tabular-nums;white-space:nowrap}
+.pg-mes-f{cursor:pointer}
+.pg-mes-f:hover{background:#F3E6CC}
+.pg-mes .pg-rk li.pg-mes-d{display:block;padding:0 0 12px 14px}
+.pg-mes-l li{padding:8px 6px}
+.pg-mes-l .pg-val{font-weight:600}
+/* Sin «Al mes» repetido debajo de cada bloque: lo dice el título */
+#xRes .pg-res > .pg-nota{display:none}
+.pg-pista{margin:0;font:400 16px/1.3 var(--f-text);color:var(--ink-2)}
+.pg-mes-media .pg-nom{color:var(--brand-dark)}
+.pg-mes-media .pg-bar i{background:var(--amber)}
+.pg-des{display:grid;gap:22px;padding:6px 4px 14px 14px;border-left:3px solid #F3E6CC}
+.pg-des-b{display:grid;gap:8px}
+.pg-cab-h{margin:0;font:800 18px/1.2 var(--f-head);color:var(--ink)}
+.pg-des .pg-cab-v{font-size:18px}
+.pg-rk--sin li.pg-x--logo{grid-template-columns:40px minmax(0,1fr) auto}
+.pg-rk--sin li.pg-x--logo .pg-bar{grid-column:2 / -1}
+.pg-x--abre{cursor:pointer}.pg-x--abre:hover{background:#F3E6CC}
+.pg-rk li.pg-x-d{display:block;padding:0 0 8px 14px}
+.pg-logo--bizum{background:#05C3DD}.pg-logo--transfer{background:#3E8F9D}
+.pg-wl-abre{cursor:pointer}
+.pg-wl li.pg-wl-sub{display:block;padding:0 6px 6px 58px}
+.pg-wl-sub[hidden]{display:none!important}
+.pg-wl-sub ul{list-style:none;margin:0;padding:0;display:grid;gap:6px}
+.pg-wl-sub li{display:flex;justify-content:space-between;gap:12px;font:400 16px/1.3 var(--f-text);color:var(--ink-2)}
+/* 20 nov: sin «Ver todo el detalle» (lo que se te escapa ya está en «Qué hacer ahora») y sin botones que llevaban a él */
+#xVerDetalle,#xDetalle{display:none!important}
+#xAcciones .r3-ac > button.r3-btn{display:none}
+.pg-logo--bizum{background:#fff}
+.pg-logo--bizum img{width:100%;height:100%;object-fit:contain}
+.pg-sub .pg-q{font:800 22px/1.2 var(--f-head);color:var(--ink)}
+/* Balance · Gastos · Ingresos */
+.pg-main--3{grid-template-columns:1fr 1fr 1fr}
+.pg-in{display:grid}
+.pg-neg .pg-val{color:var(--amber-text)}
+.pg-neg .pg-bar i{background:var(--amber)}
+.pg-mes-media:not(.pg-neg) .pg-val{color:var(--brand-dark)}
+#pgBal .pg-blq,#pgIn .pg-blq{gap:16px;padding:28px 24px 30px;border-radius:24px;background:#F3E6CC}
+#pgBal .pg-rel,#pgIn .pg-rel{background:var(--brand-tint)}
+#pgBal .pg-h,#pgIn .pg-h{font-size:26px}
+#pgBal > .pg,#pgIn > .pg{gap:20px}
+@media (max-width:480px){#pgBal .pg-blq,#pgIn .pg-blq{padding:22px 18px 24px;border-radius:20px}#pgBal .pg-h,#pgIn .pg-h{font-size:24px}}
+/* «Un mes normal»: una tarjeta aparte, sin barra ni color; los meses en verde (+) o rojo (−) */
+.pg-mes .pg-rk li.pg-mes-media{background:#F3E6CC;border-radius:16px;padding:14px 16px;margin-bottom:6px}
+.pg-mes .pg-rk li.pg-mes-media .pg-bar{display:none}
+.pg-mes .pg-rk li.pg-mes-media .pg-nom,.pg-mes .pg-rk li.pg-mes-media .pg-val{color:var(--ink)}
+.pg-mes .pg-rk li.pg-mes-media .pg-val{font-size:20px}
+.pg-pos .pg-val{color:#1E7A46}.pg-pos .pg-bar i{background:#2E9E5B}
+.pg-neg .pg-val{color:#B3261E}.pg-neg .pg-bar i{background:#D9534F}
+/* Resumen / Gráficas: pestañas de texto subrayado, distintas de Balance · Gastos · Ingresos */
+.pg-tabs.pg-tabs--sub{display:flex;justify-content:center;gap:28px;max-width:none;width:auto;padding:0;background:none;border-radius:0}
+.pg-tabs.pg-tabs--sub button{flex:none;min-height:40px;padding:0 2px;border-radius:0;background:none;color:var(--ink-2);font:700 16px/1 var(--f-text);border-bottom:3px solid transparent}
+.pg-tabs.pg-tabs--sub button[aria-selected="true"]{background:none;color:var(--ink);border-bottom-color:var(--brand)}
+/* dentro de un mes de Balance: «Ingresos» y «Gastos» que se abren */
+.pg-bal-l > li{font-size:18px}
+.pg-bal-l > li .pg-nom{font-size:17px}
+.pg-wl li.pg-x--abre{cursor:pointer}

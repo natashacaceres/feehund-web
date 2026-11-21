@@ -23,7 +23,7 @@
 
   const T = {
     es: {
-      titulo: "Pregunta a Feehund", gratis: "Tu primera pregunta es gratis", siguePlanes: "Elige cuánto tiempo y sigue preguntando",
+      pide: "Pregunta lo que quieras sobre tus cuentas", titulo: "Pregunta a Feehund", gratis: "Tu primera pregunta es gratis", siguePlanes: "Elige cuánto tiempo y sigue preguntando",
       estado: "Olfateando tu extracto", estadoN: (n) => "Olfateando tus " + n + " extractos", estadoNeg: "Olfateando tu datáfono", uso: (p) => "Has usado el " + p + " % de tus preguntas", privado: "Privado", pensando: "Olfateando",
       hola: "¿Qué quieres saber de tus gastos?", escribe: "Escribe tu pregunta", enviar: "Enviar",
       adonde: "¿Adónde se va mi dinero?", raro: "¿Hay algo raro en mi cuenta?", llevo: (m) => "¿Cuánto llevo en " + m + "?", mesMas: "¿En qué mes gasté más?",
@@ -41,7 +41,7 @@
       topeDia: "Por hoy ya está. Mañana seguimos.", topeTotal: "Has llegado al máximo de este pase.", noAbre: "Ese código no existe o ya caducó.", sinPagar: "Aún no nos ha llegado el pago. Si has pagado, recarga en un momento.",
     },
     ca: {
-      titulo: "Pregunta a Feehund", gratis: "La teva primera pregunta és gratis", siguePlanes: "Tria quant de temps i continua preguntant",
+      pide: "Pregunta el que vulguis sobre els teus comptes", titulo: "Pregunta a Feehund", gratis: "La teva primera pregunta és gratis", siguePlanes: "Tria quant de temps i continua preguntant",
       estado: "Ensumant el teu extracte", estadoN: (n) => "Ensumant els teus " + n + " extractes", estadoNeg: "Ensumant el teu datàfon", uso: (p) => "Has fet servir el " + p + " % de les teves preguntes", privado: "Privat", pensando: "Ensumant",
       hola: "Què vols saber de les teves despeses?", escribe: "Escriu la teva pregunta", enviar: "Enviar",
       adonde: "On van els meus diners?", raro: "Hi ha alguna cosa estranya al meu compte?", llevo: (m) => "Quant porto a " + m + "?", mesMas: "Quin mes vaig gastar més?",
@@ -59,7 +59,7 @@
       topeDia: "Per avui ja està. Demà continuem.", topeTotal: "Has arribat al màxim d'aquest passi.", noAbre: "Aquest codi no existeix o ja ha caducat.", sinPagar: "Encara no ens ha arribat el pagament. Si has pagat, torna a carregar d'aquí a un moment.",
     },
     en: {
-      titulo: "Ask Feehund", gratis: "Your first question is free", siguePlanes: "Pick how long and keep asking",
+      pide: "Ask anything about your accounts", titulo: "Ask Feehund", gratis: "Your first question is free", siguePlanes: "Pick how long and keep asking",
       estado: "Sniffing your statement", estadoN: (n) => "Sniffing your " + n + " statements", estadoNeg: "Sniffing your card machine", uso: (p) => "You've used " + p + "% of your questions", privado: "Private", pensando: "Sniffing",
       hola: "What do you want to know about your spending?", escribe: "Type your question", enviar: "Send",
       adonde: "Where does my money go?", raro: "Is anything odd in my account?", llevo: (m) => "How much have I spent on " + m + "?", mesMas: "Which month did I spend the most?",
@@ -84,13 +84,13 @@
   const SECTORES = [
     ["casa", /HIPOTECA|ALQUILER|COMUNIDAD DE PROP|OCTOPUS|ENDESA|IBERDROLA|NATURGY|AIGUES|AGUAS DE|VODAFONE|MOVISTAR|ORANGE|DIGI|HOLALUZ|REPSOL|YOIGO|MASMOVIL|LOWI|PEPEPHONE|JAZZTEL/],
     ["super", /MERCADONA|ALDI|LIDL|CONDIS|BON PREU|ESCLAT|GUISSONA|CARREFOUR|CAPRABO|EROSKI|CONSUM|DIA %|SUPERMERCA|SUPERMARKET|HIPERMERCA|\bSUPER\b|ALIMENTACI|AHORRAMAS|HIPERCOR|ALCAMPO/],
-    ["fuera", /RESTAURANT|\bBAR\b|TAPAS|TASCA|TABERNA|CERVECERIA|MESON|BRASERIA|CHURRERIA|HELADERIA|PASTELERIA|PANADERIA|CAFETERIA|TAPERIA|ASADOR|PIZZERIA|KEBAB|KFC|SUBWAY|BURGER|MCDONALD|TELEPIZZA|COFFEE|CAFE|BAKERY|WAFFLE|\bFORN\b|STARBUCKS|VIPS|GOIKO|TGTG|TOO GOOD/],
+    ["fuera", /RESTAURANT|\bBAR\b|TAPAS|TASCA|TABERNA|CERVECERIA|MESON|BRASERIA|CHURRERIA|HELADERIA|PASTELERIA|PANADERIA|CAFETERIA|TAPERIA|ASADOR|PIZZERIA|KEBAB|KFC|SUBWAY|BURGER|\bBK\d|ISTAMBUL|ISTANBUL|DONER|MCDONALD|TELEPIZZA|COFFEE|CAFE|BAKERY|WAFFLE|\bFORN\b|STARBUCKS|VIPS|GOIKO|TGTG|TOO GOOD/],
     ["domicilio", /UBER \*?EATS|GLOVO|JUST ?EAT|DELIVEROO/],
     ["transporte", /TMB|T MOBILITAT|TAXI|YEGO|UBER \*TRIP|UBER BV|CABIFY|BOLT|RYANAIR|VUELING|RENFE|IBERIA|BICING|EMT |METRO |GASOLINERA|CEPSA|GALP|SHELL|BP /],
-    ["ropa", /ZAPATER|SABATER|CALZADO|BOUTIQUE|ZARA|CALZEDONIA|MANGO|PRIMARK|H&M|BERSHKA|PULL&BEAR|STRADIVARIUS|LEFTIES|DECATHLON|TREATWELL|BEAUTY|PELUQUER/],
+    ["ropa", /ZAPATER|SABATER|CALZADO|BOUTIQUE|ZARA|CALZEDONIA|MANGO|PRIMARK|H&M|\bHM ES\d|JOIER|JOYER|BERSHKA|PULL&BEAR|STRADIVARIUS|LEFTIES|DECATHLON|TREATWELL|BEAUTY|PELUQUER/],
     ["salud", /FARMACIA|DROGUERIA|ROSSMANN|CLINICA|DENTAL|OPTICA/],
-    ["ocio", /MUSEO|MUSEU|EXPOSICI|\bZOO\b|ACUARIO|AQUARIUM|PARQUE DE ATRACC|BOLERA|KARTING|LIBRERIA|LLIBRERIA|PLAYTOMIC|NATACION|JUEGOS ONCE|CASA DEL LIBRO|FNAC|CINE|TEATRO|ENTRADAS|TICKETMASTER/],
-    ["otro", /FERRETERI|JUGUETERI|BAZAR|PAPELERI|ESTANCO|FLORISTERI|MERCERI|BRICOMART|BRICO DEPOT|LEROY MERLIN|IKEA|MEDIA ?MARKT|EL CORTE INGLES|TIENDA ANIMAL|KIWOKO/],
+    ["ocio", /MUSEO|MUSEU|EXPOSICI|\bZOO\b|ACUARIO|AQUARIUM|PARQUE DE ATRACC|BOLERA|KARTING|LIBRERIA|LLIBRERIA|PLAYTOMIC|NATACION|FITNESS|\bGYM\b|ATRACCION|JUEGOS ONCE|CASA DEL LIBRO|FNAC|CINE|TEATRO|ENTRADAS|TICKETMASTER/],
+    ["otro", /FERRETERI|JUGUETERI|BAZAR|PAPELERI|ESTANCO|FLORISTERI|MERCERI|BRICOMART|BRICO DEPOT|LEROY MERLIN|IKEA|MEDIA ?MARKT|EL CORTE INGLES|TIENDA ANIMAL|KIWOKO|WESTFIELD|CENTRO COMERCIAL|\bC\.?C\.? |\bSC$|COPYSHOW|COPISTERI/],
     ["suscr", /NETFLIX|SPOTIFY|APPLE\.COM|ANTHROPIC|CLAUDE|OPENAI|CHATGPT|HBO|DISNEY|PRIME VIDEO|YOUTUBE|DAZN|CLOUDFLARE|WORDPRESS|ADOBE|CANVA|DROPBOX|GOOGLE ONE/],
     ["online", /AMAZON|ALIEXPRESS|SHEIN|TEMU|EBAY|WALLAPOP/],
     ["impuestos", /A\.E\.A\.T|HACIENDA|AYUNTAMIENTO|AJUNTAMENT|TRIBUT/],
@@ -382,6 +382,7 @@
     // «Has usado el 90 % de tus preguntas»: solo cuando quedan 5 o menos (como ChatGPT, sin contador fijo)
     usoEl = mk("div", "tqc-uso"); usoEl.hidden = true; usoEl.append(mk("span"), mk("i")); usoEl.lastChild.appendChild(mk("b"));
     ch.append(top, sub, msgs, sug, usoEl, f);
+    if (!PAGINA) caja.appendChild(mk("h2", "r3-h tqc-tit", T.pide)); // fuera del chat, para que se entienda qué es
     caja.appendChild(ch);
     historial = [];
     const viejo = leer(PASE);
@@ -457,7 +458,7 @@
     const res = $("xRes"), r3 = res && res.querySelector(".r3"), tj = $("xTarjeta"), gr = $("pgGr");
     if (!res) return;
     if (ancho.matches) { if (caja.parentNode !== res) res.insertBefore(caja, res.firstChild); }
-    else if (r3 && r3.hidden && gr) { if (caja.previousElementSibling !== gr) gr.after(caja); }
+    else if (r3 && r3.hidden && gr) { const fin = $("pgIn") || gr; if (caja.previousElementSibling !== fin) fin.after(caja); } // después de Balance e Ingresos (ingresos.js)
     else if (tj && tj.parentNode) { if (caja.nextElementSibling !== tj) tj.before(caja); }
     else if (caja.parentNode !== res) res.appendChild(caja);
     altoOrdenador();
@@ -470,7 +471,8 @@
     // dónde empieza Feehund sin hacer scroll: arriba de su columna (Feehund es fijo al bajar, así que se mide la columna, no Feehund)
     const res = caja.parentNode; if (!res || res.id === "tqcSolo") { caja.style.removeProperty("--tqc-alto"); return; }
     const arriba = res.getBoundingClientRect().top + scrollY + (parseFloat(getComputedStyle(res).paddingTop) || 0);
-    caja.style.setProperty("--tqc-alto", Math.max(420, Math.round(innerHeight - arriba - 16)) + "px");
+    const tit = caja.querySelector(".tqc-tit"), th = tit ? tit.getBoundingClientRect().height + (parseFloat(getComputedStyle(tit).marginBottom) || 0) : 0; // el título va encima del chat
+    caja.style.setProperty("--tqc-alto", Math.max(420, Math.round(innerHeight - arriba - 16 - th)) + "px");
   }
   let tAlto; addEventListener("resize", () => { clearTimeout(tAlto); tAlto = setTimeout(altoOrdenador, 120); });
   ancho.addEventListener("change", colocar);
@@ -495,6 +497,8 @@
         return Object.assign({}, m, { id: "m" + n, c: k ? { k: c.k, s: k } : c, conocido: conocido.has(kk) });
       });
       try { pintarResto(r); } catch (e) { /* el resumen sigue sin este bloque */ }
+      // para «Gastos» (assets/extracto/ingresos.js): cada movimiento con su sector, ya clasificado aquí
+      try { document.dispatchEvent(new CustomEvent("fh-gastos", { detail: { r, todos } })); } catch (e) {}
       if (caja) caja.remove();
       montarCaja(); setTimeout(colocar, 0); setTimeout(altoOrdenador, 800); // otra vez cuando ya está todo encima (el aviso de ejemplo llega después)
     } catch (err) { /* si algo falla, el resumen sigue como siempre */ }

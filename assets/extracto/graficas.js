@@ -20,46 +20,46 @@
       resumen: "Resumen", graficas: "Gráficas", pagas: "Pagas al año en cosas que se repiten",
       calc: (n) => "al año, calculado con " + (n === 1 ? "1 mes" : n + " meses"), mes: (x) => "Unos " + x + " al mes",
       quien: "Sigues pagando", alAno: "Al mes", yaNo: "Ya no pagas", ultimo: (m) => "Último cargo en " + m, desdeMes: (m) => "Desde " + m, tipAno: (n, x) => n + ": " + x + " al año",
-      ahorro: "Lo que puedes ahorrar", ahorroNada: "En este extracto no veo nada concreto que ahorrar.", devolver: "Te lo pueden devolver", enExtracto: "En este extracto", mesL: ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"], evitable: "Se puede evitar", cada100: "De cada 100 €", menos1: "<1 €",
+      ahorro: "Lo que puedes ahorrar", ahorroNada: "En este extracto no veo nada concreto que ahorrar.", devolver: "Te lo pueden devolver", enExtracto: "En este extracto", mesL: ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"], evitable: "Se puede evitar", cada100: "De cada 100 €", cada100G: "En un mes normal, de cada 100 €", otrosG: "Otros", menos1: "<1 €",
       tipos: { casa: "Casa", susc: "Suscripciones", seg: "Seguros", banco: "Comisiones del banco", fijo: "Préstamos e impuestos", otros: "Otros pagos" },
       tipMes: (n, x) => n + ": unos " + x + " al mes", tip100: (k, l) => k + " de cada 100 €: " + l, menos: "Menos de 1",
       nada: "No hemos visto pagos que se repitan.", waffle: "Cien cuadritos: cada uno es 1 € de cada 100 que se repiten",
       compartirMi: "Compartir mi tarjeta", compartir: "Compartir", guardar: "Guardar imagen",
       mesAMes: "Mes a mes", media: (x) => "lo habitual " + x, mesTip: (m, x) => m + " · " + x, meses: ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", "nov", "dic"],
       vivo: "Lo que pagas en recibos, en directo", desde: "desde que abriste la página", escala: ["al día", "a la semana", "al mes", "al año"],
-      cuando: "Cuándo se te va", cuandoQ: "Cada punto es un cobro. Toca uno.", ventana: (a, b) => "sale entre el día " + a + " y el " + b, alMes: "al mes", dia: (d) => "Día " + d, unaVez: "1 vez al año",
+      cuando: "Qué día te cobran los pagos fijos", cuandoQ: "Cada punto es un cobro. Toca uno.", ventana: (a, b) => "sale entre el día " + a + " y el " + b, alMes: "al mes", dia: (d) => "Día " + d, unaVez: "1 vez al año",
       sube: "Quién te ha subido el precio", subeQ: "Lo que pagas de más al año por cada subida.", subeTot: "al año, sin que nadie te avise", igual: "Igual", alAnoP: "al año",
-      nadieSube: "Nadie te ha subido el precio en este extracto.",
+      nadieSube: "Nadie",
     },
     ca: {
       resumen: "Resum", graficas: "Gràfics", pagas: "Pagues l'any en coses que es repeteixen",
       calc: (n) => "a l'any, calculat amb " + (n === 1 ? "1 mes" : n + " mesos"), mes: (x) => "Uns " + x + " al mes",
       quien: "Continues pagant", alAno: "Al mes", yaNo: "Ja no pagues", ultimo: (m) => "Últim càrrec " + (/^[aeiou]/.test(m) ? "a l'" : "al ") + m, desdeMes: (m) => "Des " + (/^[aeiou]/.test(m) ? "d'" : "de ") + m, tipAno: (n, x) => n + ": " + x + " l'any",
-      ahorro: "El que pots estalviar", ahorroNada: "En aquest extracte no veig res concret per estalviar.", devolver: "Te'l poden retornar", enExtracto: "En aquest extracte", mesL: ["gener", "febrer", "març", "abril", "maig", "juny", "juliol", "agost", "setembre", "octubre", "novembre", "desembre"], evitable: "Es pot evitar", cada100: "De cada 100 €", menos1: "<1 €",
+      ahorro: "El que pots estalviar", ahorroNada: "En aquest extracte no veig res concret per estalviar.", devolver: "Te'l poden retornar", enExtracto: "En aquest extracte", mesL: ["gener", "febrer", "març", "abril", "maig", "juny", "juliol", "agost", "setembre", "octubre", "novembre", "desembre"], evitable: "Es pot evitar", cada100: "De cada 100 €", cada100G: "En un mes normal, de cada 100 €", otrosG: "Altres", menos1: "<1 €",
       tipos: { casa: "Casa", susc: "Subscripcions", seg: "Assegurances", banco: "Comissions del banc", fijo: "Préstecs i impostos", otros: "Altres pagaments" },
       tipMes: (n, x) => n + ": uns " + x + " al mes", tip100: (k, l) => k + " de cada 100 €: " + l, menos: "Menys d'1",
       nada: "No hem vist pagaments que es repeteixin.", waffle: "Cent quadradets: cadascun és 1 € de cada 100 que es repeteixen",
       compartirMi: "Compartir la meva targeta", compartir: "Compartir", guardar: "Desar la imatge",
       mesAMes: "Mes a mes", media: (x) => "l'habitual " + x, mesTip: (m, x) => m + " · " + x, meses: ["gen", "febr", "març", "abr", "maig", "juny", "jul", "ag", "set", "oct", "nov", "des"],
       vivo: "El que pagues en rebuts, en directe", desde: "des que has obert la pàgina", escala: ["al dia", "a la setmana", "al mes", "l'any"],
-      cuando: "Quan se te'n va", cuandoQ: "Cada punt és un cobrament. Toca'n un.", ventana: (a, b) => "surt entre el dia " + a + " i el " + b, alMes: "al mes", dia: (d) => "Dia " + d, unaVez: "1 cop l'any",
+      cuando: "Quin dia et cobren els pagaments fixos", cuandoQ: "Cada punt és un cobrament. Toca'n un.", ventana: (a, b) => "surt entre el dia " + a + " i el " + b, alMes: "al mes", dia: (d) => "Dia " + d, unaVez: "1 cop l'any",
       sube: "Qui t'ha apujat el preu", subeQ: "El que pagues de més l'any per cada pujada.", subeTot: "l'any, sense que ningú t'avisi", igual: "Igual", alAnoP: "l'any",
-      nadieSube: "Ningú t'ha apujat el preu en aquest extracte.",
+      nadieSube: "Ningú",
     },
     en: {
       resumen: "Summary", graficas: "Charts", pagas: "You pay each year in things that repeat",
       calc: (n) => "a year, worked out from " + (n === 1 ? "1 month" : n + " months"), mes: (x) => "About " + x + " a month",
       quien: "Still paying", alAno: "A month", yaNo: "No longer paying", ultimo: (m) => "Last charge in " + m, desdeMes: (m) => "Since " + m, tipAno: (n, x) => n + ": " + x + " a year",
-      ahorro: "What you can save", ahorroNada: "I can't see anything specific to save in this statement.", devolver: "You can get it back", enExtracto: "In this statement", mesL: ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"], evitable: "Avoidable", cada100: "Out of every 100 €", menos1: "<1 €",
+      ahorro: "What you can save", ahorroNada: "I can't see anything specific to save in this statement.", devolver: "You can get it back", enExtracto: "In this statement", mesL: ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"], evitable: "Avoidable", cada100: "Out of every 100 €", cada100G: "In a normal month, out of every 100 €", otrosG: "Other", menos1: "<1 €",
       tipos: { casa: "Home", susc: "Subscriptions", seg: "Insurance", banco: "Bank fees", fijo: "Loans and taxes", otros: "Other payments" },
       tipMes: (n, x) => n + ": about " + x + " a month", tip100: (k, l) => k + " of every 100 €: " + l, menos: "Less than 1",
       nada: "We didn't see any payments that repeat.", waffle: "A hundred squares: each one is 1 € of every 100 that repeat",
       compartirMi: "Share my card", compartir: "Share", guardar: "Save image",
       mesAMes: "Month by month", media: (x) => "usual " + x, mesTip: (m, x) => m + " · " + x, meses: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
       vivo: "What you pay in bills, live", desde: "since you opened the page", escala: ["a day", "a week", "a month", "a year"],
-      cuando: "When it leaves", cuandoQ: "Each dot is a payment. Tap one.", ventana: (a, b) => "goes out between day " + a + " and day " + b, alMes: "a month", dia: (d) => "Day " + d, unaVez: "once a year",
+      cuando: "Which day your fixed payments go out", cuandoQ: "Each dot is a payment. Tap one.", ventana: (a, b) => "goes out between day " + a + " and day " + b, alMes: "a month", dia: (d) => "Day " + d, unaVez: "once a year",
       sube: "Who raised your price", subeQ: "What you pay extra each year for each rise.", subeTot: "a year, without anyone telling you", igual: "Same", alAnoP: "a year",
-      nadieSube: "Nobody raised your price in this statement.",
+      nadieSube: "Nobody",
     },
   }[LANG];
 
@@ -74,7 +74,8 @@
     { k: "banco", cats: ["comisiones"] },
   ];
   const tipoDe = (cat) => (TIPOS.find((t) => t.cats.indexOf(cat) >= 0) || { k: "otros" }).k;
-  const COLOR_TIPO = { casa: "#0E5E6F", susc: "#7FC1CC", seg: "#3E8F9D", otros: "#D9C7A5", banco: "#FFB238", fijo: "#A8957A" };
+  const COLOR_TIPO = { alquiler: "#0E5E6F", suministros: "#4FA3A5", casa: "#0E5E6F", susc: "#7FC1CC", seg: "#3E8F9D", otros: "#D9C7A5", banco: "#FFB238", fijo: "#A8957A", comida: "#C2603A", ropa: "#E39A7B", ocio: "#5E7F3A", transporte: "#8FB07A", personas: "#14213D", tarjeta: "#6B5B95", nose: "#C9BFAE", efectivo: "#B9AC93" };
+  const COLOR_MAS = ["#9C6644", "#4F5667", "#B08968", "#7A9E9F", "#D4A373"];
 
   function calcRepe(r) {
     const cobros = r.cobros || [], porId = {}; cobros.forEach((c) => { porId[c.id] = c; });
@@ -207,19 +208,26 @@
     const max = repe.items[0].v;
     const porT = {};
     repe.items.forEach((it) => { const k = tipoDe(it.cat); (porT[k] = porT[k] || { tk: k, v: 0, quien: [] }); porT[k].v += it.v; porT[k].quien.push(it.n); });
-    const tipos = Object.values(porT).sort((a, b) => b.v - a.v), suma = tipos.reduce((a, t) => a + t.v, 0);
+    // Con Gastos completo (assets/extracto/ingresos.js): todo lo que gastas, también comida, ropa, ocio, personas…
+    const GG = window.FeehundGastosG;
+    let tipos = GG && GG.cats && GG.cats.length ? GG.cats.map((c) => ({ tk: c.k, label: c.n, v: c.v * 12, quien: c.quien })) : Object.values(porT).sort((a, b) => b.v - a.v);
+    let suma = tipos.reduce((a, t) => a + t.v, 0);
+    if (GG && tipos.length > 6) {
+      const peq = tipos.filter((t) => t.v / suma < 0.03);
+      if (peq.length > 1) { tipos = tipos.filter((t) => peq.indexOf(t) < 0); tipos.push({ tk: "otros", label: T.otrosG, v: peq.reduce((a, t) => a + t.v, 0), quien: peq.map((t) => t.label), sub: peq }); tipos.sort((a, b) => b.v - a.v); }
+      suma = tipos.reduce((a, t) => a + t.v, 0);
+    }
     const cnt = tipos.map((t) => Math.floor((t.v / suma) * 100)); let falta = 100 - cnt.reduce((a, b) => a + b, 0);
     tipos.map((t, i) => ({ i, r: (t.v / suma) * 100 - cnt[i] })).sort((a, b) => b.r - a.r).forEach((o) => { if (falta > 0) { cnt[o.i]++; falta--; } });
-    tipos.forEach((t, i) => { t.k = cnt[i]; t.color = COLOR_TIPO[t.tk]; });
+    tipos.forEach((t, i) => { t.k = cnt[i]; t.color = COLOR_TIPO[t.tk] || COLOR_MAS[i % COLOR_MAS.length]; });
 
     gr.innerHTML =
       '<div class="pg-vivo"><p class="pg-vivo-t"><i aria-hidden="true"></i>' + esc(T.vivo) + '</p><p class="pg-vivo-n" aria-hidden="true">0,0000 €</p><p class="pg-vivo-s">' + esc(T.desde) + '</p></div>' +
       '<ul class="pg-esc"></ul>' +
-      '<section class="pg-blq"><h3 class="pg-h">' + esc(T.cada100) + '</h3><div class="pg-wfz"><div class="pg-wf" role="img" aria-label="' + esc(T.waffle) + '"></div><ul class="pg-wl"></ul></div></section>' +
-      (repe.puntos.length > 1 ? '<section class="pg-blq pg-rel"><h3 class="pg-h">' + esc(T.cuando) + '</h3><p class="pg-q">' + esc(T.cuandoQ) + '</p><div class="pg-rel-in"></div></section>' : "") +
-      '<section class="pg-blq pg-sub"><h3 class="pg-h">' + esc(T.sube) + '</h3></section>' +
-      '<section class="pg-blq pg-aho"><h3 class="pg-h">' + esc(T.ahorro) + '</h3></section>';
-    vivo(gr); reloj(gr.querySelector(".pg-rel-in")); subidas(gr.querySelector(".pg-sub")); ahorro(gr.querySelector(".pg-aho"));
+      '<section class="pg-blq"><h3 class="pg-h">' + esc(window.FeehundGastosG ? T.cada100G : T.cada100) + '</h3><div class="pg-wfz"><div class="pg-wf" role="img" aria-label="' + esc(T.waffle) + '"></div><ul class="pg-wl"></ul></div></section>' +
+      (repe.puntos.length > 1 ? '<section class="pg-blq pg-rel"><h3 class="pg-h">' + esc(T.cuando) + '</h3><div class="pg-rel-in"></div></section>' : "") +
+      '<section class="pg-blq pg-sub"><h3 class="pg-h">' + esc(T.sube) + '</h3></section>';
+    vivo(gr); reloj(gr.querySelector(".pg-rel-in")); subidas(gr.querySelector(".pg-sub"));
 
     // De cada 100 €
     const wf = gr.querySelector(".pg-wf"), wl = gr.querySelector(".pg-wl");
@@ -227,11 +235,19 @@
       for (let k = 0; k < t.k; k++) { const c = document.createElement("i"); c.dataset.t = n; c.style.background = t.color; wf.appendChild(c); }
       const li = document.createElement("li"); li.tabIndex = 0; li.dataset.t = n;
       const ct = document.createElement("span"); ct.className = "pg-cnt"; ct.textContent = t.k ? t.k + " €" : T.menos1;
-      const tn = document.createElement("span"); tn.className = "pg-tn"; const sq = document.createElement("i"); sq.style.background = t.color; tn.append(sq, document.createTextNode(T.tipos[t.tk]));
+      const tn = document.createElement("span"); tn.className = "pg-tn"; const sq = document.createElement("i"); sq.style.background = t.color; tn.append(sq, document.createTextNode(t.label || T.tipos[t.tk]));
       const v = document.createElement("span"); v.className = "pg-val"; v.textContent = eurM(t.v / 12);
       li.append(ct, tn, v); wl.appendChild(li);
+      if (t.sub) {
+        li.classList.add("pg-wl-abre"); li.setAttribute("role", "button"); li.setAttribute("aria-expanded", "false");
+        const sub = document.createElement("li"); sub.className = "pg-wl-sub"; sub.hidden = true; const su = document.createElement("ul");
+        t.sub.forEach((x) => { const l2 = document.createElement("li"), a = document.createElement("span"), b = document.createElement("span"); a.textContent = x.label || T.tipos[x.tk]; b.className = "pg-val"; b.textContent = eurM(x.v / 12); l2.append(a, b); su.appendChild(l2); });
+        sub.appendChild(su); wl.appendChild(sub);
+        const abre = () => { sub.hidden = !sub.hidden; li.setAttribute("aria-expanded", String(!sub.hidden)); };
+        li.addEventListener("click", abre); li.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); abre(); } });
+      }
     });
-    const filas = [...wl.children];
+    const filas = [...wl.children].filter((li) => li.dataset.t != null);
     const marca = (i, e) => {
       wf.classList.toggle("foco", i != null);
       wf.querySelectorAll("i").forEach((c) => c.classList.toggle("on", c.dataset.t == i));
@@ -301,8 +317,7 @@
   // ---------- Quién te ha subido el precio ----------
   function subidas(sec) {
     const S = repe.subidas;
-    if (!S.length) { const p = document.createElement("p"); p.className = "pg-q"; p.textContent = T.nadieSube; sec.appendChild(p); return; }
-    const q = document.createElement("p"); q.className = "pg-q"; q.textContent = T.subeQ; sec.appendChild(q);
+    if (!S.length) { sec.remove(); return; } // nadie te subió el precio: el bloque no sale
     const tot = S.reduce((s, x) => s + x.extra, 0), mxE = S[0].extra;
     const top = document.createElement("div"); top.className = "pg-sub-tot";
     top.innerHTML = '<span class="pg-big">+' + esc(eur(tot)) + '</span><span class="pg-k">' + esc(T.subeTot) + "</span>"; sec.appendChild(top);
@@ -347,7 +362,6 @@
       tabs.addEventListener("click", (e) => {
         const b = e.target.closest("button"); if (!b) return;
         const g = b.dataset.t === "g"; elegir(g);
-        tabs.scrollIntoView({ block: "start", behavior: "smooth" });
       });
     }
     const elegir = (g) => {
@@ -390,6 +404,6 @@
 
   document.addEventListener("fh-resultado", (e) => {
     const r = e.detail; if (!r) return;
-    try { ultimoR = r; repe = calcRepe(r); montarPestanas(); ponerEnResumen(); plegarTarjeta(); } catch (err) { /* si algo falla, el resumen sigue como siempre */ }
+    try { ultimoR = r; repe = calcRepe(r); window.FeehundRepe = repe; montarPestanas(); ponerEnResumen(); plegarTarjeta(); } catch (err) { /* si algo falla, el resumen sigue como siempre */ }
   });
 })();
