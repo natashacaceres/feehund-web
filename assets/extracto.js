@@ -188,9 +188,11 @@
     if (error || !r) { show("up"); msg($("xErr"), (error && error.message) || TX.bad); return; }
     if (bandeja) bandeja.marcar(r.errores);
     let cobros = (r.cobros || []).filter((c) => c.estado === "seguro" || c.estado === "posible");
-    if (!cobros.length && !(r.gastos_fijos || []).length && !(r.terminados || []).length && !(r.devoluciones || []).length) {
+    // sin cobros pero con movimientos: se enseña igual (Balance, Gastos e Ingresos salen de los movimientos)
+    const hayMovs = ((r.lectura && r.lectura.movimientos) || []).some((m) => m.importe);
+    if (!hayMovs && !cobros.length && !(r.gastos_fijos || []).length && !(r.terminados || []).length && !(r.devoluciones || []).length) {
       // sin ningún movimiento leído: ¿es el resumen del datáfono? Entonces se dice y se enlaza «Mi datáfono»
-      if (!((r.lectura && r.lectura.movimientos) || []).length && await esResumenDatafono(entrada)) { show("up"); aMiDatafono($("xErr")); return; }
+      if (await esResumenDatafono(entrada)) { show("up"); aMiDatafono($("xErr")); return; }
       show("up");
       const err = (r.errores || [])[0];
       msg($("xErr"), err ? err.texto : r.necesita_mapeo ? TX.mapeo : TX.none);

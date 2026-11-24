@@ -29,7 +29,7 @@
       meses: ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", "nov", "dic"],
       cat: { alquiler: "Casa", suministros: "Suministros", casa: "Casa", susc: "Suscripciones", seg: "Seguros", fijo: "Préstamos e impuestos", banco: "Comisiones del banco", otrosF: "Otros pagos fijos" },
       balance: "Balance", quedaMes: "Te queda al mes", faltaMes: "Te falta al mes", enCuenta: "de media",
-      fijosDe100: (x) => "De cada 100 € que ingresas, " + x + " van a pagos fijos.", entroL: "Ingresos", gastasteL: "Gastos", peso: "Lo que más pesó",
+      fijosDe100: (x) => "De cada 100 € que ingresas, " + x + " van a pagos fijos.", entroL: "Ingresos", gastasteL: "Gastos", entreL: "Entre tus cuentas", peso: "Lo que más pesó",
       hacer: "Qué hacer ahora", revisar: "Para revisar",
       cRevT: (sum) => (sum ? "Revisa las subidas de tus suministros" : "Revisa los cobros que han subido"), cRevL: (L, n) => (L.length ? y(L, " y ") + (L.length === 1 ? " te ha cobrado más algún mes." : " te han cobrado más algún mes.") : n === 1 ? "Hay 1 cosa para revisar." : "Hay " + n + " cosas para revisar."), cRevB: "Ver en Gastos",
       cLuzT: (n) => "Comprueba si " + n + " te cobra lo que gastas de verdad", cLuzL: (a, b) => "Unos meses pagas " + a + " y otros " + b + ". Puede que te estén estimando el consumo.",
@@ -66,7 +66,7 @@
       meses: ["gen", "febr", "març", "abr", "maig", "juny", "jul", "ag", "set", "oct", "nov", "des"],
       cat: { alquiler: "Casa", suministros: "Subministraments", casa: "Casa", susc: "Subscripcions", seg: "Assegurances", fijo: "Préstecs i impostos", banco: "Comissions del banc", otrosF: "Altres pagaments fixos" },
       balance: "Balanç", quedaMes: "Et queda al mes", faltaMes: "Et falta al mes", enCuenta: "de mitjana",
-      fijosDe100: (x) => "De cada 100 € que ingresses, " + x + " van a pagaments fixos.", entroL: "Ingressos", gastasteL: "Despeses", peso: "El que més va pesar",
+      fijosDe100: (x) => "De cada 100 € que ingresses, " + x + " van a pagaments fixos.", entroL: "Ingressos", gastasteL: "Despeses", entreL: "Entre els teus comptes", peso: "El que més va pesar",
       hacer: "Què fer ara", revisar: "Per revisar",
       cRevT: (sum) => (sum ? "Revisa les pujades dels teus subministraments" : "Revisa els cobraments que han pujat"), cRevL: (L, n) => (L.length ? y(L, " i ") + (L.length === 1 ? " t'ha cobrat més algun mes." : " t'han cobrat més algun mes.") : n === 1 ? "Hi ha 1 cosa per revisar." : "Hi ha " + n + " coses per revisar."), cRevB: "Veure a Despeses",
       cLuzT: (n) => "Comprova si " + n + " et cobra el que gastes de debò", cLuzL: (a, b) => "Uns mesos pagues " + a + " i d'altres " + b + ". Potser t'estan estimant el consum.",
@@ -103,7 +103,7 @@
       meses: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
       cat: { alquiler: "Home", suministros: "Utilities", casa: "Home", susc: "Subscriptions", seg: "Insurance", fijo: "Loans and taxes", banco: "Bank fees", otrosF: "Other fixed payments" },
       balance: "Balance", quedaMes: "You keep each month", faltaMes: "You are short each month", enCuenta: "on average",
-      fijosDe100: (x) => "Out of every 100 € you earn, " + x + " go to fixed payments.", entroL: "Income", gastasteL: "Spending", peso: "What weighed most",
+      fijosDe100: (x) => "Out of every 100 € you earn, " + x + " go to fixed payments.", entroL: "Income", gastasteL: "Spending", entreL: "Between your accounts", peso: "What weighed most",
       hacer: "What to do now", revisar: "To check",
       cRevT: (sum) => (sum ? "Check the price rises on your utilities" : "Check the charges that went up"), cRevL: (L, n) => (L.length ? y(L, " and ") + " charged you more some months." : n === 1 ? "There is 1 thing to check." : "There are " + n + " things to check."), cRevB: "See in Spending",
       cLuzT: (n) => "Check that " + n + " charges you for what you really use", cLuzL: (a, b) => "Some months you pay " + a + " and others " + b + ". They may be estimating your usage.",
@@ -129,6 +129,10 @@
 
   // ---------- Qué es cada entrada: solo lo que dice el concepto ----------
   const limpio = (s) => String(s || "").replace(/\s+/g, " ").trim();
+  // Lo que pasas de una cuenta tuya a otra (ahorro, hucha, plan de pensiones) no es ni gasto ni ingreso: las mismas palabras que el motor
+  const TRASPASO = /\b(TRASPASOS?|TRASP|TRASPAS|HUCHA|APARTADOS?|POCKETS?|VAULTS?|REDONDEO|ROUNDUP|GUARDIOLA|CONVERTED)\b|EXCHANGED? TO|ENTRE (CUENTAS|COMPTES)|CUENTAS? PROPIAS?|COMPTE PROPI|A MI CUENTA|CUENTA (DE )?AHORRO|\bTO EUR\b|OWN ACCOUNT|ROUND UP|PLAN (DE )?PENSIONES|APORTACION PLAN|SAVINGS PLAN|PLAN (DE )?INVERSION/;
+  const esTraspaso = (m) => m.nota === "traspaso" || m.nota === "cambio_divisa" || TRASPASO.test(limpio(m.concepto).toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g, ""));
+  const enEuros = (m) => !m.divisa || m.divisa === "EUR"; // los dólares no se suman como euros
   const titulo = (s) => limpio(s).toLowerCase().replace(/(^|[\s.(\/-])(\p{L})/gu, (a, b, c) => b + c.toUpperCase()).replace(/\b(Sl|Sa|Slu|Ab|Bv|Ltd|Inc)\b/g, (x) => x.toUpperCase());
   // Quién te paga: si el concepto nombra a una empresa o un organismo conocido, su nombre limpio y su logo oficial
   // (bajado de su propia web: assets/logos/pagadores/ y, si ya existía para Gastos, el de siempre)
@@ -180,21 +184,25 @@
 
   // Ingresos con las mismas reglas que Gastos: lo fijo (el mismo pagador, 3 meses o más y con ritmo) a su importe de
   // cada mes; lo que cambia, mes a mes con lo real; «Un mes normal» es su media. Lo fijo que se cortó, aparte.
+  // La paga extra (lo que un mes llega por encima de lo de siempre) cuenta en lo que cambia: no se pierde.
+  // Cada mes enseña todo lo que entró de verdad, también lo fijo y lo que ya no llega.
   const NO_FIJO = ["devolucion", "hacienda", "efectivo", "otros"];
   const mediana = (L) => { const x = L.slice().sort((a, b) => a - b), n = x.length; return n ? (n % 2 ? x[(n - 1) / 2] : (x[n / 2 - 1] + x[n / 2]) / 2) : 0; };
   function calcular(r) {
     const per = (r.lectura && r.lectura.periodo) || {}, movs = (r.lectura && r.lectura.movimientos) || [];
     const meses = per.meses || 12;
     const lista = [];
-    if (per.desde && per.hasta) { let [y, mm] = per.desde.slice(0, 7).split("-").map(Number); const fin = per.hasta.slice(0, 7); for (let n = 0; n < 40; n++) { const k = y + "-" + String(mm).padStart(2, "0"); lista.push({ k, e: 0, s: 0, cub: {}, v: 0 }); if (k >= fin) break; mm++; if (mm > 12) { mm = 1; y++; } } }
+    if (per.desde && per.hasta) { let [y, mm] = per.desde.slice(0, 7).split("-").map(Number); const fin = per.hasta.slice(0, 7); for (let n = 0; n < 40; n++) { const k = y + "-" + String(mm).padStart(2, "0"); lista.push({ k, e: 0, s: 0, tr: 0, trMovs: [], porT: {}, cub: {}, v: 0 }); if (k >= fin) break; mm++; if (mm > 12) { mm = 1; y++; } } }
     const idx = {}; lista.forEach((m, i) => { idx[m.k] = i; });
     const pag = {};
     movs.forEach((m) => {
-      const k = String(m.fecha || "").slice(0, 7); if (idx[k] == null || !m.importe) return;
+      const k = String(m.fecha || "").slice(0, 7); if (idx[k] == null || !m.importe || !enEuros(m)) return;
       const x = lista[idx[k]];
+      if (esTraspaso(m)) { x.tr += m.importe; x.trMovs.push(m); return; }
       if (m.importe < 0) { x.s -= m.importe; return; }
       x.e += m.importe;
       const q = quien(m.concepto), key = q.t + "|" + q.n.toUpperCase();
+      const g = x.porT[q.t] || (x.porT[q.t] = { k: q.t, n: T.tiposP[q.t], v: 0, c: 0, movs: [] }); g.v += m.importe; g.c++; g.movs.push(m);
       const p = pag[key] || (pag[key] = { t: q.t, n: q.n, logo: q.logo, movs: [], porMes: {} }); p.movs.push(m); p.porMes[k] = (p.porMes[k] || 0) + m.importe;
     });
     const fijos = [], yaNo = [], todo = {};
@@ -204,7 +212,10 @@
       const med = mediana(mk.map((k) => p.porMes[k]));
       if (NO_FIJO.indexOf(p.t) < 0 && n >= 3 && n / span >= 0.5 && med >= 20) { // 20 €: el pádel de un amigo no es un ingreso fijo
         const it = { t: p.t, n: p.n, logo: p.logo, v: med, desde: mk[0], ultimo: mk[n - 1], movs: p.movs };
-        (idx[it.ultimo] >= lista.length - 2 ? fijos : yaNo).push(it);
+        const sigue = idx[it.ultimo] >= lista.length - 2;
+        (sigue ? fijos : yaNo).push(it);
+        // la paga extra: lo que ese mes llegó por encima de lo de siempre
+        if (sigue) mk.forEach((k) => { const extra = p.porMes[k] - med; if (extra >= 1) { const x = todo[p.t] || (todo[p.t] = { k: p.t, n: T.tiposP[p.t], v: 0, c: 0, movs: [] }); x.v += extra; } });
         return;
       }
       p.movs.forEach((m) => { const k = m.fecha.slice(0, 7); meter(lista[idx[k]].cub, p, m); meter(todo, p, m); lista[idx[k]].v += m.importe; });
@@ -295,7 +306,7 @@
     });
     return ul;
   }
-  // Lo que entró un mes y no es fijo: por tipo (Transferencias, Bizums…); al tocar, los nombres
+  // Lo que entró un mes: por tipo (Nóminas, Transferencias, Bizums…); al tocar, los movimientos
   function desgloseIn(cub) {
     const box = el("div", "pg-des"); const L = Object.values(cub).sort((a, b) => b.v - a.v);
     if (!L.length) { box.appendChild(el("p", "pg-k", T.vacio)); return box; }
@@ -310,8 +321,8 @@
     cabeza(box, T.entra, eur(I.entra), T.alAnoTot(eur(I.entra * 12)), T.nFijos(I.fijos.length, eur(I.fijosT)), I.fijos.length > 0);
     if (I.fijos.length) { const sec = el("section", "r3-blq pg-res"); cabecera(sec, T.fijosIn, I.fijosT); sec.appendChild(listaFijos(I.fijos, false)); box.appendChild(sec); }
     if (I.yaNo.length) { const sec = el("section", "r3-blq pg-res"); sec.appendChild(el("h2", "r3-h", T.yaNoIn)); sec.appendChild(listaFijos(I.yaNo, true)); box.appendChild(sec); }
-    box.appendChild(seccionMeses({ t: T.mesNormal, v: I.cambia, txt: eur(I.cambia) },
-      I.lista.map((m, n) => ({ t: nombreMes(m.k) + " " + m.k.slice(0, 4), sub: subMes(I.lista, n, I.desde, I.hasta), v: m.v, txt: eur(m.v), detalle: () => desgloseIn(m.cub) }))));
+    box.appendChild(seccionMeses({ t: T.mesNormal, v: I.entra, txt: eur(I.entra) },
+      I.lista.map((m, n) => ({ t: nombreMes(m.k) + " " + m.k.slice(0, 4), sub: subMes(I.lista, n, I.desde, I.hasta), v: m.e, txt: eur(m.e), detalle: () => desgloseIn(m.porT) }))));
   }
 
   // ---------- Ingresos · Gráficas ----------
@@ -362,18 +373,18 @@
   function calcGastos(r, todos) {
     const per = (r.lectura && r.lectura.periodo) || {}, meses = per.meses || 12, repe = window.FeehundRepe || { items: [], total: 0 };
     const porId = {}; (r.cobros || []).forEach((c) => { porId[c.id] = c; });
-    const saltar = new Set(), tarjetas = new Set();
-    (r.grupos || []).forEach((g) => { if (!(g.codigo.indexOf("sector_") === 0 || g.codigo === "recibos" || g.codigo === "comisiones")) return; (g.ids || []).forEach((id) => { const c = porId[id]; if (c && c.estado !== "terminado") (c.movimientos || []).forEach((m) => { saltar.add(clave(m)); const t = String(m.concepto || "").match(/TARJETA\s*:?\s*[.\s]*(\d{4})\b/i); if (t && c.tipo !== "comision") tarjetas.add(t[1]); }); }); });
-    [].concat(r.terminados || [], (r.cobros || []).filter((c) => c.estado === "terminado")).forEach((c) => (c.movimientos || []).forEach((m) => saltar.add(clave(m))));
+    const saltar = new Set(), tarjetas = new Set(), fijoN = {};
+    (r.grupos || []).forEach((g) => { if (!(g.codigo.indexOf("sector_") === 0 || g.codigo === "recibos" || g.codigo === "comisiones")) return; (g.ids || []).forEach((id) => { const c = porId[id]; if (c && c.estado !== "terminado") (c.movimientos || []).forEach((m) => { saltar.add(clave(m)); fijoN[clave(m)] = c.nombre; const t = String(m.concepto || "").match(/TARJETA\s*:?\s*[.\s]*(\d{4})\b/i); if (t && c.tipo !== "comision") tarjetas.add(t[1]); }); }); });
+    [].concat(r.terminados || [], (r.cobros || []).filter((c) => c.estado === "terminado")).forEach((c) => (c.movimientos || []).forEach((m) => { saltar.add(clave(m)); fijoN[clave(m)] = c.nombre; }));
     // cada movimiento que cambia: su grupo (día a día, envíos, otros) y su apartado
     const meter = (cub, g, k, n, d, m) => { const G2 = cub[g] || (cub[g] = {}); const x = G2[k] || (G2[k] = { k, n, d, v: 0, c: 0, movs: [] }); x.v += -m.importe; x.c++; x.movs.push(m); };
     const porMes = {}, todo = {}, fijMes = {};
     todos.forEach((m) => {
-      if (!(m.importe < 0) || !/^\d{4}-\d{2}/.test(m.fecha || "")) return;
-      if (saltar.has(clave(m))) { const f = fijMes[m.fecha.slice(0, 7)] || (fijMes[m.fecha.slice(0, 7)] = { v: 0, movs: [] }); f.v -= m.importe; f.movs.push(m); return; }
+      if (!(m.importe < 0) || !/^\d{4}-\d{2}/.test(m.fecha || "") || !enEuros(m) || esTraspaso(m)) return;
+      if (saltar.has(clave(m))) { const mk = m.fecha.slice(0, 7), f = fijMes[mk] || (fijMes[mk] = { v: 0, movs: [] }); f.v -= m.importe; f.movs.push(m); const n = fijoN[clave(m)] || nombreMov(m); meter(porMes[mk] || (porMes[mk] = {}), "fijos", n.toUpperCase(), n, null, m); return; }
       const u = String(m.concepto || "").toUpperCase(), sct = m.c && m.c.s;
       let g, k, n, d = null;
-      if (sct !== "tarjeta" && /^BIZUM|^TRANSFERENCIA|^TRASPASO|A FAVOR DE/.test(u)) {
+      if (sct !== "tarjeta" && /^BIZUM|^TRANSFERENCIA|A FAVOR DE/.test(u)) {
         const f = u.match(/A FAVOR DE\s+(.+?)(?:\s+CONCEPTO|,|$)/); n = f ? titulo(f[1]) : titulo(u.replace(/ CONCEPTO.*$/, "").slice(0, 36)); g = "envios"; k = n.toUpperCase(); d = /^BIZUM/.test(u) ? "bizum" : "transfer";
       } else if (/CAJERO|REINTEGRO|RETIRADA (DE )?EFECTIVO|DISPOSICION (DE )?EFECTIVO|\bATM\b/.test(u)) { g = "otros"; k = "efectivo"; n = T.efectivoS; }
       else if (sct === "tarjeta" || sct === "impuestos" || sct === "comisiones") { g = "otros"; k = sct; n = T[sct]; }
@@ -394,6 +405,7 @@
       const k = g === "envios" ? "personas" : /^(superM|fueraM|domicilioM)$/.test(x.k) ? "comida" : x.k === "recibos" ? "suministros" : x.k === "impuestos" ? "fijo" : x.k === "comisiones" ? "banco" : x.k;
       sumar(k, g === "envios" ? T.envios : k === "comida" ? T.comida : T.cat[k] || x.n, x.v / meses, g === "envios" ? x.n : x.n);
     }));
+    // cada mes, todo lo que salió: también los pagos fijos (así cuadra con Balance)
     const lista = []; if (per.desde && per.hasta) { let [y, mm] = per.desde.slice(0, 7).split("-").map(Number); for (let n = 0; n < 40; n++) { const k = y + "-" + String(mm).padStart(2, "0"); lista.push({ k, cub: porMes[k] || {}, v: sumaG(porMes[k] || {}) }); if (k >= per.hasta.slice(0, 7)) break; mm++; if (mm > 12) { mm = 1; y++; } } }
     const comidaFuera = ((todo.dia && todo.dia.fueraM ? todo.dia.fueraM.v : 0) + (todo.dia && todo.dia.domicilioM ? todo.dia.domicilioM.v : 0)) / meses;
     const out = { meses, fijosT, cambia, total: fijosT + cambia, todo, lista, fijMes, desde: per.desde, hasta: per.hasta, tarjetas: tarjetas.size, comidaFuera, cats: Object.values(cats).filter((c) => c.v > 0).sort((a, b) => b.v - a.v) };
@@ -426,7 +438,7 @@
   function desglose(cub, div) {
     const box = el("div", "pg-des");
     const suma = (g) => Object.values(cub[g] || {}).reduce((a, x) => a + x.v, 0);
-    [["dia", T.compras], ["envios", T.envios], ["otros", T.otrosP]].sort((a, b) => suma(b[0]) - suma(a[0])).forEach(([g, t]) => {
+    [["fijos", T.pagosFijosL], ["dia", T.compras], ["envios", T.envios], ["otros", T.otrosP]].sort((a, b) => suma(b[0]) - suma(a[0])).forEach(([g, t]) => {
       let L = Object.values(cub[g] || {}).filter((x) => x.v / (div || 1) >= 0.5).sort((a, b) => (a.k === "nose") - (b.k === "nose") || b.v - a.v);
       if (!L.length) return;
       // muchas personas con poco: las primeras cinco y el resto juntas
@@ -439,7 +451,7 @@
   }
   function mesesGastos() {
     const sec = el("section", "r3-blq pg-res pg-mes"); sec.id = "pgMesG"; sec.appendChild(el("h2", "r3-h", T.mesAMes));
-    const ul = el("ul", "pg-rk pg-rk--sin"); const mx = Math.max(1, G.cambia, ...G.lista.map((m) => m.v));
+    const ul = el("ul", "pg-rk pg-rk--sin"); const mx = Math.max(1, G.total, ...G.lista.map((m) => m.v));
     const fila1 = (titulo, sub, v, cub, div) => {
       const li = el("li", cub ? "pg-mes-f" : "pg-mes-media"); if (cub) { li.tabIndex = 0; li.setAttribute("role", "button"); li.setAttribute("aria-expanded", "false"); }
       const nom = el("span", "pg-nom", titulo); if (sub) nom.appendChild(el("small", null, sub));
@@ -449,7 +461,7 @@
       abrible(li, "mes", () => { const d = el("li", "pg-mes-d"); d.appendChild(desglose(cub, div)); return d; });
       return li;
     };
-    fila1(T.mesNormal, null, G.cambia, null, 0);
+    fila1(T.mesNormal, null, G.total, null, 0);
     G.lista.forEach((m, n) => {
       const parte = [];
       if (n === 0 && G.desde && +G.desde.slice(8, 10) > 1) parte.push(T.desdeDia(+G.desde.slice(8, 10)));
@@ -501,8 +513,8 @@
   }
   // Lo que entró un mes, por tipo (Transferencias, Bizums…), y lo que salió: pagos fijos, compras, envíos y otros pagos
   function ingresosDelMes(k) {
-    const g = {}; ((R && R.lectura && R.lectura.movimientos) || []).forEach((m) => { if (!(m.importe > 0) || String(m.fecha).slice(0, 7) !== k) return; const t = quien(m.concepto).t; const x = g[t] || (g[t] = { n: T.tiposP[t], v: 0, c: 0, movs: [] }); x.v += m.importe; x.c++; x.movs.push(m); });
-    return Object.values(g).sort((a, b) => b.v - a.v);
+    const x = I && I.lista.find((m) => m.k === k);
+    return x ? Object.values(x.porT).sort((a, b) => b.v - a.v) : [];
   }
   function gastosDelMes(k) {
     const out = [], gm = G.lista.find((m) => m.k === k), fij = G.fijMes[k];
@@ -527,6 +539,12 @@
           };
           fila2(T.entroL, m.e, ingresosDelMes(m.k));
           fila2(T.gastasteL, m.s, gastosDelMes(m.k));
+          if (m.trMovs.length) { // lo que moviste entre tus cuentas: se enseña, pero no es ni ingreso ni gasto
+            const li = el("li"); li.append(el("span", "pg-nom", T.entreL), el("span", "pg-val", firmado(m.tr))); ul.appendChild(li);
+            abrible(li, "fila", () => { const det = el("li", "pg-x-d"); const dl = el("ul", "pg-rk pg-rk--sin pg-mes-l");
+              m.trMovs.slice().sort((a, b) => (a.fecha < b.fecha ? -1 : 1)).forEach((t) => { const l2 = el("li"); const nm = el("span", "pg-nom", titulo(limpio(t.concepto).slice(0, 48))); nm.appendChild(el("small", null, fechaL(t.fecha))); l2.append(nm, el("span", "pg-val", firmado(t.importe))); dl.appendChild(l2); });
+              det.appendChild(dl); return det; });
+          }
           box2.appendChild(ul); return box2;
         } };
       })));
