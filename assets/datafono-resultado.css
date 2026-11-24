@@ -32,9 +32,11 @@ main.calc:has(#res:not([hidden])) #dLector{display:none}
 .dr-tarj{display:grid;gap:12px}
 .dr-tr{display:grid;grid-template-columns:minmax(110px,190px) minmax(0,1fr) 76px;gap:12px;align-items:center;font:400 16px/1.3 var(--f-text);color:var(--ink)}
 .dr-tp{position:relative;height:26px}
-.dr-tp i{position:absolute;left:0;top:0;bottom:0;border-radius:7px;background:var(--brand)}
-.dr-tp i.al{background:var(--amber)}
+.dr-tp i{position:absolute;left:0;top:0;bottom:0;border-radius:7px;background:#14213D}
+.dr-tp i.dr-caro{background:#B23A1E}
 .dr-tv{text-align:right;font-weight:800;font-variant-numeric:tabular-nums;white-space:nowrap}
+/* en el móvil, las etiquetas en una sola línea: la columna del nombre mide lo que el nombre más largo y las barras empiezan todas en el mismo sitio */
+@media (max-width:600px){@supports (grid-template-columns:subgrid){.dr-tarj{grid-template-columns:max-content minmax(0,1fr) auto;column-gap:12px}.dr-tarj>*{grid-column:1 / -1}.dr-tarj .dr-tr{grid-template-columns:subgrid}.dr-tn{white-space:nowrap}}}
 /* gráficas */
 .dr-gr{display:grid;gap:20px}
 .dr-gr[hidden]{display:none}

@@ -21,8 +21,7 @@
 .pg-tag{display:inline-block;margin-left:8px;font:700 13px/1 var(--f-text);color:var(--amber-text);background:var(--over-bg);padding:4px 8px;border-radius:99px;vertical-align:2px}
 .pg-val{font:700 16px/1 var(--f-text);font-variant-numeric:tabular-nums;color:var(--ink);text-align:right}
 .pg-bar{grid-column:2 / span 2;height:12px;border-radius:99px;background:#EFE4CF;overflow:hidden}
-.pg-bar i{display:block;height:100%;border-radius:99px;background:var(--brand)}
-.pg-ambar .pg-bar i{background:var(--amber)}
+.pg-bar i{display:block;height:100%;border-radius:99px;background:#14213D}
 .pg-nota{margin:0;font:400 16px/1.3 var(--f-text);color:var(--ink-2)}
 .pg-wfz{display:grid;gap:20px}
 @media (min-width:760px){.pg-wfz{grid-template-columns:minmax(0,300px) minmax(0,1fr);gap:40px;align-items:center}.pg-big{font-size:56px}}
@@ -157,7 +156,7 @@ body.dq-abierta{overflow:hidden}
 .pg-sub-n{display:grid;gap:2px;font:800 16px/1.2 var(--f-text);color:var(--ink);min-width:0}
 .pg-sub-n small{font:400 14px/1.2 var(--f-text);color:var(--ink-2);white-space:nowrap;font-variant-numeric:tabular-nums}
 .pg-sub-b{position:relative;height:28px}
-.pg-sub-b i{position:absolute;left:0;top:0;bottom:0;border-radius:8px;background:var(--amber);transform-origin:left;animation:pgCrece .9s ease both}
+.pg-sub-b i{position:absolute;left:0;top:0;bottom:0;border-radius:8px;background:#14213D;transform-origin:left;animation:pgCrece .9s ease both}
 @keyframes pgCrece{from{transform:scaleX(0)}}
 .pg-sub-d{text-align:right;font:800 16px/1.2 var(--f-text);color:var(--amber-text);font-variant-numeric:tabular-nums}
 .pg-sub-d small{display:block;font:400 13px/1.2 var(--f-text);color:var(--ink-2)}
@@ -186,14 +185,14 @@ body:has(.pg-atras:not([hidden])) .pg-vivo{top:calc(var(--hdr) + 56px)}
 @media (max-width:480px){#pgInGr .pg-blq{padding:22px 18px 24px;border-radius:20px}#pgInGr .pg-h{font-size:24px}}
 .pg-ley{display:flex;gap:20px;margin:0;font:600 15px/1 var(--f-text);color:var(--ink-2)}
 .pg-ley span{display:inline-flex;align-items:center;gap:8px}
-.pg-ley i{width:12px;height:12px;border-radius:3px;background:var(--brand)}
-.pg-ley-s i{background:var(--amber)}
+.pg-ley i{width:12px;height:12px;border-radius:3px;background:#1A6E3F}
+.pg-ley-s i{background:#14213D}
 .pg-mm{list-style:none;margin:0;padding:0;display:grid;grid-auto-flow:column;grid-auto-columns:minmax(0,1fr);gap:4px;height:220px}
 .pg-mm li{display:grid;grid-template-rows:minmax(0,1fr) auto;gap:8px;height:100%;border-radius:8px;outline:none;cursor:pointer}
 .pg-mm li.on,.pg-mm li:focus-visible{background:rgba(14,94,111,.08)}
 .pg-mm-b{display:flex;align-items:flex-end;justify-content:center;gap:2px;height:100%}
-.pg-mm-b i{width:42%;max-width:16px;border-radius:4px 4px 0 0;background:var(--brand)}
-.pg-mm-b .pg-mm-s{background:var(--amber)}
+.pg-mm-b i{width:42%;max-width:16px;border-radius:4px 4px 0 0;background:#1A6E3F}
+.pg-mm-b .pg-mm-s{background:#14213D}
 .pg-mm-m{font:600 13px/1 var(--f-text);color:var(--ink-2);text-align:center;white-space:nowrap}
 /* Ver por fechas: día, semana o mes (assets/extracto/ingresos.js) */
 .pg-per-w{display:grid;gap:20px}
@@ -264,8 +263,6 @@ body:has(.pg-atras:not([hidden])) .pg-vivo{top:calc(var(--hdr) + 56px)}
 /* Balance · Gastos · Ingresos */
 .pg-main--3{grid-template-columns:1fr 1fr 1fr}
 .pg-in{display:grid}
-.pg-neg .pg-val{color:var(--amber-text)}
-.pg-neg .pg-bar i{background:var(--amber)}
 .pg-mes-media:not(.pg-neg) .pg-val{color:var(--brand-dark)}
 #pgBal .pg-blq,#pgIn .pg-blq{gap:16px;padding:28px 24px 30px;border-radius:24px;background:#F3E6CC}
 #pgBal .pg-rel,#pgIn .pg-rel{background:var(--brand-tint)}
@@ -277,8 +274,12 @@ body:has(.pg-atras:not([hidden])) .pg-vivo{top:calc(var(--hdr) + 56px)}
 .pg-mes .pg-rk li.pg-mes-media .pg-bar{display:none}
 .pg-mes .pg-rk li.pg-mes-media .pg-nom,.pg-mes .pg-rk li.pg-mes-media .pg-val{color:var(--ink)}
 .pg-mes .pg-rk li.pg-mes-media .pg-val{font-size:20px}
-.pg-pos .pg-val{color:#1E7A46}.pg-pos .pg-bar i{background:#2E9E5B}
-.pg-neg .pg-val{color:#B3261E}.pg-neg .pg-bar i{background:#D9534F}
+.pg-pos .pg-val{color:#1E7A46}
+/* Colores de las barras: Gastos en azul marino, Balance e Ingresos en verde y un mes en negativo en rojo (cifra y barra) */
+#pgBal .pg-bar i,#pgIn .pg-bar i{background:#1A6E3F}
+#pgBal .pg-gasto .pg-bar i{background:#14213D}
+.pg-neg .pg-val{color:#B23A1E}
+.pg-neg .pg-bar i,#pgBal .pg-neg .pg-bar i,#pgIn .pg-neg .pg-bar i{background:#B23A1E}
 /* Resumen / Gráficas: pestañas de texto subrayado, distintas de Balance · Gastos · Ingresos */
 .pg-tabs.pg-tabs--sub{display:flex;justify-content:center;gap:28px;max-width:none;width:auto;padding:0;background:none;border-radius:0}
 .pg-tabs.pg-tabs--sub button{flex:none;min-height:40px;padding:0 2px;border-radius:0;background:none;color:var(--ink-2);font:700 16px/1 var(--f-text);border-bottom:3px solid transparent}

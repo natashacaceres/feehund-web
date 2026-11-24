@@ -270,7 +270,7 @@
     const fila1 = (f, detalle) => {
       const li = el("li", detalle ? "pg-mes-f" : "pg-mes-media"); if (f.signo) li.classList.add(f.v < 0 ? "pg-neg" : "pg-pos");
       const nom = el("span", "pg-nom", f.t); if (f.sub) nom.appendChild(el("small", null, f.sub));
-      const bar = el("span", "pg-bar"); const i = el("i"); i.style.width = Math.max(f.v ? 2 : 0, (Math.abs(f.v) / mx) * 100) + "%"; bar.appendChild(i);
+      const bar = el("span", "pg-bar"); const i = el("i"); i.style.width = "max(6px, " + (Math.abs(f.v) / mx) * 100 + "%)"; bar.appendChild(i);
       li.append(nom, el("span", "pg-val", f.txt), bar); ul.appendChild(li);
       if (!detalle) return;
       abrible(li, "mes", () => { const d = el("li", "pg-mes-d"); d.appendChild(detalle()); return d; });
@@ -301,7 +301,7 @@
       const nom = el("span", "pg-nom", x.n);
       if (ya) nom.appendChild(el("small", null, T.ultimoM(mesL(x.ultimo))));
       else if (I && I.lista.length && x.desde > I.lista[Math.min(1, I.lista.length - 1)].k) nom.appendChild(el("small", null, T.desdeM(mesL(x.desde))));
-      const bar = el("span", "pg-bar"); const i = el("i"); i.style.width = Math.max(2, (x.v / max) * 100) + "%"; bar.appendChild(i);
+      const bar = el("span", "pg-bar"); const i = el("i"); i.style.width = "max(6px, " + (x.v / max) * 100 + "%)"; bar.appendChild(i);
       li.append(nom, el("span", "pg-val", eurM(x.v)), bar); ul.appendChild(li);
     });
     return ul;
@@ -331,14 +331,14 @@
     if (!I.lista.some((m) => m.e)) { gr.appendChild(el("p", "pg-k", T.nada)); return; }
     // En un mes normal, de cada 100 € que te entran: por tipo
     const porT = {}; I.fijos.forEach((x) => { porT[x.t] = (porT[x.t] || 0) + x.v; }); Object.values(I.todo).forEach((x) => { porT[x.k] = (porT[x.k] || 0) + x.v / I.meses; });
-    const tipos = Object.keys(porT).map((t) => ({ t, v: porT[t] })).filter((x) => x.v > 0).sort((a, b) => b.v - a.v), tot = tipos.reduce((a, x) => a + x.v, 0);
-    const cnt = tipos.map((x) => Math.floor((x.v / tot) * 100)); let falta = 100 - cnt.reduce((a, b) => a + b, 0);
-    tipos.map((x, i) => ({ i, r: (x.v / tot) * 100 - cnt[i] })).sort((a, b) => b.r - a.r).forEach((o) => { if (falta > 0) { cnt[o.i]++; falta--; } });
+    const PAL = window.FeehundPaleta;
+    const tipos = PAL.repartir(Object.keys(porT).map((t) => ({ t, v: porT[t] })).filter((x) => x.v > 0), (x) => x.t === "otros", (resto) => ({ t: "otros", v: resto.reduce((a, x) => a + x.v, 0) }));
+    const cq = PAL.cuadros(tipos.map((x) => x.v)), cnt = cq.r;
     const s1 = el("section", "pg-blq"); s1.appendChild(el("h3", "pg-h", T.cada100In));
     const wfz = el("div", "pg-wfz"), wf = el("div", "pg-wf"), wl = el("ul", "pg-wl"); wf.setAttribute("role", "img"); wf.setAttribute("aria-label", T.waffle);
     tipos.forEach((x, n) => {
-      for (let k = 0; k < cnt[n]; k++) { const c = el("i"); c.style.background = COLOR[x.t]; wf.appendChild(c); }
-      const li = el("li"); const tn = el("span", "pg-tn"); const sq = el("i"); sq.style.background = COLOR[x.t]; tn.append(sq, document.createTextNode(T.tiposP[x.t]));
+      for (let k = 0; k < cq.c[n]; k++) { const c = el("i"); c.style.background = x.color; wf.appendChild(c); }
+      const li = el("li"); const tn = el("span", "pg-tn"); const sq = el("i"); sq.style.background = x.color; tn.append(sq, document.createTextNode(T.tiposP[x.t]));
       li.append(el("span", "pg-cnt", cnt[n] ? cnt[n] + " €" : "<1 €"), tn, el("span", "pg-val", eurM(x.v))); wl.appendChild(li);
     });
     wfz.append(wf, wl); s1.appendChild(wfz); gr.appendChild(s1);
@@ -425,7 +425,7 @@
     if (x.d) li.appendChild(ICO_BIZUM(x.d));
     const nom = el("span", "pg-nom", x.n); if (x.d) nom.appendChild(el("small", null, (x.d === "bizum" ? T.bizum : T.transfer) + " · " + T.veces(x.c)));
     const v = x.v / (div || 1);
-    const bar = el("span", "pg-bar"); const i = el("i"); i.style.width = Math.max(2, (v / max) * 100) + "%"; bar.appendChild(i);
+    const bar = el("span", "pg-bar"); const i = el("i"); i.style.width = "max(6px, " + (v / max) * 100 + "%)"; bar.appendChild(i);
     li.append(nom, el("span", "pg-val", eurM(v)), bar); if (x.d) li.classList.add("pg-x--logo"); ul.appendChild(li);
     if (!conMovs) return;
     abrible(li, "mov", () => {
@@ -455,7 +455,7 @@
     const fila1 = (titulo, sub, v, cub, div) => {
       const li = el("li", cub ? "pg-mes-f" : "pg-mes-media"); if (cub) { li.tabIndex = 0; li.setAttribute("role", "button"); li.setAttribute("aria-expanded", "false"); }
       const nom = el("span", "pg-nom", titulo); if (sub) nom.appendChild(el("small", null, sub));
-      const bar = el("span", "pg-bar"); const i = el("i"); i.style.width = Math.max(v ? 2 : 0, (v / mx) * 100) + "%"; bar.appendChild(i);
+      const bar = el("span", "pg-bar"); const i = el("i"); i.style.width = "max(6px, " + (v / mx) * 100 + "%)"; bar.appendChild(i);
       li.append(nom, el("span", "pg-val", eur(v)), bar); ul.appendChild(li);
       if (!cub) return li;
       abrible(li, "mes", () => { const d = el("li", "pg-mes-d"); d.appendChild(desglose(cub, div)); return d; });
@@ -533,12 +533,12 @@
         const d = m.e - m.s;
         return { t: nombreMes(m.k) + " " + m.k.slice(0, 4), sub: subMes(I.lista, n, I.desde, I.hasta), v: d, txt: firmado(d), signo: true, detalle: () => {
           const box2 = el("div", "pg-des"); const ul = el("ul", "pg-rk pg-rk--sin pg-bal-l");
-          const fila2 = (titulo, v, grupos) => {
+          const fila2 = (titulo, v, grupos, gasto) => {
             const li = el("li"); li.append(el("span", "pg-nom", titulo), el("span", "pg-val", eur(v))); ul.appendChild(li);
-            abrible(li, "fila", () => { const det = el("li", "pg-x-d"); const u2 = el("ul", "pg-rk pg-rk--sin"); const mx = Math.max(0.01, ...grupos.map((x) => x.v)); grupos.forEach((x) => fila(u2, x, 0, mx)); det.appendChild(u2); return det; });
+            abrible(li, "fila", () => { const det = el("li", "pg-x-d"); const u2 = el("ul", "pg-rk pg-rk--sin" + (gasto ? " pg-gasto" : "")); const mx = Math.max(0.01, ...grupos.map((x) => x.v)); grupos.forEach((x) => fila(u2, x, 0, mx)); det.appendChild(u2); return det; });
           };
           fila2(T.entroL, m.e, ingresosDelMes(m.k));
-          fila2(T.gastasteL, m.s, gastosDelMes(m.k));
+          fila2(T.gastasteL, m.s, gastosDelMes(m.k), true);
           if (m.trMovs.length) { // lo que moviste entre tus cuentas: se enseña, pero no es ni ingreso ni gasto
             const li = el("li"); li.append(el("span", "pg-nom", T.entreL), el("span", "pg-val", firmado(m.tr))); ul.appendChild(li);
             abrible(li, "fila", () => { const det = el("li", "pg-x-d"); const dl = el("ul", "pg-rk pg-rk--sin pg-mes-l");
@@ -572,7 +572,7 @@
     I.lista.forEach((m) => {
       const li = el("li"); li.tabIndex = 0;
       const b = el("span", "pg-mm-b"); const e = el("i", "pg-mm-e"), x = el("i", "pg-mm-s");
-      e.style.height = Math.max(m.e ? 2 : 0, (m.e / top) * 100) + "%"; x.style.height = Math.max(m.s ? 2 : 0, (m.s / top) * 100) + "%"; b.append(e, x);
+      e.style.height = "max(4px, " + (m.e / top) * 100 + "%)"; x.style.height = "max(4px, " + (m.s / top) * 100 + "%)"; b.append(e, x);
       li.append(b, el("span", "pg-mm-m", T.meses[+m.k.slice(5, 7) - 1]));
       const t = T.mesTip(nombreMes(m.k), eur(m.e), eur(m.s));
       const on = (ev) => { li.classList.add("on"); tip(ev, t); }, off = () => { li.classList.remove("on"); tip(null, ""); };
@@ -584,7 +584,7 @@
     if (I.entra > 0) {
       const g = (k) => (G.todo[k] ? Object.values(G.todo[k]).reduce((a, x) => a + x.v, 0) / G.meses : 0);
       const queda = I.entra - G.total;
-      const L = [[T.pagosFijosL, G.fijosT, "#0E5E6F"], [T.compras, g("dia"), "#C2603A"], [T.envios, g("envios"), "#14213D"], [T.otrosP, g("otros"), "#A8957A"], [queda >= 0 ? T.quedaL : T.faltaL, Math.abs(queda), queda >= 0 ? "#7FC1CC" : "#FFB238"]].filter((x) => x[1] >= 0.5).sort((a, b) => b[1] - a[1]);
+      const L = window.FeehundPaleta.repartir([[T.pagosFijosL, G.fijosT], [T.compras, g("dia")], [T.envios, g("envios")], [T.otrosP, g("otros")], [queda >= 0 ? T.quedaL : T.faltaL, Math.abs(queda)]].filter((x) => x[1] >= 0.5).map(([n, v]) => ({ n, v })), (x) => x.n === T.otrosP, (r) => r[0]).map((x) => [x.n, x.v, x.color]);
       const s1 = el("section", "pg-blq"); s1.appendChild(el("h3", "pg-h", T.cada100In));
       const wl = el("ul", "pg-wl");
       const dentro = {};

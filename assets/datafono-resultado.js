@@ -53,7 +53,8 @@
     },
   };
   const IPC = 0.049; // INE, IPC de octubre de 2026 (igual que «Si sigues así» de Mi banco)
-  const COLORES = ["#0E5E6F", "#7FC1CC", "#3E8F9D", "#FFB238", "#D9C7A5"];
+  // gráficas por categorías: por tamaño, en este orden y sin repetir (las mismas que en Mi banco)
+  const PALETA = ["#14213D", "#B5651D", "#6B4E9B", "#2F7FB8", "#5E8C3A", "#8A8270"];
   const NS = "http://www.w3.org/2000/svg";
   const ICO = {
     paga: '<rect x="3" y="6" width="18" height="12" rx="2"/><path d="M3 10h18M7 15h3"/>',
@@ -117,10 +118,10 @@
     if (filas.length >= 2) {
       const sec = el("section", "r3-blq dr-nuevo dr-tarj");
       sec.append(el("h2", "r3-h", t.tarj), el("p", "dr-q", t.tarjQ));
-      const mx = Math.max(...filas.map((f) => f.v), 0.01), base = Math.min(...filas.map((f) => f.v));
+      const mx = Math.max(...filas.map((f) => f.v), 0.01);
       filas.sort((a, b2) => a.v - b2.v).forEach((f) => {
         const fila = el("div", "dr-tr"), p = el("span", "dr-tp"), i = el("i");
-        i.style.width = Math.max(4, f.v / mx * 100) + "%"; if (f.v > base * 1.6) i.className = "al";
+        i.style.width = "max(6px, " + f.v / mx * 100 + "%)"; if (f.v > 1) i.className = "dr-caro";
         p.appendChild(i); fila.append(el("span", "dr-tn", t.tipos[f.i]), p, el("span", "dr-tv", n2(f.v))); sec.appendChild(fila);
       });
       r3.insertBefore(sec, antesDe);
@@ -168,9 +169,13 @@
       w.map((x, i) => ({ i, r: x * 100 - cnt[i] })).sort((a, b) => b.r - a.r).forEach((o) => { if (falta > 0) { cnt[o.i]++; falta--; } });
       const sec = el("section", "dr-blq"); sec.append(el("h3", "dr-h", t.pagan), el("p", "dr-q", t.paganQ));
       const z = el("div", "dr-wfz"), wf = el("div", "dr-wf"), ul = el("ul", "dr-wl"); wf.setAttribute("aria-hidden", "true");
-      cnt.forEach((k, i) => { for (let j = 0; j < k; j++) { const q = el("i"); q.style.background = COLORES[i]; wf.appendChild(q); } });
-      cnt.map((k, i) => ({ k, i })).filter((o) => o.k > 0).sort((a, b) => b.k - a.k).forEach((o) => {
-        const li = el("li"), sq = el("i"); sq.style.background = COLORES[o.i]; li.append(el("b", null, o.k + " €"), sq, document.createTextNode(t.tipos[o.i])); ul.appendChild(li);
+      // lo que se dibuja: cada tipo que se usa, con 1 cuadro como mínimo (sale del mayor); el color, por tamaño y sin repetir
+      const dib = cnt.slice(); w.forEach((x, i) => { if (x > 0 && dib[i] === 0) { const m = dib.indexOf(Math.max(...dib)); if (dib[m] > 1) { dib[m]--; dib[i] = 1; } } });
+      const orden = w.map((x, i) => ({ x, i })).filter((o) => o.x > 0).sort((a, b) => b.x - a.x), col = {};
+      orden.forEach((o, n) => { col[o.i] = PALETA[n]; });
+      orden.forEach((o) => { for (let j = 0; j < dib[o.i]; j++) { const q = el("i"); q.style.background = col[o.i]; wf.appendChild(q); } });
+      orden.forEach((o) => {
+        const li = el("li"), sq = el("i"); sq.style.background = col[o.i]; li.append(el("b", null, cnt[o.i] ? cnt[o.i] + " €" : "<1 €"), sq, document.createTextNode(t.tipos[o.i])); ul.appendChild(li);
       });
       z.append(wf, ul); sec.appendChild(z); gr.appendChild(sec);
     }

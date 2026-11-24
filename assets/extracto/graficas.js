@@ -74,8 +74,24 @@
     { k: "banco", cats: ["comisiones"] },
   ];
   const tipoDe = (cat) => (TIPOS.find((t) => t.cats.indexOf(cat) >= 0) || { k: "otros" }).k;
-  const COLOR_TIPO = { alquiler: "#0E5E6F", suministros: "#4FA3A5", casa: "#0E5E6F", susc: "#7FC1CC", seg: "#3E8F9D", otros: "#D9C7A5", banco: "#FFB238", fijo: "#A8957A", comida: "#C2603A", ropa: "#E39A7B", ocio: "#5E7F3A", transporte: "#8FB07A", personas: "#14213D", tarjeta: "#6B5B95", nose: "#C9BFAE", efectivo: "#B9AC93" };
-  const COLOR_MAS = ["#9C6644", "#4F5667", "#B08968", "#7A9E9F", "#D4A373"];
+  // Gráficas por categorías (también las de assets/extracto/ingresos.js): los colores van por tamaño y en este orden,
+  // nunca repetidos. Con más de 6, las 5 mayores y el resto junto en «Otros», siempre el último y en gris.
+  const PALETA = ["#14213D", "#B5651D", "#6B4E9B", "#2F7FB8", "#5E8C3A", "#8A8270"];
+  function repartir(L, esOtros, juntar) {
+    let a = L.filter((x) => !esOtros(x)).sort((x, y) => y.v - x.v), o = L.filter(esOtros);
+    if (a.length + Math.min(1, o.length) > 6 || o.length > 1) { const resto = a.slice(5).concat(o); a = a.slice(0, 5); o = resto.length === 1 && esOtros(resto[0]) ? resto : resto.length ? [juntar(resto)] : []; }
+    a.forEach((x, i) => { x.color = PALETA[i]; }); o.forEach((x) => { x.color = PALETA[5]; });
+    return a.concat(o);
+  }
+  // Los 100 cuadros: r es lo que le toca a cada uno (lo que se escribe) y c lo que se dibuja, con 1 como mínimo
+  // para que nada se quede sin verse (ese cuadro sale del mayor)
+  function cuadros(vals) {
+    const tot = vals.reduce((a, v) => a + v, 0) || 1, r = vals.map((v) => Math.floor((v / tot) * 100)); let falta = 100 - r.reduce((a, b) => a + b, 0);
+    vals.map((v, i) => ({ i, d: (v / tot) * 100 - r[i] })).sort((a, b) => b.d - a.d).forEach((o) => { if (falta > 0) { r[o.i]++; falta--; } });
+    const c = r.slice(); c.forEach((k, i) => { if (k === 0) { const m = c.indexOf(Math.max(...c)); if (c[m] > 1) { c[m]--; c[i] = 1; } } });
+    return { r, c };
+  }
+  window.FeehundPaleta = { repartir, cuadros };
 
   function calcRepe(r) {
     const cobros = r.cobros || [], porId = {}; cobros.forEach((c) => { porId[c.id] = c; });
@@ -155,7 +171,7 @@
       // empezó después del principio del extracto: se dice desde cuándo (Octopus, desde marzo)
       if (it.pri && repe.desde && (Date.parse(it.pri) - Date.parse(repe.desde)) / 864e5 > 45) { const sm = document.createElement("small"); sm.textContent = T.desdeMes(T.mesL[+it.pri.slice(5, 7) - 1]); nom.appendChild(sm); }
       const val = document.createElement("span"); val.className = "pg-val"; val.textContent = eurM(it.v / 12);
-      const bar = document.createElement("span"); bar.className = "pg-bar"; const i = document.createElement("i"); i.style.width = Math.max(2, (it.v / max) * 100) + "%"; bar.appendChild(i);
+      const bar = document.createElement("span"); bar.className = "pg-bar"; const i = document.createElement("i"); i.style.width = "max(6px, " + (it.v / max) * 100 + "%)"; bar.appendChild(i);
       li.append(nom, val, bar); rk.appendChild(li);
       const t = T.tipAno(it.n, eur(it.v));
       const on = (e) => { li.classList.add("on"); tip(e, t); }, off = () => { li.classList.remove("on"); tip(null, ""); };
@@ -211,15 +227,10 @@
     // Con Gastos completo (assets/extracto/ingresos.js): todo lo que gastas, también comida, ropa, ocio, personas…
     const GG = window.FeehundGastosG;
     let tipos = GG && GG.cats && GG.cats.length ? GG.cats.map((c) => ({ tk: c.k, label: c.n, v: c.v * 12, quien: c.quien })) : Object.values(porT).sort((a, b) => b.v - a.v);
-    let suma = tipos.reduce((a, t) => a + t.v, 0);
-    if (GG && tipos.length > 6) {
-      const peq = tipos.filter((t) => t.v / suma < 0.03);
-      if (peq.length > 1) { tipos = tipos.filter((t) => peq.indexOf(t) < 0); tipos.push({ tk: "otros", label: T.otrosG, v: peq.reduce((a, t) => a + t.v, 0), quien: peq.map((t) => t.label), sub: peq }); tipos.sort((a, b) => b.v - a.v); }
-      suma = tipos.reduce((a, t) => a + t.v, 0);
-    }
-    const cnt = tipos.map((t) => Math.floor((t.v / suma) * 100)); let falta = 100 - cnt.reduce((a, b) => a + b, 0);
-    tipos.map((t, i) => ({ i, r: (t.v / suma) * 100 - cnt[i] })).sort((a, b) => b.r - a.r).forEach((o) => { if (falta > 0) { cnt[o.i]++; falta--; } });
-    tipos.forEach((t, i) => { t.k = cnt[i]; t.color = COLOR_TIPO[t.tk] || COLOR_MAS[i % COLOR_MAS.length]; });
+    const nomT = (t) => t.label || T.tipos[t.tk];
+    tipos = repartir(tipos, (t) => t.tk === "otros", (resto) => { const sub = [].concat(...resto.map((t) => (t.sub ? t.sub : [t]))); return { tk: "otros", label: T.otrosG, v: resto.reduce((a, t) => a + t.v, 0), quien: sub.map(nomT), sub }; });
+    const cq = cuadros(tipos.map((t) => t.v));
+    tipos.forEach((t, i) => { t.k = cq.r[i]; t.dib = cq.c[i]; });
 
     gr.innerHTML =
       '<div class="pg-vivo"><p class="pg-vivo-t"><i aria-hidden="true"></i>' + esc(T.vivo) + '</p><p class="pg-vivo-n" aria-hidden="true">0,0000 €</p><p class="pg-vivo-s">' + esc(T.desde) + '</p></div>' +
@@ -232,7 +243,7 @@
     // De cada 100 €
     const wf = gr.querySelector(".pg-wf"), wl = gr.querySelector(".pg-wl");
     tipos.forEach((t, n) => {
-      for (let k = 0; k < t.k; k++) { const c = document.createElement("i"); c.dataset.t = n; c.style.background = t.color; wf.appendChild(c); }
+      for (let k = 0; k < t.dib; k++) { const c = document.createElement("i"); c.dataset.t = n; c.style.background = t.color; wf.appendChild(c); }
       const li = document.createElement("li"); li.tabIndex = 0; li.dataset.t = n;
       const ct = document.createElement("span"); ct.className = "pg-cnt"; ct.textContent = t.k ? t.k + " €" : T.menos1;
       const tn = document.createElement("span"); tn.className = "pg-tn"; const sq = document.createElement("i"); sq.style.background = t.color; tn.append(sq, document.createTextNode(t.label || T.tipos[t.tk]));
@@ -326,7 +337,7 @@
       const li = document.createElement("li");
       const n = document.createElement("span"); n.className = "pg-sub-n"; n.textContent = s.n;
       const sm = document.createElement("small"); sm.textContent = nf2.format(s.a) + " € → " + nf2.format(s.b) + " €"; n.appendChild(sm);
-      const bar = document.createElement("span"); bar.className = "pg-sub-b"; const m = document.createElement("i"); m.style.width = Math.max(4, (s.extra / mxE) * 100) + "%"; m.style.animationDelay = (0.2 + i * 0.12) + "s"; bar.appendChild(m);
+      const bar = document.createElement("span"); bar.className = "pg-sub-b"; const m = document.createElement("i"); m.style.width = "max(6px, " + (s.extra / mxE) * 100 + "%)"; m.style.animationDelay = (0.2 + i * 0.12) + "s"; bar.appendChild(m);
       const d = document.createElement("span"); d.className = "pg-sub-d"; d.textContent = "+" + eur(s.extra); const al = document.createElement("small"); al.textContent = T.alAnoP; d.appendChild(al);
       li.append(n, bar, d); ul.appendChild(li);
     });
